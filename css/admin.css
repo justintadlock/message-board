@@ -1,4 +1,21 @@
 
-.edit-tags-php #col-container #col-right {
+.edit-tags-php #col-container #col-right,
+.edit-tags-php #col-container #col-left {
 	width: 100%;
+}
+
+@media only screen and (min-width: 769px) {
+
+	.edit-tags-php #col-container #col-left .col-wrap {
+		overflow: hidden;
+	}
+
+	.edit-tags-php #col-container #col-left .tagcloud {
+		float: right;
+		width: 45%;
+	}
+	.edit-tags-php #col-container #col-left .form-wrap {
+		float: left;
+		width: 45%;
+	}
 }
