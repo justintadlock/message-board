@@ -28,9 +28,9 @@ function mb_register_taxonomies() {
 		array( 'forum_topic' ),
 		array(
 			'public'            => true,
-			'show_ui'           => true,
+			'show_ui'           => false,
 			'show_in_nav_menus' => true,
-			'show_forumcloud'     => true,
+			'show_tagcloud'     => true,
 			'show_admin_column' => true,
 			'hierarchical'      => true,
 			'query_var'         => 'forum',
