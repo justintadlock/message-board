@@ -88,6 +88,7 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/template-view.php'      );
 
 		if ( is_admin() ) {
+			require_once( $this->dir_path . 'admin/admin.php' );
 			require_once( $this->dir_path . 'admin/meta-boxes.php' );
 			require_once( $this->dir_path . 'admin/single-term/class.taxonomy-single-term.php' );
 
