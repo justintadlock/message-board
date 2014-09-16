@@ -223,7 +223,7 @@ function mb_get_topic_last_post_url( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 	$reply_id = mb_get_topic_last_reply_id( $topic_id );
 
-	$url = !empty( $reply_id ) ? mb_get_reply_url( $reply_id ) : mb_get_topic_url( $topic_id );
+	$url = !empty( $reply_id ) ? mb_get_reply_url( $reply_id ) : mb_get_post_jump_url( $topic_id );
 
 	return apply_filters( 'mb_get_topic_last_post_url', $url, $reply_id, $topic_id );
 }

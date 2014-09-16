@@ -67,6 +67,19 @@ function mb_get_post_url( $post_id = 0 ) {
 	return apply_filters( 'mb_get_post_url', get_permalink( $post_id ), $post_id );
 }
 
+function mb_post_jump_url( $post_id = 0 ) {
+	echo mb_get_post_jump_url( $post_id );
+}
+
+/* example.com/board/topics/example/#post-1000 */
+function mb_get_post_jump_url( $post_id = 0 ) {
+	$post_id = mb_get_post_id( $post_id );
+
+	$url = 'forum_topic' === get_post_type( $post_id ) ? esc_url( trailingslashit( get_permalink( $post_id ) ) . '#post-' . get_the_ID() ) : get_permalink( $post_id );
+
+	return apply_filters( 'mb_get_post_jump_url', $url, $post_id );
+}
+
 /* ====== Post Author ====== */
 
 function mb_post_author_id( $post_id = 0 ) {
