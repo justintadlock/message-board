@@ -24,3 +24,20 @@ http://localhost/wp-admin/edit-tags.php?taxonomy=forum_tag&post_type=forum_topic
 */
 
 }
+
+add_action( 'admin_enqueue_scripts', 'mb_admin_enqueue_scripts' );
+
+function mb_admin_enqueue_scripts( $hook_suffix ) {
+	global $typenow;
+
+	if ( 'edit-tags.php' === $hook_suffix && 'forum_topic' === $typenow )
+		wp_enqueue_style( 'mb-admin', trailingslashit( message_board()->dir_uri ) . 'css/admin.css' );
+}
+
+
+
+
+
+
+
+
