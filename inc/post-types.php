@@ -89,8 +89,6 @@ function mb_register_post_types() {
 		'supports' => array(
 			'title',
 			'editor',
-			'comments',
-			'custom-fields'
 		),
 
 		'labels' => array(
@@ -164,8 +162,6 @@ function mb_register_post_types() {
 		'supports' => array(
 			'title',
 			'editor',
-			'comments',
-			'custom-fields'
 		),
 
 		'labels' => array(
