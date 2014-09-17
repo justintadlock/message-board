@@ -259,7 +259,7 @@ function mb_topic_voice_count( $topic_id = 0 ) {
 
 function mb_get_topic_voice_count( $topic_id = 0 ) {
 	$topic_id     = mb_get_topic_id( $topic_id );
-	$voice_count  = get_post_meta( $topic_id, '_topic_voice_count' );
+	$voice_count  = get_post_meta( $topic_id, '_topic_voice_count', true );
 
 	$voice_count = $voice_count ? absint( $voice_count ) : count( mb_get_topic_voices( $topic_id ) );
 
@@ -545,11 +545,19 @@ function mb_get_topic_subscribers( $topic_id = 0 ) {
 	$users = wp_cache_get( 'mb_get_topic_subscribers_' . $topic_id, 'message-board-users' );
 
 	if ( false === $users ) {
-		$users = $wpdb->get_col( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = '_topic_subscriptions' and FIND_IN_SET( '{$topic_id}', meta_value ) > 0" );
-		wp_cache_set( 'mb_get_topic_subscribers_' . $topic_id, $users, 'message-board-users' );
+		$users = mb_set_topic_subscribers( $topic_id );
 	}
 
 	return apply_filters( 'mb_get_topic_subscribers', $users );
+}
+
+function mb_set_topic_subscribers( $topic_id ) {
+	global $wpdb;
+
+	$users = $wpdb->get_col( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = '_topic_subscriptions' and FIND_IN_SET( '{$topic_id}', meta_value ) > 0" );
+	wp_cache_set( 'mb_get_topic_subscribers_' . $topic_id, $users, 'message-board-users' );
+
+	return $users;
 }
 
 /* ====== Topic Favorites ====== */

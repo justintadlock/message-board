@@ -70,11 +70,15 @@ function mb_template_redirect() {
 
 			if ( $published ) {
 				wp_set_post_terms( $published, array( absint( $_POST['mb_topic_forum'] ) ), 'forum' );
+
+				//mb_notify_topic_subscribers( $topic_id );
+
 				wp_safe_redirect( get_permalink( $published ) );
 			}
 		}
 	}
 }
+
 function mb_new_reply_handler() {
 
 	if ( !isset( $_GET['message-board'] ) || !in_array( $_GET['message-board'], array( 'new-reply' ) ) )
@@ -152,19 +156,19 @@ function mb_new_reply_handler() {
 
 		if ( empty( $voices ) || !in_array( $user_id, $voices ) ) {
 			add_post_meta( $topic_id, '_topic_voices', $user_id );
+
+			$count = count( $voices ) + 1;
+
+			update_post_meta( $topic_id, '_topic_voice_count', $count );
 		}
-
-		$voices = get_post_meta( $topic_id, '_topic_voices' );
-
-		$count = count( $voices );
-
-		update_post_meta( $topic_id, '_topic_voice_count', $count );
 
 			$count = get_post_meta( $topic_id, '_topic_reply_count', true );
 
 				$i = absint( $count ) + 1;
 
 				update_post_meta( $topic_id, '_topic_reply_count', $i );
+
+				mb_notify_topic_subscribers( $topic_id, $published );
 
 				wp_safe_redirect( get_permalink( $published ) );
 			}
@@ -204,6 +208,8 @@ function mb_topic_subscribe_handler() {
 			$new_subscriptions   = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
 
 			update_user_meta( $user_id, '_topic_subscriptions', $new_subscriptions );
+
+			mb_set_topic_subscribers( $topic_id );
 		}
 
 	} elseif ( 0 < $user_id && 0 < $topic_id && 'unsubscribe' === $_GET['action'] ) {
@@ -222,6 +228,8 @@ function mb_topic_subscribe_handler() {
 			$new_subscriptions   = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
 
 			update_user_meta( $user_id, '_topic_subscriptions', $new_subscriptions );
+
+			mb_set_topic_subscribers( $topic_id );
 		}
 	}
 
