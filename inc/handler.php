@@ -69,6 +69,21 @@ function mb_template_redirect() {
 			);
 
 			if ( $published ) {
+
+				if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] ) {
+
+					$subscriptions = get_user_meta( absint( $user_id ), '_topic_subscriptions', true );
+					$subs = explode( ',', $subscriptions );
+
+					if ( !in_array( $published, $subs ) ) {
+						$subs[] = $published;
+
+						$new_subscriptions   = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
+
+						update_user_meta( absint( $user_id ), '_topic_subscriptions', $new_subscriptions );
+					}
+				}
+
 				wp_set_post_terms( $published, array( absint( $_POST['mb_topic_forum'] ) ), 'forum' );
 
 				//mb_notify_topic_subscribers( $topic_id );
@@ -136,6 +151,22 @@ function mb_new_reply_handler() {
 			);
 
 			if ( $published ) {
+
+				if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] ) {
+
+					$subscriptions = get_user_meta( absint( $user_id ), '_topic_subscriptions', true );
+					$subs = explode( ',', $subscriptions );
+
+					if ( !in_array( $topic_id, $subs ) ) {
+						$subs[] = $topic_id;
+
+						$new_subscriptions   = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
+
+						update_user_meta( absint( $user_id ), '_topic_subscriptions', $new_subscriptions );
+
+						mb_set_topic_subscribers( $topic_id );
+					}
+				}
 
 
 

@@ -410,14 +410,14 @@ function mb_get_topic_form() {
 
 	// title field
 	$default_fields['title']  = '<p>';
-	$default_fields['title'] .= sprintf( '<label for="mb_topic_title">%s</label>', __( 'Title', 'message-board' ) );
+	$default_fields['title'] .= sprintf( '<label for="mb_topic_title">%s</label>', __( 'Topic title: (be brief and descriptive)', 'message-board' ) );
 	$default_fields['title'] .= '<input type="text" id="mb_topic_title" name="mb_topic_title" />';
 	$default_fields['title'] .= '</p>';
 
 	// forum field
 	if ( !is_tax( 'forum' ) ) {
 		$default_fields['forum'] = '<p>';
-		$default_fields['forum'] .= sprintf( '<label for="mb_topic_forum">%s</label>', __( 'Forum', 'message-board' ) );
+		$default_fields['forum'] .= sprintf( '<label for="mb_topic_forum">%s</label>', __( 'Select a forum:', 'message-board' ) );
 		$default_fields['forum'] .= wp_dropdown_categories(
 			array(
 				'name'          => 'mb_topic_forum',
@@ -454,6 +454,9 @@ function mb_get_topic_form() {
 		$form .= sprintf( '<input type="hidden" name="mb_topic_forum" value="%s" />', absint( get_queried_object_id() ) );
 
 	$form .= sprintf( '<p><input type="submit" value="%s" /></p>', esc_attr__( 'Submit', 'message-board' ) );
+
+	$form .= sprintf( '<p><label><input type="checkbox" name="mb_topic_subscribe" value="1" /> %s</label></p>', __( 'Notify me of follow-up posts via email', 'message-board' ) );
+
 	$form .= wp_nonce_field( 'mb_new_topic_action', 'mb_new_topic_nonce', false, false );
 	$form .= '</fieldset>';
 	$form .= '</form>';
