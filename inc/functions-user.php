@@ -18,7 +18,8 @@ function mb_notify_topic_subscribers( $topic_id, $reply_id ) {
 
 	$blog_name     = esc_html( strip_tags( get_option( 'blogname' ) ) );
 
-	$from          = '<noreply@' . ltrim( get_home_url(), '^(http|https)://' ) . '>';
+	$site_url      = untrailingslashit( str_replace( array( 'http://', 'https://' ), '', home_url() ) );
+	$from          = '<noreply@' . $site_url . '>';
 
 	$message = sprintf( 
 		__( '%1$s replied: %4$s%2$s %4$sPost Link: %3$s %4$sYou are receiving this email because you subscribed to a forum topic. Log in and visit the topic to unsubscribe from these emails.', 'message-board' ),
