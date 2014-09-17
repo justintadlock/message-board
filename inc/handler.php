@@ -271,6 +271,8 @@ function mb_topic_favorite_handler() {
 			$new_favorites   = implode( ',', wp_parse_id_list( array_filter( $favs ) ) );
 
 			update_user_meta( $user_id, '_topic_favorites', $new_favorites );
+
+			mb_set_topic_favoriters( $topic_id );
 		}
 
 	} elseif ( 0 < $user_id && 0 < $topic_id && 'unfavorite' === $_GET['action'] ) {
@@ -289,6 +291,8 @@ function mb_topic_favorite_handler() {
 			$new_favorites   = implode( ',', wp_parse_id_list( array_filter( $favs ) ) );
 
 			update_user_meta( $user_id, '_topic_favorites', $new_favorites );
+
+			mb_set_topic_favoriters( $topic_id );
 		}
 	}
 

@@ -533,14 +533,11 @@ function mb_is_user_subscribed_to_topic( $user_id, $topic_id ) {
 	return in_array( $topic_id, $subs ) ? true : false;
 }
 
-/* @todo - Delete cache when user un/subscribes. */
 function mb_get_topic_subscribers( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
 	if ( empty( $topic_id ) )
 		return;
-
-	global $wpdb;
 
 	$users = wp_cache_get( 'mb_get_topic_subscribers_' . $topic_id, 'message-board-users' );
 
@@ -624,21 +621,26 @@ function mb_is_user_favorite_topic( $user_id, $topic_id ) {
 	return in_array( $topic_id, $favs ) ? true : false;
 }
 
-/* @todo - Delete cache when user un/favorites. */
 function mb_get_topic_favoriters( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
 	if ( empty( $topic_id ) )
 		return;
 
-	global $wpdb;
-
-	$key   = '_topic_favorites';
 	$users = wp_cache_get( 'mb_get_topic_favoriters_' . $topic_id, 'message-board-users' );
+
 	if ( false === $users ) {
-		$users = $wpdb->get_col( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = '{$key}' and FIND_IN_SET('{$topic_id}', meta_value) > 0" );
-		wp_cache_set( 'mb_get_topic_favoriters_' . $topic_id, $users, 'message-board-users' );
+		$users = mb_set_topic_favoriters();
 	}
 
 	return apply_filters( 'mb_get_topic_favoriters', $users );
+}
+
+function mb_set_topic_favoriters( $topic_id ) {
+	global $wpdb;
+
+	$users = $wpdb->get_col( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = '_topic_favorites' and FIND_IN_SET( '{$topic_id}', meta_value ) > 0" );
+	wp_cache_set( 'mb_get_topic_favoriters_' . $topic_id, $users, 'message-board-users' );
+
+	return $users;
 }
