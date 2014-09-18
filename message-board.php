@@ -156,7 +156,8 @@ final class Message_Board {
 			array(
 				'title' => __( 'Popular', 'message-board' ),
 				'query' => array(
-					'orderby' => 'comment_count',
+					'orderby'  => 'meta_value_num',
+					'meta_key' => '_topic_reply_count'
 				)
 			)
 		);
