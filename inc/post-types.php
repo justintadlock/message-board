@@ -120,7 +120,7 @@ function mb_register_post_types() {
 		'show_in_nav_menus'   => false,
 		'show_ui'             => true,
 		'show_in_menu'        => false,
-		'show_in_admin_bar'   => true,
+		'show_in_admin_bar'   => false,
 		'menu_position'       => null,
 		'menu_icon'           => null,
 		'can_export'          => true,

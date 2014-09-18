@@ -77,6 +77,7 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/handler.php'        );
 		require_once( $this->dir_path . 'inc/shortcodes.php'     );
 		require_once( $this->dir_path . 'inc/options.php'        );
+		require_once( $this->dir_path . 'inc/admin-bar.php'      );
 
 		/* Templates. */
 		require_once( $this->dir_path . 'inc/template-hierarchy.php' );
