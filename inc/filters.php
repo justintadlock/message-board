@@ -24,7 +24,6 @@ add_filter( 'map_meta_cap', 'mb_map_meta_cap', 10, 4 );
 /* Meta filters. See `meta.php`. */
 add_action( 'init',              'mb_register_meta'         );
 add_action( 'save_post',         'mb_save_post',      10, 2 );
-add_action( 'wp_insert_comment', 'mb_insert_comment', 10, 2 );
 
 /* Rewrite filters. See `rewrite.php`. */
 add_action( 'init',                      'mb_rewrite_rules',            5     );
