@@ -64,7 +64,7 @@ function mb_reply_post_type_link( $link, $post ) {
 
 		// Don't include pagination if on first page
 		if ( 1 >= $reply_page ) {
-			$url = trailingslashit( $topic_url ) . $reply_hash;
+			$url = $topic_url . $reply_hash;
 
 		// Include pagination
 		} else {
@@ -72,7 +72,7 @@ function mb_reply_post_type_link( $link, $post ) {
 
 			// Pretty permalinks
 			if ( $wp_rewrite->using_permalinks() ) {
-				$url = trailingslashit( $topic_url ) . trailingslashit( $wp_rewrite->pagination_base ) . trailingslashit( $reply_page ) . $reply_hash;
+				$url = trailingslashit( $topic_url ) . trailingslashit( $wp_rewrite->pagination_base ) . $reply_page . $reply_hash;
 
 			// Yucky links
 			} else {

@@ -75,7 +75,7 @@ function mb_post_jump_url( $post_id = 0 ) {
 function mb_get_post_jump_url( $post_id = 0 ) {
 	$post_id = mb_get_post_id( $post_id );
 
-	$url = 'forum_topic' === get_post_type( $post_id ) ? esc_url( trailingslashit( get_permalink( $post_id ) ) . '#post-' . get_the_ID() ) : get_permalink( $post_id );
+	$url = 'forum_topic' === get_post_type( $post_id ) ? esc_url( get_permalink( $post_id ) . '#post-' . get_the_ID() ) : get_permalink( $post_id );
 
 	return apply_filters( 'mb_get_post_jump_url', $url, $post_id );
 }
