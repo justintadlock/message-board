@@ -16,6 +16,12 @@ function mb_template_include( $template ) {
 		);
 	}
 
+	elseif ( is_singular( 'forum_topic' ) && get_query_var( 'edit' ) && current_user_can( 'edit_post', absint( get_query_var( 'edit' ) ) ) ) {
+		$has_template = locate_template( 
+			array( "{$dir}/edit.php", "{$dir}/board.php" ) 
+		);
+	}
+
 	elseif ( is_singular( 'forum_topic' ) ) {
 		$has_template = locate_template( 
 			array( "{$dir}/single-topic.php", "{$dir}/board.php" ) 

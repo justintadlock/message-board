@@ -3,6 +3,7 @@
 
 add_action( 'template_redirect', 'mb_new_reply_handler', 0 );
 add_action( 'template_redirect', 'mb_template_redirect', 0 );
+add_action( 'template_redirect', 'mb_edit_post_handler', 0 );
 add_action( 'template_redirect', 'mb_topic_subscribe_handler', 1 );
 add_action( 'template_redirect', 'mb_topic_favorite_handler', 1 );
 
@@ -202,6 +203,97 @@ function mb_new_reply_handler() {
 				mb_notify_topic_subscribers( $topic_id, $published );
 
 				wp_safe_redirect( get_permalink( $published ) );
+			}
+		}
+	}
+}
+
+function mb_edit_post_handler() {
+
+	if ( !isset( $_GET['message-board'] ) || !in_array( $_GET['message-board'], array( 'edit' ) ) )
+		return;
+
+	if ( isset( $_POST['mb_edit_post_nonce'] ) ) {
+ 
+		if ( !wp_verify_nonce( $_POST['mb_edit_post_nonce'], 'mb_edit_post_action' ) ) {
+			wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
+			exit;
+		} else {
+
+			if ( empty( $_POST['mb_post_id'] ) ) {
+				wp_die( __( 'No post ID found!', 'message-board' ) );
+			}
+
+			$post = get_post( absint( $_POST['mb_post_id'] ) );
+
+			if ( is_wp_error( $post ) || empty( $post ) ) {
+				wp_die( __( 'Post not found!', 'message-board' ) );
+			}
+
+			if ( 'forum_topic' === $post->post_type ) {
+
+				if ( isset( $_POST['mb_post_title'] ) ) {
+
+					$new_title = $_POST['mb_post_title'];
+
+					if ( !empty( $new_title ) && $new_title !== $post->post_title ) {
+						$post_title = esc_html( strip_tags( $new_title ) );
+					}
+
+				}
+
+				if ( isset( $_POST['mb_post_forum'] ) ) {
+					$new_forum = $_POST['mb_post_forum'];
+
+					$terms = get_the_terms( $post->ID, 'forum' );
+					$forum = array_shift( $terms );
+
+					if ( !empty( $new_forum ) && $new_forum !== $forum->term_id ) {
+
+						$post_forum = absint( $new_forum );
+					}
+				}
+			} // end check for 'forum_topic'
+
+			if ( empty( $_POST['mb_post_content'] ) ) {
+
+				wp_die( __( 'You did not enter any content!', 'message-board' ) );
+				exit;
+			} else {
+
+				/* Post content. */
+				if ( !current_user_can( 'unfiltered_html' ) ) {
+					$post_content = wp_filter_post_kses( $_POST['mb_post_content'] );
+				} else {
+					$post_content = $_POST['mb_post_content'];
+				}
+			}
+
+			$user_id = get_current_user_id();
+
+			if ( empty( $user_id ) ) {
+				wp_die( 'Did not recognize user ID.', 'message-board' );
+				exit;
+			}
+
+			$post_date = current_time( 'mysql' );
+
+			/* Update. */
+			$post_arr = array( 'ID' => $post->ID, 'post_content' => $post_content );
+
+			if ( !empty( $post_title ) ) {
+				$post_arr['post_title'] = $post_title;
+			}
+
+			$updated = wp_update_post( $post_arr );
+
+			if ( $updated ) {
+
+				if ( !empty( $post_forum ) ) {
+					wp_set_post_terms( $updated, array( absint( $post_forum ) ), 'forum' );
+				}
+
+				wp_safe_redirect( get_permalink( $updated ) );
 			}
 		}
 	}

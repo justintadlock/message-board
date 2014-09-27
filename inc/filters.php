@@ -18,6 +18,9 @@ add_filter( 'mb_get_post_content',                   'make_clickable',       40 
 add_filter( 'the_title', 'mb_forum_reply_title_filter', 5, 2 );
 add_filter( 'post_title', 'mb_forum_reply_title_filter', 5, 2 );
 
+/* Edit post link filters. */
+add_filter( 'get_edit_post_link', 'mb_get_edit_post_link', 5, 2 );
+
 /* Capabilities. See `capabilities.php`. */
 add_filter( 'map_meta_cap', 'mb_map_meta_cap', 10, 4 );
 
@@ -93,4 +96,32 @@ function mb_forum_reply_title_filter( $title, $post_id ) {
 	}
 
 	return $title;
+}
+
+function mb_get_edit_post_link( $url, $post_id ) {
+
+	$post_type = get_post_type( $post_id );
+
+	if ( 'forum_topic' === $post_type || 'forum_reply' === $post_type ) {
+
+		if ( 'forum_topic' === $post_type ) {
+			$topic_link = get_permalink( $post_id );
+		} else {
+			$post = get_post( $post_id );
+			$topic_link = get_permalink( $post->post_parent );
+		}
+
+		global $wp_rewrite;
+
+		if ( $wp_rewrite->using_permalinks() ) {
+			$url = trailingslashit( $topic_link ) . 'edit/' . $post_id;
+
+		} else {
+			$url = add_query_arg( 'edit', $post_id, $topic_link );
+		}
+
+		$url = esc_url( $url );
+	}
+
+	return $url;
 }

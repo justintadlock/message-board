@@ -30,6 +30,16 @@ function mb_get_user_slug() {
 	return apply_filters( 'mb_get_user_slug', mb_maybe_get_root_slug() . 'users' );
 }
 
+function mb_query_vars( $vars ) {
+
+	if ( !array_search( 'edit', $vars ) )
+		$vars[] = 'edit';
+
+	return $vars;
+}
+
+add_filter( 'query_vars', 'mb_query_vars' );
+
 /**
  * Sets up custom rewrite rules for pages that aren't handled by the CPT and CT APIs but are needed by 
  * the plugin.
@@ -96,6 +106,7 @@ function mb_forum_topic_rewrite_rules( $rules ) {
 		$topic_slug . '/page/?([0-9]{1,})/?$'                                      => 'index.php?post_type=forum_topic&paged=$matches[1]',
 		$topic_slug . '/([^/]+)/page/([0-9]{1,})/?$'                               => 'index.php?forum_topic=$matches[1]&paged=$matches[2]',
 		$topic_slug . '/([^/]+)(/[0-9]+)?/?$'                                      => 'index.php?forum_topic=$matches[1]&page=$matches[2]',
+		$topic_slug . '/([^/]+)/edit/([0-9]+)?/?$'                                 => 'index.php?forum_topic=$matches[1]&edit=$matches[2]',
 		$topic_slug . '/[^/]+/([^/]+)/?$'                                          => 'index.php?attachment=$matches[1]',
 		$topic_slug . '/[^/]+/([^/]+)/trackback/?$'                                => 'index.php?attachment=$matches[1]&tb=1',
 		$topic_slug . '/[^/]+/([^/]+)/feed/(feed|rdf|rss|rss2|atom)/?$'            => 'index.php?attachment=$matches[1]&feed=$matches[2]',
