@@ -76,6 +76,7 @@ function mb_encodeit( $matches ) {
 	$text = str_replace(  '&amp;amp;',           '&amp;', $text );
 	$text = str_replace(  '&amp;lt;',            '&lt;',  $text );
 	$text = str_replace(  '&amp;gt;',            '&gt;',  $text );
+	$text = str_replace( array( '&quot;' ),                   '"',           $text );
 
 	$text = "<code>$text</code>";
 
@@ -109,11 +110,65 @@ function mb_decodeit( $matches ) {
 	$text = str_replace( '<br />',                 '<coded_br />', $text );
 	$text = str_replace( '<p>',                    '<coded_p>',    $text );
 	$text = str_replace( '</p>',                   '</coded_p>',   $text );
-	$text = str_replace( array( '&#38;','&amp;' ), '&',            $text );
-	$text = str_replace( '&#39;',                   "'",           $text );
+	$text = str_replace( array( '&#038;', '&#38;','&amp;' ), '&',            $text );
+	$text = str_replace( array( '&#039;', '&#39;' ),                   "'",           $text );
+	$text = str_replace( array( '&quot;' ),                   '"',           $text );
 
 	if ( '<pre><code>' == $matches[1] )
-		$text = "\n$text\n";
+		return preg_replace( "|\n\n\n+|",           "\n\n",  "\n`\n$text\n`" );
 
 	return "`$text`";
+}
+
+
+
+function _mb_encode_bad_empty(&$text, $key, $preg) {
+	if (strpos($text, '`') !== 0)
+		$text = preg_replace("|&lt;($preg)\s*?/*?&gt;|i", '<$1 />', $text);
+}
+
+function _mb_encode_bad_normal(&$text, $key, $preg) {
+	if (strpos($text, '`') !== 0)
+		$text = preg_replace("|&lt;(/?$preg)&gt;|i", '<$1>', $text);
+}
+
+function mb_encode_bad( $text ) {
+	//$text = esc_html( $text );
+
+	$text = preg_split('@(`[^`]*`)@m', $text, -1, PREG_SPLIT_NO_EMPTY + PREG_SPLIT_DELIM_CAPTURE);
+
+	$allowed = mb_allowed_tags();
+	$empty = array( 'br' => true, 'hr' => true, 'img' => true, 'input' => true, 'param' => true, 'area' => true, 'col' => true, 'embed' => true );
+
+	foreach ( $allowed as $tag => $args ) {
+		$preg = $args ? "$tag(?:\s.*?)?" : $tag;
+
+		if ( isset( $empty[$tag] ) )
+			array_walk($text, '_mb_encode_bad_empty', $preg);
+		else
+			array_walk($text, '_mb_encode_bad_normal', $preg);
+	}
+
+	return join('', $text);
+}
+
+
+
+function mb_allowed_tags() {
+	$tags = array(
+		'a' => array(
+			'href' => array(),
+			'title' => array(),
+			'rel' => array()),
+		'blockquote' => array('cite' => array()),
+		'br' => array(),
+		'code' => array(),
+		'pre' => array(),
+		'em' => array(),
+		'strong' => array(),
+		'ul' => array(),
+		'ol' => array(),
+		'li' => array()
+	);
+	return apply_filters( 'mb_allowed_tags', $tags );
 }

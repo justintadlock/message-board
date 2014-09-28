@@ -40,7 +40,11 @@ function mb_template_redirect() {
 
 				/* Post content. */
 				if ( !current_user_can( 'unfiltered_html' ) ) {
-					$post_content = wp_filter_post_kses( $_POST['mb_topic_content'] );
+					$post_content = $_POST['mb_topic_content'];
+					$post_content = mb_encode_bad( $post_content );
+					$post_content = mb_code_trick( $post_content );
+					$post_content = force_balance_tags( $post_content );
+					$post_content = wp_filter_post_kses( $post_content );
 				} else {
 					$post_content = $_POST['mb_topic_content'];
 				}
@@ -123,7 +127,11 @@ function mb_new_reply_handler() {
 
 				/* Post content. */
 				if ( !current_user_can( 'unfiltered_html' ) ) {
-					$post_content = wp_filter_post_kses( $_POST['mb_reply_content'] );
+					$post_content = $_POST['mb_reply_content'];
+					$post_content = mb_encode_bad( $post_content );
+					$post_content = mb_code_trick( $post_content );
+					$post_content = force_balance_tags( $post_content );
+					$post_content = wp_filter_post_kses( $post_content );
 				} else {
 					$post_content = $_POST['mb_reply_content'];
 				}
@@ -263,7 +271,11 @@ function mb_edit_post_handler() {
 
 				/* Post content. */
 				if ( !current_user_can( 'unfiltered_html' ) ) {
-					$post_content = wp_filter_post_kses( $_POST['mb_post_content'] );
+					$post_content = $_POST['mb_post_content'];
+					$post_content = mb_encode_bad( $post_content );
+					$post_content = mb_code_trick( $post_content );
+					$post_content = force_balance_tags( $post_content );
+					$post_content = wp_filter_post_kses( $post_content );
 				} else {
 					$post_content = $_POST['mb_post_content'];
 				}
