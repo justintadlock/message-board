@@ -78,6 +78,7 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/shortcodes.php'     );
 		require_once( $this->dir_path . 'inc/options.php'        );
 		require_once( $this->dir_path . 'inc/admin-bar.php'      );
+		require_once( $this->dir_path . 'inc/forum-meta.php'     );
 
 		/* Templates. */
 		require_once( $this->dir_path . 'inc/template-hierarchy.php' );
@@ -152,6 +153,10 @@ final class Message_Board {
 
 	public function register_views() {
 
+		/* Temporary: @todo - move to own function. */
+		global $wpdb;
+		$wpdb->termmeta = $wpdb->prefix . 'termmeta';
+
 		mb_register_view(
 			'popular',
 			array(
@@ -206,6 +211,36 @@ final class Message_Board {
 			$role->add_cap( 'edit_forum_topics' );
 			$role->add_cap( 'create_forum_replies' );
 			$role->add_cap( 'edit_forum_replies' );
+		}
+
+		$term_meta_table = _get_meta_table( 'term' );
+
+		if ( false === $term_meta_table ) {
+			global $wpdb;
+
+			$table_name      = $wpdb->prefix . 'termmeta';
+			$charset_collate = '';
+
+			if ( ! empty( $wpdb->charset ) ) {
+				$charset_collate = "DEFAULT CHARACTER SET {$wpdb->charset}";
+			}
+
+			if ( ! empty( $wpdb->collate ) ) {
+				$charset_collate .= " COLLATE {$wpdb->collate}";
+			}
+
+			$sql = "CREATE TABLE $table_name (
+				meta_id bigint(20) unsigned NOT NULL auto_increment,
+				term_id bigint(20) unsigned NOT NULL default '0',
+				meta_key varchar(255) default NULL,
+				meta_value longtext,
+				PRIMARY KEY  (meta_id),
+				KEY term_id (term_id),
+				KEY meta_key (meta_key)
+			) $charset_collate;";
+
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+			dbDelta( $sql );
 		}
 	}
 }

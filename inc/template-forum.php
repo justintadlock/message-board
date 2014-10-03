@@ -90,13 +90,67 @@ function mb_get_forum_link( $forum_id = 0 ) {
 
 
 
-
 function mb_forum_topic_count( $forum_id ) {
 	echo mb_get_forum_topic_count( $forum_id );
 }
 
 function mb_get_forum_topic_count( $forum_id ) {
 	return get_term( absint( $forum_id ), 'forum' )->count;
+}
+
+function mb_forum_post_count( $forum_id ) {
+	echo mb_get_forum_post_count( $forum_id );
+}
+
+function mb_get_forum_post_count( $forum_id ) {
+
+	$topic_count = mb_get_forum_topic_count( $forum_id );
+	$reply_count = mb_get_forum_reply_count( $forum_id );
+
+	return $topic_count + $reply_count;
+}
+
+function mb_forum_reply_count( $forum_id ) {
+	echo mb_get_forum_reply_count( $forum_id );
+}
+
+function mb_get_forum_reply_count( $forum_id ) {
+
+	$count = mb_get_forum_meta( $forum_id, '_forum_reply_count', true );
+
+	if ( empty( $count ) )
+		$count = mb_set_forum_reply_count( $forum_id );
+
+	return $count;
+}
+
+function mb_set_forum_reply_count( $forum_id ) {
+
+	$topic_ids = mb_get_forum_topic_ids( $forum_id );
+
+	if ( empty( $topic_ids ) )
+		return 0;
+
+	$reply_ids = mb_get_multi_topic_reply_ids( $topic_ids );
+
+	$count = !empty( $reply_ids ) ? count( $reply_ids ) : 0;
+
+	if ( !empty( $count ) )
+		mb_update_forum_meta( $forum_id, '_forum_reply_count', $count );
+
+	return $count;
+}
+
+function mb_get_forum_topic_ids( $forum_id ) {
+	$topic_ids = get_objects_in_term( $forum_id, 'forum' );
+
+	return ( !is_wp_error( $topic_ids ) && !empty( $topic_ids ) ) ? $topic_ids : array();
+}
+
+function mb_get_multi_topic_reply_ids( $topic_ids ) {
+	global $wpdb;
+
+	return $wpdb->get_col( "SELECT ID FROM {$wpdb->posts} WHERE post_parent IN ( " . implode( ',', $topic_ids ) . " )" );
 }
 
 function mb_forum_title( $forum_id ) {

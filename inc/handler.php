@@ -89,10 +89,17 @@ function mb_template_redirect() {
 					}
 				}
 
-				wp_set_post_terms( $published, array( absint( $_POST['mb_topic_forum'] ) ), 'forum' );
+				$forum_id = absint( $_POST['mb_topic_forum'] );
 
-				//mb_notify_topic_subscribers( $topic_id );
+				wp_set_post_terms( $published, array( $forum_id ), 'forum' );
 
+				/* Update forum meta. */
+
+				mb_update_forum_meta( $forum_id, '_forum_activity_datetime', $post_date );
+				mb_update_forum_meta( $forum_id, '_forum_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
+				mb_update_forum_meta( $forum_id, '_forum_last_topic_id', $published );
+
+				/* Redirect. */
 				wp_safe_redirect( get_permalink( $published ) );
 			}
 		}
@@ -187,6 +194,16 @@ function mb_new_reply_handler() {
 		$old_topic['ID'] = $topic_id;
 
 		wp_insert_post( $old_topic );
+
+		$forum_id = mb_get_topic_forum_id( $topic_id );
+
+		mb_update_forum_meta( $forum_id, '_forum_activity_datetime', $post_date );
+		mb_update_forum_meta( $forum_id, '_forum_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
+		mb_update_forum_meta( $forum_id, '_forum_last_reply_id', $published );
+
+		$count = get_post_meta( $forum_id, '_forum_reply_count', true );
+		update_post_meta( $forum_id, '_forum_reply_count', absint( $count ) + 1 );
+
 
 		update_post_meta( $topic_id, '_topic_activity_datetime',       $reply_date );
 		update_post_meta( $topic_id, '_topic_activity_datetime_epoch', mysql2date( 'U', $reply_date ) );
