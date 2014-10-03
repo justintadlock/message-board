@@ -1,5 +1,14 @@
 <?php
 
+/* ====== Lead Topic ====== */
+
+function mb_show_lead_topic() {
+
+	$show_lead = is_paged() ? false : true;
+
+	return apply_filters( 'mb_show_lead_topic', $show_lead );
+}
+
 /* ====== Topic Labels ====== */
 
 function mb_topic_labels( $topic_id = 0 ) {
