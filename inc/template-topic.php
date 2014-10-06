@@ -97,6 +97,17 @@ function mb_get_topic_url( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_url', mb_get_post_url( $topic_id ), $topic_id );
 }
 
+function mb_topic_link( $topic_id = 0 ) {
+	echo mb_get_topic_link( $topic_id );
+}
+
+function mb_get_topic_link( $topic_id = 0 ) {
+	$url   = mb_get_topic_url(   $topic_id );
+	$title = mb_get_topic_title( $topic_id );
+
+	return sprintf( '<a href="%s">%s</a>', $url, $title );
+}
+
 /* ====== Topic Author ====== */
 
 function mb_topic_author_id( $topic_id = 0 ) {
