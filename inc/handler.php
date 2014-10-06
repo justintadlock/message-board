@@ -200,6 +200,7 @@ function mb_new_reply_handler() {
 		mb_update_forum_meta( $forum_id, '_forum_activity_datetime', $post_date );
 		mb_update_forum_meta( $forum_id, '_forum_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
 		mb_update_forum_meta( $forum_id, '_forum_last_reply_id', $published );
+		mb_update_forum_meta( $forum_id, '_forum_last_topic_id', $topic_id );
 
 		$count = get_post_meta( $forum_id, '_forum_reply_count', true );
 		update_post_meta( $forum_id, '_forum_reply_count', absint( $count ) + 1 );
