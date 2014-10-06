@@ -160,3 +160,41 @@ function mb_forum_title( $forum_id ) {
 function mb_get_forum_title( $forum_id ) {
 	return get_term( absint( $forum_id ), 'forum' )->name;
 }
+
+function mb_forum_last_topic_id( $forum_id ) {
+	echo mb_get_forum_last_topic_id( $forum_id );
+}
+
+function mb_get_forum_last_topic_id( $forum_id ) {
+	$topic_id = mb_get_forum_meta( $forum_id, '_forum_last_topic_id', true );
+
+	return !empty( $topic_id ) ? absint( $topic_id ) : 0;
+}
+
+function mb_forum_last_reply_id( $forum_id ) {
+	echo mb_get_forum_last_reply_id( $forum_id );
+}
+
+function mb_get_forum_last_reply_id( $forum_id ) {
+	$topic_id = mb_get_forum_meta( $forum_id, '_forum_last_reply_id', true );
+
+	return !empty( $reply_id ) ? absint( $reply_id ) : 0;
+}
+
+function mb_forum_last_post_id( $forum_id ) {
+	echo mb_get_forum_last_post_id( $forum_id );
+}
+
+function mb_get_forum_last_post_id( $forum_id ) {
+
+	$topic_id = mb_get_forum_last_topic_id( $forum_id );
+	$reply_id = mb_get_forum_last_reply_id( $forum_id );
+
+	return $reply_id > $topic_id ? $reply_id : $topic_id;
+}
+
+
+
+
+
+
