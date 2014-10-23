@@ -39,7 +39,7 @@ add_filter( 'post_type_link', 'mb_reply_post_type_link', 10, 2 );
 function mb_reply_post_type_link( $link, $post ) {
 
 
-	if ( 'forum_reply' !== $post->post_type )
+	if ( mb_get_reply_post_type() !== $post->post_type )
 		return $link;
 
 	$url = mb_mb_bbp_get_reply_url( $post->ID, $post );
@@ -153,7 +153,7 @@ function mb_bbp_get_reply_position_raw( $reply_id = 0, $topic_id = 0 ) {
 		if ( !empty( $reply_count ) ) {
 
 			// Get reply id's
-			$topic_replies = mb_bbp_get_all_child_ids( $topic_id, 'forum_reply' );
+			$topic_replies = mb_bbp_get_all_child_ids( $topic_id, mb_get_reply_post_type() );
 			if ( !empty( $topic_replies ) ) {
 
 				// Reverse replies array and search for current reply position

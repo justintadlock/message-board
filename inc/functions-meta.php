@@ -69,9 +69,4 @@ function mb_save_post( $post_id, $post = '' ) {
 			add_post_meta( $post_id, '_topic_voice_count', $count );
 		}
 	}
-
-	elseif ( 'forum_reply' === $post->post_type ) {
-		//$count = get_post_meta( $topic_id, '_topic_reply_count', true );
-
-	}
 }

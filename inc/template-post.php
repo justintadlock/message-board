@@ -149,7 +149,7 @@ function mb_edit_form() {
 
 	$post = get_post( $edit );
 
-	if ( empty( $post ) || ( mb_get_topic_post_type() !== $post->post_type && 'forum_reply' !== $post->post_type ) )
+	if ( empty( $post ) || ( mb_get_topic_post_type() !== $post->post_type && mb_get_reply_post_type() !== $post->post_type ) )
 		return;
 
 	$edit = $post->ID;
@@ -226,7 +226,7 @@ function mb_get_edit_form() {
 
 	$post = get_post( $edit );
 
-	if ( empty( $post ) || ( mb_get_topic_post_type() !== $post->post_type && 'forum_reply' !== $post->post_type ) )
+	if ( empty( $post ) || ( mb_get_topic_post_type() !== $post->post_type && mb_get_reply_post_type() !== $post->post_type ) )
 		return;
 
 	$edit = $post->ID;

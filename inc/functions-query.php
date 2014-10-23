@@ -18,7 +18,7 @@ function mb_is_forum_search() {
 
 		$type = is_array( $type ) ? $type : array( $type );
 
-		return in_array( mb_get_topic_post_type(), $type ) || in_array( 'forum_reply', $type ) ? true : false;
+		return in_array( mb_get_topic_post_type(), $type ) || in_array( mb_get_reply_post_type(), $type ) ? true : false;
 	}
 
 	return false;
@@ -108,14 +108,14 @@ function mb_pre_get_posts( $query ) {
 
 		} elseif ( 'replies' === get_query_var( 'mb_user_view' ) ) {
 
-			$query->set( 'post_type',     'forum_reply'              );
+			$query->set( 'post_type',      mb_get_reply_post_type()              );
 			$query->set( 'posts_per_page', mb_get_replies_per_page() );
 			$query->set( 'order',          'DESC'                    );
 			$query->set( 'orderby',        'date'                    );
 
 		} elseif ( 'activity' === get_query_var( 'mb_user_view' ) ) {
 
-			$query->set( 'post_type',     array( 'forum_reply', mb_get_topic_post_type() ) );
+			$query->set( 'post_type',     array( mb_get_reply_post_type(), mb_get_topic_post_type() ) );
 			$query->set( 'posts_per_page', mb_get_replies_per_page()            );
 			$query->set( 'order',          'DESC'                               );
 			$query->set( 'orderby',        'date'                               );

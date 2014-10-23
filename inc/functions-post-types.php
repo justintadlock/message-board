@@ -206,7 +206,7 @@ function mb_register_post_types() {
 		'delete_with_user'    => false,
 		'hierarchical'        => false,
 		'has_archive'         =>  false,
-		'query_var'           => 'forum_reply',
+		'query_var'           => mb_get_reply_post_type(),
 		'capability_type'     => 'forum_reply',
 		'map_meta_cap'        => true,
 
@@ -266,7 +266,7 @@ function mb_register_post_types() {
 	/* Register post types. */
 	register_post_type( mb_get_forum_post_type(), $forum_args );
 	register_post_type( mb_get_topic_post_type(), $topic_args );
-	register_post_type( 'forum_reply', $reply_args );
+	register_post_type( mb_get_reply_post_type(), $reply_args );
 }
 
 /**
@@ -295,6 +295,7 @@ function mb_post_updated_messages( $messages ) {
 	global $post, $post_ID;
 
 	$topic_type = mb_get_topic_post_type();
+	$reply_type = mb_get_reply_post_type();
 
 	$messages[ $topic_type ] = array(
 		 0 => '', // Unused. Messages start at index 1.
@@ -310,7 +311,7 @@ function mb_post_updated_messages( $messages ) {
 		10 => sprintf( __( 'Topic draft updated. <a target="_blank" href="%s">Preview topic</a>', 'message-board' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
 	);
 
-	$messages['forum_reply'] = array(
+	$messages[ $reply_type ] = array(
 		 0 => '', // Unused. Messages start at index 1.
 		 1 => sprintf( __( 'Reply updated. <a href="%s">View reply</a>', 'message-board' ), esc_url( get_permalink( $post_ID ) ) ),
 		 2 => '',

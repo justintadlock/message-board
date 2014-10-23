@@ -164,10 +164,9 @@ function mb_handler_new_reply() {
 					'post_date'   => $post_date,
 					'post_author' => absint( $user_id ),
 					'post_content' => $post_content,
-			//		'tax_input' => $tax_input,
 					'post_parent' => $topic_id,
 					'post_status' => 'publish',
-					'post_type' => 'forum_reply',
+					'post_type' => mb_get_reply_post_type(),
 				)
 			);
 

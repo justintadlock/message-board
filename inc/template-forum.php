@@ -189,7 +189,7 @@ function mb_get_forum_topic_ids( $forum_id ) {
 function mb_get_multi_topic_reply_ids( $topic_ids ) {
 	global $wpdb;
 
-	return $wpdb->get_col( "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'forum_reply' AND post_parent IN ( " . implode( ',', $topic_ids ) . " )" );
+	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_parent IN ( " . implode( ',', $topic_ids ) . " )", mb_get_reply_post_type() ) );
 }
 
 function mb_forum_last_topic_id( $forum_id ) {

@@ -88,7 +88,7 @@ function mb_body_class( $classes ) {
 
 function mb_forum_reply_title_filter( $title, $post_id ) {
 
-	if ( 'forum_reply' === get_post_type( $post_id ) ) {
+	if ( mb_get_reply_post_type() === get_post_type( $post_id ) ) {
 		$post = get_post( $post_id );
 		if ( 0 >= $post->post_parent )
 			$title = get_the_ID();
@@ -106,7 +106,7 @@ function mb_get_edit_post_link( $url, $post_id ) {
 
 	$post_type = get_post_type( $post_id );
 
-	if ( mb_get_topic_post_type() === $post_type || 'forum_reply' === $post_type ) {
+	if ( mb_get_topic_post_type() === $post_type || mb_get_reply_post_type() === $post_type ) {
 
 		if ( mb_get_topic_post_type() === $post_type ) {
 			$topic_link = get_permalink( $post_id );

@@ -13,7 +13,7 @@ function mb_has_replies() {
 	$per_page = mb_get_replies_per_page();
 
 	$defaults = array(
-		'post_type'           => 'forum_reply',
+		'post_type'           => mb_get_reply_post_type(),
 		'posts_per_page'      => $per_page,
 		'paged'               => get_query_var( 'paged' ),
 		'orderby'             => 'date',
