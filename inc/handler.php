@@ -12,17 +12,8 @@ add_action( 'mb_template_redirect', 'mb_handler_edit_post'       );
 add_action( 'mb_template_redirect', 'mb_handler_topic_subscribe' );
 add_action( 'mb_template_redirect', 'mb_handler_topic_favorite'  );
 
-/*
-add_action( 'template_redirect', 'mb_new_reply_handler', 0 );
-add_action( 'template_redirect', 'mb_template_redirect', 0 );
-add_action( 'template_redirect', 'mb_edit_post_handler', 0 );
-add_action( 'template_redirect', 'mb_topic_subscribe_handler', 1 );
-add_action( 'template_redirect', 'mb_topic_favorite_handler', 1 );
-*/
 
-
-
-function mb_template_redirect() {
+function mb_handler_new_topic() {
 
 	if ( !isset( $_GET['message-board'] ) || !in_array( $_GET['message-board'], array( 'new-topic' ) ) )
 		return;
@@ -123,7 +114,7 @@ function mb_template_redirect() {
 	}
 }
 
-function mb_new_reply_handler() {
+function mb_handler_new_reply() {
 
 	if ( !isset( $_GET['message-board'] ) || !in_array( $_GET['message-board'], array( 'new-reply' ) ) )
 		return;
@@ -250,7 +241,7 @@ function mb_new_reply_handler() {
 	}
 }
 
-function mb_edit_post_handler() {
+function mb_handler_edit_post() {
 
 	if ( !isset( $_GET['message-board'] ) || !in_array( $_GET['message-board'], array( 'edit' ) ) )
 		return;
@@ -343,7 +334,7 @@ function mb_edit_post_handler() {
 }
 
 
-function mb_topic_subscribe_handler() {
+function mb_handler_topic_subscribe() {
 
 	if ( !is_user_logged_in() )
 		return;
@@ -406,7 +397,7 @@ function mb_topic_subscribe_handler() {
 }
 
 
-function mb_topic_favorite_handler() {
+function mb_handler_topic_favorite() {
 
 	if ( !is_user_logged_in() )
 		return;
