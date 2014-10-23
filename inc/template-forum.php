@@ -66,6 +66,13 @@ function mb_the_forum() {
 	return message_board()->forum_query->the_post();
 }
 
+function mb_is_subforum( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	$forum = get_post( $forum_id );
+
+	return 0 < $forum->post_parent ? true : false;
+}
 
 /* ====== Forum ID ====== */
 
