@@ -31,7 +31,7 @@ function mb_has_topics() {
 			'ignore_sticky_posts' => true,
 		);
 
-		if ( is_singular( 'forum' ) ) {
+		if ( is_singular( mb_get_forum_post_type() ) ) {
 			$defaults['post_parent'] = get_queried_object_id();
 		}
 
@@ -218,13 +218,6 @@ function mb_get_topic_forum_id( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
 	$forum_id = get_post( $topic_id )->post_parent;
-
-/*
-	$terms    = get_the_terms( $topic_id, 'forum' );
-
-	$forum    = is_array( $terms ) ? array_shift( $terms ) : false;
-	$forum_id = is_object( $forum ) ? $forum->term_id : 0;
-*/
 
 	return apply_filters( 'mb_get_topic_forum_id', $forum_id, $topic_id );
 }
@@ -517,7 +510,7 @@ function mb_get_topic_form() {
 
     $parents = get_posts(
         array(
-            'post_type'   => 'forum', 
+            'post_type'   => mb_get_forum_post_type(), 
             'orderby'     => 'title', 
             'order'       => 'ASC', 
             'numberposts' => -1 

@@ -11,7 +11,7 @@ function mb_has_forums() {
 	$mb = message_board();
 
 	$defaults = array(
-		'post_type'           => 'forum',
+		'post_type'           => mb_get_forum_post_type(),
 		'nopaging'            => true,
 		'posts_per_page'      => -1,
 		'orderby'             => 'title',
@@ -19,7 +19,7 @@ function mb_has_forums() {
 		'ignore_sticky_posts' => true,
 	);
 
-	if ( is_singular( 'forum' ) ) {
+	if ( is_singular( mb_get_forum_post_type() ) ) {
 		$defaults['post_parent'] = get_queried_object_id();
 	}
 

@@ -95,9 +95,6 @@ function mb_handler_new_topic() {
 					}
 				}
 
-
-				//wp_set_post_terms( $published, array( $forum_id ), 'forum' );
-
 				/* Update forum meta. */
 
 				update_post_meta( $forum_id, '_forum_activity_datetime', $post_date );

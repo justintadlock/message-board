@@ -38,15 +38,6 @@ add_filter( 'post_type_link', 'mb_reply_post_type_link', 10, 2 );
 
 function mb_reply_post_type_link( $link, $post ) {
 
-/**
-	if ( 'forum' === $post->post_type ) {
-
-		$slug = mb_get_forum_slug();
-		$url = home_url( "{$slug}/{$post->post_name}" );
-
-		return esc_url( $url );
-	}
-/**/
 
 	if ( 'forum_reply' !== $post->post_type )
 		return $link;

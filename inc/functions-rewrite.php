@@ -60,16 +60,12 @@ function mb_rewrite_rules() {
 	$profile_query_var = 'mb_profile';
 	$user_query_var    = 'mb_user_view';
 	$view_query_var    = 'mb_view';
-	//$forum_query_var   = 'forum';
 
 	/* Rewrite tags. */
 
-	//add_rewrite_tag( '%' . $forum_query_var   . '%', '([^/]+)' );
 	add_rewrite_tag( '%' . $profile_query_var . '%', '([^/]+)' );
 	add_rewrite_tag( '%' . $user_query_var    . '%', '([^/]+)' );
 	add_rewrite_tag( '%' . $view_query_var    . '%', '([^/]+)' );
-
-	//add_permastruct( 'forum', '/board/forums/%forum%', false);
 
 	add_rewrite_rule( $user_slug . '/([^/]+)/([^/]+)/page/?([0-9]{1,})/?$', 'index.php?author_name=$matches[1]&' . $user_query_var . '=$matches[2]&paged=$matches[3]', 'top' );
 	add_rewrite_rule( $user_slug . '/([^/]+)/([^/]+)/feed/?$',              'index.php?author_name=$matches[1]&' . $user_query_var . '=$matches[2]&feed=$matches[3]',  'top' );

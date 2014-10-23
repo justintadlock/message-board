@@ -38,7 +38,7 @@ function mb_is_message_board() {
 	if ( 1 == get_query_var( 'mb_profile' ) || get_query_var( 'mb_topics' ) || get_query_var( 'mb_replies' ) ||
 		get_query_var( 'mb_favorites' ) || get_query_var( 'mb_subscriptions' ) 
 		|| mb_is_view() || mb_is_user_view() || mb_is_forum_search() 
-		|| mb_is_forum_front() || is_post_type_archive( mb_get_topic_post_type() ) || is_singular( array( 'forum', mb_get_topic_post_type() ) ) || is_tax( array( 'forum', 'forum_tag' ) ) )
+		|| mb_is_forum_front() || is_post_type_archive( mb_get_topic_post_type() ) || is_singular( array( mb_get_forum_post_type(), mb_get_topic_post_type() ) ) )
 		return true;
 
 	return false;
@@ -60,7 +60,7 @@ function mb_pre_get_posts( $query ) {
 		$query->set( 'post_type', mb_get_topic_post_type() );
 	}
 
-	elseif ( !is_admin() && $query->is_main_query() && ( is_post_type_archive( mb_get_topic_post_type() ) || is_tax( array( 'forum', 'forum_tag' ) ) ) ) {
+	elseif ( !is_admin() && $query->is_main_query() && ( is_post_type_archive( mb_get_topic_post_type() ) ) ) {
 
 		$query->set( 'post_type',      mb_get_topic_post_type()            );
 		$query->set( 'posts_per_page', mb_get_topics_per_page() );
@@ -162,7 +162,7 @@ function mb_the_posts( $posts, $query ) {
 		$posts = mb_the_posts_stickies( $posts, $super_stickies );
 	}
 
-	elseif ( !is_admin() && $query->is_main_query() && is_tax( 'forum' ) ) {
+	elseif ( !is_admin() && $query->is_main_query() ) {
 
 		$super_stickies = get_option( 'mb_super_sticky_topics', array() );
 		$topic_stickies = get_option( 'mb_sticky_topics',       array() );
@@ -260,12 +260,6 @@ function mb_404_override() {
 		status_header( 200 );
 		$wp_query->is_404 = false;
 	}
-
-//	elseif ( is_singular( 'forum' ) ) {
-//		status_header( 200 );
-//		$wp_query->is_404 = false;
-//	}
-
 
 
 

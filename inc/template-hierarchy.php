@@ -28,7 +28,7 @@ function mb_template_include( $template ) {
 		);
 	}
 
-	elseif ( is_singular( 'forum' ) ) {
+	elseif ( is_singular( mb_get_forum_post_type() ) ) {
 		$has_template = locate_template( 
 			array( "{$dir}/single-forum.php" ) 
 		);

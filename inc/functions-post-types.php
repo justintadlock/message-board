@@ -46,8 +46,8 @@ function mb_register_post_types() {
 		'can_export'          => true,
 		'delete_with_user'    => false,
 		'hierarchical'        => true,
-		'has_archive'         =>  mb_get_root_slug(),
-		'query_var'           => 'forum',
+		'has_archive'         => mb_get_root_slug(),
+		'query_var'           => mb_get_forum_post_type(),
 		'capability_type'     => 'forum',
 		'map_meta_cap'        => true,
 
@@ -264,7 +264,7 @@ function mb_register_post_types() {
 	);
 
 	/* Register post types. */
-	register_post_type( 'forum',       $forum_args );
+	register_post_type( mb_get_forum_post_type(), $forum_args );
 	register_post_type( mb_get_topic_post_type(), $topic_args );
 	register_post_type( 'forum_reply', $reply_args );
 }
