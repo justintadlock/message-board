@@ -38,7 +38,7 @@ function mb_is_message_board() {
 	if ( 1 == get_query_var( 'mb_profile' ) || get_query_var( 'mb_topics' ) || get_query_var( 'mb_replies' ) ||
 		get_query_var( 'mb_favorites' ) || get_query_var( 'mb_subscriptions' ) 
 		|| mb_is_view() || mb_is_user_view() || mb_is_forum_search() 
-		|| mb_is_forum_front() || is_post_type_archive( 'forum_topic' ) || is_singular( 'forum_topic' ) || is_tax( array( 'forum', 'forum_tag' ) ) )
+		|| mb_is_forum_front() || is_post_type_archive( 'forum_topic' ) || is_singular( array( 'forum', 'forum_topic' ) ) || is_tax( array( 'forum', 'forum_tag' ) ) )
 		return true;
 
 	return false;
@@ -226,12 +226,83 @@ function mb_the_posts_stickies( $posts, $sticky_posts ) {
 	return $posts;
 }
 
-function mb_have_topics() {
-	return have_posts();
+function mb_has_forums() {
+	$mb = message_board();
+
+	$defaults = array(
+		'post_type'           => 'forum',
+		'nopaging'            => true,
+		'posts_per_page'      => -1,
+		'orderby'             => 'title',
+		'order'               => 'ASC',
+		'ignore_sticky_posts' => true,
+	);
+
+	if ( is_singular( 'forum' ) ) {
+		$defaults['post_parent'] = get_queried_object_id();
+	}
+
+	$mb->forum_query = new WP_Query( $defaults );
+
+	return $mb->forum_query->have_posts();
+}
+
+function mb_forums() {
+
+	$have_posts = message_board()->forum_query->have_posts();
+
+	if ( empty( $have_posts ) )
+		wp_reset_postdata();
+
+	return $have_posts;
+}
+
+function mb_the_forum() {
+	return message_board()->forum_query->the_post();
+}
+
+function mb_has_topics() {
+
+	$mb = message_board();
+
+	if ( is_archive( 'forum_topic' ) ) {
+		global $wp_the_query;
+		
+		$mb->topic_query = $wp_the_query;
+	}
+
+	else {
+
+		$per_page = mb_get_topics_per_page();
+
+		$defaults = array(
+			'post_type'           => 'forum_topic',
+			'post_parent'         => get_queried_object_id(),
+			'posts_per_page'      => $per_page,
+			'paged'               => get_query_var( 'paged' ),
+			'orderby'             => 'menu_order',
+			'order'               => 'DESC',
+			'ignore_sticky_posts' => true,
+		);
+
+		$mb->topic_query = new WP_Query( $defaults );
+	}
+
+	return $mb->topic_query->have_posts();
+}
+
+function mb_topics() {
+
+	$have_posts = message_board()->topic_query->have_posts();
+
+	if ( empty( $have_posts ) )
+		wp_reset_postdata();
+
+	return $have_posts;
 }
 
 function mb_the_topic() {
-	return the_post();
+	return message_board()->topic_query->the_post();
 }
 
 function mb_has_replies() {
@@ -303,4 +374,14 @@ function mb_404_override() {
 		status_header( 200 );
 		$wp_query->is_404 = false;
 	}
+
+//	elseif ( is_singular( 'forum' ) ) {
+//		status_header( 200 );
+//		$wp_query->is_404 = false;
+//	}
+
+
+
+
+
 }

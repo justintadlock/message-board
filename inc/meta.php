@@ -10,20 +10,23 @@
  */
 function mb_register_meta() {
 
-	/* Register post meta. */
-	register_meta( 'post', '_topic_activity_datetime',       'esc_html',   '__return_true' );
-	register_meta( 'post', '_topic_activity_datetime_epoch', 'absint',     '__return_true' );
-	register_meta( 'post', '_topic_last_reply_id',           'absint',     '__return_true' );
-	register_meta( 'post', '_topic_voices',                  'absint',     '__return_true' );
-	register_meta( 'post', '_topic_voice_count',             'absint',     '__return_true' );
-	register_meta( 'post', '_topic_reply_count',             'absint',     '__return_true' );
+	/* Forum meta. */
+	register_meta( 'post', '_forum_activity_datetime', 'esc_html', '__return_true' );
+	register_meta( 'post', '_forum_last_topic_id',     'absint',   '__return_true' );
+	register_meta( 'post', '_forum_last_reply_id',     'absint',   '__return_true' );
+	register_meta( 'post', '_forum_topic_count',       'absint',   '__return_true' );
+	register_meta( 'post', '_forum_reply_count',       'absint',   '__return_true' );
 
-	/* Register term meta. One can dream, right? */
-	//register_meta( 'term', '_forum_activity_datetime',       'strip_tags', '__return_true' );
-	//register_meta( 'term', '_forum_activity_datetime_epoch', 'strip_tags', '__return_true' );
-	//register_meta( 'term', '_forum_last_topic_id',           'absint',     '__return_true' );
-	//register_meta( 'term', '_forum_last_reply_id',           'absint',     '__return_true' );
-	//register_meta( 'term', '_forum_reply_count',             'absint',     '__return_true' );
+	/* Topic meta. */
+	register_meta( 'post', '_topic_activity_datetime', 'esc_html',   '__return_true' );
+	register_meta( 'post', '_topic_last_reply_id',     'absint',     '__return_true' );
+	register_meta( 'post', '_topic_voices',            'absint',     '__return_true' );
+	register_meta( 'post', '_topic_voice_count',       'absint',     '__return_true' );
+	register_meta( 'post', '_topic_reply_count',       'absint',     '__return_true' );
+
+	/* User meta. */
+	register_meta( 'user', '_topic_subscriptions', 'esc_html', '__return_true' );
+	register_meta( 'user', '_topic_favorites',     'esc_html', '__return_true' );
 }
 
 /**

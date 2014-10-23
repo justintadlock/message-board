@@ -40,6 +40,7 @@ function mb_query_vars( $vars ) {
 
 add_filter( 'query_vars', 'mb_query_vars' );
 
+
 /**
  * Sets up custom rewrite rules for pages that aren't handled by the CPT and CT APIs but are needed by 
  * the plugin.
@@ -59,12 +60,16 @@ function mb_rewrite_rules() {
 	$profile_query_var = 'mb_profile';
 	$user_query_var    = 'mb_user_view';
 	$view_query_var    = 'mb_view';
+	//$forum_query_var   = 'forum';
 
 	/* Rewrite tags. */
 
+	//add_rewrite_tag( '%' . $forum_query_var   . '%', '([^/]+)' );
 	add_rewrite_tag( '%' . $profile_query_var . '%', '([^/]+)' );
 	add_rewrite_tag( '%' . $user_query_var    . '%', '([^/]+)' );
 	add_rewrite_tag( '%' . $view_query_var    . '%', '([^/]+)' );
+
+	//add_permastruct( 'forum', '/board/forums/%forum%', false);
 
 	add_rewrite_rule( $user_slug . '/([^/]+)/([^/]+)/page/?([0-9]{1,})/?$', 'index.php?author_name=$matches[1]&' . $user_query_var . '=$matches[2]&paged=$matches[3]', 'top' );
 	add_rewrite_rule( $user_slug . '/([^/]+)/([^/]+)/feed/?$',              'index.php?author_name=$matches[1]&' . $user_query_var . '=$matches[2]&feed=$matches[3]',  'top' );
@@ -77,6 +82,55 @@ function mb_rewrite_rules() {
 
 	/* Forum front page. */
 	add_rewrite_rule( '^' . $root_slug . '$', 'index.php', 'top' );
+}
+
+function mb_forum_rewrite_rules( $rules ) {
+//	global $wp_rewrite;
+
+//var_dump( $wp_rewrite );
+
+//var_dump( $rules );
+return $rules;
+
+	$forum_slug = mb_get_forum_slug();
+
+	$rules = array(
+		$forum_slug . '/.+?/attachment/([^/]+)/?$' => 'index.php?attachment=$matches[1]',
+		$forum_slug . '/.+?/attachment/([^/]+)/trackback/?$' => 'index.php?attachment=$matches[1]&tb=1',
+		$forum_slug . '/.+?/attachment/([^/]+)/feed/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?attachment=$matches[1]&feed=$matches[2]',
+		$forum_slug . '/.+?/attachment/([^/]+)/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?attachment=$matches[1]&feed=$matches[2]',
+		$forum_slug . '/.+?/attachment/([^/]+)/comment-page-([0-9]{1,})/?$' => 'index.php?attachment=$matches[1]&cpage=$matches[2]',
+	//	$forum_slug . '/(.+?)/trackback/?$' => 'index.php?forum=$matches[1]&tb=1',
+		$forum_slug . '/(.+?)/feed/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?forum=$matches[1]&feed=$matches[2]',
+		$forum_slug . '/(.+?)/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?forum=$matches[1]&feed=$matches[2]',
+		$forum_slug . '/(.+?)/page/?([0-9]{1,})/?$' => 'index.php?forum=$matches[1]&paged=$matches[2]',
+	//	$forum_slug . '/(.+?)/comment-page-([0-9]{1,})/?$' => 'index.php?forum=$matches[1]&cpage=$matches[2]',
+		$forum_slug . '/(.+?)(/[0-9]+)?/?$' => 'index.php?forum=$matches[1]&page=$matches[2]',
+	);
+
+/*
+	$rules = array(
+		$forum_slug . '/[^/]+/attachment/([^/]+)/?$'                               => 'index.php?attachment=$matches[1]',
+		$forum_slug . '/[^/]+/attachment/([^/]+)/trackback/?$'                     => 'index.php?attachment=$matches[1]&tb=1',
+		$forum_slug . '/[^/]+/attachment/([^/]+)/feed/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?attachment=$matches[1]&feed=$matches[2]',
+		$forum_slug . '/[^/]+/attachment/([^/]+)/(feed|rdf|rss|rss2|atom)/?$'      => 'index.php?attachment=$matches[1]&feed=$matches[2]',
+		$forum_slug . '/[^/]+/attachment/([^/]+)/comment-page-([0-9]{1,})/?$'      => 'index.php?attachment=$matches[1]&cpage=$matches[2]',
+		$forum_slug . '/([^/]+)/trackback/?$'                                      => 'index.php?forum=$matches[1]&tb=1',
+		$forum_slug . '/([^/]+)/feed/(feed|rdf|rss|rss2|atom)/?$'                  => 'index.php?forum=$matches[1]&feed=$matches[2]',
+		$forum_slug . '/([^/]+)/(feed|rdf|rss|rss2|atom)/?$'                       => 'index.php?forum=$matches[1]&feed=$matches[2]',
+		$forum_slug . '/page/?([0-9]{1,})/?$'                                      => 'index.php?post_type=forum&paged=$matches[1]',
+		$forum_slug . '/([^/]+)/page/([0-9]{1,})/?$'                               => 'index.php?forum=$matches[1]&paged=$matches[2]',
+		$forum_slug . '/([^/]+)(/[0-9]+)?/?$'                                      => 'index.php?forum=$matches[1]&page=$matches[2]',
+	//	$forum_slug . '/([^/]+)/edit/([0-9]+)?/?$'                                 => 'index.php?forum=$matches[1]&edit=$matches[2]',
+		$forum_slug . '/[^/]+/([^/]+)/?$'                                          => 'index.php?attachment=$matches[1]',
+	//	$forum_slug . '/[^/]+/([^/]+)/trackback/?$'                                => 'index.php?attachment=$matches[1]&tb=1',
+		$forum_slug . '/[^/]+/([^/]+)/feed/(feed|rdf|rss|rss2|atom)/?$'            => 'index.php?attachment=$matches[1]&feed=$matches[2]',
+		$forum_slug . '/[^/]+/([^/]+)/(feed|rdf|rss|rss2|atom)/?$'                 => 'index.php?attachment=$matches[1]&feed=$matches[2]',
+		$forum_slug . '/[^/]+/([^/]+)/comment-page-([0-9]{1,})/?$'                 => 'index.php?attachment=$matches[1]&cpage=$matches[2]'
+	);
+*/
+
+	return $rules;
 }
 
 /**
@@ -129,8 +183,9 @@ function mb_forum_topic_rewrite_rules( $rules ) {
 function mb_redirect_canonical( $redirect_url, $requested_url ) {
 
 	$topic_slug = mb_get_topic_slug();
+	$forum_slug = mb_get_forum_slug();
 
-	if ( preg_match( "#{$topic_slug}/([^/]+)/page/([0-9]{1,})/?$#i", $requested_url ) )
+	if ( preg_match( "#{$topic_slug}|{$forum_slug}/([^/]+)|(.+?)/page/([0-9]{1,})/?$#i", $requested_url ) )
 		return false;
 
 	return $redirect_url;

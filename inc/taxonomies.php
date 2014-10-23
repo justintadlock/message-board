@@ -23,6 +23,7 @@ add_action( 'init', 'mb_register_taxonomies' );
  */
 function mb_register_taxonomies() {
 
+/*
 	register_taxonomy(
 		'forum',
 		array( 'forum_topic' ),
@@ -35,7 +36,7 @@ function mb_register_taxonomies() {
 			'hierarchical'      => true,
 			'query_var'         => 'forum',
 
-			/* Only 2 caps are needed: 'manage_restaurant' and 'edit_restaurant_items'. */
+			/* Only 2 caps are needed: 'manage_restaurant' and 'edit_restaurant_items'. *
 			'capabilities' => array(
 				'manage_terms' => 'manage_forums',
 				'edit_terms'   => 'manage_forums',
@@ -43,7 +44,7 @@ function mb_register_taxonomies() {
 				'assign_terms' => 'edit_forum_topics',
 			),
 
-			/* The rewrite handles the URL structure. */
+			/* The rewrite handles the URL structure. *
 			'rewrite' => array(
 				'slug'         => mb_get_forum_slug(),
 				'with_front'   => false,
@@ -51,7 +52,7 @@ function mb_register_taxonomies() {
 				'ep_mask'      => EP_NONE
 			),
 
-			/* Labels used when displaying taxonomy and terms. */
+			/* Labels used when displaying taxonomy and terms. *
 			'labels' => array(
 				'name'                       => __( 'Forums',                           'message-board' ),
 				'singular_name'              => __( 'Forum',                            'message-board' ),
@@ -71,6 +72,7 @@ function mb_register_taxonomies() {
 			)
 		)
 	);
+/**/
 
 	register_taxonomy(
 		'forum_tag',

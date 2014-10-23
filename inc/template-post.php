@@ -20,11 +20,8 @@ function mb_get_post_id( $post_id = 0 ) {
 	if ( is_numeric( $post_id ) && 0 < $post_id )
 		$_post_id = $post_id;
 
-	elseif ( in_the_loop() )
-		$_post_id = get_the_ID();
-
 	else
-		$_post_id = 0;
+		$_post_id = get_the_ID();
 
 	return apply_filters( 'mb_get_post_id', $_post_id, $post_id );
 }

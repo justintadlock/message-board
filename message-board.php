@@ -65,7 +65,6 @@ final class Message_Board {
 
 		require_once( $this->dir_path . 'inc/core.php'           );
 		require_once( $this->dir_path . 'inc/post-types.php'     );
-		require_once( $this->dir_path . 'inc/taxonomies.php'     );
 		require_once( $this->dir_path . 'inc/meta.php'           );
 		require_once( $this->dir_path . 'inc/filters.php'        );
 		require_once( $this->dir_path . 'inc/formatting.php'     );
@@ -93,14 +92,6 @@ final class Message_Board {
 		if ( is_admin() ) {
 			require_once( $this->dir_path . 'admin/admin.php' );
 			require_once( $this->dir_path . 'admin/meta-boxes.php' );
-			require_once( $this->dir_path . 'admin/single-term/class.taxonomy-single-term.php' );
-
-			$forum_tax = new Taxonomy_Single_Term( 'forum', array( 'forum_topic' ), 'select' );
-			$forum_tax->set( 'priority', 'core' );
-			$forum_tax->set( 'context', 'side' );
-			$forum_tax->set( 'force_selection', true );
-			$forum_tax->set( 'indented', true );
-			$forum_tax->set( 'allow_new_terms', true );
 		}
 	}
 
@@ -154,8 +145,8 @@ final class Message_Board {
 	public function register_views() {
 
 		/* Temporary: @todo - move to own function. */
-		global $wpdb;
-		$wpdb->termmeta = $wpdb->prefix . 'termmeta';
+		//global $wpdb;
+		//$wpdb->termmeta = $wpdb->prefix . 'termmeta';
 
 		mb_register_view(
 			'popular',
@@ -207,12 +198,15 @@ final class Message_Board {
 		if ( !empty( $role ) ) {
 
 			$role->add_cap( 'manage_forums' );
+			$role->add_cap( 'create_forums' );
+			$role->add_cap( 'edit_forums' );
 			$role->add_cap( 'create_forum_topics' );
 			$role->add_cap( 'edit_forum_topics' );
 			$role->add_cap( 'create_forum_replies' );
 			$role->add_cap( 'edit_forum_replies' );
 		}
 
+		/**
 		$term_meta_table = _get_meta_table( 'term' );
 
 		if ( false === $term_meta_table ) {
@@ -242,6 +236,7 @@ final class Message_Board {
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 			dbDelta( $sql );
 		}
+		/**/
 	}
 }
 

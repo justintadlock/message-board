@@ -32,6 +32,85 @@ function mb_register_post_types() {
 	/* Get plugin settings. */
 	//$settings = get_option( 'restaurant_settings', mb_get_default_settings() );
 
+	$forum_args = array(
+		'description'         => '',
+		'public'              => true,
+		'publicly_queryable'  => true,
+		'exclude_from_search' => true,
+		'show_in_nav_menus'   => true,
+		'show_ui'             => true,
+		'show_in_menu'        => true,
+		'show_in_admin_bar'   => true,
+		'menu_position'       => null,
+		'menu_icon'           => 'dashicons-format-chat',
+		'can_export'          => true,
+		'delete_with_user'    => false,
+		'hierarchical'        => true,
+		'has_archive'         =>  mb_get_root_slug(),
+		'query_var'           => 'forum',
+		'capability_type'     => 'forum',
+		'map_meta_cap'        => true,
+
+		'capabilities' => array(
+
+			// meta caps (don't assign these to roles)
+			'edit_post'              => 'edit_forum',
+			'read_post'              => 'read_forum',
+			'delete_post'            => 'delete_forum',
+
+			// primitive/meta caps
+			'create_posts'           => 'create_forums',
+
+			// primitive caps used outside of map_meta_cap()
+			'edit_posts'             => 'edit_forums',
+			'edit_others_posts'      => 'manage_forums',
+			'publish_posts'          => 'edit_forums',
+			'read_private_posts'     => 'read',
+
+			// primitive caps used inside of map_meta_cap()
+			'read'                   => 'read',
+			'delete_posts'           => 'manage_forums',
+			'delete_private_posts'   => 'manage_forums',
+			'delete_published_posts' => 'manage_forums',
+			'delete_others_posts'    => 'manage_forums',
+			'edit_private_posts'     => 'edit_forums',
+			'edit_published_posts'   => 'edit_forums'
+		),
+
+		'rewrite' => array(
+			'slug'       => mb_get_forum_slug(),
+			'with_front' => false,
+			'pages'      => false,
+			'feeds'      => true,
+			'ep_mask'    => EP_PERMALINK,
+		),
+
+		'supports' => array(
+			'title',
+			'editor',
+		),
+
+		'labels' => array(
+			'name'               => __( 'Forums',                   'message-board' ),
+			'singular_name'      => __( 'Forum',                    'message-board' ),
+			'menu_name'          => __( 'Message Board',            'message-board' ),
+			'name_admin_bar'     => __( 'Forums',                   'message-board' ),
+			'all_items'          => __( 'Forums',                   'message-board' ),
+			'add_new'            => __( 'Add Forum',                'message-board' ),
+			'add_new_item'       => __( 'Add New Forum',            'message-board' ),
+			'edit_item'          => __( 'Edit Forum',               'message-board' ),
+			'new_item'           => __( 'New Forum',                'message-board' ),
+			'view_item'          => __( 'View Forum',               'message-board' ),
+			'search_items'       => __( 'Search Forums',            'message-board' ),
+			'not_found'          => __( 'No forums found',          'message-board' ),
+			'not_found_in_trash' => __( 'No forums found in trash', 'message-board' ),
+			'parent_item_colon'  => __( 'Parent Forum:',            'message-board' ),
+
+			/* Custom archive label.  Must filter 'post_type_archive_title' to use. */
+			'archive_title'      => __( 'Forums',                   'message-board' ),
+		)
+	);
+
 	/* Set up the arguments for the post type. */
 	$topic_args = array(
 		'description'         => '',
@@ -40,10 +119,10 @@ function mb_register_post_types() {
 		'exclude_from_search' => false,
 		'show_in_nav_menus'   => false,
 		'show_ui'             => true,
-		'show_in_menu'        => true,
+		'show_in_menu'        => false,
 		'show_in_admin_bar'   => true,
 		'menu_position'       => null,
-		'menu_icon'           => 'dashicons-format-chat',
+		'menu_icon'           => null,
 		'can_export'          => true,
 		'delete_with_user'    => false,
 		'hierarchical'        => false,
@@ -185,9 +264,8 @@ function mb_register_post_types() {
 	);
 
 	/* Register post types. */
+	register_post_type( 'forum',       $forum_args );
 	register_post_type( 'forum_topic', $topic_args );
-
-	/* Register post types. */
 	register_post_type( 'forum_reply', $reply_args );
 }
 

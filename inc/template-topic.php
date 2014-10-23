@@ -146,12 +146,17 @@ function mb_get_topic_author_profile_link( $topic_id = 0 ) {
 
 function mb_get_topic_forum_id( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
+
+	$forum_id = get_post( $topic_id )->post_parent;
+
+/*
 	$terms    = get_the_terms( $topic_id, 'forum' );
 
 	$forum    = is_array( $terms ) ? array_shift( $terms ) : false;
 	$forum_id = is_object( $forum ) ? $forum->term_id : 0;
+*/
 
-	return apply_filters( 'mb_get_topic_forum_id', $forum_id, $terms, $topic_id );
+	return apply_filters( 'mb_get_topic_forum_id', $forum_id, $topic_id );
 }
 
 function mb_topic_forum_link( $topic_id = 0 ) {
@@ -435,10 +440,45 @@ function mb_get_topic_form() {
 	$default_fields['title'] .= '</p>';
 
 	// forum field
-	if ( !is_tax( 'forum' ) ) {
+	if ( !is_singular( 'forum' ) ) {
 		$default_fields['forum'] = '<p>';
 		$default_fields['forum'] .= sprintf( '<label for="mb_topic_forum">%s</label>', __( 'Select a forum:', 'message-board' ) );
-		$default_fields['forum'] .= wp_dropdown_categories(
+
+
+    $parents = get_posts(
+        array(
+            'post_type'   => 'forum', 
+            'orderby'     => 'title', 
+            'order'       => 'ASC', 
+            'numberposts' => -1 
+        )
+    );
+
+    if ( !empty( $parents ) ) {
+
+        $default_fields['forum'] .= '<select name="mb_topic_forum" class="widefat">'; // !Important! Don't change the 'parent_id' name attribute.
+
+        foreach ( $parents as $parent ) {
+            $default_fields['forum'] .= sprintf( '<option value="%s">%s</option>', esc_attr( $parent->ID ), esc_html( $parent->post_title ) );
+        }
+
+        $default_fields['forum'] .= '</select>';
+    }
+
+/*
+		$default_fields['forum'] .= wp_dropdown_pages(
+			array(
+				'post_type'     => 'forum',
+				'name'          => 'mb_topic_forum',
+				'id'            => 'mb_topic_forum',
+				'sort_order'    => 'ASC',
+				'sort_column'   => 'post_title',
+				'hierarchical'  => true,
+				'echo'          => false
+			)
+		);
+*/
+/*		$default_fields['forum'] .= wp_dropdown_categories(
 			array(
 				'name'          => 'mb_topic_forum',
 				'id'            => 'mb_topic_forum',
@@ -450,6 +490,7 @@ function mb_get_topic_form() {
 				'echo'          => false
 			)
 		);
+*/
 		$default_fields['forum'] .= '</p>';
 	}
 
@@ -470,7 +511,7 @@ function mb_get_topic_form() {
 		$form .= $field;
 	}
 
-	if ( is_tax( 'forum' ) )
+	if ( is_singular( 'forum' ) )
 		$form .= sprintf( '<input type="hidden" name="mb_topic_forum" value="%s" />', absint( get_queried_object_id() ) );
 
 	$form .= sprintf( '<p><input type="submit" value="%s" /></p>', esc_attr__( 'Submit', 'message-board' ) );

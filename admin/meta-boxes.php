@@ -1,23 +1,93 @@
 <?php
 
 /* Hook meta box to just the 'place' post type. */
+add_action( 'add_meta_boxes_forum', 'my_add_meta_boxes' );
 add_action( 'add_meta_boxes_forum_reply', 'my_add_meta_boxes' );
+add_action( 'add_meta_boxes_forum_topic', 'my_add_meta_boxes' );
 
 /* Creates the meta box. */
 function my_add_meta_boxes( $post ) {
 
     add_meta_box(
-        'my-place-parent',
+        'mb-forum-parent',
+        __( 'Parent Forum', 'message-board' ),
+        'mb_forum_parent_meta_box',
+        'forum',
+        'side',
+        'core'
+    );
+
+    add_meta_box(
+        'mb-reply-parent',
         __( 'Parent Topic', 'message-board' ),
-        'my_place_parent_meta_box',
+        'mb_reply_parent_meta_box',
         'forum_reply',
+        'side',
+        'core'
+    );
+
+    add_meta_box(
+        'mb-topic-parent',
+        __( 'Forum', 'message-board' ),
+        'mb_topic_parent_meta_box',
+        'forum_topic',
         'side',
         'core'
     );
 }
 
 /* Displays the meta box. */
-function my_place_parent_meta_box( $post ) {
+function mb_forum_parent_meta_box( $post ) {
+
+    $parents = get_posts(
+        array(
+            'post_type'   => 'forum', 
+            'orderby'     => 'title', 
+            'order'       => 'ASC', 
+            'numberposts' => -1,
+		'post__not_in' => array( $post->ID ),
+        )
+    );
+
+    if ( !empty( $parents ) ) {
+
+        echo '<select name="parent_id" class="widefat">'; // !Important! Don't change the 'parent_id' name attribute.
+	printf( '<option value="0"%s>%s</option>', selected( 0, $post->post_parent, false ), esc_html__( '--No Parent--', 'message-board' ) );
+
+        foreach ( $parents as $parent ) {
+            printf( '<option value="%s"%s>%s</option>', esc_attr( $parent->ID ), selected( $parent->ID, $post->post_parent, false ), esc_html( $parent->post_title ) );
+        }
+
+        echo '</select>';
+    }
+}
+
+/* Displays the meta box. */
+function mb_topic_parent_meta_box( $post ) {
+
+    $parents = get_posts(
+        array(
+            'post_type'   => 'forum', 
+            'orderby'     => 'title', 
+            'order'       => 'ASC', 
+            'numberposts' => -1 
+        )
+    );
+
+    if ( !empty( $parents ) ) {
+
+        echo '<select name="parent_id" class="widefat">'; // !Important! Don't change the 'parent_id' name attribute.
+
+        foreach ( $parents as $parent ) {
+            printf( '<option value="%s"%s>%s</option>', esc_attr( $parent->ID ), selected( $parent->ID, $post->post_parent, false ), esc_html( $parent->post_title ) );
+        }
+
+        echo '</select>';
+    }
+}
+
+/* Displays the meta box. */
+function mb_reply_parent_meta_box( $post ) {
 
     $parents = get_posts(
         array(

@@ -10,10 +10,9 @@ function mb_admin_menu() {
 
 	//add_menu_page( __( 'Message Board', 'message-board' ), __( 'Forums', 'message-board' ), 'manage_forums', 'edit-tags.php?taxonomy=forum&post_type=forum_topic', '', 'dashicons-format-chat', '42' );
 
-	add_submenu_page( 'edit.php?post_type=forum_topic', __( 'Forums',  'message-board' ), __( 'Forums',  'message-board' ), 'manage_forums',      'edit-tags.php?taxonomy=forum&post_type=forum_topic' );
-	add_submenu_page( 'edit.php?post_type=forum_topic', __( 'Topics',  'message-board' ), __( 'Topics',  'message-board' ), 'edit_forum_topics',  'edit.php?post_type=forum_topic' );
-	add_submenu_page( 'edit.php?post_type=forum_topic', __( 'Replies', 'message-board' ), __( 'Replies', 'message-board' ), 'edit_forum_replies', 'edit.php?post_type=forum_reply' );
-	add_submenu_page( 'edit.php?post_type=forum_topic', __( 'Tags',    'message-board' ), __( 'Tags',    'message-board' ), 'manage_forums',      'edit-tags.php?taxonomy=forum&post_type=forum_topic' );
+	add_submenu_page( 'edit.php?post_type=forum', __( 'Topics',  'message-board' ), __( 'Topics',  'message-board' ), 'edit_forum_topics',  'edit.php?post_type=forum_topic' );
+	add_submenu_page( 'edit.php?post_type=forum', __( 'Replies', 'message-board' ), __( 'Replies', 'message-board' ), 'edit_forum_replies', 'edit.php?post_type=forum_reply' );
+	add_submenu_page( 'edit.php?post_type=forum', __( 'Tags',    'message-board' ), __( 'Tags',    'message-board' ), 'manage_forums',      'edit-tags.php?taxonomy=forum_tag&post_type=forum_topic' );
 
 /*
 

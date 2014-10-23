@@ -78,6 +78,8 @@ function mb_encodeit( $matches ) {
 	$text = str_replace(  '&amp;gt;',            '&gt;',  $text );
 	$text = str_replace( array( '&quot;' ),                   '"',           $text );
 
+	$text = str_replace( '[', '&#091;', $text );
+
 	$text = "<code>$text</code>";
 
 	if ( "`" != $matches[1] )

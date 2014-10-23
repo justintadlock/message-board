@@ -31,6 +31,7 @@ add_action( 'save_post',         'mb_save_post',      10, 2 );
 /* Rewrite filters. See `rewrite.php`. */
 add_action( 'init',                      'mb_rewrite_rules',            5     );
 add_filter( 'forum_topic_rewrite_rules', 'mb_forum_topic_rewrite_rules'       );
+add_filter( 'forum_rewrite_rules',       'mb_forum_rewrite_rules'       );
 add_filter( 'redirect_canonical',        'mb_redirect_canonical',       10, 2 );
 
 /* Query filters. See `query.php`. */
@@ -99,6 +100,9 @@ function mb_forum_reply_title_filter( $title, $post_id ) {
 }
 
 function mb_get_edit_post_link( $url, $post_id ) {
+
+	if ( is_admin() )
+		return $url;
 
 	$post_type = get_post_type( $post_id );
 
