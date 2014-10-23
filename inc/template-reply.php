@@ -1,5 +1,65 @@
 <?php
 
+/**
+ * Creates a new reply query and checks if there are any replies found.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_has_replies() {
+	$mb = message_board();
+
+	$per_page = mb_get_replies_per_page();
+
+	$defaults = array(
+		'post_type'           => 'forum_reply',
+		'posts_per_page'      => $per_page,
+		'paged'               => get_query_var( 'paged' ),
+		'orderby'             => 'date',
+		'order'               => 'ASC',
+		'hierarchical'        => false,
+		'ignore_sticky_posts' => true,
+	);
+
+	if ( is_singular( 'forum_topic' ) ) {
+		$defaults['post_parent'] = get_queried_object_id();
+	}
+
+	$mb->reply_query = new WP_Query( $defaults );
+
+	return $mb->reply_query->have_posts();
+}
+
+/**
+ * Function for use within a while loop to loop through the available replies found in the 
+ * reply query.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_replies() {
+
+	$have_posts = message_board()->reply_query->have_posts();
+
+	if ( empty( $have_posts ) )
+		wp_reset_postdata();
+
+	return $have_posts;
+}
+
+/**
+ * Sets up the reply data for the current reply in The Loop.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_the_reply() {
+	return message_board()->reply_query->the_post();
+}
+
 /* ====== Reply ID ====== */
 
 function mb_reply_id( $reply_id = 0 ) {

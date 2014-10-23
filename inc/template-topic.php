@@ -1,5 +1,75 @@
 <?php
 
+/**
+ * Creates a new topic query and checks if there are any topics found.  Note that we ue the main 
+ * WordPress query if viewing the topic archive.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_has_topics() {
+
+	$mb = message_board();
+
+	if ( is_archive( 'forum_topic' ) ) {
+		global $wp_the_query;
+		
+		$mb->topic_query = $wp_the_query;
+	}
+
+	else {
+
+		$per_page = mb_get_topics_per_page();
+
+		$defaults = array(
+			'post_type'           => 'forum_topic',
+			'posts_per_page'      => $per_page,
+			'paged'               => get_query_var( 'paged' ),
+			'orderby'             => 'menu_order',
+			'order'               => 'DESC',
+			'ignore_sticky_posts' => true,
+		);
+
+		if ( is_singular( 'forum' ) ) {
+			$defaults['post_parent'] = get_queried_object_id();
+		}
+
+		$mb->topic_query = new WP_Query( $defaults );
+	}
+
+	return $mb->topic_query->have_posts();
+}
+
+/**
+ * Function for use within a while loop to loop through the available topics found in the 
+ * topic query.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_topics() {
+
+	$have_posts = message_board()->topic_query->have_posts();
+
+	if ( empty( $have_posts ) )
+		wp_reset_postdata();
+
+	return $have_posts;
+}
+
+/**
+ * Sets up the topic data for the current topic in The Loop.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_the_topic() {
+	return message_board()->topic_query->the_post();
+}
+
 /* ====== Lead Topic ====== */
 
 function mb_show_lead_topic() {

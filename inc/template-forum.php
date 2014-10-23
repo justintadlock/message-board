@@ -1,69 +1,62 @@
 <?php
 
-/* wrapper for wp_list_categories() */
-function mb_list_forums( $args = array() ) {
+/**
+ * Creates a new forum query and checks if there are any forums found.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_has_forums() {
+	$mb = message_board();
 
 	$defaults = array(
-		'show_option_none' => false,
-		'show_count'       => true,
-		'hierarchical'     => true,
-		'hide_empty'       => false,
-		'echo'             => true,
-
-		// custom args
-		'wrap'             => '<ul %s>%s</ul>',
+		'post_type'           => 'forum',
+		'nopaging'            => true,
+		'posts_per_page'      => -1,
+		'orderby'             => 'title',
+		'order'               => 'ASC',
+		'ignore_sticky_posts' => true,
 	);
 
-	$r = $args = wp_parse_args( $args, $defaults );
-
-	$r['echo']     = false;
-	$r['title_li'] = false;
-	$r['taxonomy'] = 'forum';
-
-	unset( $r['wrap'] );
-
-	$forums = wp_list_categories( $r );
-
-	if ( !empty( $forums ) ) {
-
-		$forums = sprintf( $args['wrap'], 'class="forums-list"', $forums );
+	if ( is_singular( 'forum' ) ) {
+		$defaults['post_parent'] = get_queried_object_id();
 	}
 
-	$forums = apply_filters( 'mb_list_forums', $forums, $args );
+	$mb->forum_query = new WP_Query( $defaults );
 
-	if ( !$args['echo'] )
-		return $forums;
-
-	echo $forums;
+	return $mb->forum_query->have_posts();
 }
 
-function mb_get_forums( $args = array() ) {
+/**
+ * Function for use within a while loop to loop through the available forums found in the 
+ * forum query.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_forums() {
 
-	$defaults = array(
-		'hide_empty'               => false,
-		'hierarchical'             => false,
-		'parent'                   => 0,
-		'pad_counts'               => true,
-	);
+	$have_posts = message_board()->forum_query->have_posts();
 
-	$args = wp_parse_args( $args, $defaults );
+	if ( empty( $have_posts ) )
+		wp_reset_postdata();
 
-	return 	get_terms( 'forum', $args );
+	return $have_posts;
 }
 
-function mb_get_sub_forums( $args = array() ) {
-
-	$defaults = array(
-		'parent'       => is_tax( 'forum' ) ? get_queried_object_id() : 0,
-		'hide_empty'   => false,
-		'pad_counts'   => true,
-		'hierarchical' => false
-	);
-
-	$args = wp_parse_args( $args, $defaults );
-
-	return get_terms( 'forum', $args );
+/**
+ * Sets up the forum data for the current forum in The Loop.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_the_forum() {
+	return message_board()->forum_query->the_post();
 }
+
 
 /* ====== Forum ID ====== */
 
