@@ -77,7 +77,7 @@ function mb_rewrite_rules() {
 	add_rewrite_rule( $view_slug . '/([^/]+)/?$',                   'index.php?' . $view_query_var . '=$matches[1]',                   'top' );
 
 	/* Forum front page. */
-	add_rewrite_rule( '^' . $root_slug . '$', 'index.php', 'top' );
+	//add_rewrite_rule( '^' . $root_slug . '$', 'index.php', 'top' );
 }
 
 function mb_forum_rewrite_rules( $rules ) {

@@ -10,20 +10,29 @@
 function mb_has_forums() {
 	$mb = message_board();
 
-	$defaults = array(
-		'post_type'           => mb_get_forum_post_type(),
-		'nopaging'            => true,
-		'posts_per_page'      => -1,
-		'orderby'             => 'title',
-		'order'               => 'ASC',
-		'ignore_sticky_posts' => true,
-	);
-
-	if ( is_singular( mb_get_forum_post_type() ) ) {
-		$defaults['post_parent'] = get_queried_object_id();
+	if ( is_post_type_archive( mb_get_forum_post_type() ) ) {
+		global $wp_query;
+		
+		$mb->forum_query = $wp_query;
 	}
 
-	$mb->forum_query = new WP_Query( $defaults );
+	else {
+
+		$defaults = array(
+			'post_type'           => mb_get_forum_post_type(),
+			'nopaging'            => true,
+			'posts_per_page'      => -1,
+			'orderby'             => 'title',
+			'order'               => 'ASC',
+			'ignore_sticky_posts' => true,
+		);
+
+		if ( is_singular( mb_get_forum_post_type() ) ) {
+			$defaults['post_parent'] = get_queried_object_id();
+		}
+
+		$mb->forum_query = new WP_Query( $defaults );
+	}
 
 	return $mb->forum_query->have_posts();
 }

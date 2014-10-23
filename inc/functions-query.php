@@ -55,10 +55,12 @@ function mb_is_message_board() {
  */
 function mb_pre_get_posts( $query ) {
 
-//var_dump( $query );
-
-	if ( !is_admin() && $query->is_main_query() && mb_is_forum_front() ) {
-		$query->set( 'post_type', mb_get_topic_post_type() );
+	if ( !is_admin() && $query->is_main_query() && is_post_type_archive( mb_get_forum_post_type() ) ) {
+		$query->set( 'post_type', mb_get_forum_post_type() );
+		$query->set( 'posts_per_page', -1 );
+		$query->set( 'nopaging', true );
+		$query->set( 'order', 'ASC' );
+		$query->set( 'orderby', 'menu_order title' );
 	}
 
 	elseif ( !is_admin() && $query->is_main_query() && ( is_post_type_archive( mb_get_topic_post_type() ) ) ) {
@@ -156,11 +158,36 @@ add_filter( 'the_posts', 'mb_the_posts', 10, 2 );
 
 function mb_the_posts( $posts, $query ) {
 
-	if ( !is_admin() && $query->is_main_query() && is_post_type_archive( mb_get_topic_post_type() ) || is_tax( 'forum_tag' ) ) {
+	if ( !is_admin() && $query->is_main_query() && is_post_type_archive( mb_get_topic_post_type() ) ) {
 
 		$super_stickies = get_option( 'mb_super_sticky_topics', array() );
 
 		$posts = mb_the_posts_stickies( $posts, $super_stickies );
+	}
+
+	// http://wordpress.stackexchange.com/questions/63599/custom-post-type-wp-query-and-orderby
+	if ( !is_admin() && $query->is_main_query() && is_post_type_archive( mb_get_forum_post_type() ) ) {
+
+    $refs = $list = array();
+    // Make heirarchical structure in one pass.
+    // Thanks again, Nate Weiner:
+    // http://blog.ideashower.com/post/15147134343/create-a-parent-child-array-structure-in-one-pass
+    foreach( $posts as $post ) {
+        $thisref = &$refs[$post->ID];
+
+        $thisref['post'] = $post;
+
+        if( $post->post_parent == 0)
+            $list[$post->ID] = &$thisref;
+        else
+            $refs[$post->post_parent]['children'][$post->ID] = &$thisref;
+    }
+
+    // Create single, sorted list
+    $result = array();
+    mb_recursively_flatten_list( $list, $result );
+
+    return $result;
 	}
 /*
 	* @todo - add to forum topic query.
@@ -174,6 +201,14 @@ function mb_the_posts( $posts, $query ) {
 */
 
 	return $posts;
+}
+
+function mb_recursively_flatten_list( $list, &$result ) {
+    foreach( $list as $node ) {
+        $result[] = $node['post'];
+        if( isset( $node['children'] ) )
+            mb_recursively_flatten_list( $node['children'], $result );
+    }
 }
 
 function mb_the_posts_stickies( $posts, $sticky_posts ) {

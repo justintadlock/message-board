@@ -1,6 +1,17 @@
 <?php
 
 /**
+ * Returns what to show on the forum front page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string forums|topics
+ */
+function mb_get_show_on_front() {
+	return apply_filters( 'mb_get_show_on_front', 'forums' );
+}
+
+/**
  * Returns the number of topics to show per page.
  *
  * @todo Plugin setting.
