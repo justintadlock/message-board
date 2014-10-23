@@ -57,6 +57,10 @@ final class Message_Board {
 
 	private function setup() {
 
+		$this->forum_query = new WP_Query();
+		$this->topic_query = new WP_Query();
+		$this->reply_query = new WP_Query();
+
 		$this->dir_path = trailingslashit( plugin_dir_path( __FILE__ ) );
 		$this->dir_uri  = trailingslashit( plugin_dir_url(  __FILE__ ) );
 	}
@@ -64,6 +68,9 @@ final class Message_Board {
 	private function includes() {
 
 		require_once( $this->dir_path . 'inc/functions-core.php'           );
+		require_once( $this->dir_path . 'inc/functions-forum.php'          );
+		require_once( $this->dir_path . 'inc/functions-topic.php'          );
+		require_once( $this->dir_path . 'inc/functions-reply.php'          );
 		require_once( $this->dir_path . 'inc/functions-post-types.php'     );
 		require_once( $this->dir_path . 'inc/functions-meta.php'           );
 		require_once( $this->dir_path . 'inc/functions-filters.php'        );
