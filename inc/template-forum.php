@@ -100,7 +100,7 @@ function mb_get_forum_link( $forum_id = 0 ) {
 	$url   = mb_get_forum_url(   $forum_id );
 	$title = mb_get_forum_title( $forum_id );
 
-	return sprintf( '<a href="%s">%s</a>', $url, $title );
+	return sprintf( '<a class="forum-link" href="%s">%s</a>', $url, $title );
 }
 
 /* ====== Forum Counts ====== */
