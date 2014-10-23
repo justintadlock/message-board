@@ -22,7 +22,7 @@ function mb_has_replies() {
 		'ignore_sticky_posts' => true,
 	);
 
-	if ( is_singular( 'forum_topic' ) ) {
+	if ( is_singular( mb_get_topic_post_type() ) ) {
 		$defaults['post_parent'] = get_queried_object_id();
 	}
 

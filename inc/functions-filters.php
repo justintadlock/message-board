@@ -106,9 +106,9 @@ function mb_get_edit_post_link( $url, $post_id ) {
 
 	$post_type = get_post_type( $post_id );
 
-	if ( 'forum_topic' === $post_type || 'forum_reply' === $post_type ) {
+	if ( mb_get_topic_post_type() === $post_type || 'forum_reply' === $post_type ) {
 
-		if ( 'forum_topic' === $post_type ) {
+		if ( mb_get_topic_post_type() === $post_type ) {
 			$topic_link = get_permalink( $post_id );
 		} else {
 			$post = get_post( $post_id );

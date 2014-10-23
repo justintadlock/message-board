@@ -126,8 +126,8 @@ function mb_register_post_types() {
 		'can_export'          => true,
 		'delete_with_user'    => false,
 		'hierarchical'        => false,
-		'has_archive'         =>  mb_get_topic_slug(),
-		'query_var'           => 'forum_topic',
+		'has_archive'         => mb_get_topic_slug(),
+		'query_var'           => mb_get_topic_post_type(),
 		'capability_type'     => 'forum_topic',
 		'map_meta_cap'        => true,
 
@@ -265,7 +265,7 @@ function mb_register_post_types() {
 
 	/* Register post types. */
 	register_post_type( 'forum',       $forum_args );
-	register_post_type( 'forum_topic', $topic_args );
+	register_post_type( mb_get_topic_post_type(), $topic_args );
 	register_post_type( 'forum_reply', $reply_args );
 }
 
@@ -294,7 +294,9 @@ function mb_enter_title_here( $title, $post ) {
 function mb_post_updated_messages( $messages ) {
 	global $post, $post_ID;
 
-	$messages['forum_topic'] = array(
+	$topic_type = mb_get_topic_post_type();
+
+	$messages[ $topic_type ] = array(
 		 0 => '', // Unused. Messages start at index 1.
 		 1 => sprintf( __( 'Topic updated. <a href="%s">View topic</a>', 'message-board' ), esc_url( get_permalink( $post_ID ) ) ),
 		 2 => '',

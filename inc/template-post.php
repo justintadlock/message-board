@@ -72,7 +72,7 @@ function mb_post_jump_url( $post_id = 0 ) {
 function mb_get_post_jump_url( $post_id = 0 ) {
 	$post_id = mb_get_post_id( $post_id );
 
-	$url = 'forum_topic' === get_post_type( $post_id ) ? esc_url( get_permalink( $post_id ) . '#post-' . get_the_ID() ) : get_permalink( $post_id );
+	$url = mb_get_topic_post_type() === get_post_type( $post_id ) ? esc_url( get_permalink( $post_id ) . '#post-' . get_the_ID() ) : get_permalink( $post_id );
 
 	return apply_filters( 'mb_get_post_jump_url', $url, $post_id );
 }
@@ -149,7 +149,7 @@ function mb_edit_form() {
 
 	$post = get_post( $edit );
 
-	if ( empty( $post ) || ( 'forum_topic' !== $post->post_type && 'forum_reply' !== $post->post_type ) )
+	if ( empty( $post ) || ( mb_get_topic_post_type() !== $post->post_type && 'forum_reply' !== $post->post_type ) )
 		return;
 
 	$edit = $post->ID;
@@ -164,7 +164,7 @@ function mb_edit_form() {
 	printf( '<legend>%s</legend>', $pt_object->labels->edit_item );
 
 	// title field
-	if ( 'forum_topic' === $post->post_type ) {
+	if ( mb_get_topic_post_type() === $post->post_type ) {
 
 		echo '<p>';
 		printf( '<label for="mb_post_title">%s</label>', __( 'Topic title: (be brief and descriptive)', 'message-board' ) );
@@ -226,7 +226,7 @@ function mb_get_edit_form() {
 
 	$post = get_post( $edit );
 
-	if ( empty( $post ) || ( 'forum_topic' !== $post->post_type && 'forum_reply' !== $post->post_type ) )
+	if ( empty( $post ) || ( mb_get_topic_post_type() !== $post->post_type && 'forum_reply' !== $post->post_type ) )
 		return;
 
 	$edit = $post->ID;
@@ -241,7 +241,7 @@ function mb_get_edit_form() {
 	$form .= sprintf( '<legend>%s</legend>', $pt_object->labels->edit_item );
 
 	// title field
-	if ( 'forum_topic' === $post->post_type ) {
+	if ( mb_get_topic_post_type() === $post->post_type ) {
 
 		$default_fields['title']  = '<p>';
 		$default_fields['title'] .= sprintf( '<label for="mb_post_title">%s</label>', __( 'Topic title: (be brief and descriptive)', 'message-board' ) );

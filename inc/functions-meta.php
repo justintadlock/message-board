@@ -43,7 +43,7 @@ function mb_save_post( $post_id, $post = '' ) {
 	if ( empty( $post ) )
 		return;
 
-	if ( 'forum_topic' === $post->post_type ) {
+	if ( mb_get_topic_post_type() === $post->post_type ) {
 
 		$last_post_time = get_post_meta( $post_id, '_topic_activity_datetime', true );
 

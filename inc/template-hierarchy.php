@@ -16,13 +16,13 @@ function mb_template_include( $template ) {
 		);
 	}
 
-	elseif ( is_singular( 'forum_topic' ) && get_query_var( 'edit' ) && current_user_can( 'edit_post', absint( get_query_var( 'edit' ) ) ) ) {
+	elseif ( is_singular( mb_get_topic_post_type() ) && get_query_var( 'edit' ) && current_user_can( 'edit_post', absint( get_query_var( 'edit' ) ) ) ) {
 		$has_template = locate_template( 
 			array( "{$dir}/edit.php", "{$dir}/board.php" ) 
 		);
 	}
 
-	elseif ( is_singular( 'forum_topic' ) ) {
+	elseif ( is_singular( mb_get_topic_post_type() ) ) {
 		$has_template = locate_template( 
 			array( "{$dir}/single-topic.php", "{$dir}/board.php" ) 
 		);
@@ -40,7 +40,7 @@ function mb_template_include( $template ) {
 		);
 	}
 
-	elseif ( is_post_type_archive( 'forum_topic' ) ) {
+	elseif ( is_post_type_archive( mb_get_topic_post_type() ) ) {
 		$has_template = locate_template( 
 			array( "{$dir}/archive-topic.php" ) 
 		);

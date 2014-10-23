@@ -12,7 +12,7 @@ function mb_has_topics() {
 
 	$mb = message_board();
 
-	if ( is_archive( 'forum_topic' ) ) {
+	if ( is_archive( mb_get_topic_post_type() ) ) {
 		global $wp_the_query;
 		
 		$mb->topic_query = $wp_the_query;
@@ -23,7 +23,7 @@ function mb_has_topics() {
 		$per_page = mb_get_topics_per_page();
 
 		$defaults = array(
-			'post_type'           => 'forum_topic',
+			'post_type'           => mb_get_topic_post_type(),
 			'posts_per_page'      => $per_page,
 			'paged'               => get_query_var( 'paged' ),
 			'orderby'             => 'menu_order',
@@ -374,7 +374,7 @@ function mb_get_topic_voices( $topic_id = 0 ) {
 
 function mb_is_topic_paged() {
 
-	if ( !is_singular( 'forum_topic' ) )
+	if ( !is_singular( mb_get_topic_post_type() ) )
 		return false;
 
 	return is_paged() ? true : false;

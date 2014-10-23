@@ -74,7 +74,7 @@ function mb_handler_new_topic() {
 					'post_content' => $post_content,
 			//		'tax_input' => $tax_input,
 					'post_status' => 'publish',
-					'post_type' => 'forum_topic',
+					'post_type' => mb_get_topic_post_type(),
 					'post_parent' => $forum_id,
 				)
 			);
@@ -263,7 +263,7 @@ function mb_handler_edit_post() {
 				wp_die( __( 'Post not found!', 'message-board' ) );
 			}
 
-			if ( 'forum_topic' === $post->post_type ) {
+			if ( mb_get_topic_post_type() === $post->post_type ) {
 
 				if ( isset( $_POST['mb_post_title'] ) ) {
 
@@ -283,7 +283,7 @@ function mb_handler_edit_post() {
 						$post_forum = absint( $new_forum );
 					}
 				}
-			} // end check for 'forum_topic'
+			} // end check for forum topic
 
 			if ( empty( $_POST['mb_post_content'] ) ) {
 

@@ -183,7 +183,7 @@ function mb_set_forum_reply_count( $forum_id ) {
 function mb_get_forum_topic_ids( $forum_id ) {
 	global $wpdb;
 
-	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'forum_topic' AND post_parent = %s", absint( $forum_id ) ) );
+	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_parent = %s", mb_get_topic_post_type(), absint( $forum_id ) ) );
 }
 
 function mb_get_multi_topic_reply_ids( $topic_ids ) {
