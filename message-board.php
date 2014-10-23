@@ -3,7 +3,7 @@
  * Plugin Name: Message Board
  * Plugin URI:  http://themehybrid.com
  * Description: Simple forums for us simple folks.
- * Version:     1.0.0-alpha-1
+ * Version:     1.0.0-pre-alpha
  * Author:      Justin Tadlock
  * Author URI:  http://justintadlock.com
  * Text Domain: message-board
