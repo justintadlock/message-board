@@ -63,21 +63,21 @@ final class Message_Board {
 
 	private function includes() {
 
-		require_once( $this->dir_path . 'inc/core.php'           );
-		require_once( $this->dir_path . 'inc/post-types.php'     );
-		require_once( $this->dir_path . 'inc/meta.php'           );
-		require_once( $this->dir_path . 'inc/filters.php'        );
-		require_once( $this->dir_path . 'inc/formatting.php'     );
-		require_once( $this->dir_path . 'inc/query.php'          );
-		require_once( $this->dir_path . 'inc/capabilities.php'   );
-		require_once( $this->dir_path . 'inc/rewrite.php'        );
-		require_once( $this->dir_path . 'inc/functions-view.php' );
-		require_once( $this->dir_path . 'inc/functions-user.php' );
-		require_once( $this->dir_path . 'inc/handler.php'        );
-		require_once( $this->dir_path . 'inc/shortcodes.php'     );
-		require_once( $this->dir_path . 'inc/options.php'        );
-		require_once( $this->dir_path . 'inc/admin-bar.php'      );
-		require_once( $this->dir_path . 'inc/forum-meta.php'     );
+		require_once( $this->dir_path . 'inc/functions-core.php'           );
+		require_once( $this->dir_path . 'inc/functions-post-types.php'     );
+		require_once( $this->dir_path . 'inc/functions-meta.php'           );
+		require_once( $this->dir_path . 'inc/functions-filters.php'        );
+		require_once( $this->dir_path . 'inc/functions-formatting.php'     );
+		require_once( $this->dir_path . 'inc/functions-query.php'          );
+		require_once( $this->dir_path . 'inc/functions-capabilities.php'   );
+		require_once( $this->dir_path . 'inc/functions-rewrite.php'        );
+		require_once( $this->dir_path . 'inc/functions-view.php'           );
+		require_once( $this->dir_path . 'inc/functions-user.php'           );
+		require_once( $this->dir_path . 'inc/functions-handler.php'        );
+		require_once( $this->dir_path . 'inc/functions-shortcodes.php'     );
+		require_once( $this->dir_path . 'inc/functions-options.php'        );
+		require_once( $this->dir_path . 'inc/functions-admin-bar.php'      );
+		require_once( $this->dir_path . 'inc/functions-forum-meta.php'     );
 
 		/* Templates. */
 		require_once( $this->dir_path . 'inc/template-hierarchy.php' );
