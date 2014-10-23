@@ -38,7 +38,8 @@ function mb_is_message_board() {
 	if ( 1 == get_query_var( 'mb_profile' ) || get_query_var( 'mb_topics' ) || get_query_var( 'mb_replies' ) ||
 		get_query_var( 'mb_favorites' ) || get_query_var( 'mb_subscriptions' ) 
 		|| mb_is_view() || mb_is_user_view() || mb_is_forum_search() 
-		|| mb_is_forum_front() || is_post_type_archive( mb_get_topic_post_type() ) || is_singular( array( mb_get_forum_post_type(), mb_get_topic_post_type() ) ) )
+		|| mb_is_forum_front() || is_post_type_archive( mb_get_topic_post_type() ) 
+		|| is_singular( array( mb_get_forum_post_type(), mb_get_topic_post_type() ) ) )
 		return true;
 
 	return false;
@@ -161,7 +162,8 @@ function mb_the_posts( $posts, $query ) {
 
 		$posts = mb_the_posts_stickies( $posts, $super_stickies );
 	}
-
+/*
+	* @todo - add to forum topic query.
 	elseif ( !is_admin() && $query->is_main_query() ) {
 
 		$super_stickies = get_option( 'mb_super_sticky_topics', array() );
@@ -169,6 +171,7 @@ function mb_the_posts( $posts, $query ) {
 
 		$posts = mb_the_posts_stickies( $posts, array_merge( $super_stickies, $topic_stickies ) );
 	}
+*/
 
 	return $posts;
 }

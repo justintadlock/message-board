@@ -503,7 +503,7 @@ function mb_get_topic_form() {
 	$default_fields['title'] .= '</p>';
 
 	// forum field
-	if ( !is_singular( 'forum' ) ) {
+	if ( !is_singular( mb_get_forum_post_type() ) ) {
 		$default_fields['forum'] = '<p>';
 		$default_fields['forum'] .= sprintf( '<label for="mb_topic_forum">%s</label>', __( 'Select a forum:', 'message-board' ) );
 
@@ -528,32 +528,6 @@ function mb_get_topic_form() {
         $default_fields['forum'] .= '</select>';
     }
 
-/*
-		$default_fields['forum'] .= wp_dropdown_pages(
-			array(
-				'post_type'     => 'forum',
-				'name'          => 'mb_topic_forum',
-				'id'            => 'mb_topic_forum',
-				'sort_order'    => 'ASC',
-				'sort_column'   => 'post_title',
-				'hierarchical'  => true,
-				'echo'          => false
-			)
-		);
-*/
-/*		$default_fields['forum'] .= wp_dropdown_categories(
-			array(
-				'name'          => 'mb_topic_forum',
-				'id'            => 'mb_topic_forum',
-				'hierarchical'  => true,
-				'orderby'       => 'name',
-				'hide_empty'    => false,
-				'hide_if_empty' => true,
-				'taxonomy'      => 'forum',
-				'echo'          => false
-			)
-		);
-*/
 		$default_fields['forum'] .= '</p>';
 	}
 
@@ -574,7 +548,7 @@ function mb_get_topic_form() {
 		$form .= $field;
 	}
 
-	if ( is_singular( 'forum' ) )
+	if ( is_singular( mb_get_forum_post_type() ) )
 		$form .= sprintf( '<input type="hidden" name="mb_topic_forum" value="%s" />', absint( get_queried_object_id() ) );
 
 	$form .= sprintf( '<p><input type="submit" value="%s" /></p>', esc_attr__( 'Submit', 'message-board' ) );
