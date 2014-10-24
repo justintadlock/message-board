@@ -10,7 +10,7 @@ function mb_template_include( $template ) {
 
 	$dir = 'message-board';
 
-	if ( mb_is_forum_front() ) {
+	if ( is_post_type_archive( mb_get_forum_post_type() ) ) {
 		$has_template = locate_template( 
 			array( "{$dir}/archive-forum.php", "{$dir}/board.php" ) 
 		);
