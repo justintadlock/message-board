@@ -67,11 +67,11 @@ final class Message_Board {
 
 	private function includes() {
 
-		require_once( $this->dir_path . 'inc/functions-core.php'           );
 		require_once( $this->dir_path . 'inc/functions-forum.php'          );
 		require_once( $this->dir_path . 'inc/functions-topic.php'          );
 		require_once( $this->dir_path . 'inc/functions-reply.php'          );
 		require_once( $this->dir_path . 'inc/functions-post-types.php'     );
+		require_once( $this->dir_path . 'inc/functions-post-statuses.php'  );
 		require_once( $this->dir_path . 'inc/functions-meta.php'           );
 		require_once( $this->dir_path . 'inc/functions-filters.php'        );
 		require_once( $this->dir_path . 'inc/functions-formatting.php'     );
@@ -150,10 +150,6 @@ final class Message_Board {
 	}
 
 	public function register_views() {
-
-		/* Temporary: @todo - move to own function. */
-		//global $wpdb;
-		//$wpdb->termmeta = $wpdb->prefix . 'termmeta';
 
 		mb_register_view(
 			'popular',

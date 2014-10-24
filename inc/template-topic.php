@@ -79,6 +79,29 @@ function mb_show_lead_topic() {
 	return apply_filters( 'mb_show_lead_topic', $show_lead );
 }
 
+/* ====== Topic Status ====== */
+
+function mb_is_topic_open( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$status   = get_post_status( $topic_id );
+
+	return apply_filters( 'mb_is_topic_open', in_array( $status, array( 'publish', 'inherit' ) ) ? true : false, $topic_id );
+}
+
+function mb_is_topic_closed( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$status   = get_post_status( $topic_id );
+
+	return apply_filters( 'mb_is_topic_closed', 'closed' === $status ? true : false, $topic_id );
+}
+
+function mb_is_topic_spam( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$status   = get_post_status( $topic_id );
+
+	return apply_filters( 'mb_is_topic_spam', 'spam' === $status ? true : false, $topic_id );
+}
+
 /* ====== Topic Labels ====== */
 
 function mb_topic_labels( $topic_id = 0 ) {

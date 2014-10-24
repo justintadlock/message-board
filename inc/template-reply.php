@@ -60,6 +60,15 @@ function mb_the_reply() {
 	return message_board()->reply_query->the_post();
 }
 
+/* ====== Reply Status ====== */
+
+function mb_is_reply_spam( $reply_id = 0 ) {
+	$reply_id = mb_get_reply_id( $reply_id );
+	$status   = get_post_status( $reply_id );
+
+	return apply_filters( 'mb_is_reply_spam', 'spam' === $status ? true : false, $topic_id );
+}
+
 /* ====== Reply ID ====== */
 
 function mb_reply_id( $reply_id = 0 ) {
