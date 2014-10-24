@@ -8,81 +8,78 @@ add_filter( 'template_include', 'mb_template_include' );
 
 function mb_template_include( $template ) {
 
-	$dir = 'message-board';
+	$dir          = 'message-board';
+	$has_template = false;
+	$_templates   = array();
 
-	if ( is_post_type_archive( mb_get_forum_post_type() ) ) {
-		$has_template = locate_template( 
-			array( "{$dir}/archive-forum.php", "{$dir}/board.php" ) 
-		);
+	if ( is_singular( mb_get_forum_post_type() ) ) {
+
+		$_templates[] = "{$dir}/single-forum.php";
+	}
+
+	elseif ( is_post_type_archive( mb_get_forum_post_type() ) ) {
+
+		$_templates[] = "{$dir}/archive-forum.php";
 	}
 
 	elseif ( is_singular( mb_get_topic_post_type() ) && get_query_var( 'edit' ) && current_user_can( 'edit_post', absint( get_query_var( 'edit' ) ) ) ) {
-		$has_template = locate_template( 
-			array( "{$dir}/edit.php", "{$dir}/board.php" ) 
-		);
+
+		$_templates[] = "{$dir}/edit.php";
 	}
 
 	elseif ( is_singular( mb_get_topic_post_type() ) ) {
-		$has_template = locate_template( 
-			array( "{$dir}/single-topic.php", "{$dir}/board.php" ) 
-		);
-	}
 
-	elseif ( is_singular( mb_get_forum_post_type() ) ) {
-		$has_template = locate_template( 
-			array( "{$dir}/single-forum.php" ) 
-		);
-	}
-
-	elseif ( is_tax( 'forum_tag' ) ) {
-		$has_template = locate_template( 
-			array( "{$dir}/single-tag.php" ) 
-		);
+		$_templates[] = "{$dir}/single-topic.php";
 	}
 
 	elseif ( is_post_type_archive( mb_get_topic_post_type() ) ) {
-		$has_template = locate_template( 
-			array( "{$dir}/archive-topic.php" ) 
-		);
+
+		$_templates[] = "{$dir}/archive-topic.php";
 	}
 
 	elseif ( is_author() && mb_is_user_view() ) {
-		$has_template = locate_template( 
-			array( "{$dir}/single-user-topics.php", "{$dir}/single-user.php" ) 
-		);
+
+		$_templates[] = "{$dir}/single-user-topics.php";
+		$_templates[] = "{$dir}/single-user.php";
 	}
 
 	elseif ( is_author() && get_query_var( 'mb_subscriptions' ) ) {
-		$has_template = locate_template( 
-			array( "{$dir}/single-user-topics.php", "{$dir}/single-user.php" ) 
-		);
+
+		$_templates[] = "{$dir}/single-user-topics.php";
+		$_templates[] = "{$dir}/single-user.php";
 	}
 
 	elseif ( is_author() && get_query_var( 'mb_topics' ) ) {
-		$has_template = locate_template( 
-			array( "{$dir}/single-user-topics.php", "{$dir}/single-user.php" ) 
-		);
+
+		$_templates[] = "{$dir}/single-user-topics.php";
+		$_templates[] = "{$dir}/single-user.php";
 	}
 
 	elseif ( 1 == get_query_var( 'mb_profile' ) ) {
-		$has_template = locate_template( 
-			array( "{$dir}/single-user.php" ) 
-		);
+
+		$_templates[] = "{$dir}/single-user.php";
 	}
 
 	elseif ( mb_is_view() ) {
+
 		$view = sanitize_key( get_query_var( 'mb_view' ) );
 
-		$has_template = locate_template( 
-			array( "{$dir}/single-view-{$view}.php", "{$dir}/single-view.php" )
-		);
+		$_templates[] = "{$dir}/single-view-{$view}.php";
+		$_templates[] = "{$dir}/single-view.php";
 	}
 
 	elseif ( mb_is_forum_search() ) {
-		$has_template = locate_template( 
-			array( "{$dir}/search.php", "{$dir}/archive-topic.php" )
-		);
+
+		$_templates[] = "{$dir}/search.php";
+		$_templates[] = "{$dir}/archive-topic.php"; // temp
 	}
 
-	return !empty( $has_template ) ? $has_template : $template;
+	if ( !empty( $_templates ) ) {
+		$_templates[] = "{$dir}/board.php";
+		$has_template = locate_template( apply_filters( 'mb_template_hierarchy', $_templates ) );
+
+		return apply_filters( 'mb_template_include', !empty( $has_template ) ? $has_template : $template );
+	}
+
+	return $template;
 }
