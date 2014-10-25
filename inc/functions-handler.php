@@ -12,102 +12,122 @@ add_action( 'mb_template_redirect', 'mb_handler_edit_post'       );
 add_action( 'mb_template_redirect', 'mb_handler_topic_subscribe' );
 add_action( 'mb_template_redirect', 'mb_handler_topic_favorite'  );
 
-
+/**
+ * New topic handler. This function executes when a new topic is posted on the front end.
+ *
+ * @todo Separate some of the functionality into its own functions.
+ * @todo Use filter hooks for sanitizing rather than doing it directly in the function.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_handler_new_topic() {
 
-	if ( !isset( $_GET['message-board'] ) || !in_array( $_GET['message-board'], array( 'new-topic' ) ) )
+	/* Check if this is a new topic. */
+	if ( !isset( $_GET['message-board'] ) || 'new-topic' !== $_GET['message-board'] )
 		return;
 
-	if ( isset( $_POST['mb_new_topic_nonce'] ) ) {
- 
-		if ( !wp_verify_nonce( $_POST['mb_new_topic_nonce'], 'mb_new_topic_action' ) ) {
-			wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
-			exit;
-		} else {
+	/* Check if the new topic nonce was posted. */
+	if ( !isset( $_POST['mb_new_topic_nonce'] ) || !wp_verify_nonce( $_POST['mb_new_topic_nonce'], 'mb_new_topic_action' ) ) {
+		wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
+		exit;
+	}
 
-			if ( empty( $_POST['mb_topic_title'] ) ) {
+	/* Make sure the current user can create forum topics. */
+	if ( !current_user_can( 'create_forum_topics' ) ) {
+		wp_die( 'Sorry, you cannot create new forum topics.', 'message-board' );
+		exit;
+	}
 
-				wp_die( __( 'You did not enter a topic title!', 'message-board' ) );
-				exit;
-			} else {
+	/* Make sure we have a user ID. */
+	if ( ! $user_id = get_current_user_id() ) {
+		wp_die( 'Did not recognize user.', 'message-board' );
+		exit;
+	}
 
-				$post_title = esc_html( strip_tags( $_POST['mb_topic_title'] ) );
-			}
+	/* Make sure we have a topic title. */
+	if ( empty( $_POST['mb_topic_title'] ) ) {
+		wp_die( __( 'You did not enter a topic title!', 'message-board' ) );
+		exit;
+	}
 
+	/* Make sure we have topic content. */
+	if ( empty( $_POST['mb_topic_content'] ) ) {
+		wp_die( __( 'You did not enter any content!', 'message-board' ) );
+		exit;
+	}
 
-			if ( empty( $_POST['mb_topic_content'] ) ) {
+	/* Make sure we have a forum. */
+	if ( empty( $_POST['mb_topic_forum'] ) ) {
+		wp_die( __( 'No forum specified.', 'message-board' ) );
+		exit;
+	}
 
-				wp_die( __( 'You did not enter any content!', 'message-board' ) );
-				exit;
-			} else {
+	/* Post title. */
+	$post_title = esc_html( strip_tags( $_POST['mb_topic_title'] ) );
 
-				/* Post content. */
-				if ( !current_user_can( 'unfiltered_html' ) ) {
-					$post_content = $_POST['mb_topic_content'];
-					$post_content = mb_encode_bad( $post_content );
-					$post_content = mb_code_trick( $post_content );
-					$post_content = force_balance_tags( $post_content );
-					$post_content = wp_filter_post_kses( $post_content );
-				} else {
-					$post_content = $_POST['mb_topic_content'];
-				}
-			}
+	/* Post content. */
+	$post_content = $_POST['mb_topic_content'];
+	$post_content = mb_encode_bad( $post_content );
+	$post_content = mb_code_trick( $post_content );
+	$post_content = force_balance_tags( $post_content );
 
-			$user_id = get_current_user_id();
+	if ( !current_user_can( 'unfiltered_html' ) ) {
+		$post_content = wp_filter_post_kses( $post_content );
+	}
 
-			if ( empty( $user_id ) ) {
-				wp_die( 'Did not recognize user ID.', 'message-board' );
-				exit;
-			}
+	/* Forum ID. */
+	$forum_id = absint( $_POST['mb_topic_forum'] );
 
-			$forum_id = absint( $_POST['mb_topic_forum'] );
+	/* Post Date. */
+	$post_date = current_time( 'mysql' );
 
-			$post_date = current_time( 'mysql' );
+	/* Publish a new forum topic. */
+	$published = wp_insert_post(
+		array(
+			'menu_order'   => mysql2date( 'U', $post_date ), // Saved as datetime epoch.
+			'post_date'    => $post_date,
+			'post_author'  => absint( $user_id ),
+			'post_title'   => $post_title,
+			'post_content' => $post_content,
+			'post_status'  => 'publish',
+			'post_type'    => mb_get_topic_post_type(),
+			'post_parent'  => $forum_id,
+		)
+	);
 
-			/* Publish a new forum topic. */
-			$published = wp_insert_post(
-				array(
-					'menu_order' => mysql2date( 'U', $post_date ),
-					'post_date'   => $post_date,
-					'post_author' => absint( $user_id ),
-					'post_title' => $post_title,
-					'post_content' => $post_content,
-			//		'tax_input' => $tax_input,
-					'post_status' => 'publish',
-					'post_type' => mb_get_topic_post_type(),
-					'post_parent' => $forum_id,
-				)
-			);
+	/* If the post was published. */
+	if ( $published ) {
 
-			if ( $published ) {
+		/* If the user chose to subscribe to the topic. */
+		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] ) {
 
-				if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] ) {
+			/* Get the user's current subscriptions. */
+			$subscriptions = get_user_meta( absint( $user_id ), '_topic_subscriptions', true );
+			$subs          = explode( ',', $subscriptions );
 
-					$subscriptions = get_user_meta( absint( $user_id ), '_topic_subscriptions', true );
-					$subs = explode( ',', $subscriptions );
+			/* If ID not already in subscriptions list. */
+			if ( !in_array( $published, $subs ) ) {
+				$subs[] = $published;
 
-					if ( !in_array( $published, $subs ) ) {
-						$subs[] = $published;
+				$new_subscriptions = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
 
-						$new_subscriptions   = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
-
-						update_user_meta( absint( $user_id ), '_topic_subscriptions', $new_subscriptions );
-					}
-				}
-
-				/* Update forum meta. */
-
-				update_post_meta( $forum_id, '_forum_activity_datetime', $post_date );
-				update_post_meta( $forum_id, '_forum_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
-				update_post_meta( $forum_id, '_forum_last_topic_id', $published );
-
-				$topic_count = get_post_meta( $forum_id, '_forum_topic_count', true );
-				update_post_meta( $forum_id, '_forum_topic_count', absint( $topic_count ) + 1 );
-
-				/* Redirect. */
-				wp_safe_redirect( get_permalink( $published ) );
+				update_user_meta( absint( $user_id ), '_topic_subscriptions', $new_subscriptions );
 			}
 		}
+
+		/* Update forum meta. */
+
+		update_post_meta( $forum_id, '_forum_activity_datetime', $post_date );
+		update_post_meta( $forum_id, '_forum_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
+		update_post_meta( $forum_id, '_forum_last_topic_id', $published );
+
+		$topic_count = get_post_meta( $forum_id, '_forum_topic_count', true );
+		update_post_meta( $forum_id, '_forum_topic_count', absint( $topic_count ) + 1 );
+
+		/* Redirect to the published topic page. */
+		wp_safe_redirect( get_permalink( $published ) );
 	}
 }
 
