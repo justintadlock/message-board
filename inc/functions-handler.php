@@ -131,106 +131,127 @@ function mb_handler_new_topic() {
 	}
 }
 
+/**
+ * New reply handler. This function executes when a new reply is posted on the front end.
+ *
+ * @todo Separate some of the functionality into its own functions.
+ * @todo Use filter hooks for sanitizing rather than doing it directly in the function.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_handler_new_reply() {
 
+	/* Check if this is a new reply. */
 	if ( !isset( $_GET['message-board'] ) || !in_array( $_GET['message-board'], array( 'new-reply' ) ) )
 		return;
 
-	if ( isset( $_POST['mb_new_reply_nonce'] ) ) {
- 
-		if ( !wp_verify_nonce( $_POST['mb_new_reply_nonce'], 'mb_new_reply_action' ) ) {
-			wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
-			exit;
-		} else {
+	/* Check if the new reply nonce was posted. */
+	if ( !isset( $_POST['mb_new_reply_nonce'] ) || !wp_verify_nonce( $_POST['mb_new_reply_nonce'], 'mb_new_reply_action' ) ) {
+		wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
+		exit;
+	}
 
-			if ( empty( $_POST['mb_reply_topic_id'] ) ) {
+	/* Make sure the current user can create forum replies. */
+	if ( !current_user_can( 'create_forum_replies' ) ) {
+		wp_die( 'Sorry, you cannot create new replies.', 'message-board' );
+		exit;
+	}
 
-				wp_die( __( 'Topic ID could not be found.', 'message-board' ) );
-				exit;
-			} else {
-				$topic_id = absint( $_POST['mb_reply_topic_id'] );
+	/* Make sure we have a user ID. */
+	if ( ! $user_id = get_current_user_id() ) {
+		wp_die( 'Did not recognize user.', 'message-board' );
+		exit;
+	}
+
+	/* Make sure we have a topic ID. */
+	if ( empty( $_POST['mb_reply_topic_id'] ) ) {
+		wp_die( __( 'Forum topic not specified.', 'message-board' ) );
+		exit;
+	}
+
+	/* Make sure we have reply content. */
+	if ( empty( $_POST['mb_reply_content'] ) ) {
+		wp_die( __( 'You did not enter any content!', 'message-board' ) );
+		exit;
+	}
+
+	/* Parent post ID. */
+	$topic_id = absint( $_POST['mb_reply_topic_id'] );
+
+	/* Post content. */
+	$post_content = $_POST['mb_reply_content'];
+	$post_content = mb_encode_bad( $post_content );
+	$post_content = mb_code_trick( $post_content );
+	$post_content = force_balance_tags( $post_content );
+
+	if ( !current_user_can( 'unfiltered_html' ) ) {
+		$post_content = wp_filter_post_kses( $post_content );
+	}
+
+	/* Post Date. */
+	$post_date = current_time( 'mysql' );
+
+	/* Publish a new forum topic. */
+	$published = wp_insert_post(
+		array(
+			'post_date'    => $post_date,
+			'post_author'  => absint( $user_id ),
+			'post_content' => $post_content,
+			'post_parent'  => $topic_id,
+			'post_status'  => 'publish',
+			'post_type'    => mb_get_reply_post_type(),
+		)
+	);
+
+	/* If the post was published. */
+	if ( $published ) {
+
+		/* If the user chose to subscribe to the topic. */
+		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] ) {
+
+			/* Get the user's current subscriptions. */
+			$subscriptions = get_user_meta( absint( $user_id ), '_topic_subscriptions', true );
+			$subs          = explode( ',', $subscriptions );
+
+			/* If ID not already in subscriptions list. */
+			if ( !in_array( $topic_id, $subs ) ) {
+				$subs[] = $topic_id;
+
+				$new_subscriptions   = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
+
+				update_user_meta( absint( $user_id ), '_topic_subscriptions', $new_subscriptions );
+
+				/* Resets topic subscribers cache. */
+				mb_set_topic_subscribers( $topic_id );
 			}
+		}
 
-			if ( empty( $_POST['mb_reply_content'] ) ) {
+		/* Update topic. */
 
-				wp_die( __( 'You did not enter any content!', 'message-board' ) );
-				exit;
-			} else {
-
-				/* Post content. */
-				if ( !current_user_can( 'unfiltered_html' ) ) {
-					$post_content = $_POST['mb_reply_content'];
-					$post_content = mb_encode_bad( $post_content );
-					$post_content = mb_code_trick( $post_content );
-					$post_content = force_balance_tags( $post_content );
-					$post_content = wp_filter_post_kses( $post_content );
-				} else {
-					$post_content = $_POST['mb_reply_content'];
-				}
-			}
-
-			$user_id = get_current_user_id();
-
-			if ( empty( $user_id ) ) {
-				wp_die( 'Did not recognize user ID.', 'message-board' );
-				exit;
-			}
-
-			$post_date = current_time( 'mysql' );
-
-			/* Publish a new forum topic. */
-			$published = wp_insert_post(
-				array(
-					'post_date'   => $post_date,
-					'post_author' => absint( $user_id ),
-					'post_content' => $post_content,
-					'post_parent' => $topic_id,
-					'post_status' => 'publish',
-					'post_type' => mb_get_reply_post_type(),
-				)
-			);
-
-			if ( $published ) {
-
-				if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] ) {
-
-					$subscriptions = get_user_meta( absint( $user_id ), '_topic_subscriptions', true );
-					$subs = explode( ',', $subscriptions );
-
-					if ( !in_array( $topic_id, $subs ) ) {
-						$subs[] = $topic_id;
-
-						$new_subscriptions   = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
-
-						update_user_meta( absint( $user_id ), '_topic_subscriptions', $new_subscriptions );
-
-						mb_set_topic_subscribers( $topic_id );
-					}
-				}
-
-
-
-		//$topic_id = get_post_field( 'parent', $published );
-		$reply_date = get_post_field( 'post_date', $published );
-
-		$old_topic = get_post( $topic_id, 'ARRAY_A' );
-		$old_topic['menu_order'] = mysql2date( 'U', $reply_date );
-		$old_topic['ID'] = $topic_id;
+		$old_topic               = get_post( $topic_id, 'ARRAY_A' );
+		$old_topic['menu_order'] = mysql2date( 'U', $post_date );
+		$old_topic['ID']         = $topic_id;
 
 		wp_insert_post( $old_topic );
 
+		/* Update forum meta. */
+
 		$forum_id = mb_get_topic_forum_id( $topic_id );
 
-		update_post_meta( $forum_id, '_forum_activity_datetime', $post_date );
+		update_post_meta( $forum_id, '_forum_activity_datetime',       $post_date );
 		update_post_meta( $forum_id, '_forum_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
-		update_post_meta( $forum_id, '_forum_last_reply_id', $published );
-		update_post_meta( $forum_id, '_forum_last_topic_id', $topic_id );
+		update_post_meta( $forum_id, '_forum_last_reply_id',           $published );
+		update_post_meta( $forum_id, '_forum_last_topic_id',           $topic_id );
 
 		$reply_count = get_post_meta( $forum_id, '_forum_reply_count', true );
 		update_post_meta( $forum_id, '_forum_reply_count', absint( $reply_count ) + 1 );
 
-		update_post_meta( $topic_id, '_topic_activity_datetime',       $reply_date );
-		update_post_meta( $topic_id, '_topic_activity_datetime_epoch', mysql2date( 'U', $reply_date ) );
+		/* Update topic meta. */
+
+		update_post_meta( $topic_id, '_topic_activity_datetime',       $post_date );
+		update_post_meta( $topic_id, '_topic_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
 		update_post_meta( $topic_id, '_topic_last_reply_id',           $published );
 
 		$voices = get_post_meta( $topic_id, '_topic_voices' );
@@ -243,17 +264,15 @@ function mb_handler_new_reply() {
 			update_post_meta( $topic_id, '_topic_voice_count', $count );
 		}
 
-			$count = get_post_meta( $topic_id, '_topic_reply_count', true );
+		$count = get_post_meta( $topic_id, '_topic_reply_count', true );
 
-				$i = absint( $count ) + 1;
+		update_post_meta( $topic_id, '_topic_reply_count', absint( $count ) + 1 );
 
-				update_post_meta( $topic_id, '_topic_reply_count', $i );
+		/* Notify topic subscribers. */
+		mb_notify_topic_subscribers( $topic_id, $published );
 
-				mb_notify_topic_subscribers( $topic_id, $published );
-
-				wp_safe_redirect( get_permalink( $published ) );
-			}
-		}
+		/* Redirect to the published topic page. */
+		wp_safe_redirect( get_permalink( $published ) );
 	}
 }
 
