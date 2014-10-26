@@ -1,5 +1,51 @@
 <?php
 
+function mb_get_user_subscriptions( $user_id ) {
+
+	$subscriptions = get_user_meta( $user_id, '_topic_subscriptions', true );
+
+	return !empty( $subscriptions ) ? explode( ',', $subscriptions ) : array();
+}
+
+function mb_update_user_subscriptions( $user_id, $subs ) {
+
+	if ( is_array( $subs ) ) {
+		$subs = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
+	}
+
+	return update_user_meta( $user_id, '_topic_subscriptions', $subs );
+}
+
+function mb_add_user_subscription( $user_id, $topic_id ) {
+
+	$subs = mb_get_user_subscriptions( $user_id );
+
+	/* If ID not already in subscriptions list. */
+	if ( !in_array( $topic_id, $subs ) ) {
+		$subs[] = $topic_id;
+
+		return mb_update_user_subscriptions( $user_id, $subs );
+	}
+
+	return false;
+}
+
+function mb_remove_user_subscription( $user_id, $topic_id ) {
+
+	$subs = mb_get_user_subscriptions( $user_id );
+
+	if ( in_array( $topic_id, $subs ) ) {
+
+		$_sub = array_search( $topic_id, $subs );
+
+		unset( $subs[ $_sub ] );
+
+		return mb_update_user_subscriptions( $user_id, $subs );
+	}
+
+	return false;
+}
+
 function mb_notify_topic_subscribers( $topic_id, $reply_id ) {
 
 	$subscribers =  mb_get_topic_subscribers( $topic_id, true );

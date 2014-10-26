@@ -103,18 +103,7 @@ function mb_handler_new_topic() {
 		/* If the user chose to subscribe to the topic. */
 		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] ) {
 
-			/* Get the user's current subscriptions. */
-			$subscriptions = get_user_meta( absint( $user_id ), '_topic_subscriptions', true );
-			$subs          = explode( ',', $subscriptions );
-
-			/* If ID not already in subscriptions list. */
-			if ( !in_array( $published, $subs ) ) {
-				$subs[] = $published;
-
-				$new_subscriptions = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
-
-				update_user_meta( absint( $user_id ), '_topic_subscriptions', $new_subscriptions );
-			}
+			mb_add_user_subscription( absint( $user_id ), $published );
 		}
 
 		/* Update forum meta. */
@@ -211,18 +200,9 @@ function mb_handler_new_reply() {
 		/* If the user chose to subscribe to the topic. */
 		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] ) {
 
-			/* Get the user's current subscriptions. */
-			$subscriptions = get_user_meta( absint( $user_id ), '_topic_subscriptions', true );
-			$subs          = explode( ',', $subscriptions );
+			$added = mb_add_user_subscription( absint( $user_id ), $topic_id );
 
-			/* If ID not already in subscriptions list. */
-			if ( !in_array( $topic_id, $subs ) ) {
-				$subs[] = $topic_id;
-
-				$new_subscriptions   = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
-
-				update_user_meta( absint( $user_id ), '_topic_subscriptions', $new_subscriptions );
-
+			if ( $added ) {
 				/* Resets topic subscribers cache. */
 				mb_set_topic_subscribers( $topic_id );
 			}
@@ -388,39 +368,17 @@ function mb_handler_topic_subscribe() {
 
 	if ( 0 < $user_id && 0 < $topic_id && 'subscribe' === $_GET['action'] ) {
 
-		// mb_get_user_subscriptions( $user_id );
+		$added = mb_add_user_subscription( absint( $user_id ), $topic_id );
 
-		$subscriptions = get_user_meta( $user_id, '_topic_subscriptions', true );
-		$subs = explode( ',', $subscriptions );
-
-
-		if ( !in_array( $topic_id, $subs ) ) {
-			$subs[] = $topic_id;
-
-			$new_subscriptions   = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
-
-			update_user_meta( $user_id, '_topic_subscriptions', $new_subscriptions );
-
+		if ( $added ) {
 			mb_set_topic_subscribers( $topic_id );
 		}
 
 	} elseif ( 0 < $user_id && 0 < $topic_id && 'unsubscribe' === $_GET['action'] ) {
 
-		// mb_get_user_subscriptions( $user_id );
+		$removed = mb_remove_user_subscription( $user_id, $topic_id );
 
-		$subscriptions = get_user_meta( $user_id, '_topic_subscriptions', true );
-		$subs = explode( ',', $subscriptions );
-
-		if ( in_array( $topic_id, $subs ) ) {
-
-			$_sub = array_search( $topic_id, $subs );
-
-			unset( $subs[ $_sub ] );
-
-			$new_subscriptions   = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
-
-			update_user_meta( $user_id, '_topic_subscriptions', $new_subscriptions );
-
+		if ( $removed ) {
 			mb_set_topic_subscribers( $topic_id );
 		}
 	}
