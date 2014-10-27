@@ -7,12 +7,22 @@
  * @access public
  * @return bool
  */
-function mb_has_forums() {
+function mb_forum_query() {
 	$mb = message_board();
+
+	if ( !is_null( $mb->forum_query->query ) ) {
+
+		$have_posts = $mb->forum_query->have_posts();
+
+		if ( empty( $have_posts ) )
+			wp_reset_postdata();
+
+		return $have_posts;
+	}
 
 	if ( is_post_type_archive( mb_get_forum_post_type() ) ) {
 		global $wp_query;
-		
+
 		$mb->forum_query = $wp_query;
 	}
 
@@ -35,24 +45,6 @@ function mb_has_forums() {
 	}
 
 	return $mb->forum_query->have_posts();
-}
-
-/**
- * Function for use within a while loop to loop through the available forums found in the 
- * forum query.
- *
- * @since  1.0.0
- * @access public
- * @return bool
- */
-function mb_forums() {
-
-	$have_posts = message_board()->forum_query->have_posts();
-
-	if ( empty( $have_posts ) )
-		wp_reset_postdata();
-
-	return $have_posts;
 }
 
 /**

@@ -8,11 +8,20 @@
  * @access public
  * @return bool
  */
-function mb_has_topics() {
-
+function mb_topic_query() {
 	$mb = message_board();
 
-	if ( is_archive( mb_get_topic_post_type() ) ) {
+	if ( !is_null( $mb->topic_query->query ) ) {
+
+		$have_posts = $mb->topic_query->have_posts();
+
+		if ( empty( $have_posts ) )
+			wp_reset_postdata();
+
+		return $have_posts;
+	}
+
+	if ( is_singular( mb_get_topic_post_type() ) || is_archive( mb_get_topic_post_type() ) ) {
 		global $wp_the_query;
 		
 		$mb->topic_query = $wp_the_query;
@@ -39,24 +48,6 @@ function mb_has_topics() {
 	}
 
 	return $mb->topic_query->have_posts();
-}
-
-/**
- * Function for use within a while loop to loop through the available topics found in the 
- * topic query.
- *
- * @since  1.0.0
- * @access public
- * @return bool
- */
-function mb_topics() {
-
-	$have_posts = message_board()->topic_query->have_posts();
-
-	if ( empty( $have_posts ) )
-		wp_reset_postdata();
-
-	return $have_posts;
 }
 
 /**

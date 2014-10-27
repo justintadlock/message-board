@@ -7,8 +7,18 @@
  * @access public
  * @return bool
  */
-function mb_has_replies() {
+function mb_reply_query() {
 	$mb = message_board();
+
+	if ( !is_null( $mb->reply_query->query ) ) {
+
+		$have_posts = $mb->reply_query->have_posts();
+
+		if ( empty( $have_posts ) )
+			wp_reset_postdata();
+
+		return $have_posts;
+	}
 
 	$per_page = mb_get_replies_per_page();
 
@@ -29,24 +39,6 @@ function mb_has_replies() {
 	$mb->reply_query = new WP_Query( $defaults );
 
 	return $mb->reply_query->have_posts();
-}
-
-/**
- * Function for use within a while loop to loop through the available replies found in the 
- * reply query.
- *
- * @since  1.0.0
- * @access public
- * @return bool
- */
-function mb_replies() {
-
-	$have_posts = message_board()->reply_query->have_posts();
-
-	if ( empty( $have_posts ) )
-		wp_reset_postdata();
-
-	return $have_posts;
 }
 
 /**
