@@ -4,6 +4,12 @@ function mb_get_topic_post_type() {
 	return apply_filters( 'mb_get_topic_post_type', 'forum_topic' );
 }
 
+function mb_get_multi_topic_reply_ids( $topic_ids ) {
+	global $wpdb;
+
+	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish'  AND post_parent IN ( " . implode( ',', $topic_ids ) . " )", mb_get_reply_post_type() ) );
+}
+
 function mb_get_topic_subscribers( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
