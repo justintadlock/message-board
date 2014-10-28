@@ -84,7 +84,6 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/functions-shortcodes.php'     );
 		require_once( $this->dir_path . 'inc/functions-options.php'        );
 		require_once( $this->dir_path . 'inc/functions-admin-bar.php'      );
-		require_once( $this->dir_path . 'inc/functions-forum-meta.php'     );
 
 		/* Templates. */
 		require_once( $this->dir_path . 'inc/template-hierarchy.php' );

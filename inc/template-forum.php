@@ -166,7 +166,7 @@ function mb_set_forum_topic_count( $forum_id ) {
 	$count = count( $topic_ids );
 
 	if ( !empty( $count ) )
-		mb_update_forum_meta( $forum_id, '_forum_topic_count', $count );
+		update_post_meta( $forum_id, '_forum_topic_count', $count );
 
 	return $count;
 }
@@ -183,7 +183,7 @@ function mb_set_forum_reply_count( $forum_id ) {
 	$count = !empty( $reply_ids ) ? count( $reply_ids ) : 0;
 
 	if ( !empty( $count ) )
-		mb_update_forum_meta( $forum_id, '_forum_reply_count', $count );
+		update_post_meta( $forum_id, '_forum_reply_count', $count );
 
 	return $count;
 }
@@ -205,7 +205,7 @@ function mb_forum_last_topic_id( $forum_id ) {
 }
 
 function mb_get_forum_last_topic_id( $forum_id ) {
-	$topic_id = mb_get_forum_meta( $forum_id, '_forum_last_topic_id', true );
+	$topic_id = get_post_meta( $forum_id, '_forum_last_topic_id', true );
 
 	return !empty( $topic_id ) ? absint( $topic_id ) : 0;
 }
@@ -215,7 +215,7 @@ function mb_forum_last_reply_id( $forum_id ) {
 }
 
 function mb_get_forum_last_reply_id( $forum_id ) {
-	$topic_id = mb_get_forum_meta( $forum_id, '_forum_last_reply_id', true );
+	$topic_id = get_post_meta( $forum_id, '_forum_last_reply_id', true );
 
 	return !empty( $reply_id ) ? absint( $reply_id ) : 0;
 }
