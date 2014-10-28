@@ -81,6 +81,9 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/functions-options.php'        );
 		require_once( $this->dir_path . 'inc/functions-admin-bar.php'      );
 
+		/* Load common files. */
+		require_once( $this->dir_path . 'inc/common/template.php' );
+
 		/* Load forum files. */
 		require_once( $this->dir_path . 'inc/forum/functions.php' );
 		require_once( $this->dir_path . 'inc/forum/template.php'  );
@@ -100,7 +103,6 @@ final class Message_Board {
 		/* Templates. */
 		require_once( $this->dir_path . 'inc/template-hierarchy.php' );
 		require_once( $this->dir_path . 'inc/template.php'           );
-		require_once( $this->dir_path . 'inc/template-post.php'      );
 		require_once( $this->dir_path . 'inc/template-view.php'      );
 
 		if ( is_admin() ) {
