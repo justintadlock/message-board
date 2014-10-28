@@ -58,7 +58,56 @@ function mb_is_reply_spam( $reply_id = 0 ) {
 	$reply_id = mb_get_reply_id( $reply_id );
 	$status   = get_post_status( $reply_id );
 
-	return apply_filters( 'mb_is_reply_spam', 'spam' === $status ? true : false, $topic_id );
+	return apply_filters( 'mb_is_reply_spam', 'spam' === $status ? true : false, $reply_id );
+}
+
+function mb_reply_spam_url( $reply_id = 0 ) {
+	echo mb_get_reply_spam_url( $reply_id );
+}
+
+function mb_get_reply_spam_url( $reply_id = 0 ) {
+
+	$reply_id = mb_get_reply_id( $reply_id );
+	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+	$url = esc_url( add_query_arg( array( 'action' => 'spam', 'reply_id' => $reply_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+
+	return apply_filters( 'mb_get_reply_spam_url', $url, $reply_id );
+}
+
+function mb_reply_unspam_url( $reply_id = 0 ) {
+	echo mb_get_reply_unspam_url( $reply_id );
+}
+
+function mb_get_reply_unspam_url( $reply_id = 0 ) {
+
+	$reply_id = mb_get_reply_id( $reply_id );
+	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+	$url = esc_url( add_query_arg( array( 'action' => 'unspam', 'reply_id' => $reply_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+
+	return apply_filters( 'mb_get_reply_unspam_url', $url, $reply_id );
+}
+
+function mb_reply_spam_link( $reply_id = 0 ) {
+	echo mb_get_reply_spam_link( $reply_id );
+}
+
+function mb_get_reply_spam_link( $reply_id = 0 ) {
+
+	if ( !current_user_can( 'manage_forums' ) )
+		return '';
+
+	$reply_id = mb_get_reply_id( $reply_id );
+
+	if ( !mb_is_reply_spam( $reply_id ) ) {
+		$link = sprintf( '<a class="spam-link" href="%s">%s</a>', mb_get_reply_spam_url( $reply_id ), __( 'Spam', 'message-board' ) );
+	}
+	else {
+		$link = sprintf( '<a class="spam-link" href="%s">%s</a>', mb_get_reply_spam_url( $reply_id ), __( 'Unspam', 'message-board' ) );
+	}
+
+	return $link;
 }
 
 /* ====== Reply ID ====== */
