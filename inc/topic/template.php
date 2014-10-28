@@ -77,7 +77,7 @@ function mb_the_topic() {
  * @return bool
  */
 function mb_show_lead_topic() {
-	return apply_filters( 'mb_show_lead_topic', is_paged() ? false : true );
+	return apply_filters( 'mb_show_lead_topic', mb_is_topic_paged() ? false : true );
 }
 
 /* ====== Topic Status ====== */
@@ -669,11 +669,7 @@ function mb_get_topic_voices( $topic_id = 0 ) {
  * @return bool
  */
 function mb_is_topic_paged() {
-
-	if ( !is_singular( mb_get_topic_post_type() ) )
-		return false;
-
-	return is_paged() ? true : false;
+	return is_singular( mb_get_topic_post_type() ) && is_paged() ? true : false;
 }
 
 /**

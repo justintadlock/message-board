@@ -569,11 +569,7 @@ function mb_get_forum_reply_count( $forum_id = 0 ) {
  * @return bool
  */
 function mb_is_forum_paged() {
-
-	if ( !is_singular( mb_get_forum_post_type() ) )
-		return false;
-
-	return is_paged() ? true : false;
+	return is_singular( mb_get_forum_post_type() ) && is_paged() ? true : false;
 }
 
 /**
