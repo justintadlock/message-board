@@ -174,7 +174,7 @@ function mb_get_reply_form() {
 	$form .= sprintf( '<p><input type="submit" value="%s" /></p>', esc_attr__( 'Submit', 'message-board' ) );
 	$form .= sprintf( '<input type="hidden" name="mb_reply_topic_id" value="%s" />', absint( get_queried_object_id() ) );
 
-	if ( !mb_is_user_subscribed_to_topic( get_current_user_id(), get_queried_object_id() ) ) {
+	if ( !mb_is_user_subscribed_topic( get_current_user_id(), get_queried_object_id() ) ) {
 		$form .= sprintf( '<p><label><input type="checkbox" name="mb_topic_subscribe" value="1" /> %s</label></p>', __( 'Notify me of follow-up posts via email', 'message-board' ) );
 	}
 

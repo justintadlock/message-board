@@ -2,7 +2,9 @@
 
 /**
  * Creates a new topic query and checks if there are any topics found.  Note that we ue the main 
- * WordPress query if viewing the topic archive.
+ * WordPress query if viewing the topic archive or a single topic.  This function is a wrapper 
+ * function for the standard WP `have_posts()`, but this function should be used instead because 
+ * it must also create a query of its own under some circumstances.
  *
  * @since  1.0.0
  * @access public
@@ -11,6 +13,7 @@
 function mb_topic_query() {
 	$mb = message_board();
 
+	/* If a query has already been created, let's roll. */
 	if ( !is_null( $mb->topic_query->query ) ) {
 
 		$have_posts = $mb->topic_query->have_posts();
@@ -21,12 +24,14 @@ function mb_topic_query() {
 		return $have_posts;
 	}
 
+	/* Use the main WP query when viewing a single topic or topic archive. */
 	if ( is_singular( mb_get_topic_post_type() ) || is_archive( mb_get_topic_post_type() ) ) {
 		global $wp_the_query;
 		
 		$mb->topic_query = $wp_the_query;
 	}
 
+	/* Create a new query if all else fails. */
 	else {
 
 		$per_page = mb_get_topics_per_page();
@@ -63,15 +68,27 @@ function mb_the_topic() {
 
 /* ====== Lead Topic ====== */
 
+/**
+ * Whether to show the topic when viewing a single topic page.  By default, the topic is shown 
+ * on page #1, but it's not shown on subsequent pages if the topic is paginated.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
 function mb_show_lead_topic() {
-
-	$show_lead = is_paged() ? false : true;
-
-	return apply_filters( 'mb_show_lead_topic', $show_lead );
+	return apply_filters( 'mb_show_lead_topic', is_paged() ? false : true );
 }
 
 /* ====== Topic Status ====== */
 
+/**
+ * Whether the topic is open to new replies.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
 function mb_is_topic_open( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 	$status   = get_post_status( $topic_id );
@@ -79,32 +96,34 @@ function mb_is_topic_open( $topic_id = 0 ) {
 	return apply_filters( 'mb_is_topic_open', in_array( $status, array( 'publish', 'inherit' ) ) ? true : false, $topic_id );
 }
 
-function mb_is_topic_closed( $topic_id = 0 ) {
-	$topic_id = mb_get_topic_id( $topic_id );
-	$status   = get_post_status( $topic_id );
-
-	return apply_filters( 'mb_is_topic_closed', 'closed' === $status ? true : false, $topic_id );
-}
-
-function mb_is_topic_spam( $topic_id = 0 ) {
-	$topic_id = mb_get_topic_id( $topic_id );
-	$status   = get_post_status( $topic_id );
-
-	return apply_filters( 'mb_is_topic_spam', 'spam' === $status ? true : false, $topic_id );
-}
-
 /* ====== Topic Labels ====== */
 
+/**
+ * Outputs a topics labels.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_topic_labels( $topic_id = 0 ) {
 	echo mb_get_topic_labels( $topic_id );
 }
 
+/**
+ * Returns a topic's labels.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
 function mb_get_topic_labels( $topic_id = 0 ) {
 	$topic_id       = mb_get_topic_id( $topic_id );
 	$labels = array();
 
 	if ( mb_is_topic_sticky( $topic_id ) )
 		$labels['sticky'] = __( '[Sticky]', 'message-board' );
+
+	$labels = apply_filters( 'mb_topic_labels', $labels, $topic_id );
 
 	if ( !empty( $labels ) ) {
 
@@ -121,6 +140,14 @@ function mb_get_topic_labels( $topic_id = 0 ) {
 
 /* ====== Topic Sticky ====== */
 
+/**
+ * Checks if a topic is sticky.  Sticky topics are only sticky for their specific forum.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return bool
+ */
 function mb_is_topic_sticky( $topic_id = 0 ) {
 	$topic_id       = mb_get_topic_id( $topic_id );
 	$super_stickies = get_option( 'mb_super_sticky_topics', array() );
@@ -130,6 +157,15 @@ function mb_is_topic_sticky( $topic_id = 0 ) {
 	return in_array( $topic_id, $stickies ) ? true : false;
 }
 
+/**
+ * Checks if a topic is super sticky.  Super sticky topics are sticky on all forums as well as 
+ * the topic archive page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return bool
+ */
 function mb_is_topic_super_sticky( $topic_id = 0 ) {
 	$topic_id       = mb_get_topic_id( $topic_id );
 	$super_stickies = get_option( 'mb_super_sticky_topics', array() );
@@ -139,89 +175,247 @@ function mb_is_topic_super_sticky( $topic_id = 0 ) {
 
 /* ====== Topic ID ====== */
 
+/**
+ * Displays the topic ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_id( $topic_id = 0 ) {
 	echo mb_get_topic_id( $topic_id );
 }
 
+/**
+ * Returns the topic ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return int
+ */
 function mb_get_topic_id( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_id', mb_get_post_id( $topic_id ), $topic_id );
 }
 
 /* ====== Topic Content ====== */
 
+/**
+ * Displays the topic content.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_content( $topic_id = 0 ) {
 	echo mb_get_topic_content( $topic_id );
 }
 
+/**
+ * Returns the topic content.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_content( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_content', mb_get_post_content( $topic_id ), $topic_id );
 }
 
 /* ====== Topic Title ====== */
 
+/**
+ * Displays the single topic title.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $prefix
+ * @param  bool    $echo
+ * @return string
+ */
 function mb_single_topic_title( $prefix = '', $echo = true ) {
-	return apply_filters( 'mb_single_topic_title', single_post_title( $prefix, $echo ) );
+	$title = apply_filters( 'mb_single_topic_title', single_post_title( $prefix, false ) );
+
+	if ( false === $echo )
+		return $title;
+
+	echo $title;
 }
 
+/**
+ * Displays the topic title.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_title( $topic_id = 0 ) {
 	echo mb_get_topic_title( $topic_id );
 }
 
+/**
+ * Returns the topic title.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_title( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_title', mb_get_post_title( $topic_id ), $topic_id );
 }
 
 /* ====== Topic URL ====== */
 
+/**
+ * Displays the topic URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_url( $topic_id = 0 ) {
 	echo mb_get_topic_url( $topic_id );
 }
 
+/**
+ * Returns the topic URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_url( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_url', mb_get_post_url( $topic_id ), $topic_id );
 }
 
+/**
+ * Displays the topic link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_link( $topic_id = 0 ) {
 	echo mb_get_topic_link( $topic_id );
 }
 
+/**
+ * Returns the topic link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_link( $topic_id = 0 ) {
 	$url   = mb_get_topic_url(   $topic_id );
 	$title = mb_get_topic_title( $topic_id );
 
-	return sprintf( '<a href="%s">%s</a>', $url, $title );
+	return apply_filters( 'mb_get_topic_link', sprintf( '<a href="%s">%s</a>', $url, $title ), $topic_id );
 }
 
 /* ====== Topic Author ====== */
 
+/**
+ * Displays the topic author ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_author_id( $topic_id = 0 ) {
 	echo mb_get_topic_author_id( $topic_id );
 }
 
+/**
+ * Returns the topic autor ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return int
+ */
 function mb_get_topic_author_id( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_author_id', mb_get_post_author_id( $topic_id ), $topic_id );
 }
 
+/**
+ * Displays the topic author.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_author( $topic_id = 0 ) {
 	echo mb_get_topic_author( $topic_id );
 }
 
+/**
+ * Returns the topic author.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_author( $topic_id = 0 ) {
-	return apply_filters( 'mb_get_topic_author_display_name', mb_get_post_author( $topic_id ), $topic_id );
+	return apply_filters( 'mb_get_topic_author', mb_get_post_author( $topic_id ), $topic_id );
 }
 
+/**
+ * Displays the topic author profile URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_author_profile_url( $topic_id = 0 ) {
 	echo mb_get_topic_author_profile_url( $topic_id );
 }
 
+/**
+ * Returns the topic author profile URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_author_profile_url( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_author_profile_url', mb_get_post_author_profile_url( $topic_id ), $topic_id );
 }
 
+/**
+ * Displays the topic author profile link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_author_profile_link( $topic_id = 0 ) {
 	echo mb_get_topic_author_profile_link( $topic_id );
 }
 
+/**
+ * Returns the topic author profile link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_author_profile_link( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_author_profile_link', mb_get_post_author_profile_link( $topic_id ), $topic_id );
 }
@@ -302,10 +496,26 @@ function mb_get_topic_last_reply_id( $topic_id = 0 ) {
 
 /* ====== Last Post Author ====== */
 
+/**
+ * Displays the last post author for a topic.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_last_poster( $topic_id = 0 ) {
 	echo mb_get_topic_last_poster( $topic_id );
 }
 
+/**
+ * Returns the last post author for a topic.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_last_poster( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 	$reply_id = mb_get_topic_last_reply_id( $topic_id );
@@ -317,10 +527,26 @@ function mb_get_topic_last_poster( $topic_id = 0 ) {
 
 /* ====== Last Post URL ====== */
 
+/**
+ * Displays the last post URL for a topic.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_last_post_url( $topic_id = 0 ) {
 	echo mb_get_topic_last_post_url( $topic_id );
 }
 
+/**
+ * Returns a topic's last post URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_last_post_url( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 	$reply_id = mb_get_topic_last_reply_id( $topic_id );
@@ -332,10 +558,26 @@ function mb_get_topic_last_post_url( $topic_id = 0 ) {
 
 /* ====== Post/Reply Count ====== */
 
+/**
+ * Displays the topic reply count.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_reply_count( $topic_id = 0 ) {
 	echo mb_get_topic_reply_count( $topic_id );
 }
 
+/**
+ * Returns the topic reply count.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_reply_count( $topic_id = 0 ) {
 	$topic_id    = mb_get_topic_id( $topic_id );
 	$reply_count = get_post_meta( $topic_id, '_topic_reply_count', true );
@@ -343,10 +585,26 @@ function mb_get_topic_reply_count( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_reply_count', absint( $reply_count ), $topic_id );
 }
 
+/**
+ * Displays the topic post count (topic + reply count).
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_post_count( $topic_id = 0 ) {
 	echo mb_get_topic_post_count( $topic_id );
 }
 
+/**
+ * Returns the topic post count (topic + reply count).
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_post_count( $topic_id = 0 ) {
 	$post_count = 1 + mb_get_topic_reply_count( $topic_id );
 
@@ -355,10 +613,26 @@ function mb_get_topic_post_count( $topic_id = 0 ) {
 
 /* ====== Topic Voices ====== */
 
+/**
+ * Displays the topic voice count.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_voice_count( $topic_id = 0 ) {
 	echo mb_get_topic_voice_count( $topic_id );
 }
 
+/**
+ * Retuurns the topic voice count.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return int
+ */
 function mb_get_topic_voice_count( $topic_id = 0 ) {
 	$topic_id     = mb_get_topic_id( $topic_id );
 	$voice_count  = get_post_meta( $topic_id, '_topic_voice_count', true );
@@ -368,6 +642,14 @@ function mb_get_topic_voice_count( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_voice_count', $voice_count, $topic_id );
 }
 
+/**
+ * Returns an array of user IDs (topic voices).
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return array
+ */
 function mb_get_topic_voices( $topic_id = 0 ) {
 	$topic_id     = mb_get_topic_id( $topic_id );
 	$topic_voices = get_post_meta( $topic_id, '_topic_voices' );
@@ -379,6 +661,13 @@ function mb_get_topic_voices( $topic_id = 0 ) {
 
 /* ====== Pagination ====== */
 
+/**
+ * Checks if viewing a paginated topic. Only for use on single topic pages.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
 function mb_is_topic_paged() {
 
 	if ( !is_singular( mb_get_topic_post_type() ) )
@@ -387,8 +676,17 @@ function mb_is_topic_paged() {
 	return is_paged() ? true : false;
 }
 
+/**
+ * Outputs pagination links for single topic pages (the replies are paginated).
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $args
+ * @global object $wp_rewrite
+ * @return string
+ */
 function mb_topic_pagination( $args = array() ) {
-	global $wp_rewrite, $wp_query;
+	global $wp_rewrite;
 
 	$query = message_board()->reply_query;
 
@@ -397,7 +695,7 @@ function mb_topic_pagination( $args = array() ) {
 		return;
 
 	/* Get the current page. */
-	$current = ( get_query_var( 'paged' ) ? absint( get_query_var( 'paged' ) ) : 1 );
+	$current = get_query_var( 'paged' ) ? absint( get_query_var( 'paged' ) ) : 1;
 
 	/* Get the max number of pages. */
 	$max_num_pages = intval( $query->max_num_pages );
@@ -412,8 +710,6 @@ function mb_topic_pagination( $args = array() ) {
 		'total'        => $max_num_pages,
 		'current'      => $current,
 		'prev_next'    => true,
-		//'prev_text'  => __( '&laquo; Previous' ), // This is the WordPress default.
-		//'next_text'  => __( 'Next &raquo;' ), // This is the WordPress default.
 		'show_all'     => false,
 		'end_size'     => 1,
 		'mid_size'     => 1,
@@ -464,18 +760,48 @@ function mb_topic_pagination( $args = array() ) {
 
 /* ====== Topic Form ====== */
 
+/**
+ * Outputs the URL to the new topic form.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_topic_form_url() {
 	echo mb_get_topic_form_url();
 }
 
+/**
+ * Returns the URL to the new topic form.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
 function mb_get_topic_form_url() {
 	return apply_filters( 'mb_topic_form_url', esc_url( '#topic-form' ) );
 }
 
+/**
+ * Outputs a link to the new topic form.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $args
+ * @return void
+ */
 function mb_topic_form_link( $args = array() ) {
 	echo mb_get_topic_form_link( $args );
 }
 
+/**
+ * Returns a link to the new topic form.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $args
+ * @return string
+ */
 function mb_get_topic_form_link( $args = array() ) {
 
 	if ( !current_user_can( 'create_forum_topics' ) )
@@ -497,11 +823,16 @@ function mb_get_topic_form_link( $args = array() ) {
 	return apply_filters( 'mb_get_topic_form_link', $link, $args );
 }
 
+/**
+ * Displays the new topic form.
+ *
+ * @todo Set up system of hooks.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_topic_form() {
-	echo mb_get_topic_form();
-}
-
-function mb_get_topic_form() {
 
 	if ( !current_user_can( 'create_forum_topics' ) )
 		return; 
@@ -521,27 +852,15 @@ function mb_get_topic_form() {
 		$default_fields['forum'] = '<p>';
 		$default_fields['forum'] .= sprintf( '<label for="mb_topic_forum">%s</label>', __( 'Select a forum:', 'message-board' ) );
 
-
-    $parents = get_posts(
-        array(
-            'post_type'   => mb_get_forum_post_type(), 
-            'orderby'     => 'title', 
-            'order'       => 'ASC', 
-            'numberposts' => -1 
-        )
-    );
-
-    if ( !empty( $parents ) ) {
-
-        $default_fields['forum'] .= '<select name="mb_topic_forum" class="widefat">'; // !Important! Don't change the 'parent_id' name attribute.
-
-        foreach ( $parents as $parent ) {
-            $default_fields['forum'] .= sprintf( '<option value="%s">%s</option>', esc_attr( $parent->ID ), esc_html( $parent->post_title ) );
-        }
-
-        $default_fields['forum'] .= '</select>';
-    }
-
+		$default_fields['forum'] .= wp_dropdown_pages(
+			array(
+				'post_type' => mb_get_forum_post_type(),
+				'name'      => 'mb_topic_forum',
+				'id'        => 'mb_topic_forum',
+				'echo'      => false,
+			)
+		);
+		$default_fields['forum'] .= '</select>';
 		$default_fields['forum'] .= '</p>';
 	}
 
@@ -554,16 +873,12 @@ function mb_get_topic_form() {
 	$default_fields = apply_filters( 'mb_topic_form_fields', $default_fields );
 
 	foreach ( $default_fields as $key => $field ) {
-
-		if ( is_tax( 'forum' ) && 'forum' === $key ) {
-			continue;
-		}
-
 		$form .= $field;
 	}
 
-	if ( is_singular( mb_get_forum_post_type() ) )
+	if ( is_singular( mb_get_forum_post_type() ) ) {
 		$form .= sprintf( '<input type="hidden" name="mb_topic_forum" value="%s" />', absint( get_queried_object_id() ) );
+	}
 
 	$form .= sprintf( '<p><input type="submit" value="%s" /></p>', esc_attr__( 'Submit', 'message-board' ) );
 
@@ -573,23 +888,53 @@ function mb_get_topic_form() {
 	$form .= '</fieldset>';
 	$form .= '</form>';
 
-	return apply_filters( 'mb_get_topic_form', $form );
+	echo $form;
 }
 
+/**
+ * Displays the topic form action URL
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_topic_form_action_url() {
 	echo mb_get_topic_form_action_url();
 }
 
+/**
+ * Returns the topic form action URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
 function mb_get_topic_form_action_url() {
 	return esc_url( add_query_arg( 'message-board', 'new-topic', trailingslashit( home_url() ) ) );
 }
 
 /* ====== Topic Subscriptions ====== */
 
+/**
+ * Displays the topic subscribe URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_topic_subscribe_url( $topic_id = 0 ) {
 	echo mb_get_topic_subscribe_url( $topic_id );
 }
 
+/**
+ * Returns the topic subscribe URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_subscribe_url( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -599,10 +944,26 @@ function mb_get_topic_subscribe_url( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_subscribe_url', $url, $topic_id );
 }
 
+/**
+ * Displays the topic unsubscribe URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_unsubscribe_url( $topic_id = 0 ) {
 	echo mb_get_topic_unsubscribe_url( $topic_id );
 }
 
+/**
+ * Returns the topic unsubscribe URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_unsubscribe_url( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -612,15 +973,31 @@ function mb_get_topic_unsubscribe_url( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_unsubscribe_url', $url, $topic_id );
 }
 
+/**
+ * Displays the topic un/subscribe link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_subscribe_link( $topic_id = 0 ) {
 	echo mb_get_topic_subscribe_link( $topic_id );
 }
 
+/**
+ * Returns the topic un/subscribe link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_subscribe_link( $topic_id = 0 ) {
 
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	if ( !mb_is_user_subscribed_to_topic( get_current_user_id(), $topic_id ) ) {
+	if ( !mb_is_user_subscribed_topic( get_current_user_id(), $topic_id ) ) {
 
 		$link = sprintf( 
 			'<a class="subscribe-link" href="%s">%s</a>', 
@@ -639,7 +1016,19 @@ function mb_get_topic_subscribe_link( $topic_id = 0 ) {
 	return $link;
 }
 
-function mb_is_user_subscribed_to_topic( $user_id, $topic_id ) {
+/**
+ * Checks if the user is subscribed to the topic.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $user_id
+ * @param  int     $topic_id
+ * @return bool
+ */
+function mb_is_user_subscribed_topic( $user_id = 0, $topic_id = 0 ) {
+
+	$user_id  = 0 < $user_id ? $user_id : get_current_user_id();
+	$topic_id = mb_get_topic_id( $topic_id );
 
 	$subs = mb_get_user_subscriptions( $user_id );
 
@@ -648,10 +1037,26 @@ function mb_is_user_subscribed_to_topic( $user_id, $topic_id ) {
 
 /* ====== Topic Favorites ====== */
 
+/**
+ * Displays the topic favorite URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_favorite_url( $topic_id = 0 ) {
 	echo mb_get_topic_favorite_url( $topic_id );
 }
 
+/**
+ * Returns the topic favorite URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_favorite_url( $topic_id = 0 ) {
 
 	$topic_id = mb_get_topic_id( $topic_id );
@@ -662,10 +1067,26 @@ function mb_get_topic_favorite_url( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_favorite_url', $url, $topic_id );
 }
 
+/**
+ * Displays the topic unfavorite URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_unfavorite_url( $topic_id = 0 ) {
 	echo mb_get_topic_unfavorite_url( $topic_id );
 }
 
+/**
+ * Returns the topic unfavorite URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_unfavorite_url( $topic_id = 0 ) {
 
 	$topic_id = mb_get_topic_id( $topic_id );
@@ -676,10 +1097,26 @@ function mb_get_topic_unfavorite_url( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_unfavorite_url', $url, $topic_id );
 }
 
+/**
+ * Displays the topic un/favorite link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_topic_favorite_link( $topic_id = 0 ) {
 	echo mb_get_topic_favorite_link( $topic_id );
 }
 
+/**
+ * Returns the topic un/favorite link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
 function mb_get_topic_favorite_link( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
@@ -701,7 +1138,19 @@ function mb_get_topic_favorite_link( $topic_id = 0 ) {
 	return $link;
 }
 
-function mb_is_user_favorite_topic( $user_id, $topic_id ) {
+/**
+ * Checks if the topic is one of the user's favorites.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $user_id
+ * @param  int     $topic_id
+ * @return bool
+ */
+function mb_is_user_favorite_topic( $user_id = 0, $topic_id = 0 ) {
+
+	$user_id  = 0 < $user_id ? $user_id : get_current_user_id();
+	$topic_id = mb_get_topic_id( $topic_id );
 
 	$favorites = get_user_meta( $user_id, '_topic_favorites', true );
 
