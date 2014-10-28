@@ -67,9 +67,6 @@ final class Message_Board {
 
 	private function includes() {
 
-		require_once( $this->dir_path . 'inc/functions-forum.php'          );
-		require_once( $this->dir_path . 'inc/functions-topic.php'          );
-		require_once( $this->dir_path . 'inc/functions-reply.php'          );
 		require_once( $this->dir_path . 'inc/functions-post-types.php'     );
 		require_once( $this->dir_path . 'inc/functions-post-statuses.php'  );
 		require_once( $this->dir_path . 'inc/functions-meta.php'           );
@@ -79,20 +76,31 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/functions-capabilities.php'   );
 		require_once( $this->dir_path . 'inc/functions-rewrite.php'        );
 		require_once( $this->dir_path . 'inc/functions-view.php'           );
-		require_once( $this->dir_path . 'inc/functions-user.php'           );
 		require_once( $this->dir_path . 'inc/functions-handler.php'        );
 		require_once( $this->dir_path . 'inc/functions-shortcodes.php'     );
 		require_once( $this->dir_path . 'inc/functions-options.php'        );
 		require_once( $this->dir_path . 'inc/functions-admin-bar.php'      );
 
+		/* Load forum files. */
+		require_once( $this->dir_path . 'inc/forum/functions.php' );
+		require_once( $this->dir_path . 'inc/forum/template.php'  );
+
+		/* Load topic files. */
+		require_once( $this->dir_path . 'inc/topic/functions.php' );
+		require_once( $this->dir_path . 'inc/topic/template.php'  );
+
+		/* Load reply files. */
+		require_once( $this->dir_path . 'inc/reply/functions.php' );
+		require_once( $this->dir_path . 'inc/reply/template.php'  );
+
+		/* Load user files. */
+		require_once( $this->dir_path . 'inc/user/functions.php' );
+		require_once( $this->dir_path . 'inc/user/template.php'  );
+
 		/* Templates. */
 		require_once( $this->dir_path . 'inc/template-hierarchy.php' );
 		require_once( $this->dir_path . 'inc/template.php'           );
 		require_once( $this->dir_path . 'inc/template-post.php'      );
-		require_once( $this->dir_path . 'inc/template-forum.php'     );
-		require_once( $this->dir_path . 'inc/template-topic.php'     );
-		require_once( $this->dir_path . 'inc/template-reply.php'     );
-		require_once( $this->dir_path . 'inc/template-user.php'      );
 		require_once( $this->dir_path . 'inc/template-view.php'      );
 
 		if ( is_admin() ) {
