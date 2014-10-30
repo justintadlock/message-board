@@ -1,5 +1,9 @@
 <?php
 
+function mb_filter_post_kses( $content ) {
+	return current_user_can( 'unfiltered_html' ) ? $content : wp_filter_post_kses( $content );
+}
+
 /**
  * Function for using backticks to wrap text in code tags. This is code from the original standalone 
  * bbPress software (not the plugin).
@@ -157,20 +161,42 @@ function mb_encode_bad( $text ) {
 
 
 function mb_allowed_tags() {
-	$tags = array(
-		'a' => array(
-			'href' => array(),
-			'title' => array(),
-			'rel' => array()),
-		'blockquote' => array('cite' => array()),
-		'br' => array(),
-		'code' => array(),
-		'pre' => array(),
-		'em' => array(),
-		'strong' => array(),
-		'ul' => array(),
-		'ol' => array(),
-		'li' => array()
+
+	$not_allowed = array(
+		'area',
+		'aside',
+		'article',
+		'button',
+		'col',
+		'colgroup',
+		'details',
+		'div',
+		'fieldset',
+		'font',
+		'footer',
+		'form',
+		'header',
+		'hgroup',
+		'input',
+		'label',
+		'legend',
+		'map',
+		'menu',
+		'nav',
+		'option',
+		'section',
+		'select',
+		'summary',
+		'textarea',
+		'title'
 	);
-	return apply_filters( 'mb_allowed_tags', $tags );
+
+	$allowed = wp_kses_allowed_html( 'post' );
+
+	foreach ( $not_allowed as $remove ) {
+		if ( isset( $allowed[ $remove ] ) )
+			unset( $allowed[ $remove ] );
+	}
+
+	return $allowed;
 }

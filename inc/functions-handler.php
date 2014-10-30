@@ -72,10 +72,7 @@ function mb_handler_new_topic() {
 	$post_content = mb_encode_bad( $post_content );
 	$post_content = mb_code_trick( $post_content );
 	$post_content = force_balance_tags( $post_content );
-
-	if ( !current_user_can( 'unfiltered_html' ) ) {
-		$post_content = wp_filter_post_kses( $post_content );
-	}
+	$post_content = mb_filter_post_kses( $post_content );
 
 	/* Forum ID. */
 	$forum_id = absint( $_POST['mb_topic_forum'] );
@@ -174,10 +171,7 @@ function mb_handler_new_reply() {
 	$post_content = mb_encode_bad( $post_content );
 	$post_content = mb_code_trick( $post_content );
 	$post_content = force_balance_tags( $post_content );
-
-	if ( !current_user_can( 'unfiltered_html' ) ) {
-		$post_content = wp_filter_post_kses( $post_content );
-	}
+	$post_content = mb_filter_post_kses( $post_content );
 
 	/* Post Date. */
 	$post_date = current_time( 'mysql' );
