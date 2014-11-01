@@ -38,11 +38,10 @@ add_filter( 'post_type_link', 'mb_reply_post_type_link', 10, 2 );
 
 function mb_reply_post_type_link( $link, $post ) {
 
-
 	if ( mb_get_reply_post_type() !== $post->post_type )
 		return $link;
 
-	$url = mb_mb_bbp_get_reply_url( $post->ID, $post );
+	$url = mb_generate_reply_url( $post->ID );
 
 	return !empty( $url ) ? $url : $link;
 
@@ -50,149 +49,53 @@ function mb_reply_post_type_link( $link, $post ) {
 
 }
 
-	function mb_mb_bbp_get_reply_url( $reply_id = 0, $post, $redirect_to = '' ) {
+function mb_get_reply_topic_id( $reply_id = 0 ) {
+	$reply_id = mb_get_reply_id( $reply_id );
+	return get_post_field( 'post_parent', $reply_id );
+}
 
-		$topic_id = $post->post_parent;
+function mb_generate_reply_url( $reply_id = 0 ) {
 
-		if ( 0 >= $topic_id )
-			return '';
+	$reply_id       = mb_get_reply_id( $reply_id );
+	$per_page       = mb_get_replies_per_page();
+	$reply_position = mb_get_reply_position( $reply_id );
+	$reply_hash     = "#post-{$reply_id}";
 
-		$reply_page = ceil( (int) mb_mb_bbp_get_reply_position( $reply_id, $topic_id ) / (int) mb_get_replies_per_page() );
+	$reply_page = ceil( $reply_position / $per_page );
 
-		$reply_hash = '#post-' . $reply_id;
-		$topic_link = get_permalink( $topic_id );
-		$topic_url  = remove_query_arg( 'view', $topic_link );
+	$topic_id  = mb_get_reply_topic_id( $reply_id );
+	$topic_url = get_permalink( $topic_id );
 
-		// Don't include pagination if on first page
-		if ( 1 >= $reply_page ) {
-			$url = $topic_url . $reply_hash;
+	if ( 1 >= $reply_page ) {
 
-		// Include pagination
+		$reply_url = user_trailingslashit( $topic_url ) . $reply_hash;
+	}
+
+	else {
+		global $wp_rewrite;
+
+		if ( $wp_rewrite->using_permalinks() ) {
+
+			$reply_url = trailingslashit( $topic_url ) . trailingslashit( $wp_rewrite->pagination_base ) . user_trailingslashit( $reply_page ) . $reply_hash;
+
 		} else {
-			global $wp_rewrite;
-
-			// Pretty permalinks
-			if ( $wp_rewrite->using_permalinks() ) {
-				$url = trailingslashit( $topic_url ) . trailingslashit( $wp_rewrite->pagination_base ) . $reply_page . $reply_hash;
-
-			// Yucky links
-			} else {
-				$url = add_query_arg( 'paged', $reply_page, $topic_url ) . $reply_hash;
-			}
+			$reply_url = add_query_arg( 'paged', $reply_page, $topic_url ) . $reply_hash;
 		}
-
-		return apply_filters( 'mb_bbp_get_reply_url', $url, $reply_id, $redirect_to );
 	}
 
-	function mb_mb_bbp_get_reply_position( $reply_id = 0, $topic_id = 0 ) {
+	return $reply_url;
+}
 
-		// Get required data
-		$reply_position = get_post_field( 'menu_order', $reply_id );
+function mb_get_reply_position( $reply_id = 0 ) {
 
-		// Reply doesn't have a position so get the raw value
-		if ( empty( $reply_position ) ) {
+	$reply_id       = mb_get_reply_id( $reply_id );
+	$reply_position = get_post_field( 'menu_order', $reply_id );
 
-			// Post is not the topic
-			if ( $reply_id !== $topic_id ) {
-				$reply_position = mb_bbp_get_reply_position_raw( $reply_id, $topic_id );
-
-				// Update the reply position in the posts table so we'll never have
-				// to hit the DB again.
-				if ( !empty( $reply_position ) ) {
-					mb_bbp_update_reply_position( $reply_id, $reply_position );
-				}
-
-			// Topic's position is always 0
-			} else {
-				$reply_position = 0;
-			}
-		}
-
-		return (int) apply_filters( 'mb_bbp_get_reply_position', $reply_position, $reply_id, $topic_id );
-	}
-
-
-function mb_bbp_update_reply_position( $reply_id = 0, $reply_position = 0 ) {
-
-	if ( empty( $reply_id ) )
-		return false;
-
-	// If no position was passed, get it from the db and update the menu_order
 	if ( empty( $reply_position ) ) {
-		$reply_position = mb_bbp_get_reply_position_raw( $reply_id, mb_bbp_get_reply_topic_id( $reply_id ) );
+		$topic_id = mb_get_reply_topic_id( $reply_id );
+		mb_reset_reply_positions( $topic_id );
+		$reply_position = get_post_field( 'menu_order', $reply_id );
 	}
 
-	// Update the replies' 'menp_order' with the reply position
-	wp_update_post( array(
-		'ID'         => $reply_id,
-		'menu_order' => $reply_position
-	) );
-
-	return (int) $reply_position;
-}
-
-/**
- * Get the position of a reply by querying the DB directly for the replies
- * of a given topic.
- *
- * @since bbPress (r3933)
- *
- * @param int $reply_id
- * @param int $topic_id
- */
-function mb_bbp_get_reply_position_raw( $reply_id = 0, $topic_id = 0 ) {
-
-	// Get required data
-	$reply_position = 0;
-
-	// If reply is actually the first post in a topic, return 0
-	if ( $reply_id !== $topic_id ) {
-
-		// Make sure the topic has replies before running another query
-		$reply_count = mb_bbp_get_topic_reply_count( $topic_id, false );
-		if ( !empty( $reply_count ) ) {
-
-			// Get reply id's
-			$topic_replies = mb_bbp_get_all_child_ids( $topic_id, mb_get_reply_post_type() );
-			if ( !empty( $topic_replies ) ) {
-
-				// Reverse replies array and search for current reply position
-				$topic_replies  = array_reverse( $topic_replies );
-				$reply_position = array_search( (string) $reply_id, $topic_replies );
-
-				// Bump the position to compensate for the lead topic post
-				$reply_position++;
-			}
-		}
-	}
-
-	return (int) $reply_position;
-}
-
-	function mb_bbp_get_topic_reply_count( $topic_id = 0, $integer = false ) {
-
-		$replies  = (int) get_post_meta( $topic_id, '_topic_reply_count', true );
-		$filter   = ( true === $integer ) ? 'mb_bbp_get_topic_reply_count_int' : 'mb_bbp_get_topic_reply_count';
-
-		return apply_filters( $filter, $replies, $topic_id );
-	}
-function mb_bbp_get_all_child_ids( $parent_id = 0, $post_type = 'post' ) {
-	global $wpdb;
-
-	// Bail if nothing passed
-	if ( empty( $parent_id ) )
-		return false;
-
-	// The ID of the cached query
-	$cache_id  = 'mb_bbp_parent_all_' . $parent_id . '_type_' . $post_type . '_child_ids';
-
-	// Check for cache and set if needed
-	$child_ids = wp_cache_get( $cache_id, 'bbpress_posts' );
-	if ( false === $child_ids ) {
-		$child_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_parent = %d AND post_status = 'publish' AND post_type = '%s' ORDER BY ID DESC;", $parent_id, $post_type ) );
-		wp_cache_set( $cache_id, $child_ids, 'bbpress_posts' );
-	}
-
-	// Filter and return
-	return apply_filters( 'mb_bbp_get_all_child_ids', $child_ids, (int) $parent_id, $post_type );
+	return $reply_position;
 }
