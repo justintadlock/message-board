@@ -26,7 +26,7 @@ function mb_reply_query() {
 		'post_type'           => mb_get_reply_post_type(),
 		'posts_per_page'      => $per_page,
 		'paged'               => get_query_var( 'paged' ),
-		'orderby'             => 'date',
+		'orderby'             => 'menu_order',
 		'order'               => 'ASC',
 		'hierarchical'        => false,
 		'ignore_sticky_posts' => true,
