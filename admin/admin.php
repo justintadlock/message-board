@@ -3,6 +3,9 @@
 /* Add admin menu items. */
 add_action( 'admin_menu', 'mb_admin_menu' );
 
+/* Admin notices. */
+add_action( 'admin_notices', 'mb_admin_notices' );
+
 /**
  * Adds admin menu items needed by the plugin.  Rather than having multiple top-level menu items 
  * like some plugins, which shall remain unnamed, we'll consolidate everything into a single 
@@ -40,4 +43,22 @@ function mb_admin_menu() {
 		$reply_object->cap->edit_posts, 
 		"edit.php?post_type={$reply_type}" 
 	);
+}
+
+/**
+ * Displays an admin notice if the current theme does not support the Message Board plugin.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_admin_notices() { 
+
+	if ( !current_theme_supports( 'message-board' ) ) { ?>
+		<div class="error">
+			<p>
+			<?php _e( 'The theme you are currently using does not support the Message Board plugin. Please activate a theme with support to continue enjoying full use of the plugin.', 'message-board' ); ?>
+			</p>
+		</div>
+	<?php }
 }
