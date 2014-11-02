@@ -120,6 +120,62 @@ function mb_is_topic_open( $topic_id = 0 ) {
 	return apply_filters( 'mb_is_topic_open', in_array( $status, array( 'publish', 'inherit' ) ) ? true : false, $topic_id );
 }
 
+function mb_is_topic_spam( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$status   = get_post_status( $topic_id );
+
+	return apply_filters( 'mb_is_topic_spam', 'spam' === $status ? true : false, $topic_id );
+}
+
+function mb_topic_spam_url( $topic_id = 0 ) {
+	echo mb_get_topic_spam_url( $topic_id );
+}
+
+function mb_get_topic_spam_url( $topic_id = 0 ) {
+
+	$topic_id = mb_get_topic_id( $topic_id );
+	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+	$url = esc_url( add_query_arg( array( 'action' => 'spam', 'topic_id' => $topic_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+
+	return apply_filters( 'mb_get_topic_spam_url', $url, $topic_id );
+}
+
+function mb_topic_unspam_url( $topic_id = 0 ) {
+	echo mb_get_topic_unspam_url( $topic_id );
+}
+
+function mb_get_topic_unspam_url( $topic_id = 0 ) {
+
+	$topic_id = mb_get_topic_id( $topic_id );
+	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+	$url = esc_url( add_query_arg( array( 'action' => 'unspam', 'topic_id' => $topic_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+
+	return apply_filters( 'mb_get_topic_unspam_url', $url, $topic_id );
+}
+
+function mb_topic_spam_link( $topic_id = 0 ) {
+	echo mb_get_topic_spam_link( $topic_id );
+}
+
+function mb_get_topic_spam_link( $topic_id = 0 ) {
+
+	if ( !current_user_can( 'manage_forums' ) )
+		return '';
+
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	if ( !mb_is_topic_spam( $topic_id ) ) {
+		$link = sprintf( '<a class="spam-link" href="%s">%s</a>', mb_get_topic_spam_url( $topic_id ), __( 'Spam', 'message-board' ) );
+	}
+	else {
+		$link = sprintf( '<a class="spam-link" href="%s">%s</a>', mb_get_topic_spam_url( $topic_id ), __( 'Unspam', 'message-board' ) );
+	}
+
+	return $link;
+}
+
 /* ====== Topic Labels ====== */
 
 /**
