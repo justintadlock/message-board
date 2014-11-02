@@ -52,6 +52,30 @@ function mb_the_reply() {
 	return message_board()->reply_query->the_post();
 }
 
+/* ====== Reply Trash ====== */
+
+function mb_reply_trash_url( $reply_id = 0 ) {
+	echo mb_get_reply_trash_url( $reply_id );
+}
+
+function mb_get_reply_trash_url( $reply_id = 0 ) {
+	$reply_id = mb_get_reply_id( $reply_id );
+	return apply_filters( 'mb_get_reply_trash_url', get_delete_post_link( $reply_id ), $reply_id );
+}
+
+function mb_reply_trash_link( $reply_id = 0 ) {
+	echo mb_get_reply_trash_link( $reply_id );
+}
+
+function mb_get_reply_trash_link( $reply_id = 0 ) {
+	$url = mb_get_reply_trash_url( $reply_id );
+
+	if ( !empty( $url ) )
+		$link = sprintf( '<a href="%s" class="reply-trash-link trash-link">%s</a>', $url, __( 'Trash', 'reply' ) );
+
+	return apply_filters( 'mb_get_reply_trash_link', $link );
+}
+
 /* ====== Reply Status ====== */
 
 function mb_is_reply_spam( $reply_id = 0 ) {

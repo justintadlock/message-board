@@ -80,6 +80,30 @@ function mb_show_lead_topic() {
 	return apply_filters( 'mb_show_lead_topic', mb_is_topic_paged() ? false : true );
 }
 
+/* ====== Topic Trash ====== */
+
+function mb_topic_trash_url( $topic_id = 0 ) {
+	echo mb_get_topic_trash_url( $topic_id );
+}
+
+function mb_get_topic_trash_url( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	return apply_filters( 'mb_get_topic_trash_url', get_delete_post_link( $topic_id ), $topic_id );
+}
+
+function mb_topic_trash_link( $topic_id = 0 ) {
+	echo mb_get_topic_trash_link( $topic_id );
+}
+
+function mb_get_topic_trash_link( $topic_id = 0 ) {
+	$url = mb_get_topic_trash_url( $topic_id );
+
+	if ( !empty( $url ) )
+		$link = sprintf( '<a href="%s" class="topic-trash-link trash-link">%s</a>', $url, __( 'Trash', 'topic' ) );
+
+	return apply_filters( 'mb_get_topic_trash_link', $link );
+}
+
 /* ====== Topic Status ====== */
 
 /**
