@@ -30,6 +30,10 @@ function mb_get_user_slug() {
 	return apply_filters( 'mb_get_user_slug', mb_maybe_get_root_slug() . 'users' );
 }
 
+function mb_get_login_slug() {
+	return apply_filters( 'mb_get_user_slug', mb_maybe_get_root_slug() . 'login' );
+}
+
 function mb_query_vars( $vars ) {
 
 	if ( !array_search( 'edit', $vars ) )
@@ -75,6 +79,10 @@ function mb_rewrite_rules() {
 	add_rewrite_rule( $view_slug . '/([^/]+)/page/?([0-9]{1,})/?$', 'index.php?' . $view_query_var . '=$matches[1]&paged=$matches[2]', 'top' );
 	add_rewrite_rule( $view_slug . '/([^/]+)/feed/?$',              'index.php?' . $view_query_var . '=$matches[1]&feed=$matches[2]',  'top' );
 	add_rewrite_rule( $view_slug . '/([^/]+)/?$',                   'index.php?' . $view_query_var . '=$matches[1]',                   'top' );
+
+	/* Login page. */
+	$login_slug = mb_get_login_slug();
+	add_rewrite_rule( '^' . $root_slug . '/' . $login_slug . '$', 'index.php', 'top' );
 
 	/* Forum front page. */
 	//add_rewrite_rule( '^' . $root_slug . '$', 'index.php', 'top' );

@@ -24,6 +24,12 @@ function mb_is_forum_search() {
 	return false;
 }
 
+function mb_is_forum_login() {
+	global $wp;
+
+	return mb_get_login_slug() === $wp->request ? true : false;
+}
+
 /**
  * Checks if viewing one of the Message Board plugin pages.
  *
@@ -38,7 +44,8 @@ function mb_is_message_board() {
 	if ( 1 == get_query_var( 'mb_profile' ) || get_query_var( 'mb_topics' ) || get_query_var( 'mb_replies' ) ||
 		get_query_var( 'mb_favorites' ) || get_query_var( 'mb_subscriptions' ) 
 		|| mb_is_view() || mb_is_user_view() || mb_is_forum_search() 
-		|| mb_is_forum_front() || is_post_type_archive( mb_get_topic_post_type() ) 
+		|| mb_is_forum_front() || is_post_type_archive( mb_get_topic_post_type() )
+		|| mb_is_forum_login()
 		|| is_singular( array( mb_get_forum_post_type(), mb_get_topic_post_type() ) ) )
 		return true;
 
@@ -294,12 +301,8 @@ function mb_parse_query( $query ) {
 function mb_404_override() {
 	global $wp_query;
 
-	if ( mb_is_forum_front() ) {
+	if ( mb_is_forum_front() || mb_is_forum_login() ) {
 		status_header( 200 );
 		$wp_query->is_404 = false;
 	}
-
-
-
-
 }

@@ -9,6 +9,24 @@
  * certain hooks that will be executed when using these functions.
  */
 
+/* ====== Login ====== */
+
+function mb_login_url() {
+	echo mb_get_login_url();
+}
+
+function mb_get_login_url() {
+	return esc_url( home_url( mb_get_login_slug() ) );
+}
+
+function mb_login_link() {
+	echo mb_get_login_link();
+}
+
+function mb_get_login_link() {
+	return sprintf( '<a href="%s" class="login-link">%s</a>', mb_get_login_url(), __( 'Log In', 'message-board' ) );
+}
+
 /* ====== Post ID ====== */
 
 function mb_post_id( $post_id = 0 ) {

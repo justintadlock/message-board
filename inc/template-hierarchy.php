@@ -74,6 +74,11 @@ function mb_template_include( $template ) {
 		$_templates[] = "{$dir}/archive-topic.php"; // temp
 	}
 
+	elseif ( mb_is_forum_login() ) {
+
+		$_templates[] = "{$dir}/login.php";
+	}
+
 	if ( !empty( $_templates ) ) {
 		$_templates[] = "{$dir}/board.php";
 		$has_template = locate_template( apply_filters( 'mb_template_hierarchy', $_templates ) );
