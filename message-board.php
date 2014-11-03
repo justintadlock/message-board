@@ -155,7 +155,7 @@ final class Message_Board {
 	 * @return void
 	 */
 	public function i18n() {
-		load_plugin_textdomain( 'message-board', false, 'message-board/languages' );
+		load_plugin_textdomain( 'message-board', false, 'message-board/languages/' );
 	}
 
 	public function register_views() {
