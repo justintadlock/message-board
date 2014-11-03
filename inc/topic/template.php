@@ -96,6 +96,8 @@ function mb_topic_edit_link( $topic_id = 0 ) {
 }
 
 function mb_get_topic_edit_link( $topic_id = 0 ) {
+
+	$link = '';
 	$url = mb_get_topic_edit_url( $topic_id );
 
 	if ( !empty( $url ) )
@@ -120,6 +122,8 @@ function mb_topic_trash_link( $topic_id = 0 ) {
 }
 
 function mb_get_topic_trash_link( $topic_id = 0 ) {
+
+	$link = '';
 	$url = mb_get_topic_trash_url( $topic_id );
 
 	if ( !empty( $url ) )

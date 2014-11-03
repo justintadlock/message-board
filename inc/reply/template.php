@@ -52,6 +52,26 @@ function mb_the_reply() {
 	return message_board()->reply_query->the_post();
 }
 
+/* ====== Reply Position ====== */
+
+function mb_reply_position( $reply_id = 0 ) {
+	echo mb_get_reply_position( $reply_id );
+}
+
+function mb_get_reply_position( $reply_id = 0 ) {
+
+	$reply_id       = mb_get_reply_id( $reply_id );
+	$reply_position = get_post_field( 'menu_order', $reply_id );
+
+	if ( empty( $reply_position ) ) {
+		$topic_id = mb_get_reply_topic_id( $reply_id );
+		mb_reset_reply_positions( $topic_id );
+		$reply_position = get_post_field( 'menu_order', $reply_id );
+	}
+
+	return $reply_position;
+}
+
 /* ====== Reply Edit ====== */
 
 function mb_reply_edit_url( $reply_id = 0 ) {

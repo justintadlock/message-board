@@ -27,6 +27,21 @@ function mb_get_login_link() {
 	return sprintf( '<a href="%s" class="login-link">%s</a>', mb_get_login_url(), __( 'Log In', 'message-board' ) );
 }
 
+/* ====== Thread Position ====== */
+
+function mb_thread_position( $post_id = 0 ) {
+	echo mb_get_thread_position( $post_id );
+}
+
+function mb_get_thread_position( $post_id = 0 ) {
+	$post_id   = mb_get_post_id( $post_id );
+	$post_type = get_post_type( $post_id );
+
+	$position = mb_get_reply_post_type() === $post_type ? mb_get_reply_position( $post_id ) + 1 : 1;
+
+	return apply_filters( 'mb_get_thread_position', $position );
+}
+
 /* ====== Post ID ====== */
 
 function mb_post_id( $post_id = 0 ) {

@@ -85,17 +85,3 @@ function mb_generate_reply_url( $reply_id = 0 ) {
 
 	return $reply_url;
 }
-
-function mb_get_reply_position( $reply_id = 0 ) {
-
-	$reply_id       = mb_get_reply_id( $reply_id );
-	$reply_position = get_post_field( 'menu_order', $reply_id );
-
-	if ( empty( $reply_position ) ) {
-		$topic_id = mb_get_reply_topic_id( $reply_id );
-		mb_reset_reply_positions( $topic_id );
-		$reply_position = get_post_field( 'menu_order', $reply_id );
-	}
-
-	return $reply_position;
-}
