@@ -760,7 +760,17 @@ function mb_get_topic_voice_count( $topic_id = 0 ) {
  */
 function mb_get_topic_voices( $topic_id = 0 ) {
 	$topic_id     = mb_get_topic_id( $topic_id );
-	$topic_voices = get_post_meta( $topic_id, '_topic_voices' );
+
+	/* @todo - Make this a single call before release. */
+	$voices = get_post_meta( $topic_id, '_topic_voices' );
+
+	/* @todo - remove count check and just use explode() before release. */
+	if ( 1 < count( $voices ) ) {
+		delete_post_meta( $topic_id, '_topic_voices' );
+		$voices = mb_set_topic_voices( $topic_id );
+	} else {
+		$voices = explode( ',', array_shift( $voices ) );
+	}
 
 	$voices = !empty( $voices ) ? $voices : array( mb_get_topic_author_id( $topic_id ) );
 

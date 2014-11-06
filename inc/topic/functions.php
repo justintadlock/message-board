@@ -82,6 +82,22 @@ function mb_reset_topic_latest( $topic_id ) {
 	}
 }
 
+function mb_set_topic_voices( $topic_id ) {
+	global $wpdb;
+
+	$voices = $wpdb->get_col( $wpdb->prepare( "SELECT post_author FROM {$wpdb->posts} WHERE post_parent = %d AND post_type = %s AND post_status = 'publish'", absint( $topic_id ), mb_get_reply_post_type() ) );
+
+	$topic_author = mb_get_topic_author_id( $topic_id );
+
+	$voices = array_merge( array( $topic_author ), (array)$voices );
+	$voices = array_unique( $voices );
+
+	$_voices = implode( ',', wp_parse_id_list( array_filter( $voices ) ) );
+	update_post_meta( $topic_id, '_topic_voices', $_voices );
+	update_post_meta( $topic_id, '_topic_voice_count', count( $_voices ) );
+
+	return $voices;
+}
 
 
 

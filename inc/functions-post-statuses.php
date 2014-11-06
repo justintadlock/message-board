@@ -114,8 +114,8 @@ function mb_publish_to_spam( $post ) {
 		$topic_reply_count = mb_topic_reply_count( $topic_id );
 		update_post_meta( $topic_id, '_topic_reply_count', absint( $topic_reply_count ) - 1 );
 
-		/* @todo - reset topic voices. Note: topic voices currently multiple meta. 
-		 * plan to make it single meta and treat it same as subs and favs. */
+		/* Reset topic voices. */
+		mb_set_topic_voices( $topic_id );
 
 		/* If this is the last reply, reset all forum data. */
 		if ( $post->ID === absint( $forum_last_reply ) ) {

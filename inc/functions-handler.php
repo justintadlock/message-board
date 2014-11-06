@@ -232,7 +232,7 @@ function mb_handler_new_reply() {
 		update_post_meta( $topic_id, '_topic_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
 		update_post_meta( $topic_id, '_topic_last_reply_id',           $published );
 
-		$voices = get_post_meta( $topic_id, '_topic_voices' );
+		$voices = mb_get_topic_voices( $topic_id );
 
 		if ( empty( $voices ) || !in_array( $user_id, $voices ) ) {
 			add_post_meta( $topic_id, '_topic_voices', $user_id );

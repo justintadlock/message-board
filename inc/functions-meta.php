@@ -59,7 +59,7 @@ function mb_save_post( $post_id, $post = '' ) {
 			add_post_meta( $post_id, '_topic_activity_datetime_epoch', mysql2date( 'U', $post->post_date ) );
 		}
 
-		$voices = get_post_meta( $post_id, '_topic_voices' );
+		$voices = mb_get_topic_voices( $topic_id );
 
 		if ( empty( $voices ) || !in_array( $post->post_author, $voices ) ) {
 			add_post_meta( $post_id, '_topic_voices', $post->post_author );
