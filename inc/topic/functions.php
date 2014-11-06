@@ -7,7 +7,7 @@ function mb_get_topic_post_type() {
 function mb_get_multi_topic_reply_ids( $topic_ids ) {
 	global $wpdb;
 
-	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish'  AND post_parent IN ( " . implode( ',', $topic_ids ) . " )", mb_get_reply_post_type() ) );
+	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' AND post_parent IN ( " . implode( ',', $topic_ids ) . " ) AND ORDER BY post_date DESC", mb_get_reply_post_type() ) );
 }
 
 function mb_get_topic_subscribers( $topic_id = 0 ) {
@@ -57,3 +57,34 @@ function mb_set_topic_favoriters( $topic_id ) {
 
 	return $users;
 }
+
+function mb_reset_topic_latest( $topic_id ) {
+
+	$reply_ids = mb_get_topic_reply_ids( $topic_id );
+
+	if ( !empty( $reply_ids ) ) {
+
+		$last_reply_id = array_shift( array_reverse( $reply_ids ) );
+
+		$post_date = get_post_field( 'post_date', $last_reply_id );
+
+		update_post_meta( $topic_id, '_topic_activity_datetime',       $post_date );
+		update_post_meta( $topic_id, '_topic_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
+		update_post_meta( $topic_id, '_topic_last_reply_id',           $last_reply_id );
+
+	} else {
+		$post_date = get_post_field( 'post_date', $topic_id );
+
+		update_post_meta( $topic_id, '_topic_activity_datetime',       $post_date );
+		update_post_meta( $topic_id, '_topic_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
+
+		delete_post_meta( $topic_id, '_topic_last_reply_id' );
+	}
+}
+
+
+
+
+
+
+

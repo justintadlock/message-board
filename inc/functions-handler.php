@@ -176,6 +176,9 @@ function mb_handler_new_reply() {
 	/* Post Date. */
 	$post_date = current_time( 'mysql' );
 
+	/* Reply position. */
+	$position = absint( mb_get_topic_reply_count( $topic_id ) ) + 1;
+
 	/* Publish a new forum topic. */
 	$published = wp_insert_post(
 		array(
@@ -185,6 +188,7 @@ function mb_handler_new_reply() {
 			'post_parent'  => $topic_id,
 			'post_status'  => 'publish',
 			'post_type'    => mb_get_reply_post_type(),
+			'menu_order'   => $position
 		)
 	);
 
