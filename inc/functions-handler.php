@@ -10,7 +10,7 @@ add_action( 'mb_template_redirect', 'mb_handler_new_topic'       );
 add_action( 'mb_template_redirect', 'mb_handler_new_reply'       );
 add_action( 'mb_template_redirect', 'mb_handler_edit_post'       );
 add_action( 'mb_template_redirect', 'mb_handler_topic_subscribe' );
-add_action( 'mb_template_redirect', 'mb_handler_topic_favorite'  );
+add_action( 'mb_template_redirect', 'mb_handler_topic_bookmark'  );
 
 /**
  * New topic handler. This function executes when a new topic is posted on the front end.
@@ -388,14 +388,14 @@ function mb_handler_topic_subscribe() {
 }
 
 
-function mb_handler_topic_favorite() {
+function mb_handler_topic_bookmark() {
 
 	if ( !is_user_logged_in() )
 		return;
 
 	// @todo nonce?
 
-	if ( !isset( $_GET['action'] ) || !in_array( $_GET['action'], array( 'favorite', 'unfavorite' ) ) )
+	if ( !isset( $_GET['action'] ) || !in_array( $_GET['action'], array( 'bookmark', 'unbookmark' ) ) )
 		return;
 
 	if ( !isset( $_GET['topic_id'] ) )
@@ -405,30 +405,30 @@ function mb_handler_topic_favorite() {
 
 	$user_id = get_current_user_id();
 
-	if ( 0 < $user_id && 0 < $topic_id && 'favorite' === $_GET['action'] ) {
+	if ( 0 < $user_id && 0 < $topic_id && 'bookmark' === $_GET['action'] ) {
 
-		// mb_get_user_favorites( $user_id );
+		// mb_get_user_bookmarks( $user_id );
 
-		$favorites = get_user_meta( $user_id, '_topic_favorites', true );
-		$favs = explode( ',', $favorites );
+		$bookmarks = get_user_meta( $user_id, '_topic_bookmarks', true );
+		$favs = explode( ',', $bookmarks );
 
 
 		if ( !in_array( $topic_id, $favs ) ) {
 			$favs[] = $topic_id;
 
-			$new_favorites   = implode( ',', wp_parse_id_list( array_filter( $favs ) ) );
+			$new_bookmarks   = implode( ',', wp_parse_id_list( array_filter( $favs ) ) );
 
-			update_user_meta( $user_id, '_topic_favorites', $new_favorites );
+			update_user_meta( $user_id, '_topic_bookmarks', $new_bookmarks );
 
-			mb_set_topic_favoriters( $topic_id );
+			mb_set_topic_bookmarkers( $topic_id );
 		}
 
-	} elseif ( 0 < $user_id && 0 < $topic_id && 'unfavorite' === $_GET['action'] ) {
+	} elseif ( 0 < $user_id && 0 < $topic_id && 'unbookmark' === $_GET['action'] ) {
 
-		// mb_get_user_favorites( $user_id );
+		// mb_get_user_bookmarks( $user_id );
 
-		$favorites = get_user_meta( $user_id, '_topic_favorites', true );
-		$favs = explode( ',', $favorites );
+		$bookmarks = get_user_meta( $user_id, '_topic_bookmarks', true );
+		$favs = explode( ',', $bookmarks );
 
 		if ( in_array( $topic_id, $favs ) ) {
 
@@ -436,11 +436,11 @@ function mb_handler_topic_favorite() {
 
 			unset( $favs[ $_fav ] );
 
-			$new_favorites   = implode( ',', wp_parse_id_list( array_filter( $favs ) ) );
+			$new_bookmarks   = implode( ',', wp_parse_id_list( array_filter( $favs ) ) );
 
-			update_user_meta( $user_id, '_topic_favorites', $new_favorites );
+			update_user_meta( $user_id, '_topic_bookmarks', $new_bookmarks );
 
-			mb_set_topic_favoriters( $topic_id );
+			mb_set_topic_bookmarkers( $topic_id );
 		}
 	}
 

@@ -39,10 +39,10 @@ function mb_is_forum_login() {
  */
 function mb_is_message_board() {
 
-	//$mb_vars = array( 'mb_user', 'mb_topics', 'mb_replies', 'mb_favorites', 'mb_subscriptions' );
+	//$mb_vars = array( 'mb_user', 'mb_topics', 'mb_replies', 'mb_bookmarks', 'mb_subscriptions' );
 
 	if ( 1 == get_query_var( 'mb_profile' ) || get_query_var( 'mb_topics' ) || get_query_var( 'mb_replies' ) ||
-		get_query_var( 'mb_favorites' ) || get_query_var( 'mb_subscriptions' ) 
+		get_query_var( 'mb_bookmarks' ) || get_query_var( 'mb_subscriptions' ) 
 		|| mb_is_view() || mb_is_user_view() || mb_is_forum_search() 
 		|| mb_is_forum_front() || is_post_type_archive( mb_get_topic_post_type() )
 		|| mb_is_forum_login()
@@ -87,11 +87,11 @@ function mb_pre_get_posts( $query ) {
 			$query->set( 'order',          'DESC'                   );
 			$query->set( 'orderby',        'menu_order'             );
 
-		} elseif ( 'favorites' === get_query_var( 'mb_user_view' ) ) {
+		} elseif ( 'bookmarks' === get_query_var( 'mb_user_view' ) ) {
 
 			$user      = get_user_by( 'slug', get_query_var( 'author_name' ) );
-			$favorites = get_user_meta( $user->ID, '_topic_favorites', true );
-			$favs      = wp_parse_id_list( $favorites );
+			$bookmarks = get_user_meta( $user->ID, '_topic_bookmarks', true );
+			$favs      = wp_parse_id_list( $bookmarks );
 
 			$query->set( 'post__in',      $favs                     );
 			$query->set( 'post_type',     mb_get_topic_post_type()             );

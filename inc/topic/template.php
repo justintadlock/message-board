@@ -1079,103 +1079,103 @@ function mb_is_user_subscribed_topic( $user_id = 0, $topic_id = 0 ) {
 	return in_array( $topic_id, $subs ) ? true : false;
 }
 
-/* ====== Topic Favorites ====== */
+/* ====== Topic Bookmarks ====== */
 
 /**
- * Displays the topic favorite URL.
+ * Displays the topic bookmark URL.
  *
  * @since  1.0.0
  * @access public
  * @param  int     $topic_id
  * @return void
  */
-function mb_topic_favorite_url( $topic_id = 0 ) {
-	echo mb_get_topic_favorite_url( $topic_id );
+function mb_topic_bookmark_url( $topic_id = 0 ) {
+	echo mb_get_topic_bookmark_url( $topic_id );
 }
 
 /**
- * Returns the topic favorite URL.
+ * Returns the topic bookmark URL.
  *
  * @since  1.0.0
  * @access public
  * @param  int     $topic_id
  * @return string
  */
-function mb_get_topic_favorite_url( $topic_id = 0 ) {
+function mb_get_topic_bookmark_url( $topic_id = 0 ) {
 
 	$topic_id = mb_get_topic_id( $topic_id );
 	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
-	$url = esc_url( add_query_arg( array( 'action' => 'favorite', 'topic_id' => $topic_id, 'redirect' => $redirect ), trailingslashit( home_url( 'board' ) ) ) );
+	$url = esc_url( add_query_arg( array( 'action' => 'bookmark', 'topic_id' => $topic_id, 'redirect' => $redirect ), trailingslashit( home_url( 'board' ) ) ) );
 
-	return apply_filters( 'mb_get_topic_favorite_url', $url, $topic_id );
+	return apply_filters( 'mb_get_topic_bookmark_url', $url, $topic_id );
 }
 
 /**
- * Displays the topic unfavorite URL.
+ * Displays the topic unbookmark URL.
  *
  * @since  1.0.0
  * @access public
  * @param  int     $topic_id
  * @return void
  */
-function mb_topic_unfavorite_url( $topic_id = 0 ) {
-	echo mb_get_topic_unfavorite_url( $topic_id );
+function mb_topic_unbookmark_url( $topic_id = 0 ) {
+	echo mb_get_topic_unbookmark_url( $topic_id );
 }
 
 /**
- * Returns the topic unfavorite URL.
+ * Returns the topic unbookmark URL.
  *
  * @since  1.0.0
  * @access public
  * @param  int     $topic_id
  * @return string
  */
-function mb_get_topic_unfavorite_url( $topic_id = 0 ) {
+function mb_get_topic_unbookmark_url( $topic_id = 0 ) {
 
 	$topic_id = mb_get_topic_id( $topic_id );
 	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
-	$url = esc_url( add_query_arg( array( 'action' => 'unfavorite', 'topic_id' => $topic_id, 'redirect' => $redirect ), trailingslashit( home_url( 'board' ) ) ) );
+	$url = esc_url( add_query_arg( array( 'action' => 'unbookmark', 'topic_id' => $topic_id, 'redirect' => $redirect ), trailingslashit( home_url( 'board' ) ) ) );
 
-	return apply_filters( 'mb_get_topic_unfavorite_url', $url, $topic_id );
+	return apply_filters( 'mb_get_topic_unbookmark_url', $url, $topic_id );
 }
 
 /**
- * Displays the topic un/favorite link.
+ * Displays the topic un/bookmark link.
  *
  * @since  1.0.0
  * @access public
  * @param  int     $topic_id
  * @return void
  */
-function mb_topic_favorite_link( $topic_id = 0 ) {
-	echo mb_get_topic_favorite_link( $topic_id );
+function mb_topic_bookmark_link( $topic_id = 0 ) {
+	echo mb_get_topic_bookmark_link( $topic_id );
 }
 
 /**
- * Returns the topic un/favorite link.
+ * Returns the topic un/bookmark link.
  *
  * @since  1.0.0
  * @access public
  * @param  int     $topic_id
  * @return string
  */
-function mb_get_topic_favorite_link( $topic_id = 0 ) {
+function mb_get_topic_bookmark_link( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	if ( !mb_is_user_favorite_topic( get_current_user_id(), $topic_id ) ) {
+	if ( !mb_is_topic_user_bookmark( get_current_user_id(), $topic_id ) ) {
 		$link = sprintf( 
-			'<a class="favorite-link" href="%s">%s</a>', 
-			mb_get_topic_favorite_url( $topic_id ), 
-			__( 'Favorite', 'message-board' ) 
+			'<a class="bookmark-link" href="%s">%s</a>', 
+			mb_get_topic_bookmark_url( $topic_id ), 
+			__( 'Bookmark', 'message-board' ) 
 		);
 	}
 	else {
 		$link = sprintf( 
-			'<a class="favorite-link" href="%s">%s</a>', 
-			mb_get_topic_unfavorite_url( $topic_id ), 
-			__( 'Unfavorite', 'message-board' ) 
+			'<a class="bookmark-link" href="%s">%s</a>', 
+			mb_get_topic_unbookmark_url( $topic_id ), 
+			__( 'Unbookmark', 'message-board' ) 
 		);
 	}
 
@@ -1183,7 +1183,7 @@ function mb_get_topic_favorite_link( $topic_id = 0 ) {
 }
 
 /**
- * Checks if the topic is one of the user's favorites.
+ * Checks if the topic is one of the user's bookmarks.
  *
  * @since  1.0.0
  * @access public
@@ -1191,14 +1191,14 @@ function mb_get_topic_favorite_link( $topic_id = 0 ) {
  * @param  int     $topic_id
  * @return bool
  */
-function mb_is_user_favorite_topic( $user_id = 0, $topic_id = 0 ) {
+function mb_is_topic_user_bookmark( $user_id = 0, $topic_id = 0 ) {
 
 	$user_id  = 0 < $user_id ? $user_id : get_current_user_id();
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	$favorites = get_user_meta( $user_id, '_topic_favorites', true );
+	$bookmarks = get_user_meta( $user_id, '_topic_bookmarks', true );
 
-	$favs = explode( ',', $favorites );
+	$favs = explode( ',', $bookmarks );
 
 	return in_array( $topic_id, $favs ) ? true : false;
 }

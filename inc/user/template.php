@@ -24,15 +24,15 @@ function mb_get_user_topics_url( $user_id = 0 ) {
 	return esc_url( trailingslashit( $url ) . 'topics' );
 }
 
-function mb_user_favorites_url( $user_id = 0 ) {
-	echo mb_get_user_favorites_url( $user_id );
+function mb_user_bookmarks_url( $user_id = 0 ) {
+	echo mb_get_user_bookmarks_url( $user_id );
 }
 
-function mb_get_user_favorites_url( $user_id = 0 ) {
+function mb_get_user_bookmarks_url( $user_id = 0 ) {
 
-	$url = trailingslashit( mb_get_user_profile_url( $user_id ) ) . 'favorites';
+	$url = trailingslashit( mb_get_user_profile_url( $user_id ) ) . 'bookmarks';
 
-	return apply_filters( 'mb_get_user_favorites_url', esc_url( $url ), $user_id );
+	return apply_filters( 'mb_get_user_bookmarks_url', esc_url( $url ), $user_id );
 }
 
 function mb_user_subscriptions_url( $user_id = 0 ) {

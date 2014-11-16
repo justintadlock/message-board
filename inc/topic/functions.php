@@ -34,26 +34,26 @@ function mb_set_topic_subscribers( $topic_id ) {
 	return $users;
 }
 
-function mb_get_topic_favoriters( $topic_id = 0 ) {
+function mb_get_topic_bookmarkers( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
 	if ( empty( $topic_id ) )
 		return;
 
-	$users = wp_cache_get( 'mb_get_topic_favoriters_' . $topic_id, 'message-board-users' );
+	$users = wp_cache_get( 'mb_get_topic_bookmarkers_' . $topic_id, 'message-board-users' );
 
 	if ( false === $users ) {
-		$users = mb_set_topic_favoriters();
+		$users = mb_set_topic_bookmarkers();
 	}
 
-	return apply_filters( 'mb_get_topic_favoriters', $users );
+	return apply_filters( 'mb_get_topic_bookmarkers', $users );
 }
 
-function mb_set_topic_favoriters( $topic_id ) {
+function mb_set_topic_bookmarkers( $topic_id ) {
 	global $wpdb;
 
-	$users = $wpdb->get_col( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = '_topic_favorites' and FIND_IN_SET( '{$topic_id}', meta_value ) > 0" );
-	wp_cache_set( 'mb_get_topic_favoriters_' . $topic_id, $users, 'message-board-users' );
+	$users = $wpdb->get_col( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = '_topic_bookmarks' and FIND_IN_SET( '{$topic_id}', meta_value ) > 0" );
+	wp_cache_set( 'mb_get_topic_bookmarkers_' . $topic_id, $users, 'message-board-users' );
 
 	return $users;
 }
