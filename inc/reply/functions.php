@@ -10,6 +10,37 @@ function mb_get_topic_reply_ids( $topic_id ) {
 	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' AND post_parent = %d ORDER BY menu_order ASC", mb_get_reply_post_type(), absint( $topic_id ) ) );
 }
 
+function mb_reset_reply_data( $post ) {
+
+	$post = is_object( $post ) ? $post : get_post( $post );
+
+	$topic_id         = $post->post_parent;
+	$forum_id         = mb_get_topic_forum_id( $topic_id );
+
+	$topic_last_reply = mb_get_topic_last_reply_id( $topic_id );
+	$forum_last_reply = mb_get_forum_last_reply_id( $forum_id );
+
+	/* Reset topic reply count. */
+	mb_set_topic_reply_count( $topic_id );
+
+	/* Reset topic voices. */
+	mb_set_topic_voices( $topic_id );
+
+	/* Reset reply positions. */
+	mb_reset_reply_positions( $topic_id );
+
+	/* Reset forum reply count. */
+	mb_set_forum_reply_count( $forum_id );
+
+	/* If this is the last topic reply, reset topic latest data. */
+	if ( $post->ID === absint( $topic_last_reply ) )
+		mb_reset_topic_latest( $topic_id );
+
+	/* If this is the last reply, reset forum latest data. */
+	if ( $post->ID === absint( $forum_last_reply ) )
+		mb_reset_forum_latest( $forum_id );
+}
+
 /* Update all reply positions with a single query. */
 function mb_reset_reply_positions( $topic_id ) {
 	global $wpdb;

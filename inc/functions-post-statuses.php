@@ -82,56 +82,21 @@ function mb_publish_to_close( $post ) {}
  */
 function mb_publish_to_spam( $post ) {
 
-	if ( mb_get_topic_post_type() === $post->post_type ) {
+	if ( mb_get_topic_post_type() === $post->post_type )
+		mb_reset_topic_data( $post );
 
-		$forum_id      = mb_get_topic_forum_id( $post->ID );
-		$last_topic_id = mb_get_forum_last_topic_id( $forum_id );
-
-		/* If this is the last topic, reset all forum data. */
-		if ( $post->ID === absint( $last_topic_id ) ) {
-
-			mb_reset_forum_latest( $forum_id );
-		}
-
-		/* Reset counts. */
-		mb_set_forum_topic_count( $forum_id );
-		mb_set_forum_reply_count( $forum_id );
-
-	} elseif ( mb_get_reply_post_type() === $post->post_type ) {
-
-		$topic_id         = $post->post_parent;
-		$forum_id         = mb_get_topic_forum_id( $topic_id );
-
-		$topic_last_reply = mb_get_topic_last_reply_id( $topic_id );
-		$forum_last_reply = mb_get_forum_last_reply_id( $forum_id );
-
-		/* If this is the last topic reply, reset topic latest data. */
-		if ( $post->ID === absint( $topic_last_reply ) ) {
-
-			mb_reset_topic_latest( $topic_id );
-		}
-
-		$topic_reply_count = mb_get_topic_reply_count( $topic_id );
-		update_post_meta( $topic_id, '_topic_reply_count', absint( $topic_reply_count ) - 1 );
-
-		/* Reset topic voices. */
-		mb_set_topic_voices( $topic_id );
-
-		/* Reset reply positions. */
-		mb_reset_reply_positions( $topic_id );
-
-		/* If this is the last reply, reset all forum data. */
-		if ( $post->ID === absint( $forum_last_reply ) ) {
-
-			mb_reset_forum_latest( $forum_id );
-		}
-
-		$forum_reply_count = mb_get_forum_reply_count( $forum_id );
-		update_post_meta( $forum_id, '_forum_reply_count', absint( $forum_reply_count ) - 1 );
-	}
+	elseif ( mb_get_reply_post_type() === $post->post_type )
+		mb_reset_reply_data( $post );
 }
 
-function mb_publish_to_trash( $post ) {}
+function mb_publish_to_trash( $post ) {
+
+	if ( mb_get_topic_post_type() === $post->post_type )
+		mb_reset_topic_data( $post );
+
+	elseif ( mb_get_reply_post_type() === $post->post_type )
+		mb_reset_reply_data( $post );
+}
 
 /* actions? do nothing. */
 function mb_close_to_publish( $post ) {}

@@ -87,6 +87,15 @@ function mb_reset_topic_latest( $topic_id ) {
 	wp_update_post( $postarr );
 }
 
+function mb_set_topic_reply_count( $topic_id ) {
+
+	$replies = mb_get_topic_reply_ids( $topic_id );
+
+	$count = !empty( $replies ) ? count( $replies ) : 0;
+
+	update_post_meta( $topic_id, '_topic_reply_count', $count );
+}
+
 function mb_set_topic_voices( $topic_id ) {
 	global $wpdb;
 
@@ -104,8 +113,23 @@ function mb_set_topic_voices( $topic_id ) {
 	return $voices;
 }
 
+function mb_reset_topic_data( $post ) {
 
+	$post = is_object( $post ) ? $post : get_post( $post );
 
+	$forum_id         = mb_get_topic_forum_id( $post->ID );
+	$forum_last_topic = mb_get_forum_last_topic_id( $forum_id );
+
+	/* Reset forum topic count. */
+	mb_set_forum_topic_count( $forum_id );
+
+	/* Reset forum reply count. */
+	mb_set_forum_reply_count( $forum_id );
+
+	/* If this is the last topic, reset forum latest data. */
+	if ( $post->ID === absint( $forum_last_topic ) )
+		mb_reset_forum_latest( $forum_id );
+}
 
 
 
