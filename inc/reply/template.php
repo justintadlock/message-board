@@ -24,6 +24,7 @@ function mb_reply_query() {
 
 	$defaults = array(
 		'post_type'           => mb_get_reply_post_type(),
+	//	'post_status'         => 'publish',
 		'posts_per_page'      => $per_page,
 		'paged'               => get_query_var( 'paged' ),
 		'orderby'             => 'menu_order',

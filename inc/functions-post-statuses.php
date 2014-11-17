@@ -108,10 +108,10 @@ function mb_publish_to_spam( $post ) {
 		/* If this is the last topic reply, reset topic latest data. */
 		if ( $post->ID === absint( $topic_last_reply ) ) {
 
-			mb_reset_topic_latest( $forum_id );
+			mb_reset_topic_latest( $topic_id );
 		}
 
-		$topic_reply_count = mb_topic_reply_count( $topic_id );
+		$topic_reply_count = mb_get_topic_reply_count( $topic_id );
 		update_post_meta( $topic_id, '_topic_reply_count', absint( $topic_reply_count ) - 1 );
 
 		/* Reset topic voices. */

@@ -72,6 +72,10 @@ function mb_reset_topic_latest( $topic_id ) {
 		update_post_meta( $topic_id, '_topic_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
 		update_post_meta( $topic_id, '_topic_last_reply_id',           $last_reply_id );
 
+		$postarr['ID'] = $topic_id;
+		$postarr['menu_order'] = mysql2date( 'U', $post_date );
+		wp_update_post( $postarr );
+
 	} else {
 		$post_date = get_post_field( 'post_date', $topic_id );
 
@@ -80,6 +84,10 @@ function mb_reset_topic_latest( $topic_id ) {
 
 		delete_post_meta( $topic_id, '_topic_last_reply_id' );
 	}
+
+		$postarr['ID'] = absint( $topic_id );
+		$postarr['menu_order'] = mysql2date( 'U', $post_date );
+		wp_update_post( $postarr );
 }
 
 function mb_set_topic_voices( $topic_id ) {

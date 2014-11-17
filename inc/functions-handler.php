@@ -12,6 +12,8 @@ add_action( 'mb_template_redirect', 'mb_handler_edit_post'       );
 add_action( 'mb_template_redirect', 'mb_handler_topic_subscribe' );
 add_action( 'mb_template_redirect', 'mb_handler_topic_bookmark'  );
 
+add_action( 'mb_template_redirect', 'mb_handler_spam'  );
+
 /**
  * New topic handler. This function executes when a new topic is posted on the front end.
  *
@@ -448,4 +450,35 @@ function mb_handler_topic_bookmark() {
 
 			wp_safe_redirect( esc_url( strip_tags( $_GET['redirect'] ) ) );
 		}
+}
+
+// http://localhost/board/?action=spam&reply_id=2860&redirect=http://localhost/board/topics/sub-11/
+function mb_handler_spam() {
+
+	if ( !is_user_logged_in() )
+		return;
+
+	// @todo nonce?
+	// @todo cap check
+
+	if ( !isset( $_GET['action'] ) || 'spam' !== $_GET['action'] )
+		return;
+
+	if ( isset( $_GET['reply_id'] ) ) {
+
+		$reply_id = absint( $_GET['reply_id'] );
+
+		$postarr = get_post( $reply_id, ARRAY_A );
+
+		//if ( 'spam' !== $post['post_status'] ) {
+
+			$postarr['post_status'] = 'spam';
+
+			wp_update_post( $postarr );
+		//}
+	}
+
+	if ( isset( $_GET['redirect'] ) ) {
+		wp_safe_redirect( esc_url( strip_tags( $_GET['redirect'] ) ) );
+	}
 }
