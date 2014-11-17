@@ -28,7 +28,7 @@ function mb_register_post_statuses() {
 		array(
 			'label'                     => __( 'Spam', 'message-board' ),
 			'label_count'               => _n_noop( 'Spam <span class="count">(%s)</span>', 'Spam <span class="count">(%s)</span>', 'message-board' ),
-			'public'                    => true,
+			'public'                    => current_user_can( 'manage_forums' ) ? true : false,
 			'exclude_from_search'       => true,
 			'show_in_admin_status_list' => true,
 			'show_in_admin_all_list'    => false,
@@ -126,8 +126,8 @@ function mb_publish_to_spam( $post ) {
 			mb_reset_forum_latest( $forum_id );
 		}
 
-		/* Reset reply count. */
-		mb_set_forum_reply_count( $forum_id );
+		$forum_reply_count = mb_get_forum_reply_count( $forum_id );
+		update_post_meta( $forum_id, '_forum_reply_count', absint( $forum_reply_count ) - 1 );
 	}
 }
 

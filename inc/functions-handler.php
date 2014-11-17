@@ -464,11 +464,11 @@ function mb_handler_spam() {
 	if ( !isset( $_GET['action'] ) || 'spam' !== $_GET['action'] )
 		return;
 
-	if ( isset( $_GET['reply_id'] ) ) {
+	if ( isset( $_GET['reply_id'] ) || isset( $_GET['topic_id'] ) ) {
 
-		$reply_id = absint( $_GET['reply_id'] );
+		$post_id = isset( $_GET['reply_id'] ) ? absint( $_GET['reply_id'] ) : absint( $_GET['topic_id'] );
 
-		$postarr = get_post( $reply_id, ARRAY_A );
+		$postarr = get_post( $post_id, ARRAY_A );
 
 		if ( 'spam' !== $post['post_status'] ) {
 

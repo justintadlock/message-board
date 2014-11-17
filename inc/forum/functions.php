@@ -31,8 +31,7 @@ function mb_set_forum_reply_count( $forum_id ) {
 
 	$count = !empty( $reply_ids ) ? count( $reply_ids ) : 0;
 
-	if ( !empty( $count ) )
-		update_post_meta( $forum_id, '_forum_reply_count', $count );
+	update_post_meta( $forum_id, '_forum_reply_count', $count );
 
 	return $count;
 }
