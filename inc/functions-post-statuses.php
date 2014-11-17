@@ -117,6 +117,9 @@ function mb_publish_to_spam( $post ) {
 		/* Reset topic voices. */
 		mb_set_topic_voices( $topic_id );
 
+		/* Reset reply positions. */
+		mb_reset_reply_positions( $topic_id );
+
 		/* If this is the last reply, reset all forum data. */
 		if ( $post->ID === absint( $forum_last_reply ) ) {
 

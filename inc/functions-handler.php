@@ -470,12 +470,12 @@ function mb_handler_spam() {
 
 		$postarr = get_post( $reply_id, ARRAY_A );
 
-		//if ( 'spam' !== $post['post_status'] ) {
+		if ( 'spam' !== $post['post_status'] ) {
 
 			$postarr['post_status'] = 'spam';
 
 			wp_update_post( $postarr );
-		//}
+		}
 	}
 
 	if ( isset( $_GET['redirect'] ) ) {

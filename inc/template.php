@@ -57,6 +57,10 @@ function mb_get_reply_topic_id( $reply_id = 0 ) {
 function mb_generate_reply_url( $reply_id = 0 ) {
 
 	$reply_id       = mb_get_reply_id( $reply_id );
+
+	if ( 'publish' !== get_post_status( $reply_id ) )
+		return '';
+
 	$per_page       = mb_get_replies_per_page();
 	$reply_position = mb_get_reply_position( $reply_id );
 	$reply_hash     = "#post-{$reply_id}";
