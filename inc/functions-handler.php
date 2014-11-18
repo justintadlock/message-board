@@ -12,9 +12,9 @@ add_action( 'mb_template_redirect', 'mb_handler_edit_post'       );
 add_action( 'mb_template_redirect', 'mb_handler_topic_subscribe' );
 add_action( 'mb_template_redirect', 'mb_handler_topic_bookmark'  );
 
-add_action( 'mb_template_redirect', 'mb_handler_spam'             );
-add_action( 'mb_template_redirect', 'mb_handler_open_close_topic' );
-add_action( 'mb_template_redirect', 'mb_handler_trash'            );
+add_action( 'mb_template_redirect', 'mb_handler_spam'       );
+add_action( 'mb_template_redirect', 'mb_handler_open_close' );
+add_action( 'mb_template_redirect', 'mb_handler_trash'      );
 
 /**
  * New topic handler. This function executes when a new topic is posted on the front end.
@@ -485,7 +485,7 @@ function mb_handler_spam() {
 	}
 }
 
-function mb_handler_open_close_topic() {
+function mb_handler_open_close() {
 
 	if ( !is_user_logged_in() )
 		return;
@@ -496,9 +496,9 @@ function mb_handler_open_close_topic() {
 	if ( !isset( $_GET['action'] ) || !in_array( $_GET['action'], array( 'open', 'close' ) ) )
 		return;
 
-	if ( isset( $_GET['topic_id'] ) ) {
+	if ( isset( $_GET['forum_id'] ) || isset( $_GET['topic_id'] ) ) {
 
-		$post_id = absint( $_GET['topic_id'] );
+		$post_id = isset( $_GET['forum_id'] ) ? absint( $_GET['forum_id'] ) : absint( $_GET['topic_id'] );
 
 		$postarr = get_post( $post_id, ARRAY_A );
 

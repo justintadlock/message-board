@@ -75,6 +75,56 @@ function mb_is_forum_open( $forum_id = 0 ) {
 	return apply_filters( 'mb_is_forum_open', in_array( $status, array( 'publish', 'inherit' ) ) ? true : false, $forum_id );
 }
 
+function mb_forum_close_url( $forum_id = 0 ) {
+	echo mb_get_forum_close_url( $forum_id );
+}
+
+function mb_get_forum_close_url( $forum_id = 0 ) {
+
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+	$url = esc_url( add_query_arg( array( 'action' => 'close', 'forum_id' => $forum_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+
+	return apply_filters( 'mb_get_forum_close_url', $url, $forum_id );
+}
+
+function mb_forum_open_url( $forum_id = 0 ) {
+	echo mb_get_forum_open_url( $forum_id );
+}
+
+function mb_get_forum_open_url( $forum_id = 0 ) {
+
+	$forum_id = mb_get_forum_id( $forum_id );
+	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+	$url = esc_url( add_query_arg( array( 'action' => 'open', 'forum_id' => $forum_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+
+	return apply_filters( 'mb_get_forum_unclose_url', $url, $forum_id );
+}
+
+function mb_forum_open_close_link( $forum_id = 0 ) {
+	echo mb_get_forum_open_close_link( $forum_id );
+}
+
+function mb_get_forum_open_close_link( $forum_id = 0 ) {
+
+	if ( !current_user_can( 'manage_forums' ) )
+		return '';
+
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	if ( mb_is_forum_open( $forum_id ) ) {
+		$link = sprintf( '<a class="close-link" href="%s">%s</a>', mb_get_forum_close_url( $forum_id ), __( 'Close', 'message-board' ) );
+	}
+	else {
+		$link = sprintf( '<a class="open-link" href="%s">%s</a>', mb_get_forum_open_url( $forum_id ), __( 'Open', 'message-board' ) );
+	}
+
+	return $link;
+}
+
 /* ====== Forum Labels ====== */
 
 /**

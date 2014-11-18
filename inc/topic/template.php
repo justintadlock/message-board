@@ -181,9 +181,14 @@ function mb_get_topic_trash_link( $topic_id = 0 ) {
  */
 function mb_is_topic_open( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
+	$forum_id = mb_get_topic_forum_id( $topic_id );
 	$status   = get_post_status( $topic_id );
+	$open     = false;
 
-	return apply_filters( 'mb_is_topic_open', in_array( $status, array( 'publish', 'inherit' ) ) ? true : false, $topic_id );
+	if ( mb_is_forum_open( $forum_id ) && 'publish' === $status )
+		$open = true;
+
+	return apply_filters( 'mb_is_topic_open', $open, $topic_id );
 }
 
 function mb_is_topic_closed( $topic_id = 0 ) {
@@ -926,7 +931,13 @@ function mb_topic_form_url() {
  * @return string
  */
 function mb_get_topic_form_url() {
-	return apply_filters( 'mb_topic_form_url', esc_url( '#topic-form' ) );
+
+	if ( is_singular( mb_get_forum_post_type() ) && !mb_is_forum_open( get_queried_object_id() ) )
+		$url = '';
+	else
+		$url = esc_url( '#topic-form' );
+
+	return apply_filters( 'mb_topic_form_url', $url );
 }
 
 /**
@@ -954,6 +965,9 @@ function mb_get_topic_form_link( $args = array() ) {
 	if ( !current_user_can( 'create_forum_topics' ) )
 		return '';
 
+	$url  = mb_get_topic_form_url();
+	$link = '';
+
 	$defaults = array(
 		'text' => __( 'New Topic &rarr;', 'message-board' ),
 		'wrap' => '<a %s>%s</a>',
@@ -963,9 +977,12 @@ function mb_get_topic_form_link( $args = array() ) {
 
 	$args = wp_parse_args( $args, $defaults );
 
-	$attr = sprintf( 'class="new-topic-link new-topic" href="%s"', mb_get_topic_form_url() );
+	if ( !empty( $url ) ) {
 
-	$link = sprintf( $args['before'] . $args['wrap'] . $args['after'], $attr, $args['text'] );
+		$attr = sprintf( 'class="new-topic-link new-topic" href="%s"', $url );
+
+		$link = sprintf( $args['before'] . $args['wrap'] . $args['after'], $attr, $args['text'] );
+	}
 
 	return apply_filters( 'mb_get_topic_form_link', $link, $args );
 }
@@ -983,6 +1000,9 @@ function mb_topic_form() {
 
 	if ( !current_user_can( 'create_forum_topics' ) )
 		return; 
+
+	if ( is_singular( mb_get_forum_post_type() ) && !mb_is_forum_open( get_queried_object_id() ) )
+		return;
 
 	$form  = sprintf( '<form id="topic-form" method="post" action="%s">', mb_get_topic_form_action_url() );
 	$form .= '<fieldset>';
