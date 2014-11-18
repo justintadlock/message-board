@@ -269,7 +269,7 @@ function mb_reply_form() {
 
 function mb_get_reply_form() {
 
-	if ( !current_user_can( 'create_forum_replies' ) )
+	if ( !current_user_can( 'create_forum_replies' ) || !mb_is_topic_open( get_queried_object_id() ) )
 		return; 
 
 	$form  = sprintf( '<form id="reply-form" method="post" action="%s">', mb_get_reply_form_action_url() );

@@ -38,7 +38,7 @@ function mb_topic_query() {
 
 		$defaults = array(
 			'post_type'           => mb_get_topic_post_type(),
-			'post_status'         => 'publish',
+			'post_status'         => array( 'publish', 'close' ),
 			'posts_per_page'      => $per_page,
 			'paged'               => get_query_var( 'paged' ),
 			'orderby'             => 'menu_order',
@@ -149,6 +149,63 @@ function mb_is_topic_open( $topic_id = 0 ) {
 	return apply_filters( 'mb_is_topic_open', in_array( $status, array( 'publish', 'inherit' ) ) ? true : false, $topic_id );
 }
 
+function mb_is_topic_closed( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$status   = get_post_status( $topic_id );
+
+	return apply_filters( 'mb_is_topic_closed', 'close' === $status ? true : false, $topic_id );
+}
+
+function mb_topic_close_url( $topic_id = 0 ) {
+	echo mb_get_topic_close_url( $topic_id );
+}
+
+function mb_get_topic_close_url( $topic_id = 0 ) {
+
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+	$url = esc_url( add_query_arg( array( 'action' => 'close', 'topic_id' => $topic_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+
+	return apply_filters( 'mb_get_topic_close_url', $url, $topic_id );
+}
+
+function mb_topic_open_url( $topic_id = 0 ) {
+	echo mb_get_topic_open_url( $topic_id );
+}
+
+function mb_get_topic_open_url( $topic_id = 0 ) {
+
+	$topic_id = mb_get_topic_id( $topic_id );
+	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+	$url = esc_url( add_query_arg( array( 'action' => 'open', 'topic_id' => $topic_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+
+	return apply_filters( 'mb_get_topic_unclose_url', $url, $topic_id );
+}
+
+function mb_topic_open_close_link( $topic_id = 0 ) {
+	echo mb_get_topic_open_close_link( $topic_id );
+}
+
+function mb_get_topic_open_close_link( $topic_id = 0 ) {
+
+	if ( !current_user_can( 'manage_forums' ) )
+		return '';
+
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	if ( !mb_is_topic_closed( $topic_id ) ) {
+		$link = sprintf( '<a class="close-link" href="%s">%s</a>', mb_get_topic_close_url( $topic_id ), __( 'Close', 'message-board' ) );
+	}
+	else {
+		$link = sprintf( '<a class="open-link" href="%s">%s</a>', mb_get_topic_open_url( $topic_id ), __( 'Open', 'message-board' ) );
+	}
+
+	return $link;
+}
+
 function mb_is_topic_spam( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 	$status   = get_post_status( $topic_id );
@@ -237,6 +294,9 @@ function mb_get_topic_labels( $topic_id = 0 ) {
 	if ( mb_is_topic_sticky( $topic_id ) )
 		$labels['sticky'] = __( '[Sticky]', 'message-board' );
 
+	if ( mb_is_topic_closed( $topic_id ) )
+		$labels['closed'] = __( '[Closed]', 'message-board' );
+
 	$labels = apply_filters( 'mb_topic_labels', $labels, $topic_id );
 
 	if ( !empty( $labels ) ) {
@@ -244,7 +304,7 @@ function mb_get_topic_labels( $topic_id = 0 ) {
 		$formatted = '';
 
 		foreach ( $labels as $key => $value )
-			$formatted .= sprintf( '<span class="topic-label %s">%s</span>', sanitize_html_class( "topic-label-{$key}" ), $value );
+			$formatted .= sprintf( '<span class="topic-label %s">%s</span> ', sanitize_html_class( "topic-label-{$key}" ), $value );
 
 		return sprintf( '<span class="topic-labels">%s</span>', $formatted );
 	}

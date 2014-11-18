@@ -73,7 +73,7 @@ function mb_pre_get_posts( $query ) {
 	elseif ( !is_admin() && $query->is_main_query() && ( is_post_type_archive( mb_get_topic_post_type() ) ) ) {
 
 		$query->set( 'post_type',      mb_get_topic_post_type() );
-		$query->set( 'post_status',    'publish'                );
+		$query->set( 'post_status',    array( 'publish', 'close' ) );
 		$query->set( 'posts_per_page', mb_get_topics_per_page() );
 		$query->set( 'order',          'DESC'                   );
 		$query->set( 'orderby',        'menu_order'             );
