@@ -20,7 +20,7 @@ function mb_forum_query() {
 		return $have_posts;
 	}
 
-	if ( is_post_type_archive( mb_get_forum_post_type() ) ) {
+	if ( is_post_type_archive( mb_get_forum_post_type() ) || is_singular( mb_get_forum_post_type() ) ) {
 		global $wp_query;
 
 		$mb->forum_query = $wp_query;
@@ -37,14 +37,64 @@ function mb_forum_query() {
 			'ignore_sticky_posts' => true,
 		);
 
-		if ( is_singular( mb_get_forum_post_type() ) ) {
-			$defaults['post_parent'] = get_queried_object_id();
-		}
-
 		$mb->forum_query = new WP_Query( $defaults );
 	}
 
 	return $mb->forum_query->have_posts();
+}
+
+/**
+ * Creates a new sub-forum query and checks if there are any forums found.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_sub_forum_query() {
+	$mb = message_board();
+
+	if ( !is_null( $mb->sub_forum_query->query ) ) {
+
+		$have_posts = $mb->sub_forum_query->have_posts();
+
+		if ( empty( $have_posts ) )
+			wp_reset_postdata();
+
+		return $have_posts;
+	}
+
+	add_action( 'loop_end',             'mb_sub_forum_loop_end' );
+	add_filter( 'mb_in_sub_forum_loop', '__return_true'         );
+
+	$defaults = array(
+		'post_type'           => mb_get_forum_post_type(),
+		'nopaging'            => true,
+		'posts_per_page'      => -1,
+		'orderby'             => 'title',
+		'order'               => 'ASC',
+		'ignore_sticky_posts' => true,
+	);
+
+	if ( is_singular( mb_get_forum_post_type() ) ) {
+		$defaults['post_parent'] = get_queried_object_id();
+	}
+
+	if ( !empty( $defaults['post_parent'] ) || !empty( $defaults['child_of'] ) )
+		$mb->sub_forum_query = new WP_Query( $defaults );
+
+	return $mb->sub_forum_query->have_posts();
+}
+
+/**
+ * Remove filters/actions when the sub-forum loop ends.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_sub_forum_loop_end() {
+	remove_action( 'loop_end',             'mb_sub_forum_loop_end' );
+	remove_filter( 'mb_in_sub_forum_loop', '__return_true'         );
 }
 
 /**
@@ -55,7 +105,12 @@ function mb_forum_query() {
  * @return void
  */
 function mb_the_forum() {
-	return message_board()->forum_query->the_post();
+	$mb = message_board();
+
+	if ( apply_filters( 'mb_in_sub_forum_loop', false ) )
+		return $mb->sub_forum_query->the_post();
+
+	return $mb->forum_query->the_post();
 }
 
 
