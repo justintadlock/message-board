@@ -14,6 +14,7 @@ add_action( 'mb_template_redirect', 'mb_handler_topic_bookmark'  );
 
 add_action( 'mb_template_redirect', 'mb_handler_spam'             );
 add_action( 'mb_template_redirect', 'mb_handler_open_close_topic' );
+add_action( 'mb_template_redirect', 'mb_handler_trash'            );
 
 /**
  * New topic handler. This function executes when a new topic is posted on the front end.
@@ -513,6 +514,38 @@ function mb_handler_open_close_topic() {
 			$postarr['post_status'] = 'publish';
 
 			wp_update_post( $postarr );
+		}
+	}
+
+	if ( isset( $_GET['redirect'] ) ) {
+		wp_safe_redirect( esc_url( strip_tags( $_GET['redirect'] ) ) );
+	}
+}
+
+function mb_handler_trash() {
+
+	if ( !is_user_logged_in() )
+		return;
+
+	// @todo nonce?
+	// @todo cap check
+
+	if ( !isset( $_GET['action'] ) || !in_array( $_GET['action'], array( 'trash', 'untrash' ) ) )
+		return;
+
+	if ( isset( $_GET['reply_id'] ) || isset( $_GET['topic_id'] ) ) {
+
+		$post_id = isset( $_GET['reply_id'] ) ? absint( $_GET['reply_id'] ) : absint( $_GET['topic_id'] );
+
+		$postarr = get_post( $post_id, ARRAY_A );
+
+		if ( 'trash' === $_GET['action'] && 'trash' !== $postarr['post_status'] ) {
+			wp_trash_post( $post_id );
+		}
+
+		elseif ( 'untrash' === $_GET['action'] && 'trash' === $postarr['post_status'] ) {
+
+			wp_untrash_post( $post_id );
 		}
 	}
 

@@ -115,7 +115,34 @@ function mb_topic_trash_url( $topic_id = 0 ) {
 
 function mb_get_topic_trash_url( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-	return apply_filters( 'mb_get_topic_trash_url', get_delete_post_link( $topic_id ), $topic_id );
+
+	if ( is_singular( mb_get_topic_post_type() ) ) {
+		$redirect = mb_get_forum_url( mb_get_topic_forum_id( $topic_id ) );
+	} else {
+		$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+	}
+
+	$url = esc_url( add_query_arg( array( 'action' => 'trash', 'topic_id' => $topic_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+
+	return apply_filters( 'mb_get_topic_trash_url', $url, $topic_id );
+}
+
+function mb_topic_untrash_url( $topic_id = 0 ) {
+	echo mb_get_topic_untrash_url( $topic_id );
+}
+
+function mb_get_topic_untrash_url( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	if ( is_singular( mb_get_topic_post_type() ) ) {
+		$redirect = mb_get_forum_url( mb_get_topic_forum_id( $topic_id ) );
+	} else {
+		$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+	}
+
+	$url = esc_url( add_query_arg( array( 'action' => 'untrash', 'topic_id' => $topic_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+
+	return apply_filters( 'mb_get_topic_untrash_url', $url, $topic_id );
 }
 
 function mb_topic_trash_link( $topic_id = 0 ) {
@@ -125,10 +152,20 @@ function mb_topic_trash_link( $topic_id = 0 ) {
 function mb_get_topic_trash_link( $topic_id = 0 ) {
 
 	$link = '';
-	$url = mb_get_topic_trash_url( $topic_id );
 
-	if ( !empty( $url ) )
-		$link = sprintf( '<a href="%s" class="topic-trash-link trash-link">%s</a>', $url, __( 'Trash', 'message-board' ) );
+	if ( 'trash' !== get_post_status( $topic_id ) ) {
+		$url = mb_get_topic_trash_url( $topic_id );
+
+		if ( !empty( $url ) )
+			$link = sprintf( '<a href="%s" class="topic-trash-link trash-link">%s</a>', $url, __( 'Trash', 'message-board' ) );
+	}
+
+	else {
+		$url = mb_get_topic_untrash_url( $topic_id );
+
+		if ( !empty( $url ) )
+			$link = sprintf( '<a href="%s" class="topic-trash-link trash-link">%s</a>', $url, __( 'Restore', 'message-board' ) );
+	}
 
 	return apply_filters( 'mb_get_topic_trash_link', $link );
 }

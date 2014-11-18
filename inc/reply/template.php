@@ -105,7 +105,30 @@ function mb_reply_trash_url( $reply_id = 0 ) {
 
 function mb_get_reply_trash_url( $reply_id = 0 ) {
 	$reply_id = mb_get_reply_id( $reply_id );
-	return apply_filters( 'mb_get_reply_trash_url', get_delete_post_link( $reply_id ), $reply_id );
+
+	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+	$url = esc_url( add_query_arg( array( 'action' => 'trash', 'reply_id' => $reply_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+
+	return apply_filters( 'mb_get_reply_trash_url', $url, $reply_id );
+}
+
+function mb_reply_untrash_url( $reply_id = 0 ) {
+	echo mb_get_reply_untrash_url( $reply_id );
+}
+
+function mb_get_reply_untrash_url( $reply_id = 0 ) {
+	$reply_id = mb_get_reply_id( $reply_id );
+
+	if ( is_singular( mb_get_reply_post_type() ) ) {
+		$redirect = mb_get_forum_url( mb_get_reply_forum_id( $reply_id ) );
+	} else {
+		$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+	}
+
+	$url = esc_url( add_query_arg( array( 'action' => 'untrash', 'reply_id' => $reply_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+
+	return apply_filters( 'mb_get_reply_untrash_url', $url, $reply_id );
 }
 
 function mb_reply_trash_link( $reply_id = 0 ) {
@@ -113,10 +136,22 @@ function mb_reply_trash_link( $reply_id = 0 ) {
 }
 
 function mb_get_reply_trash_link( $reply_id = 0 ) {
-	$url = mb_get_reply_trash_url( $reply_id );
 
-	if ( !empty( $url ) )
-		$link = sprintf( '<a href="%s" class="reply-trash-link trash-link">%s</a>', $url, __( 'Trash', 'message-board' ) );
+	$link = '';
+
+	if ( 'trash' !== get_post_status( $reply_id ) ) {
+		$url = mb_get_reply_trash_url( $reply_id );
+
+		if ( !empty( $url ) )
+			$link = sprintf( '<a href="%s" class="reply-trash-link trash-link">%s</a>', $url, __( 'Trash', 'message-board' ) );
+	}
+
+	else {
+		$url = mb_get_reply_untrash_url( $reply_id );
+
+		if ( !empty( $url ) )
+			$link = sprintf( '<a href="%s" class="reply-trash-link trash-link">%s</a>', $url, __( 'Restore', 'message-board' ) );
+	}
 
 	return apply_filters( 'mb_get_reply_trash_link', $link );
 }
