@@ -9,6 +9,32 @@
  * certain hooks that will be executed when using these functions.
  */
 
+function mb_setup_post_data( $type = 'topic' ) {
+
+	if ( 'forum' === $type )
+		mb_the_forum();
+	elseif ( 'topic' === $type )
+		mb_the_topic();
+	elseif ( 'reply' === $type )
+		mb_the_reply();
+
+	do_action( "mb_setup_{$type}_data" );
+}
+
+function mb_query( $type = 'topic' ) {
+
+	$query = false;
+
+	if ( 'forum' === $type )
+		return mb_forum_query();
+	elseif ( 'topic' === $type )
+		return mb_topic_query();
+	elseif ( 'reply' === $type )
+		return mb_reply_query();
+
+	return apply_filters( "mb_{$type}_query", $query );
+}
+
 /* ====== Login ====== */
 
 function mb_login_url() {
