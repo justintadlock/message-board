@@ -22,10 +22,6 @@ function mb_get_tag_slug() {
 	return apply_filters( 'mb_tag_slug', mb_maybe_get_root_slug() . 'tags' );
 }
 
-function mb_get_view_slug() {
-	return apply_filters( 'mb_view_slug', mb_maybe_get_root_slug() . 'views' );
-}
-
 function mb_get_user_slug() {
 	return apply_filters( 'mb_get_user_slug', mb_maybe_get_root_slug() . 'users' );
 }
@@ -59,26 +55,19 @@ function mb_rewrite_rules() {
 
 	$root_slug      = mb_get_root_slug();
 	$user_slug      = mb_get_user_slug();
-	$view_slug      = mb_get_view_slug();
 
 	$profile_query_var = 'mb_profile';
 	$user_query_var    = 'mb_user_view';
-	$view_query_var    = 'mb_view';
 
 	/* Rewrite tags. */
 
 	add_rewrite_tag( '%' . $profile_query_var . '%', '([^/]+)' );
 	add_rewrite_tag( '%' . $user_query_var    . '%', '([^/]+)' );
-	add_rewrite_tag( '%' . $view_query_var    . '%', '([^/]+)' );
 
 	add_rewrite_rule( $user_slug . '/([^/]+)/([^/]+)/page/?([0-9]{1,})/?$', 'index.php?author_name=$matches[1]&' . $user_query_var . '=$matches[2]&paged=$matches[3]', 'top' );
 	add_rewrite_rule( $user_slug . '/([^/]+)/([^/]+)/feed/?$',              'index.php?author_name=$matches[1]&' . $user_query_var . '=$matches[2]&feed=$matches[3]',  'top' );
 	add_rewrite_rule( $user_slug . '/([^/]+)/([^/]+)/?$',                   'index.php?author_name=$matches[1]&' . $user_query_var . '=$matches[2]',                   'top' );
 	add_rewrite_rule( $user_slug . '/([^/]+)/?$',                           'index.php?author_name=$matches[1]&mb_profile=1',                                          'top' );
-
-	add_rewrite_rule( $view_slug . '/([^/]+)/page/?([0-9]{1,})/?$', 'index.php?' . $view_query_var . '=$matches[1]&paged=$matches[2]', 'top' );
-	add_rewrite_rule( $view_slug . '/([^/]+)/feed/?$',              'index.php?' . $view_query_var . '=$matches[1]&feed=$matches[2]',  'top' );
-	add_rewrite_rule( $view_slug . '/([^/]+)/?$',                   'index.php?' . $view_query_var . '=$matches[1]',                   'top' );
 
 	/* Login page. */
 	$login_slug = mb_get_login_slug();
