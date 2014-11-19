@@ -217,10 +217,17 @@ final class Message_Board_Admin {
 	public function load_edit() {
 		$screen = get_current_screen();
 
+		$forum_type = mb_get_forum_post_type();
+		$topic_type = mb_get_topic_post_type();
+		$reply_type = mb_get_reply_post_type();
+
 		if ( !empty( $screen->post_type ) && mb_get_forum_post_type() === $screen->post_type ) {
 			add_filter( 'request',               array( $this, 'request'       ) );
 		//	add_action( 'restrict_manage_posts', array( $this, 'tags_dropdown' ) );
-		//	add_action( 'admin_head',            array( $this, 'print_styles'  ) );
+		}
+
+		if ( !empty( $screen->post_type ) && in_array( $screen->post_type, array( $forum_type, $topic_type, $reply_type ) ) ) {
+			add_action( 'admin_head', array( $this, 'print_styles'  ) );
 		}
 	}
 
@@ -329,6 +336,7 @@ final class Message_Board_Admin {
 		$columns['title']     = __( 'Forum',      'message-board' );
 		$columns['topics']    = __( 'Topics',     'message-board' );
 		$columns['replies']   = __( 'Replies',    'message-board' );
+		$columns['datetime']  = __( 'Created',    'message-board' );
 
 		/* Return the columns. */
 		return $columns;
@@ -368,8 +376,8 @@ final class Message_Board_Admin {
 
 		/* Add custom columns and overwrite the 'title' column. */
 		$columns['title']     = __( 'Reply',      'message-board' );
-		$columns['topic']     = __( 'Topic',      'message-board' );
 		$columns['forum']     = __( 'Forum',      'message-board' );
+		$columns['topic']     = __( 'Topic',      'message-board' );
 		$columns['author']    = __( 'Author',     'message-board' );
 		$columns['datetime']  = __( 'Created',    'message-board' );
 
@@ -438,6 +446,14 @@ final class Message_Board_Admin {
 
 				break;
 
+			case 'datetime' :
+
+				the_time( get_option( 'date_format' ) );
+				echo '<br />';
+				the_time( get_option( 'time_format' ) );
+
+				break;
+
 			/* Just break out of the switch statement for everything else. */
 			default :
 				break;
@@ -502,7 +518,9 @@ final class Message_Board_Admin {
 
 			case 'datetime' :
 
-				the_time( __( 'F j, Y g:i a', 'message-board' ) );
+				the_time( get_option( 'date_format' ) );
+				echo '<br />';
+				the_time( get_option( 'time_format' ) );
 
 				break;
 
@@ -521,6 +539,18 @@ final class Message_Board_Admin {
 	 * @return void
 	 */
 	public function print_styles( ) { ?>
+		<style type="text/css">
+		.edit-php .wp-list-table .column-forum,
+		.edit-php .wp-list-table .column-topic,
+		.edit-php .wp-list-table .column-datetime { 
+			width: 15%;
+		}
+		.edit-php .wp-list-table .column-topics,
+		.edit-php .wp-list-table .column-replies,
+		.edit-php .wp-list-table .column-voices {
+			width: 10%;
+		}
+		</style>
 	<?php }
 
 	/**
