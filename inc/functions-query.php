@@ -43,7 +43,7 @@ function mb_is_message_board() {
 
 	if ( 1 == get_query_var( 'mb_profile' ) || get_query_var( 'mb_topics' ) || get_query_var( 'mb_replies' ) ||
 		get_query_var( 'mb_bookmarks' ) || get_query_var( 'mb_subscriptions' ) 
-		|| mb_is_view() || mb_is_user_view() || mb_is_forum_search() 
+		|| mb_is_user_view() || mb_is_forum_search() 
 		|| mb_is_forum_front() || is_post_type_archive( mb_get_topic_post_type() )
 		|| mb_is_forum_login()
 		|| is_singular( array( mb_get_forum_post_type(), mb_get_topic_post_type() ) ) )
@@ -130,21 +130,6 @@ function mb_pre_get_posts( $query ) {
 			$query->set( 'order',          'DESC'                               );
 			$query->set( 'orderby',        'date'                               );
 		}
-	}
-
-	elseif ( !is_admin() && $query->is_main_query() && mb_is_view() ) {
-
-		// @todo handle stickies for views
-
-		$view = mb_get_view( get_query_var( 'mb_view' ) );
-
-		foreach ( $view['query'] as $arg => $value ) {
-
-			if ( 'post_type' !== $arg )
-				$query->set( $arg, $value );
-		}
-
-		$query->set( 'post_type', mb_get_topic_post_type() );
 	}
 }
 
@@ -286,7 +271,7 @@ function mb_parse_query( $query ) {
 	if ( mb_is_forum_front() ) {
 		$query->is_404 = false;
 		$query->is_home = false;
-	} elseif ( mb_is_view() || mb_is_user_view() ) {
+	} elseif ( mb_is_user_view() ) {
 		$query->is_home = false;
 		$query->is_archive = true;
 	}

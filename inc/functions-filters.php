@@ -54,8 +54,6 @@ add_filter( 'body_class', 'mb_body_class' );
 function mb_wp_title( $title ) {
 	if ( mb_is_forum_front() )
 		$title = esc_attr__( 'Forums', 'message-board' );
-	elseif ( mb_is_view() )
-		$title = esc_attr( mb_get_view_title() );
 
 	return $title;
 }

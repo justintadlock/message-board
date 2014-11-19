@@ -27,8 +27,6 @@ final class Message_Board {
 
 	public $dir_uri = '';
 
-	public $views = array();
-
 	public $user_views = array();
 
 
@@ -104,7 +102,6 @@ final class Message_Board {
 		/* Templates. */
 		require_once( $this->dir_path . 'inc/template-hierarchy.php' );
 		require_once( $this->dir_path . 'inc/template.php'           );
-		require_once( $this->dir_path . 'inc/template-view.php'      );
 
 		if ( is_admin() ) {
 			require_once( $this->dir_path . 'admin/admin.php' );
@@ -123,7 +120,6 @@ final class Message_Board {
 		/* Provide hook for add-on plugins after the plugin has been set up. */
 		add_action( 'plugins_loaded', array( $this, 'setup_late' ), 15 );
 
-		add_action( 'init', array( $this, 'register_views' ) );
 		//add_action( 'init', array( $this, 'register_user_views' ) );
 
 		/* Register activation hook. */
@@ -157,31 +153,6 @@ final class Message_Board {
 	 */
 	public function i18n() {
 		load_plugin_textdomain( 'message-board', false, 'message-board/languages' );
-	}
-
-	public function register_views() {
-
-		mb_register_view(
-			'popular',
-			array(
-				'title' => __( 'Popular', 'message-board' ),
-				'query' => array(
-					'orderby'  => 'meta_value_num',
-					'meta_key' => '_topic_reply_count'
-				)
-			)
-		);
-
-		mb_register_view(
-			'most-voices',
-			array(
-				'title' => __( 'Most Voices', 'message-board' ),
-				'query' => array(
-					'orderby'  => 'meta_value_num',
-					'meta_key' => '_topic_voice_count'
-				)
-			)
-		);
 	}
 
 	public function register_user_views() {

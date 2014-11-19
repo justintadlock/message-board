@@ -60,14 +60,6 @@ function mb_template_include( $template ) {
 		$_templates[] = "{$dir}/single-user.php";
 	}
 
-	elseif ( mb_is_view() ) {
-
-		$view = sanitize_key( get_query_var( 'mb_view' ) );
-
-		$_templates[] = "{$dir}/single-view-{$view}.php";
-		$_templates[] = "{$dir}/single-view.php";
-	}
-
 	elseif ( mb_is_forum_search() ) {
 
 		$_templates[] = "{$dir}/search.php";
