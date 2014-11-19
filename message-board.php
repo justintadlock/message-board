@@ -57,9 +57,10 @@ final class Message_Board {
 
 	private function setup() {
 
-		$this->forum_query = new WP_Query();
-		$this->topic_query = new WP_Query();
-		$this->reply_query = new WP_Query();
+		$this->forum_query     = new WP_Query();
+		$this->sub_forum_query = new WP_Query();
+		$this->topic_query     = new WP_Query();
+		$this->reply_query     = new WP_Query();
 
 		$this->dir_path = trailingslashit( plugin_dir_path( __FILE__ ) );
 		$this->dir_uri  = trailingslashit( plugin_dir_url(  __FILE__ ) );
