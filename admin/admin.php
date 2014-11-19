@@ -20,6 +20,84 @@ function mb_post_row_actions( $actions, $post ) {
 		if ( isset( $actions['inline hide-if-no-js'] ) ) {
 			unset( $actions['inline hide-if-no-js'] );
 		}
+
+		if ( current_user_can( 'manage_forums' ) ) {
+
+			$url = admin_url( 'post.php' );
+
+			if ( mb_get_forum_post_type() === $post->post_type ) {
+
+				if ( mb_is_forum_open( $post->ID ) ) {
+					$actions['mb-close'] = sprintf( 
+						'<a href="%s">%s</a>', 
+						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-close' ), $url ) ),
+						__( 'Close', 'message-board' )
+					);
+				} else {
+					$actions['mb-open'] = sprintf( 
+						'<a href="%s">%s</a>', 
+						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-open' ), $url ) ),
+						__( 'Open', 'message-board' )
+					);
+				}
+			}
+
+			elseif ( mb_get_topic_post_type() === $post->post_type ) {
+
+				if ( !mb_is_topic_spam( $post->ID ) ) {
+					$actions['mb-spam'] = sprintf( 
+						'<a href="%s">%s</a>', 
+						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-spam' ), $url ) ),
+						__( 'Spam', 'message-board' )
+					);
+				} else {
+					$actions['mb-unspam'] = sprintf( 
+						'<a href="%s">%s</a>', 
+						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-unspam' ), $url ) ),
+						__( 'Not Spam', 'message-board' )
+					);
+				}
+
+				if ( !mb_is_topic_closed( $post->ID ) ) {
+					$actions['mb-close'] = sprintf( 
+						'<a href="%s">%s</a>', 
+						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-close' ), $url ) ),
+						__( 'Close', 'message-board' )
+					);
+				} else {
+					$actions['mb-open'] = sprintf( 
+						'<a href="%s">%s</a>', 
+						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-open' ), $url ) ),
+						__( 'Open', 'message-board' )
+					);
+				}
+			}
+
+			elseif ( mb_get_reply_post_type() === $post->post_type ) {
+
+				if ( !mb_is_reply_spam( $post->ID ) ) {
+					$actions['mb-spam'] = sprintf( 
+						'<a href="%s">%s</a>', 
+						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-spam' ), $url ) ),
+						__( 'Spam', 'message-board' )
+					);
+				} else {
+					$actions['mb-unspam'] = sprintf( 
+						'<a href="%s">%s</a>', 
+						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-unspam' ), $url ) ),
+						__( 'Not Spam', 'message-board' )
+					);
+				}
+			}
+
+			/* Move view action to the end. */
+			if ( isset( $actions['view'] ) ) {
+				$view_action = $actions['view'];
+				unset( $actions['view'] );
+				$actions['view'] = $view_action;
+			}
+		}
+
 	}
 
 	return $actions;
@@ -394,7 +472,9 @@ final class Message_Board_Admin {
 
 			case 'datetime' :
 
-				the_time( __( 'F j, Y g:i a', 'message-board' ) );
+				the_time( get_option( 'date_format' ) );
+				echo '<br />';
+				the_time( get_option( 'time_format' ) );
 
 				break;
 
