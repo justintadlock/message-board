@@ -341,10 +341,16 @@ function mb_get_reply_form() {
 /* ====== Reply Forum ====== */
 
 function mb_get_reply_forum_id( $reply_id = 0 ) {
-	$topic_id = mb_get_reply_topic_id( $reply_id );
-	$forum_id = mb_get_topic_forum_id( $topic_id );
 
-	return $forum_id;
+	$forum_id = get_post_meta( $reply_id, '_reply_forum_id', true );
+
+	if ( empty( $forum_id ) ) {
+		$topic_id = mb_get_reply_topic_id( $reply_id );
+		$forum_id = mb_get_topic_forum_id( $topic_id );
+		update_post_meta( $reply_id, '_reply_forum_id', $forum_id );
+	}
+
+	return absint( $forum_id );
 }
 
 
