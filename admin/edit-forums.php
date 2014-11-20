@@ -171,8 +171,6 @@ final class Message_Board_Admin_Edit_Forums {
 
 			$url = admin_url( 'post.php' );
 
-			if ( mb_get_forum_post_type() === $post->post_type ) {
-
 				if ( mb_is_forum_open( $post->ID ) ) {
 					$actions['mb-close'] = sprintf( 
 						'<a href="%s">%s</a>', 
@@ -186,7 +184,6 @@ final class Message_Board_Admin_Edit_Forums {
 						__( 'Open', 'message-board' )
 					);
 				}
-			}
 
 			/* Move view action to the end. */
 			if ( isset( $actions['view'] ) ) {
@@ -197,6 +194,8 @@ final class Message_Board_Admin_Edit_Forums {
 					$actions['view'] = $view_action;
 			}
 		}
+
+		return $actions;
 	}
 
 	/**
