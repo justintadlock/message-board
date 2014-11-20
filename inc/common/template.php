@@ -9,13 +9,57 @@
  * certain hooks that will be executed when using these functions.
  */
 
+function mb_get_content_type( $post_id = 0 ) {
+
+	$post_type = get_post_type( $post_id );
+
+	if ( mb_get_forum_post_type() === $post_type )
+		$type = 'forum';
+	elseif ( mb_get_topic_post_type() === $post_type )
+		$type = 'topic';
+	elseif ( mb_get_reply_post_type() === $post_type )
+		$type = 'reply';
+	else
+		$type = $post_type;
+
+	return $type;
+}
+
+function mb_thread_query() {
+
+	if ( is_singular( mb_get_topic_post_type() ) && mb_show_lead_topic() )
+		add_filter( 'the_posts', 'mb_thread_query_the_posts', 10, 2 );
+
+	return mb_reply_query();
+}
+
+function mb_thread_query_the_posts( $posts, $query ) {
+	global $wp_query;
+	remove_filter( 'the_posts', 'mb_thread_query_the_posts', 10, 2 );
+
+	if ( !empty( $wp_query->posts ) ) {
+
+			$sticky_offset = 0;
+
+				foreach ( $wp_query->posts as $sticky_post ) {
+					array_splice( $posts, $sticky_offset, 0, array( $sticky_post ) );
+					$sticky_offset++;
+				}
+	}
+	return $posts;
+}
+
 function mb_setup_post_data( $type = 'topic' ) {
 
 	if ( 'forum' === $type )
 		mb_the_forum();
+	elseif ( 'sub_forum' === $type )
+		mb_the_forum();
 	elseif ( 'topic' === $type )
 		mb_the_topic();
 	elseif ( 'reply' === $type )
+		mb_the_reply();
+	elseif ( 'thread' === $type )
 		mb_the_reply();
 
 	do_action( "mb_setup_{$type}_data" );
@@ -27,10 +71,14 @@ function mb_query( $type = 'topic' ) {
 
 	if ( 'forum' === $type )
 		return mb_forum_query();
+	elseif ( 'sub_forum' === $type )
+		return mb_sub_forum_query();
 	elseif ( 'topic' === $type )
 		return mb_topic_query();
 	elseif ( 'reply' === $type )
 		return mb_reply_query();
+	elseif ( 'thread' === $type )
+		return mb_thread_query();
 
 	return apply_filters( "mb_{$type}_query", $query );
 }
