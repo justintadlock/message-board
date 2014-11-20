@@ -113,7 +113,7 @@ function mb_set_topic_voices( $topic_id ) {
 	return $voices;
 }
 
-function mb_reset_topic_data( $post ) {
+function mb_reset_topic_data( $post, $reset_latest = false ) {
 
 	$post = is_object( $post ) ? $post : get_post( $post );
 
@@ -127,7 +127,7 @@ function mb_reset_topic_data( $post ) {
 	mb_set_forum_reply_count( $forum_id );
 
 	/* If this is the last topic, reset forum latest data. */
-	if ( $post->ID === absint( $forum_last_topic ) )
+	if ( $post->ID === absint( $forum_last_topic ) || true === $reset_latest )
 		mb_reset_forum_latest( $forum_id );
 }
 

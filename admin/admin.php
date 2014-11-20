@@ -94,7 +94,9 @@ function mb_post_row_actions( $actions, $post ) {
 			if ( isset( $actions['view'] ) ) {
 				$view_action = $actions['view'];
 				unset( $actions['view'] );
-				$actions['view'] = $view_action;
+
+				if ( 'spam' !== get_query_var( 'post_status' ) )
+					$actions['view'] = $view_action;
 			}
 		}
 

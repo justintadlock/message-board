@@ -55,24 +55,30 @@ function mb_register_post_statuses() {
 //do_action( 'transition_post_status', $new_status, $old_status, $post );
 //do_action( "{$new_status}_{$post->post_type}", $post->ID, $post );
 
-add_action( 'publish_to_close', 'mb_publish_to_close' );
+//add_action( 'publish_to_close', 'mb_publish_to_close' );
 add_action( 'publish_to_spam',  'mb_publish_to_spam'  );
 add_action( 'publish_to_trash', 'mb_publish_to_trash' );
 
-add_action( 'close_to_publish', 'mb_close_to_publish' );
+//add_action( 'close_to_publish', 'mb_close_to_publish' );
 add_action( 'close_to_spam',    'mb_close_to_spam'    );
 add_action( 'close_to_trash',   'mb_close_to_trash'   );
 
 add_action( 'spam_to_publish',  'mb_spam_to_publish'  );
 add_action( 'spam_to_close',    'mb_spam_to_close'    );
-add_action( 'spam_to_trash',    'mb_spam_to_trash'    );
+//add_action( 'spam_to_trash',    'mb_spam_to_trash'    );
 
 add_action( 'trash_to_publish', 'mb_trash_to_publish' );
 add_action( 'trash_to_close',   'mb_trash_to_close'   );
-add_action( 'trash_to_spam',    'mb_trash_to_spam'    );
+//add_action( 'trash_to_spam',    'mb_trash_to_spam'    );
 
 /* Actions? do nothing. */
 function mb_publish_to_close( $post ) {}
+/* actions? do nothing. */
+function mb_close_to_publish( $post ) {}
+/* actions? */
+function mb_spam_to_trash( $post ) {}
+/* actions? do nothing */
+function mb_trash_to_spam( $post ) {}
 
 /* Actions? 
  * topic:
@@ -100,20 +106,25 @@ function mb_publish_to_trash( $post ) {
 		mb_reset_reply_data( $post );
 }
 
-/* actions? do nothing. */
-function mb_close_to_publish( $post ) {}
+/* actions?
+ * - reset forum if topic latest
+ * - change post status of replies to 'orphan'
+ */
+function mb_close_to_spam( $post ) {
+
+	if ( mb_get_topic_post_type() === $post->post_type )
+		mb_reset_topic_data( $post );
+}
 
 /* actions?
  * - reset forum if topic latest
  * - change post status of replies to 'orphan'
  */
-function mb_close_to_spam( $post ) {}
+function mb_close_to_trash( $post ) {
 
-/* actions?
- * - reset forum if topic latest
- * - change post status of replies to 'orphan'
- */
-function mb_close_to_trash( $post ) {}
+	if ( mb_get_topic_post_type() === $post->post_type )
+		mb_reset_topic_data( $post );
+}
 
 /* Actions? 
  * topic:
@@ -123,16 +134,20 @@ function mb_close_to_trash( $post ) {}
  * - reset reply positions for topic
  * - reset topic if reply latest
  */
-function mb_spam_to_publish( $post ) {}
-function mb_spam_to_close( $post ) {}
+function mb_spam_to_publish( $post ) {
 
-/* actions?
- * topic:
- * - do nothing
- * reply:
- * - do nothing.
- */
-function mb_spam_to_trash( $post ) {}
+	if ( mb_get_topic_post_type() === $post->post_type )
+		mb_reset_topic_data( $post, true );
+
+	elseif ( mb_get_reply_post_type() === $post->post_type )
+		mb_reset_reply_data( $post, true );
+}
+
+function mb_spam_to_close( $post ) {
+
+	if ( mb_get_topic_post_type() === $post->post_type )
+		mb_reset_topic_data( $post, true );
+}
 
 /* Actions? 
  * topic:
@@ -142,11 +157,23 @@ function mb_spam_to_trash( $post ) {}
  * - reset reply positions for topic
  * - reset topic if reply latest
  */
-function mb_trash_to_publish( $post ) {}
-function mb_trash_to_close( $post ) {}
+function mb_trash_to_publish( $post ) {
 
-/* actions? do nothing */
-function mb_trash_to_spam( $post ) {}
+	if ( mb_get_topic_post_type() === $post->post_type )
+		mb_reset_topic_data( $post, true );
+
+	elseif ( mb_get_reply_post_type() === $post->post_type )
+		mb_reset_reply_data( $post, true );
+}
+
+function mb_trash_to_close( $post ) {
+
+	if ( mb_get_topic_post_type() === $post->post_type )
+		mb_reset_topic_data( $post, true );
+
+	elseif ( mb_get_reply_post_type() === $post->post_type )
+		mb_reset_reply_data( $post, true );
+}
 
 
 

@@ -10,7 +10,7 @@ function mb_get_topic_reply_ids( $topic_id ) {
 	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' AND post_parent = %d ORDER BY menu_order ASC", mb_get_reply_post_type(), absint( $topic_id ) ) );
 }
 
-function mb_reset_reply_data( $post ) {
+function mb_reset_reply_data( $post, $reset_latest = false ) {
 
 	$post = is_object( $post ) ? $post : get_post( $post );
 
@@ -33,11 +33,11 @@ function mb_reset_reply_data( $post ) {
 	mb_set_forum_reply_count( $forum_id );
 
 	/* If this is the last topic reply, reset topic latest data. */
-	if ( $post->ID === absint( $topic_last_reply ) )
+	if ( $post->ID === absint( $topic_last_reply ) || true === $reset_latest )
 		mb_reset_topic_latest( $topic_id );
 
 	/* If this is the last reply, reset forum latest data. */
-	if ( $post->ID === absint( $forum_last_reply ) )
+	if ( $post->ID === absint( $forum_last_reply ) || true === $reset_latest )
 		mb_reset_forum_latest( $forum_id );
 }
 
