@@ -7,7 +7,7 @@ add_action( 'admin_menu', 'mb_admin_menu' );
 add_action( 'admin_notices', 'mb_admin_notices' );
 
 // apply_filters( 'post_row_actions', $actions, $post );
-add_filter( 'post_row_actions', 'mb_post_row_actions', 10, 2 );
+//add_filter( 'post_row_actions', 'mb_post_row_actions', 10, 2 );
 add_filter( 'page_row_actions', 'mb_post_row_actions', 10, 2 );
 
 function mb_post_row_actions( $actions, $post ) {
@@ -28,37 +28,6 @@ function mb_post_row_actions( $actions, $post ) {
 			if ( mb_get_forum_post_type() === $post->post_type ) {
 
 				if ( mb_is_forum_open( $post->ID ) ) {
-					$actions['mb-close'] = sprintf( 
-						'<a href="%s">%s</a>', 
-						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-close' ), $url ) ),
-						__( 'Close', 'message-board' )
-					);
-				} else {
-					$actions['mb-open'] = sprintf( 
-						'<a href="%s">%s</a>', 
-						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-open' ), $url ) ),
-						__( 'Open', 'message-board' )
-					);
-				}
-			}
-
-			elseif ( mb_get_topic_post_type() === $post->post_type ) {
-
-				if ( !mb_is_topic_spam( $post->ID ) ) {
-					$actions['mb-spam'] = sprintf( 
-						'<a href="%s">%s</a>', 
-						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-spam' ), $url ) ),
-						__( 'Spam', 'message-board' )
-					);
-				} else {
-					$actions['mb-unspam'] = sprintf( 
-						'<a href="%s">%s</a>', 
-						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-unspam' ), $url ) ),
-						__( 'Not Spam', 'message-board' )
-					);
-				}
-
-				if ( !mb_is_topic_closed( $post->ID ) ) {
 					$actions['mb-close'] = sprintf( 
 						'<a href="%s">%s</a>', 
 						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-close' ), $url ) ),
@@ -178,12 +147,6 @@ final class Message_Board_Admin {
 		add_filter( "manage_edit-{$forum_type}_columns",          array( $this, 'edit_forum_columns'            )        );
 		add_filter( "manage_edit-{$forum_type}_sortable_columns", array( $this, 'manage_forum_sortable_columns' )        );
 		add_action( "manage_{$forum_type}_posts_custom_column",   array( $this, 'manage_forum_columns'          ), 10, 2 );
-
-		$topic_type = mb_get_topic_post_type();
-
-		add_filter( "manage_edit-{$topic_type}_columns",          array( $this, 'edit_topic_columns'            )        );
-		add_filter( "manage_edit-{$topic_type}_sortable_columns", array( $this, 'manage_topic_sortable_columns' )        );
-		add_action( "manage_{$topic_type}_posts_custom_column",   array( $this, 'manage_topic_columns'          ), 10, 2 );
 	}
 
 	/**
@@ -197,14 +160,13 @@ final class Message_Board_Admin {
 		$screen = get_current_screen();
 
 		$forum_type = mb_get_forum_post_type();
-		$topic_type = mb_get_topic_post_type();
 
 		if ( !empty( $screen->post_type ) && mb_get_forum_post_type() === $screen->post_type ) {
 			add_filter( 'request',               array( $this, 'request'       ) );
 		//	add_action( 'restrict_manage_posts', array( $this, 'tags_dropdown' ) );
 		}
 
-		if ( !empty( $screen->post_type ) && in_array( $screen->post_type, array( $forum_type, $topic_type ) ) ) {
+		if ( !empty( $screen->post_type ) && in_array( $screen->post_type, array( $forum_type ) ) ) {
 			add_action( 'admin_head', array( $this, 'print_styles'  ) );
 		}
 	}
@@ -265,7 +227,6 @@ final class Message_Board_Admin {
 	 * @return void
 	 */
 	public function load_post_meta_boxes() {
-		//require_once( RESTAURANT_DIR . 'admin/class-restaurant-post-meta-boxes.php' );
 	}
 
 	/**
@@ -320,28 +281,6 @@ final class Message_Board_Admin {
 		return $columns;
 	}
 
-	public function edit_topic_columns( $post_columns ) {
-
-		$screen     = get_current_screen();
-		$post_type  = $screen->post_type;
-		$columns    = array();
-		$taxonomies = array();
-
-		/* Adds the checkbox column. */
-		$columns['cb'] = $post_columns['cb'];
-
-		/* Add custom columns and overwrite the 'title' column. */
-		$columns['title']     = __( 'Topic',      'message-board' );
-		$columns['forum']     = __( 'Forum',      'message-board' );
-		$columns['replies']   = __( 'Replies',    'message-board' );
-		$columns['voices']    = __( 'Voices',     'message-board' );
-		$columns['author']    = __( 'Author',     'message-board' );
-		$columns['datetime']  = __( 'Created',    'message-board' );
-
-		/* Return the columns. */
-		return $columns;
-	}
-
 	/**
 	 * Adds the 'price' column to the array of sortable columns.
 	 *
@@ -354,14 +293,6 @@ final class Message_Board_Admin {
 
 		$columns['topics']  = array( '_forum_topic_count', true );
 		$columns['replies'] = array( '_forum_reply_count', true );
-
-		return $columns;
-	}
-
-	public function manage_topic_sortable_columns( $columns ) {
-
-		//$columns['topics']  = array( '_forum_topic_count', true );
-		//$columns['replies'] = array( '_forum_reply_count', true );
 
 		return $columns;
 	}
@@ -392,46 +323,6 @@ final class Message_Board_Admin {
 				$reply_count = mb_get_forum_reply_count( $post_id );
 
 				echo !empty( $reply_count ) ? absint( $reply_count ) : number_format_i18n( 0 );
-
-				break;
-
-			case 'datetime' :
-
-				the_time( get_option( 'date_format' ) );
-				echo '<br />';
-				the_time( get_option( 'time_format' ) );
-
-				break;
-
-			/* Just break out of the switch statement for everything else. */
-			default :
-				break;
-		}
-	}
-
-	public function manage_topic_columns( $column, $post_id ) {
-
-		switch( $column ) {
-
-			case 'forum' :
-
-				mb_forum_link( mb_get_topic_forum_id( $post_id ) );
-
-				break;
-
-			case 'replies' :
-
-				$reply_count = mb_get_topic_reply_count( $post_id );
-
-				echo !empty( $reply_count ) ? absint( $reply_count ) : number_format_i18n( 0 );
-
-				break;
-
-			case 'voices' :
-
-				$voice_count = mb_get_topic_voice_count( $post_id );
-
-				echo !empty( $voice_count ) ? absint( $voice_count ) : number_format_i18n( 0 );
 
 				break;
 
