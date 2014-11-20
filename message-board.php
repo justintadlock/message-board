@@ -105,6 +105,7 @@ final class Message_Board {
 
 		if ( is_admin() ) {
 			require_once( $this->dir_path . 'admin/admin.php' );
+			require_once( $this->dir_path . 'admin/edit-replies.php' );
 			require_once( $this->dir_path . 'admin/meta-boxes.php' );
 		}
 	}
