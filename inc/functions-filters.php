@@ -91,7 +91,7 @@ function mb_forum_reply_title_filter( $title, $post_id ) {
 		if ( 0 >= $post->post_parent )
 			$title = get_the_ID();
 		else
-			$title = sprintf( __( 'Reply to &ldquo;%s&rdquo;', 'message-board' ), get_post_field( 'post_title', $post->post_parent ) );
+			$title = sprintf( __( 'Reply to: %s', 'message-board' ), get_post_field( 'post_title', $post->post_parent ) );
 	}
 
 	return $title;
