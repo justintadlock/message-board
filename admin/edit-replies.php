@@ -39,6 +39,10 @@ final class Message_Board_Admin_Edit_Replies {
 		if ( empty( $screen->post_type ) && $screen->post_type !== $reply_type )
 			return;
 
+		add_action( 'mb_edit_replies_handler', array( $this, 'handler' ), 0 );
+
+		do_action( 'mb_edit_replies_handler' );
+
 		add_action( 'admin_head', array( $this, 'print_styles'  ) );
 
 		add_filter( "manage_edit-{$reply_type}_columns",          array( $this, 'edit_columns'            )        );
@@ -116,18 +120,18 @@ final class Message_Board_Admin_Edit_Replies {
 
 		if ( current_user_can( 'manage_forums' ) ) {
 
-			$url = admin_url( 'post.php' );
+			$url = admin_url( "post.php" );
 
 			if ( !mb_is_reply_spam( $post->ID ) ) {
 				$actions['mb-spam'] = sprintf( 
 					'<a href="%s">%s</a>', 
-					esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-spam' ), $url ) ),
+					esc_url( add_query_arg( array( 'reply_id' => get_the_ID(), 'mb_action' => 'mb-spam' ) ) ),
 					__( 'Spam', 'message-board' )
 				);
 			} else {
 				$actions['mb-unspam'] = sprintf( 
 					'<a href="%s">%s</a>', 
-					esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-unspam' ), $url ) ),
+					esc_url( add_query_arg( array( 'reply_id' => get_the_ID(), 'mb_action' => 'mb-unspam' ) ) ),
 					__( 'Not Spam', 'message-board' )
 				);
 			}
@@ -143,6 +147,38 @@ final class Message_Board_Admin_Edit_Replies {
 		}
 
 		return $actions;
+	}
+
+	public function handler() {
+
+		// @todo - nonce
+		if ( !isset( $_GET['mb_action'] ) || !in_array( $_GET['mb_action'], array( 'mb-spam', 'mb-unspam' ) ) )
+			return;
+
+		if ( isset( $_GET['reply_id'] ) ) {
+
+			$post_id = absint( $_GET['reply_id'] );
+
+			$postarr = get_post( $post_id, ARRAY_A );
+
+			if ( 'mb-spam' === $_GET['mb_action'] && 'spam' !== $postarr['post_status'] ) {
+
+				$postarr['post_status'] = 'spam';
+
+				wp_update_post( $postarr );
+			}
+
+			elseif ( 'mb-unspam' === $_GET['mb_action'] && 'spam' === $postarr['post_status'] ) {
+
+				$postarr['post_status'] = 'publish';
+
+				wp_update_post( $postarr );
+			}
+		}
+
+		$redirect = remove_query_arg( array( 'mb_action', 'reply_id' ) );
+		wp_safe_redirect( $redirect );
+		exit();
 	}
 
 	/**

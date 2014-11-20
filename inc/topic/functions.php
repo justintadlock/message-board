@@ -64,7 +64,8 @@ function mb_reset_topic_latest( $topic_id ) {
 
 	if ( !empty( $reply_ids ) ) {
 
-		$last_reply_id = array_shift( array_reverse( $reply_ids ) );
+		$reply_ids = array_reverse( $reply_ids );
+		$last_reply_id = array_shift( $reply_ids );
 
 		$post_date = get_post_field( 'post_date', $last_reply_id );
 
