@@ -39,6 +39,10 @@ final class Message_Board_Admin_Edit_Topics {
 		if ( !empty( $screen->post_type ) && $screen->post_type !== $topic_type )
 			return;
 
+		add_action( 'mb_edit_topics_handler', array( $this, 'handler' ), 0 );
+
+		do_action( 'mb_edit_topics_handler' );
+
 		add_action( 'admin_head', array( $this, 'print_styles'  ) );
 
 		add_filter( "manage_edit-{$topic_type}_columns",          array( $this, 'edit_columns'            )        );
@@ -46,6 +50,37 @@ final class Message_Board_Admin_Edit_Topics {
 		add_action( "manage_{$topic_type}_posts_custom_column",   array( $this, 'manage_columns'          ), 10, 2 );
 
 		add_filter( 'post_row_actions', array( $this, 'row_actions' ), 10, 2 );
+
+		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+	}
+
+	public function admin_notices() {
+
+		$allowed_notices = array( 'spammed', 'unspammed', 'opened', 'closed' );
+
+		if ( isset( $_GET['mb_topic_notice'] ) && in_array( $_GET['mb_topic_notice'], $allowed_notices ) && isset( $_GET['topic_id'] ) ) {
+
+			$notice   = $_GET['mb_topic_notice'];
+			$topic_id = mb_get_topic_id( absint( $_GET['topic_id'] ) );
+
+			if ( 'spammed' === $notice )
+				$text = sprintf( __( 'The topic "%s" was successfully marked as spam.', 'message-board' ), mb_get_topic_title( $topic_id ) );
+
+			elseif ( 'unspammed' === $notice )
+				$text = sprintf( __( 'The topic "%s" was successfully removed from spam.', 'message-board' ), mb_get_topic_title( $topic_id ) );
+
+			elseif ( 'closed' === $notice )
+				$text = sprintf( __( 'The topic "%s" was successfully closed.', 'message-board' ), mb_get_topic_title( $topic_id ) );
+
+			elseif ( 'opened' === $notice )
+				$text = sprintf( __( 'The topic "%s" was successfully opened.', 'message-board' ), mb_get_topic_title( $topic_id ) );
+
+			if ( !empty( $text ) ) { ?>
+				<div class="updated">
+					<p><?php echo $text; ?>	</p>
+				</div>
+			<?php }
+		}
 	}
 
 	public function edit_columns( $post_columns ) {
@@ -124,37 +159,32 @@ final class Message_Board_Admin_Edit_Topics {
 			unset( $actions['inline hide-if-no-js'] );
 		}
 
+		// @todo - current_user_can( 'moderate_topic', $post->ID );
 		if ( current_user_can( 'manage_forums' ) ) {
 
-			$url = admin_url( 'post.php' );
+			$topic_id = mb_get_topic_id( $post->ID );
 
-			if ( !mb_is_topic_spam( $post->ID ) ) {
-				$actions['mb-spam'] = sprintf( 
-					'<a href="%s">%s</a>', 
-					esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-spam' ), $url ) ),
-					__( 'Spam', 'message-board' )
-				);
-			} else {
-				$actions['mb-unspam'] = sprintf( 
-					'<a href="%s">%s</a>', 
-					esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-unspam' ), $url ) ),
-					__( 'Not Spam', 'message-board' )
-				);
-			}
+			/* Get spam link text. */
+			$spam_text = mb_is_topic_spam( $topic_id ) ? __( 'Not Spam', 'message-board' ) : __( 'Spam', 'message-board' );
 
-			if ( !mb_is_topic_closed( $post->ID ) ) {
-				$actions['mb-close'] = sprintf( 
-					'<a href="%s">%s</a>', 
-					esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-close' ), $url ) ),
-					__( 'Close', 'message-board' )
-				);
-			} else {
-				$actions['mb-open'] = sprintf( 
-					'<a href="%s">%s</a>', 
-					esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-open' ), $url ) ),
-					__( 'Open', 'message-board' )
-				);
-			}
+			/* Build spam toggle URL. */
+			$spam_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
+			$spam_url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_spam' ), $spam_url );
+			$spam_url = wp_nonce_url( $spam_url, "spam_topic_{$topic_id}" );
+
+			/* Add toggle spam action link. */
+			$actions['mb_toggle_spam'] = sprintf( '<a href="%s">%s</a>', esc_url( $spam_url ), $spam_text );
+
+			/* Get close link text. */
+			$close_text = mb_is_topic_closed( $topic_id ) ? __( 'Open', 'message-board' ) : __( 'Close', 'message-board' );
+
+			/* Build close toggle URL. */
+			$close_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
+			$close_url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_close' ), $close_url );
+			$close_url  = wp_nonce_url( $close_url, "close_topic_{$topic_id}" );
+
+			/* Add toggle close action link. */
+			$actions['mb_toggle_close'] = sprintf( '<a href="%s">%s</a>', esc_url( $close_url ), $close_text );
 		}
 
 		/* Move view action to the end. */
@@ -167,6 +197,71 @@ final class Message_Board_Admin_Edit_Topics {
 		}
 
 		return $actions;
+	}
+
+	public function handler() {
+
+		if ( isset( $_GET['action'] ) && 'mb_toggle_spam' === $_GET['action'] && isset( $_GET['topic_id'] ) ) {
+
+			$topic_id = absint( mb_get_topic_id( $_GET['topic_id'] ) );
+
+			check_admin_referer( "spam_topic_{$topic_id}" );
+
+			$notice = 'failure';
+
+			$postarr = get_post( $topic_id, ARRAY_A );
+
+			if ( !is_null( $postarr ) ) {
+
+				$is_spam = mb_is_topic_spam( $topic_id );
+
+				$new_status = $is_spam ? 'publish' : 'spam';
+
+				if ( $postarr['post_status'] !== $new_status ) {
+
+					$notice = $is_spam ? 'unspammed' : 'spammed';
+
+					$postarr['post_status'] = $new_status;
+
+					wp_update_post( $postarr );
+				}
+			}
+
+			$redirect = add_query_arg( array( 'topic_id' => $topic_id, 'mb_topic_notice' => $notice ), remove_query_arg( array( 'action', 'topic_id', '_wpnonce' ) ) );
+			wp_safe_redirect( $redirect );
+			exit();
+		}
+
+		elseif ( isset( $_GET['action'] ) && 'mb_toggle_close' === $_GET['action'] && isset( $_GET['topic_id'] ) ) {
+
+			$topic_id = absint( mb_get_topic_id( $_GET['topic_id'] ) );
+
+			check_admin_referer( "close_topic_{$topic_id}" );
+
+			$notice = 'failure';
+
+			$postarr = get_post( $topic_id, ARRAY_A );
+
+			if ( !is_null( $postarr ) ) {
+
+				$is_closed = mb_is_topic_closed( $topic_id );
+
+				$new_status = $is_closed ? 'publish' : 'close';
+
+				if ( $postarr['post_status'] !== $new_status ) {
+
+					$notice = $is_closed ? 'opened' : 'closed';
+
+					$postarr['post_status'] = $new_status;
+
+					wp_update_post( $postarr );
+				}
+			}
+
+			$redirect = add_query_arg( array( 'topic_id' => $topic_id, 'mb_topic_notice' => $notice ), remove_query_arg( array( 'action', 'topic_id', '_wpnonce' ) ) );
+			wp_safe_redirect( $redirect );
+			exit();
+		}
 	}
 
 	/**

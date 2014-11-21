@@ -61,7 +61,7 @@ final class Message_Board_Admin_Edit_Replies {
 		if ( isset( $_GET['mb_reply_notice'] ) && in_array( $_GET['mb_reply_notice'], $allowed_notices ) && isset( $_GET['reply_id'] ) ) {
 
 			$notice   = $_GET['mb_reply_notice'];
-			$reply_id = mb_get_reply_id( absint( $_GET['mb_reply_notice'] ) );
+			$reply_id = mb_get_reply_id( absint( $_GET['topic_id'] ) );
 
 			if ( 'spammed' === $notice )
 				$text = sprintf( __( 'The reply "%s" was successfully marked as spam.', 'message-board' ), mb_get_reply_title( $reply_id ) );
