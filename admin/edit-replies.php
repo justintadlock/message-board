@@ -125,13 +125,13 @@ final class Message_Board_Admin_Edit_Replies {
 			if ( !mb_is_reply_spam( $post->ID ) ) {
 				$actions['mb-spam'] = sprintf( 
 					'<a href="%s">%s</a>', 
-					esc_url( add_query_arg( array( 'reply_id' => get_the_ID(), 'mb_action' => 'mb-spam' ) ) ),
+					esc_url( add_query_arg( array( 'reply_id' => get_the_ID(), 'action' => 'mb-spam' ) ) ),
 					__( 'Spam', 'message-board' )
 				);
 			} else {
 				$actions['mb-unspam'] = sprintf( 
 					'<a href="%s">%s</a>', 
-					esc_url( add_query_arg( array( 'reply_id' => get_the_ID(), 'mb_action' => 'mb-unspam' ) ) ),
+					esc_url( add_query_arg( array( 'reply_id' => get_the_ID(), 'action' => 'mb-unspam' ) ) ),
 					__( 'Not Spam', 'message-board' )
 				);
 			}
@@ -152,7 +152,7 @@ final class Message_Board_Admin_Edit_Replies {
 	public function handler() {
 
 		// @todo - nonce
-		if ( !isset( $_GET['mb_action'] ) || !in_array( $_GET['mb_action'], array( 'mb-spam', 'mb-unspam' ) ) )
+		if ( !isset( $_GET['action'] ) || !in_array( $_GET['action'], array( 'mb-spam', 'mb-unspam' ) ) )
 			return;
 
 		if ( isset( $_GET['reply_id'] ) ) {
@@ -161,14 +161,14 @@ final class Message_Board_Admin_Edit_Replies {
 
 			$postarr = get_post( $post_id, ARRAY_A );
 
-			if ( 'mb-spam' === $_GET['mb_action'] && 'spam' !== $postarr['post_status'] ) {
+			if ( 'mb-spam' === $_GET['action'] && 'spam' !== $postarr['post_status'] ) {
 
 				$postarr['post_status'] = 'spam';
 
 				wp_update_post( $postarr );
 			}
 
-			elseif ( 'mb-unspam' === $_GET['mb_action'] && 'spam' === $postarr['post_status'] ) {
+			elseif ( 'mb-unspam' === $_GET['action'] && 'spam' === $postarr['post_status'] ) {
 
 				$postarr['post_status'] = 'publish';
 
@@ -176,7 +176,7 @@ final class Message_Board_Admin_Edit_Replies {
 			}
 		}
 
-		$redirect = remove_query_arg( array( 'mb_action', 'reply_id' ) );
+		$redirect = remove_query_arg( array( 'action', 'reply_id' ) );
 		wp_safe_redirect( $redirect );
 		exit();
 	}
