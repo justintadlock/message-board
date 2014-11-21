@@ -36,7 +36,7 @@ final class Message_Board_Admin_Edit_Forums {
 
 		$forum_type = mb_get_forum_post_type();
 
-		if ( empty( $screen->post_type ) && $screen->post_type !== $forum_type )
+		if ( !empty( $screen->post_type ) && $screen->post_type !== $forum_type )
 			return;
 
 		add_filter( 'request', array( $this, 'request' ) );

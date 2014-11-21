@@ -36,7 +36,7 @@ final class Message_Board_Admin_Edit_Topics {
 
 		$topic_type = mb_get_topic_post_type();
 
-		if ( empty( $screen->post_type ) && $screen->post_type !== $topic_type )
+		if ( !empty( $screen->post_type ) && $screen->post_type !== $topic_type )
 			return;
 
 		add_action( 'admin_head', array( $this, 'print_styles'  ) );

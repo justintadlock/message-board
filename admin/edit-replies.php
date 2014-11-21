@@ -36,7 +36,7 @@ final class Message_Board_Admin_Edit_Replies {
 
 		$reply_type = mb_get_reply_post_type();
 
-		if ( empty( $screen->post_type ) && $screen->post_type !== $reply_type )
+		if ( !empty( $screen->post_type ) && $screen->post_type !== $reply_type )
 			return;
 
 		add_action( 'mb_edit_replies_handler', array( $this, 'handler' ), 0 );
@@ -50,6 +50,31 @@ final class Message_Board_Admin_Edit_Replies {
 		add_action( "manage_{$reply_type}_posts_custom_column",   array( $this, 'manage_columns'          ), 10, 2 );
 
 		add_filter( 'post_row_actions', array( $this, 'row_actions' ), 10, 2 );
+
+		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+	}
+
+	public function admin_notices() {
+
+		$allowed_notices = array( 'spammed', 'unspammed' );
+
+		if ( isset( $_GET['mb_reply_notice'] ) && in_array( $_GET['mb_reply_notice'], $allowed_notices ) && isset( $_GET['reply_id'] ) ) {
+
+			$notice   = $_GET['mb_reply_notice'];
+			$reply_id = mb_get_reply_id( absint( $_GET['mb_reply_notice'] ) );
+
+			if ( 'spammed' === $notice )
+				$text = sprintf( __( 'The reply "%s" was successfully marked as spam.', 'message-board' ), mb_get_reply_title( $reply_id ) );
+
+			elseif ( 'unspammed' === $notice )
+				$text = sprintf( __( 'The reply "%s" was successfully removed from spam.', 'message-board' ), mb_get_reply_title( $reply_id ) );
+
+			if ( !empty( $text ) ) { ?>
+				<div class="updated">
+					<p><?php echo $text; ?>	</p>
+				</div>
+			<?php }
+		}
 	}
 
 	public function edit_columns( $post_columns ) {
@@ -120,21 +145,16 @@ final class Message_Board_Admin_Edit_Replies {
 
 		if ( current_user_can( 'manage_forums' ) ) {
 
-			$url = admin_url( "post.php" );
+			$reply_id = mb_get_reply_id( $post->ID );
+			$is_spam  = mb_is_reply_spam( $reply_id );
 
-			if ( !mb_is_reply_spam( $post->ID ) ) {
-				$actions['mb-spam'] = sprintf( 
-					'<a href="%s">%s</a>', 
-					esc_url( add_query_arg( array( 'reply_id' => get_the_ID(), 'action' => 'mb-spam' ) ) ),
-					__( 'Spam', 'message-board' )
-				);
-			} else {
-				$actions['mb-unspam'] = sprintf( 
-					'<a href="%s">%s</a>', 
-					esc_url( add_query_arg( array( 'reply_id' => get_the_ID(), 'action' => 'mb-unspam' ) ) ),
-					__( 'Not Spam', 'message-board' )
-				);
-			}
+			$text = $is_spam ? __( 'Not Spam', 'message-board' ) : __( 'Spam', 'message-board' );
+
+			$url = remove_query_arg( array( 'reply_id', 'mb_reply_notice' ) );
+			$url = add_query_arg( array( 'reply_id' => $reply_id, 'action' => 'mb_toggle_spam' ), $url );
+			$url = wp_nonce_url( $url, "spam_reply_{$reply_id}" );
+
+			$actions['mb_toggle_spam'] = sprintf( '<a href="%s">%s</a>', esc_url( $url ), $text );
 		}
 
 		/* Move view action to the end. */
@@ -152,33 +172,36 @@ final class Message_Board_Admin_Edit_Replies {
 	public function handler() {
 
 		// @todo - nonce
-		if ( !isset( $_GET['action'] ) || !in_array( $_GET['action'], array( 'mb-spam', 'mb-unspam' ) ) )
-			return;
+		if ( isset( $_GET['action'] ) && 'mb_toggle_spam' === $_GET['action'] && isset( $_GET['reply_id'] ) ) {
 
-		if ( isset( $_GET['reply_id'] ) ) {
+			$reply_id = absint( $_GET['reply_id'] );
 
-			$post_id = absint( $_GET['reply_id'] );
+			check_admin_referer( "spam_reply_{$reply_id}" );
 
-			$postarr = get_post( $post_id, ARRAY_A );
+			$notice = 'failure';
 
-			if ( 'mb-spam' === $_GET['action'] && 'spam' !== $postarr['post_status'] ) {
+			$postarr = get_post( $reply_id, ARRAY_A );
 
-				$postarr['post_status'] = 'spam';
+			if ( !is_null( $postarr ) ) {
 
-				wp_update_post( $postarr );
+				$is_spam = mb_is_reply_spam( $reply_id );
+
+				$new_status = $is_spam ? 'publish' : 'spam';
+
+				if ( $postarr['post_status'] !== $new_status ) {
+
+					$notice = $is_spam ? 'unspammed' : 'spammed';
+
+					$postarr['post_status'] = $new_status;
+
+					wp_update_post( $postarr );
+				}
 			}
 
-			elseif ( 'mb-unspam' === $_GET['action'] && 'spam' === $postarr['post_status'] ) {
-
-				$postarr['post_status'] = 'publish';
-
-				wp_update_post( $postarr );
-			}
+			$redirect = add_query_arg( array( 'reply_id' => $reply_id, 'mb_reply_notice' => $notice ), remove_query_arg( array( 'action', 'reply_id', '_wpnonce' ) ) );
+			wp_safe_redirect( $redirect );
+			exit();
 		}
-
-		$redirect = remove_query_arg( array( 'action', 'reply_id' ) );
-		wp_safe_redirect( $redirect );
-		exit();
 	}
 
 	/**
