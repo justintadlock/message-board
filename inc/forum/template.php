@@ -130,6 +130,13 @@ function mb_is_forum_open( $forum_id = 0 ) {
 	return apply_filters( 'mb_is_forum_open', in_array( $status, array( 'publish', 'inherit' ) ) ? true : false, $forum_id );
 }
 
+function mb_is_forum_closed( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+	$status   = get_post_status( $forum_id );
+
+	return apply_filters( 'mb_is_forum_closed', 'close' === $status ? true : false, $forum_id );
+}
+
 function mb_forum_close_url( $forum_id = 0 ) {
 	echo mb_get_forum_close_url( $forum_id );
 }

@@ -39,6 +39,10 @@ final class Message_Board_Admin_Edit_Forums {
 		if ( !empty( $screen->post_type ) && $screen->post_type !== $forum_type )
 			return;
 
+		add_action( 'mb_edit_forums_handler', array( $this, 'handler' ), 0 );
+
+		do_action( 'mb_edit_forums_handler' );
+
 		add_filter( 'request', array( $this, 'request' ) );
 
 		add_action( 'admin_head', array( $this, 'print_styles'  ) );
@@ -48,6 +52,31 @@ final class Message_Board_Admin_Edit_Forums {
 		add_action( "manage_{$forum_type}_posts_custom_column",   array( $this, 'manage_columns'          ), 10, 2 );
 
 		add_filter( 'page_row_actions', array( $this, 'row_actions' ), 10, 2 );
+
+		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+	}
+
+	public function admin_notices() {
+
+		$allowed_notices = array( 'spammed', 'unspammed', 'opened', 'closed' );
+
+		if ( isset( $_GET['mb_forum_notice'] ) && in_array( $_GET['mb_forum_notice'], $allowed_notices ) && isset( $_GET['forum_id'] ) ) {
+
+			$notice   = $_GET['mb_forum_notice'];
+			$forum_id = mb_get_forum_id( absint( $_GET['forum_id'] ) );
+
+			if ( 'closed' === $notice )
+				$text = sprintf( __( 'The forum "%s" was successfully closed.', 'message-board' ), mb_get_forum_title( $forum_id ) );
+
+			elseif ( 'opened' === $notice )
+				$text = sprintf( __( 'The forum "%s" was successfully opened.', 'message-board' ), mb_get_forum_title( $forum_id ) );
+
+			if ( !empty( $text ) ) { ?>
+				<div class="updated">
+					<p><?php echo $text; ?>	</p>
+				</div>
+			<?php }
+		}
 	}
 
 	/**
@@ -169,34 +198,66 @@ final class Message_Board_Admin_Edit_Forums {
 
 		if ( current_user_can( 'manage_forums' ) ) {
 
-			$url = admin_url( 'post.php' );
+			$forum_id = mb_get_forum_id( $post->ID );
 
-				if ( mb_is_forum_open( $post->ID ) ) {
-					$actions['mb-close'] = sprintf( 
-						'<a href="%s">%s</a>', 
-						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-close' ), $url ) ),
-						__( 'Close', 'message-board' )
-					);
-				} else {
-					$actions['mb-open'] = sprintf( 
-						'<a href="%s">%s</a>', 
-						esc_url( add_query_arg( array( 'post' => get_the_ID(), 'action' => 'mb-open' ), $url ) ),
-						__( 'Open', 'message-board' )
-					);
-				}
+			/* Get close link text. */
+			$close_text = mb_is_forum_closed( $forum_id ) ? __( 'Open', 'message-board' ) : __( 'Close', 'message-board' );
 
-			/* Move view action to the end. */
-			if ( isset( $actions['view'] ) ) {
-				$view_action = $actions['view'];
-				unset( $actions['view'] );
+			/* Build close toggle URL. */
+			$close_url = remove_query_arg( array( 'forum_id', 'mb_forum_notice' ) );
+			$close_url = add_query_arg( array( 'forum_id' => $forum_id, 'action' => 'mb_toggle_close' ), $close_url );
+			$close_url = wp_nonce_url( $close_url, "close_forum_{$forum_id}" );
 
-				if ( 'spam' !== get_query_var( 'post_status' ) )
-					$actions['view'] = $view_action;
-			}
+			/* Add toggle close action link. */
+			$actions['mb_toggle_close'] = sprintf( '<a href="%s">%s</a>', esc_url( $close_url ), $close_text );
+		}
+
+		/* Move view action to the end. */
+		if ( isset( $actions['view'] ) ) {
+			$view_action = $actions['view'];
+			unset( $actions['view'] );
+
+			if ( 'spam' !== get_query_var( 'post_status' ) )
+				$actions['view'] = $view_action;
 		}
 
 		return $actions;
 	}
+
+	public function handler() {
+
+		if ( isset( $_GET['action'] ) && 'mb_toggle_close' === $_GET['action'] && isset( $_GET['forum_id'] ) ) {
+
+			$forum_id = absint( mb_get_forum_id( $_GET['forum_id'] ) );
+
+			check_admin_referer( "close_forum_{$forum_id}" );
+
+			$notice = 'failure';
+
+			$postarr = get_post( $forum_id, ARRAY_A );
+
+			if ( !is_null( $postarr ) ) {
+
+				$is_closed = mb_is_forum_closed( $forum_id );
+
+				$new_status = $is_closed ? 'publish' : 'close';
+
+				if ( $postarr['post_status'] !== $new_status ) {
+
+					$notice = $is_closed ? 'opened' : 'closed';
+
+					$postarr['post_status'] = $new_status;
+
+					wp_update_post( $postarr );
+				}
+			}
+
+			$redirect = add_query_arg( array( 'forum_id' => $forum_id, 'mb_forum_notice' => $notice ), remove_query_arg( array( 'action', 'forum_id', '_wpnonce' ) ) );
+			wp_safe_redirect( $redirect );
+			exit();
+		}
+	}
+
 
 	/**
 	 * Style adjustments for the manage menu items screen, particularly for adjusting the thumbnail 

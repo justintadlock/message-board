@@ -181,7 +181,7 @@ final class Message_Board_Admin_Edit_Topics {
 			/* Build close toggle URL. */
 			$close_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
 			$close_url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_close' ), $close_url );
-			$close_url  = wp_nonce_url( $close_url, "close_topic_{$topic_id}" );
+			$close_url = wp_nonce_url( $close_url, "close_topic_{$topic_id}" );
 
 			/* Add toggle close action link. */
 			$actions['mb_toggle_close'] = sprintf( '<a href="%s">%s</a>', esc_url( $close_url ), $close_text );
