@@ -3,6 +3,9 @@
 /* Add admin menu items. */
 add_action( 'admin_menu', 'mb_admin_menu' );
 
+/* Correct parent file. */
+add_filter( 'parent_file', 'mb_parent_file' );
+
 /* Admin notices. */
 add_action( 'admin_notices', 'mb_admin_notices' );
 
@@ -43,6 +46,19 @@ function mb_admin_menu() {
 		$reply_object->cap->edit_posts, 
 		"edit.php?post_type={$reply_type}" 
 	);
+}
+
+function mb_parent_file( $parent_file ) {
+
+	$forum_type   = mb_get_forum_post_type();
+	$topic_type   = mb_get_topic_post_type();
+	$reply_type   = mb_get_reply_post_type();
+
+	if ( "edit.php?post_type={$topic_type}" === $parent_file || "edit.php?post_type={$reply_type}" === $parent_file ) {
+		$parent_file = str_replace( array( $topic_type, $reply_type ), $forum_type, $parent_file );
+	}
+
+	return $parent_file;
 }
 
 /**
