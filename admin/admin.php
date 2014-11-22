@@ -1,85 +1,10 @@
 <?php
 
-/* Add admin menu items. */
-add_action( 'admin_menu', 'mb_admin_menu' );
-
-/* Correct parent file. */
-add_filter( 'parent_file', 'mb_parent_file' );
-
-/* Admin notices. */
-add_action( 'admin_notices', 'mb_admin_notices' );
-
-/**
- * Adds admin menu items needed by the plugin.  Rather than having multiple top-level menu items 
- * like some plugins, which shall remain unnamed, we'll consolidate everything into a single 
- * item.  Yay for no clutter!
- *
- * @since  1.0.0
- * @access public
- * @return void
- */
-function mb_admin_menu() {
-
-	/* Get post type names. */
-	$forum_type   = mb_get_forum_post_type();
-	$topic_type   = mb_get_topic_post_type();
-	$reply_type   = mb_get_reply_post_type();
-
-	/* Get post type objects. */
-	$topic_object = get_post_type_object( $topic_type );
-	$reply_object = get_post_type_object( $reply_type );
-
-	/* Add the topic menu page. */
-	add_submenu_page( 
-		"edit.php?post_type={$forum_type}", 
-		$topic_object->labels->all_items, 
-		$topic_object->labels->all_items, 
-		$topic_object->cap->edit_posts, 
-		"edit.php?post_type={$topic_type}" 
-	);
-
-	/* Add the reply menu page. */
-	add_submenu_page( 
-		"edit.php?post_type={$forum_type}", 
-		$reply_object->labels->all_items, 
-		$reply_object->labels->all_items, 
-		$reply_object->cap->edit_posts, 
-		"edit.php?post_type={$reply_type}" 
-	);
-}
-
-function mb_parent_file( $parent_file ) {
-
-	$forum_type   = mb_get_forum_post_type();
-	$topic_type   = mb_get_topic_post_type();
-	$reply_type   = mb_get_reply_post_type();
-
-	if ( "edit.php?post_type={$topic_type}" === $parent_file || "edit.php?post_type={$reply_type}" === $parent_file ) {
-		$parent_file = str_replace( array( $topic_type, $reply_type ), $forum_type, $parent_file );
-	}
-
-	return $parent_file;
-}
-
-/**
- * Displays an admin notice if the current theme does not support the Message Board plugin.
- *
- * @since  1.0.0
- * @access public
- * @return void
- */
-function mb_admin_notices() { 
-
-	if ( !current_theme_supports( 'message-board' ) ) { ?>
-		<div class="error">
-			<p>
-			<?php _e( 'The theme you are currently using does not support the Message Board plugin. Please activate a theme with support to continue enjoying full use of the plugin.', 'message-board' ); ?>
-			</p>
-		</div>
-	<?php }
-}
-
 final class Message_Board_Admin {
+
+	public $forum_type;
+	public $topic_type;
+	public $reply_type;
 
 	/**
 	 * Holds the instances of this class.
@@ -98,6 +23,81 @@ final class Message_Board_Admin {
 	 * @return void
 	 */
 	public function __construct() {
+
+		/* Get post type names. */
+		$this->forum_type = mb_get_forum_post_type();
+		$this->topic_type = mb_get_topic_post_type();
+		$this->reply_type = mb_get_reply_post_type();
+
+		/* Add admin menu items. */
+		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+
+		/* Correct parent file. */
+		add_filter( 'parent_file', array( $this, 'parent_file' ) );
+
+		/* Admin notices. */
+		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+	}
+
+	/**
+	 * Adds admin menu items needed by the plugin.  Rather than having multiple top-level menu items 
+	 * like some plugins, which shall remain unnamed, we'll consolidate everything into a single 
+	 * item.  Yay for no clutter!
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	function admin_menu() {
+
+		/* Get post type objects. */
+		$topic_object = get_post_type_object( $this->topic_type );
+		$reply_object = get_post_type_object( $this->reply_type );
+
+		/* Add the topic menu page. */
+		add_submenu_page( 
+			"edit.php?post_type={$this->forum_type}", 
+			$topic_object->labels->all_items, 
+			$topic_object->labels->all_items, 
+			$topic_object->cap->edit_posts, 
+			"edit.php?post_type={$this->topic_type}" 
+		);
+
+		/* Add the reply menu page. */
+		add_submenu_page( 
+			"edit.php?post_type={$this->forum_type}", 
+			$reply_object->labels->all_items, 
+			$reply_object->labels->all_items, 
+			$reply_object->cap->edit_posts, 
+			"edit.php?post_type={$this->reply_type}" 
+		);
+	}
+
+	function parent_file( $parent_file ) {
+
+		if ( "edit.php?post_type={$this->topic_type}" === $parent_file || "edit.php?post_type={$this->reply_type}" === $parent_file ) {
+			$parent_file = str_replace( array( $this->topic_type, $this->reply_type ), $this->forum_type, $parent_file );
+		}
+
+		return $parent_file;
+	}
+
+	/**
+	 * Displays an admin notice if the current theme does not support the Message Board plugin.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	function admin_notices() { 
+
+		if ( !current_theme_supports( 'message-board' ) ) { ?>
+			<div class="error">
+				<p>
+				<?php _e( 'The theme you are currently using does not support the Message Board plugin. Please activate a theme with support to continue enjoying full use of the plugin.', 'message-board' ); ?>
+				</p>
+			</div>
+		<?php }
 	}
 
 	/**
