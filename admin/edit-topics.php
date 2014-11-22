@@ -94,6 +94,10 @@ final class Message_Board_Admin_Edit_Topics {
 
 		/* Add custom columns and overwrite the 'title' column. */
 		$columns['title']     = __( 'Topic',      'message-board' );
+
+		if ( !isset( $_GET['post_status'] ) )
+			$columns['status']    = __( 'Status',     'message-board' );
+
 		$columns['forum']     = __( 'Forum',      'message-board' );
 		$columns['replies']   = __( 'Replies',    'message-board' );
 		$columns['voices']    = __( 'Voices',     'message-board' );
@@ -115,6 +119,17 @@ final class Message_Board_Admin_Edit_Topics {
 	public function manage_columns( $column, $post_id ) {
 
 		switch( $column ) {
+
+			case 'status' :
+
+				$status = get_post_status_object( get_post_status( $post_id ) );
+
+				if ( 'publish' === $status->name )
+					echo __( 'Open', 'message-board' );
+				else
+					echo $status->label;
+
+				break;
 
 			case 'forum' :
 
@@ -279,6 +294,7 @@ final class Message_Board_Admin_Edit_Topics {
 		.edit-php .wp-list-table .column-datetime { 
 			width: 15%;
 		}
+		.edit-php .wp-list-table .column-status,
 		.edit-php .wp-list-table .column-topics,
 		.edit-php .wp-list-table .column-replies,
 		.edit-php .wp-list-table .column-voices {
