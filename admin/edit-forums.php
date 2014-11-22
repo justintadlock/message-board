@@ -51,7 +51,6 @@ final class Message_Board_Admin_Edit_Forums {
 		add_filter( "manage_edit-{$forum_type}_sortable_columns", array( $this, 'manage_sortable_columns' )        );
 		add_action( "manage_{$forum_type}_posts_custom_column",   array( $this, 'manage_columns'          ), 10, 2 );
 
-		// apply_filters( "views_{$this->screen->id}", $views );
 		add_filter( "views_edit-{$forum_type}", array( $this, 'views' ) );
 
 		add_filter( 'page_row_actions', array( $this, 'row_actions' ), 10, 2 );
@@ -80,7 +79,7 @@ final class Message_Board_Admin_Edit_Forums {
 
 			$text = sprintf( _n( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', number_format_i18n( $num_posts->$status_name ), 'message-board' ), number_format_i18n( $num_posts->$status_name ) );
 
-			$views[ $status_name ] = sprintf( '<a href="%s">%s</a>', $url, $text );
+			$views[ $status_name ] = sprintf( '<a href="%s"%s>%s</a>', $url, $class, $text );
 		}
 
 		return $views;
