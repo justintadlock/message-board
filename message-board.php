@@ -108,6 +108,7 @@ final class Message_Board {
 			require_once( $this->dir_path . 'admin/edit-forums.php' );
 			require_once( $this->dir_path . 'admin/edit-topics.php' );
 			require_once( $this->dir_path . 'admin/edit-replies.php' );
+			require_once( $this->dir_path . 'admin/post-forum.php' );
 			require_once( $this->dir_path . 'admin/meta-boxes.php' );
 		}
 	}

@@ -239,8 +239,7 @@ function mb_register_post_types() {
 		'rewrite' => false,
 
 		'supports' => array(
-			'title',
-			'editor',
+			'editor'
 		),
 
 		'labels' => array(

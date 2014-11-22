@@ -3,6 +3,21 @@
 /* Register post statuses. */
 add_action( 'init', 'mb_register_post_statuses' );
 
+function mb_get_forum_post_statuses() {
+	$statuses = array( 'publish', 'close', 'trash' );
+	return apply_filters( 'mb_get_forum_post_statuses', $statuses );
+}
+
+function mb_get_topic_post_statuses() {
+	$statuses = array( 'publish', 'close', 'spam', 'trash' );
+	return apply_filters( 'mb_get_topic_post_statuses', $statuses );
+}
+
+function mb_get_reply_post_statuses() {
+	$statuses = array( 'publish', 'spam', 'trash' );
+	return apply_filters( 'mb_get_reply_post_statuses', $statuses );
+}
+
 /**
  * Registers post statuses used by the plugin that WordPress doesn't offer out of the box.
  *
