@@ -44,6 +44,42 @@ function mb_get_forum_type_object( $name ) {
 	return isset( $mb->forum_types[ $name ] ) ? $mb->forum_types[ $name ] : false;
 }
 
+function mb_get_forum_level( $forum_id = 0 ) {
+
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	$forum_level = get_post_meta( $forum_id, '_forum_level', true );
+
+	if ( empty( $forum_level ) )
+		$forum_level = mb_set_forum_level( $forum_id );
+
+	return apply_filters( 'mb_get_forum_level', $forum_level, $forum_id );
+}
+
+function mb_set_forum_level( $forum_id ) {
+
+	$level = 1;
+	$post_id = $forum_id;
+
+		while ( $post_id ) {
+
+			/* Get the post by ID. */
+			$post = get_post( $post_id );
+
+			/* If there's no longer a post parent, break out of the loop. */
+			if ( 0 >= $post->post_parent )
+				break;
+
+			/* Change the post ID to the parent post to continue looping. */
+			$post_id = $post->post_parent;
+
+			$level++;
+		}
+
+	update_post_meta( $forum_id, '_forum_level', absint( $level ) );
+
+	return $level;
+}
 
 function mb_set_forum_topic_count( $forum_id ) {
 

@@ -68,6 +68,16 @@ function mb_pre_get_posts( $query ) {
 		$query->set( 'nopaging', true );
 		$query->set( 'order', 'ASC' );
 		$query->set( 'orderby', 'menu_order title' );
+		$query->set( 'meta_query',
+			array(
+				array(
+					'key'     => '_forum_level',
+					'value'   => array( 1, 2 ),
+					'compare' => 'IN',
+					'type'    => 'NUMERIC'
+				)
+			)
+		);
 	}
 
 	elseif ( !is_admin() && $query->is_main_query() && ( is_post_type_archive( mb_get_topic_post_type() ) ) ) {

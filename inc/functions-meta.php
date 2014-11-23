@@ -17,12 +17,14 @@ function mb_register_meta() {
 	register_meta( 'post', '_forum_last_reply_id',           'absint',   '__return_true' );
 	register_meta( 'post', '_forum_topic_count',             'absint',   '__return_true' );
 	register_meta( 'post', '_forum_reply_count',             'absint',   '__return_true' );
+	register_meta( 'post', '_forum_type',                    'esc_html', '__return_true' );
+	register_meta( 'post', '_forum_level',                   'absint',   '__return_true' );
 
 	/* Topic meta. */
 	register_meta( 'post', '_topic_activity_datetime',       'esc_html',   '__return_true' );
 	register_meta( 'post', '_topic_activity_datetime_epoch', 'esc_html',   '__return_true' );
 	register_meta( 'post', '_topic_last_reply_id',           'absint',     '__return_true' );
-	register_meta( 'post', '_topic_voices',                  'esc_html',     '__return_true' );
+	register_meta( 'post', '_topic_voices',                  'esc_html',   '__return_true' );
 	register_meta( 'post', '_topic_voice_count',             'absint',     '__return_true' );
 	register_meta( 'post', '_topic_reply_count',             'absint',     '__return_true' );
 
@@ -45,7 +47,13 @@ function mb_save_post( $post_id, $post = '' ) {
 	if ( empty( $post ) )
 		return;
 
-	if ( mb_get_topic_post_type() === $post->post_type ) {
+	if ( mb_get_forum_post_type() === $post->post_type ) {
+
+		// @todo - this should only change when the post parent changes.
+		mb_set_forum_level( $post->ID );
+	}
+
+	elseif ( mb_get_topic_post_type() === $post->post_type ) {
 
 		$last_post_time = get_post_meta( $post_id, '_topic_activity_datetime', true );
 
