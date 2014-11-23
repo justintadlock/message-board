@@ -1004,6 +1004,9 @@ function mb_topic_form() {
 	if ( is_singular( mb_get_forum_post_type() ) && !mb_is_forum_open( get_queried_object_id() ) )
 		return;
 
+	if ( is_singular( mb_get_forum_post_type() ) && !mb_forum_type_allows_topics( mb_get_forum_type( get_queried_object_id() ) ) )
+		return;
+
 	$form  = sprintf( '<form id="topic-form" method="post" action="%s">', mb_get_topic_form_action_url() );
 	$form .= '<fieldset>';
 	$form .= sprintf( '<legend>%s</legend>', __( 'Add New Topic', 'message-board' ) );
