@@ -8,14 +8,15 @@ add_action( 'add_meta_boxes_forum_topic', 'my_add_meta_boxes' );
 /* Creates the meta box. */
 function my_add_meta_boxes( $post ) {
 
-    add_meta_box(
-        'mb-forum-parent',
-        __( 'Parent Forum', 'message-board' ),
-        'mb_forum_parent_meta_box',
-        'forum',
-        'side',
-        'core'
-    );
+	add_meta_box(
+		'mb-forum-parent',
+		__( 'Parent Forum', 'message-board' ),
+		'mb_forum_parent_meta_box',
+		'forum',
+		'side',
+		'core'
+	);
+
 
     add_meta_box(
         'mb-reply-parent',
@@ -39,6 +40,19 @@ function my_add_meta_boxes( $post ) {
 /* Displays the meta box. */
 function mb_forum_parent_meta_box( $post ) {
 
+	wp_nonce_field( basename( __FILE__ ), 'mb_forum_data_nonce' );
+
+	$forum_types = mb_get_forum_type_objects();
+
+	echo '<p><label>';
+	_e( 'Forum Type:', 'message-board' );
+	echo '<br />';
+	echo '<select id="mb_forum_type" name="mb_forum_type">';
+	foreach ( $forum_types as $type ) {
+		printf( '<option value="%s"%s>%s</option>', esc_attr( $type->name ), selected( $type->name, mb_get_forum_type( $post->ID ), false ), esc_html( $type->label ) );
+	}
+	echo '</select></label></p>';
+
     $parents = get_posts(
         array(
             'post_type'   => 'forum', 
@@ -51,6 +65,9 @@ function mb_forum_parent_meta_box( $post ) {
 
     if ( !empty( $parents ) ) {
 
+	echo '<p><label>';
+	_e( 'Parent Forum:', 'message-board' );
+	echo '<br />';
         echo '<select name="parent_id" class="widefat">'; // !Important! Don't change the 'parent_id' name attribute.
 	printf( '<option value="0"%s>%s</option>', selected( 0, $post->post_parent, false ), esc_html__( '--No Parent--', 'message-board' ) );
 
@@ -58,7 +75,7 @@ function mb_forum_parent_meta_box( $post ) {
             printf( '<option value="%s"%s>%s</option>', esc_attr( $parent->ID ), selected( $parent->ID, $post->post_parent, false ), esc_html( $parent->post_title ) );
         }
 
-        echo '</select>';
+        echo '</select></label></p>';
     }
 }
 
@@ -84,6 +101,48 @@ function mb_topic_parent_meta_box( $post ) {
 
         echo '</select>';
     }
+}
+
+// @todo - only load on edit forum screen.
+add_action( 'save_post', 'mb_meta_box_save_forum_data', 10, 2 );
+
+function mb_meta_box_save_forum_data( $post_id, $post = '' ) {
+
+	/* Fix for attachment save issue in WordPress 3.5. @link http://core.trac.wordpress.org/ticket/21963 */
+	if ( !is_object( $post ) )
+		$post = get_post();
+
+	if ( mb_get_forum_post_type() !== $post->post_type )
+		return;
+
+	/* Verify the nonce before proceeding. */
+	if ( !isset( $_POST['mb_forum_data_nonce'] ) || !wp_verify_nonce( $_POST['mb_forum_data_nonce'], basename( __FILE__ ) ) )
+		return;
+
+	/* Return here if the template is not set. There's a chance it won't be if the post type doesn't have any templates. */
+	if ( !isset( $_POST['mb_forum_type'] ) )
+		return;
+
+	/* Get the posted meta value. */
+	$new_meta_value = $_POST['mb_forum_type'];
+
+	/* Set the $meta_key variable based off the post type name. */
+	$meta_key = "_forum_type";
+
+	/* Get the meta value of the meta key. */
+	$meta_value = get_post_meta( $post_id, $meta_key, true );
+
+	/* If there is no new meta value but an old value exists, delete it. */
+	if ( current_user_can( 'delete_post_meta', $post_id ) && '' == $new_meta_value && $meta_value )
+		delete_post_meta( $post_id, $meta_key, $meta_value );
+
+	/* If a new meta value was added and there was no previous value, add it. */
+	elseif ( current_user_can( 'add_post_meta', $post_id, $meta_key ) && $new_meta_value && '' == $meta_value )
+		add_post_meta( $post_id, $meta_key, $new_meta_value, true );
+
+	/* If the new meta value does not match the old value, update it. */
+	elseif ( current_user_can( 'edit_post_meta', $post_id ) && $new_meta_value && $new_meta_value != $meta_value )
+		update_post_meta( $post_id, $meta_key, $new_meta_value );
 }
 
 /* Displays the meta box. */

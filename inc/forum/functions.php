@@ -27,6 +27,8 @@ function mb_register_forum_type( $name, $args = array() ) {
 
 		$args = wp_parse_args( $args, $defaults );
 
+		$args['name'] = $name;
+
 		$mb->forum_types[ $name ] = (object) $args;
 	}
 }
@@ -36,6 +38,10 @@ function mb_unregister_forum_type( $name ) {
 
 	if ( isset( $mb->forum_types[ $name ] ) )
 		unset( $mb->forum_types[ $name ] );
+}
+
+function mb_get_forum_type_objects() {
+	return message_board()->forum_types;
 }
 
 function mb_get_forum_type_object( $name ) {
