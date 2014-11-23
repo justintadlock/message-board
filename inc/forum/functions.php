@@ -4,6 +4,46 @@ function mb_get_forum_post_type() {
 	return apply_filters( 'mb_get_forum_post_type', 'forum' );
 }
 
+add_action( 'init', 'mb_register_forum_types' );
+
+function mb_register_forum_types() {
+
+	mb_register_forum_type( 'forum',    array( 'topics_allowed' => true,  'label' => __( 'Forum',    'message-board' ) ) );
+	mb_register_forum_type( 'category', array( 'topics_allowed' => false, 'label' => __( 'Category', 'message-board' ) ) );
+}
+
+function mb_register_forum_type( $name, $args = array() ) {
+
+	$mb = message_board();
+
+	$name = sanitize_key( $name );
+
+	if ( !isset( $mb->forum_types[ $name ] ) ) {
+
+		$defaults = array(
+			'topics_allowed' => true,
+			'label'          => '',
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
+		$mb->forum_types[ $name ] = (object) $args;
+	}
+}
+
+function mb_unregister_forum_type( $name ) {
+	$mb = message_board();
+
+	if ( isset( $mb->forum_types[ $name ] ) )
+		unset( $mb->forum_types[ $name ] );
+}
+
+function mb_get_forum_type_object( $name ) {
+	$mb = message_board();
+
+	return isset( $mb->forum_types[ $name ] ) ? $mb->forum_types[ $name ] : false;
+}
+
 
 function mb_set_forum_topic_count( $forum_id ) {
 

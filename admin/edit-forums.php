@@ -172,6 +172,7 @@ final class Message_Board_Admin_Edit_Forums {
 		if ( !isset( $_GET['post_status'] ) )
 			$columns['status']    = __( 'Status',     'message-board' );
 
+		$columns['type']      = __( 'Type',       'message-board' );
 		$columns['topics']    = __( 'Topics',     'message-board' );
 		$columns['replies']   = __( 'Replies',    'message-board' );
 		$columns['datetime']  = __( 'Created',    'message-board' );
@@ -200,6 +201,14 @@ final class Message_Board_Admin_Edit_Forums {
 					echo __( 'Open', 'message-board' );
 				else
 					echo $status->label;
+
+				break;
+
+			case 'type' :
+
+				$type = mb_get_forum_type_object( mb_get_forum_type( $post_id ) );
+
+				echo $type->label;
 
 				break;
 
@@ -319,6 +328,7 @@ final class Message_Board_Admin_Edit_Forums {
 			width: 15%;
 		}
 		.edit-php .wp-list-table .column-status,
+		.edit-php .wp-list-table .column-type,
 		.edit-php .wp-list-table .column-forums,
 		.edit-php .wp-list-table .column-topics,
 		.edit-php .wp-list-table .column-replies,

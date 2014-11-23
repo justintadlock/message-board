@@ -113,6 +113,23 @@ function mb_the_forum() {
 	return $mb->forum_query->the_post();
 }
 
+/* ====== Forum Type ====== */
+
+function mb_forum_type( $forum_id = 0 ) {
+	echo mb_get_forum_type( $forum_id );
+}
+
+function mb_get_forum_type( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	$allowed_types = array( 'forum', 'category' );
+
+	$forum_type = get_post_meta( $forum_id, '_forum_type', true );
+
+	$forum_type = empty( $forum_type ) || !in_array( $forum_type, $allowed_types ) ? 'forum' : $forum_type;
+
+	return apply_filters( 'mb_get_forum_type', $forum_type, $forum_id );
+}
 
 /* ====== Forum Status ====== */
 

@@ -29,6 +29,8 @@ final class Message_Board {
 
 	public $user_views = array();
 
+	public $forum_types = array();
+
 
 	/**
 	 * Returns the instance.
