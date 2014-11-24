@@ -4,6 +4,17 @@
 add_filter( 'template_include', 'mb_template_include' );
 
 /**
+ * Returns the theme folder that houses the templates for the plugin.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_theme_template_folder() {
+	return apply_filters( 'mb_get_theme_template_folder', 'board' );
+}
+
+/**
  * Custom template hierarchy.
  *
  * @since  1.0.0
@@ -13,7 +24,7 @@ add_filter( 'template_include', 'mb_template_include' );
  */
 function mb_template_include( $template ) {
 
-	$dir          = 'message-board';
+	$dir          = mb_get_theme_template_folder();
 	$has_template = false;
 	$_templates   = array();
 
