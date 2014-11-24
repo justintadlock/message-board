@@ -1,11 +1,16 @@
 <?php
-/**
- * Assume all of the below will change.  This is a rough first draft of the template hierarchy that themes 
- * can use.
- */
 
+/* Override the template hierarchy when viewing the forums. */
 add_filter( 'template_include', 'mb_template_include' );
 
+/**
+ * Custom template hierarchy.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $template
+ * @return string
+ */
 function mb_template_include( $template ) {
 
 	$dir          = 'message-board';
