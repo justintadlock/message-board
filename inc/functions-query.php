@@ -44,9 +44,13 @@ function mb_is_message_board() {
 	if ( 1 == get_query_var( 'mb_profile' ) || get_query_var( 'mb_topics' ) || get_query_var( 'mb_replies' ) ||
 		get_query_var( 'mb_bookmarks' ) || get_query_var( 'mb_subscriptions' ) 
 		|| mb_is_user_view() || mb_is_forum_search() 
-		|| mb_is_forum_front() || is_post_type_archive( mb_get_topic_post_type() )
+		|| mb_is_forum_front() 
+		|| mb_is_topic_archive()
+		|| mb_is_forum_archive()
 		|| mb_is_forum_login()
-		|| is_singular( array( mb_get_forum_post_type(), mb_get_topic_post_type() ) ) )
+		|| mb_is_single_topic()
+		|| mb_is_single_forum()
+		)
 		return true;
 
 	return false;
@@ -62,7 +66,7 @@ function mb_is_message_board() {
  */
 function mb_pre_get_posts( $query ) {
 
-	if ( !is_admin() && $query->is_main_query() && is_post_type_archive( mb_get_forum_post_type() ) ) {
+	if ( !is_admin() && $query->is_main_query() && mb_is_forum_archive() ) {
 		$query->set( 'post_type', mb_get_forum_post_type() );
 		$query->set( 'posts_per_page', -1 );
 		$query->set( 'nopaging', true );
@@ -80,7 +84,7 @@ function mb_pre_get_posts( $query ) {
 		);
 	}
 
-	elseif ( !is_admin() && $query->is_main_query() && ( is_post_type_archive( mb_get_topic_post_type() ) ) ) {
+	elseif ( !is_admin() && $query->is_main_query() && mb_is_topic_archive() ) {
 
 		$query->set( 'post_type',      mb_get_topic_post_type() );
 		$query->set( 'post_status',    array( 'publish', 'close' ) );
@@ -161,7 +165,7 @@ add_filter( 'the_posts', 'mb_the_posts', 10, 2 );
 
 function mb_the_posts( $posts, $query ) {
 
-	if ( !is_admin() && $query->is_main_query() && is_post_type_archive( mb_get_topic_post_type() ) ) {
+	if ( !is_admin() && $query->is_main_query() && mb_is_topic_archive() ) {
 
 		$super_stickies = get_option( 'mb_super_sticky_topics', array() );
 
@@ -169,7 +173,7 @@ function mb_the_posts( $posts, $query ) {
 	}
 
 	// http://wordpress.stackexchange.com/questions/63599/custom-post-type-wp-query-and-orderby
-	if ( !is_admin() && $query->is_main_query() && is_post_type_archive( mb_get_forum_post_type() ) ) {
+	if ( !is_admin() && $query->is_main_query() && mb_is_forum_archive() ) {
 
     $refs = $list = array();
     // Make heirarchical structure in one pass.

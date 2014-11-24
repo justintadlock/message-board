@@ -27,7 +27,7 @@ function mb_get_content_type( $post_id = 0 ) {
 
 function mb_thread_query() {
 
-	if ( is_singular( mb_get_topic_post_type() ) && mb_show_lead_topic() )
+	if ( mb_is_single_topic() && mb_show_lead_topic() )
 		add_filter( 'the_posts', 'mb_thread_query_the_posts', 10, 2 );
 
 	return mb_reply_query();

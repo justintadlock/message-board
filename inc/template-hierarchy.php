@@ -12,27 +12,27 @@ function mb_template_include( $template ) {
 	$has_template = false;
 	$_templates   = array();
 
-	if ( is_singular( mb_get_forum_post_type() ) ) {
+	if ( mb_is_single_forum() ) {
 
 		$_templates[] = "{$dir}/single-forum.php";
 	}
 
-	elseif ( is_post_type_archive( mb_get_forum_post_type() ) ) {
+	elseif ( mb_is_forum_archive() ) {
 
 		$_templates[] = "{$dir}/archive-forum.php";
 	}
 
-	elseif ( is_singular( mb_get_topic_post_type() ) && get_query_var( 'edit' ) && current_user_can( 'edit_post', absint( get_query_var( 'edit' ) ) ) ) {
+	elseif ( mb_is_single_topic() && get_query_var( 'edit' ) && current_user_can( 'edit_post', absint( get_query_var( 'edit' ) ) ) ) {
 
 		$_templates[] = "{$dir}/edit.php";
 	}
 
-	elseif ( is_singular( mb_get_topic_post_type() ) ) {
+	elseif ( mb_is_single_topic() ) {
 
 		$_templates[] = "{$dir}/single-topic.php";
 	}
 
-	elseif ( is_post_type_archive( mb_get_topic_post_type() ) ) {
+	elseif ( mb_is_topic_archive() ) {
 
 		$_templates[] = "{$dir}/archive-topic.php";
 	}

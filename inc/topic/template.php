@@ -25,7 +25,7 @@ function mb_topic_query() {
 	}
 
 	/* Use the main WP query when viewing a single topic or topic archive. */
-	if ( is_singular( mb_get_topic_post_type() ) || is_archive( mb_get_topic_post_type() ) ) {
+	if ( mb_is_single_topic() || mb_is_topic_archive() ) {
 		global $wp_the_query;
 		
 		$mb->topic_query = $wp_the_query;
@@ -46,7 +46,7 @@ function mb_topic_query() {
 			'ignore_sticky_posts' => true,
 		);
 
-		if ( is_singular( mb_get_forum_post_type() ) ) {
+		if ( mb_is_single_forum() ) {
 			$defaults['post_parent'] = get_queried_object_id();
 		}
 
@@ -65,6 +65,23 @@ function mb_topic_query() {
  */
 function mb_the_topic() {
 	return message_board()->topic_query->the_post();
+}
+
+/* ====== Conditionals ====== */
+
+function mb_is_single_topic( $topic = '' ) {
+
+	if ( !is_singular( mb_get_topic_post_type() ) )
+		return false;
+
+	if ( !empty( $topic ) )
+		return is_single( $topic );
+
+	return true;
+}
+
+function mb_is_topic_archive() {
+	return is_post_type_archive( mb_get_topic_post_type() );
 }
 
 /* ====== Lead Topic ====== */
@@ -116,7 +133,7 @@ function mb_topic_trash_url( $topic_id = 0 ) {
 function mb_get_topic_trash_url( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	if ( is_singular( mb_get_topic_post_type() ) ) {
+	if ( mb_is_single_topic() ) {
 		$redirect = mb_get_forum_url( mb_get_topic_forum_id( $topic_id ) );
 	} else {
 		$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -134,7 +151,7 @@ function mb_topic_untrash_url( $topic_id = 0 ) {
 function mb_get_topic_untrash_url( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	if ( is_singular( mb_get_topic_post_type() ) ) {
+	if ( mb_is_single_topic() ) {
 		$redirect = mb_get_forum_url( mb_get_topic_forum_id( $topic_id ) );
 	} else {
 		$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -263,7 +280,7 @@ function mb_get_topic_spam_url( $topic_id = 0 ) {
 
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	if ( is_singular( mb_get_topic_post_type() ) ) {
+	if ( mb_is_single_topic() ) {
 		$redirect = mb_get_forum_url( mb_get_topic_forum_id( $topic_id ) );
 	} else {
 		$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -895,7 +912,7 @@ function mb_get_topic_voices( $topic_id = 0 ) {
  * @return bool
  */
 function mb_is_topic_paged() {
-	return is_singular( mb_get_topic_post_type() ) && is_paged() ? true : false;
+	return mb_is_single_topic() && is_paged() ? true : false;
 }
 
 /**
@@ -932,7 +949,7 @@ function mb_topic_form_url() {
  */
 function mb_get_topic_form_url() {
 
-	if ( is_singular( mb_get_forum_post_type() ) && !mb_is_forum_open( get_queried_object_id() ) )
+	if ( mb_is_single_forum() && !mb_is_forum_open( get_queried_object_id() ) )
 		$url = '';
 	else
 		$url = esc_url( '#topic-form' );
@@ -1001,10 +1018,10 @@ function mb_topic_form() {
 	if ( !current_user_can( 'create_forum_topics' ) )
 		return; 
 
-	if ( is_singular( mb_get_forum_post_type() ) && !mb_is_forum_open( get_queried_object_id() ) )
+	if ( mb_is_single_forum() && !mb_is_forum_open( get_queried_object_id() ) )
 		return;
 
-	if ( is_singular( mb_get_forum_post_type() ) && !mb_forum_type_allows_topics( mb_get_forum_type( get_queried_object_id() ) ) )
+	if ( mb_is_single_forum() && !mb_forum_type_allows_topics( mb_get_forum_type( get_queried_object_id() ) ) )
 		return;
 
 	$form  = sprintf( '<form id="topic-form" method="post" action="%s">', mb_get_topic_form_action_url() );
@@ -1018,7 +1035,7 @@ function mb_topic_form() {
 	$default_fields['title'] .= '</p>';
 
 	// forum field
-	if ( !is_singular( mb_get_forum_post_type() ) ) {
+	if ( !mb_is_single_forum() ) {
 		$default_fields['forum'] = '<p>';
 		$default_fields['forum'] .= sprintf( '<label for="mb_topic_forum">%s</label>', __( 'Select a forum:', 'message-board' ) );
 
@@ -1046,7 +1063,7 @@ function mb_topic_form() {
 		$form .= $field;
 	}
 
-	if ( is_singular( mb_get_forum_post_type() ) ) {
+	if ( mb_is_single_forum() ) {
 		$form .= sprintf( '<input type="hidden" name="mb_topic_forum" value="%s" />', absint( get_queried_object_id() ) );
 	}
 

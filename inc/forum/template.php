@@ -20,7 +20,7 @@ function mb_forum_query() {
 		return $have_posts;
 	}
 
-	if ( is_post_type_archive( mb_get_forum_post_type() ) || is_singular( mb_get_forum_post_type() ) ) {
+	if ( mb_is_forum_archive() || mb_is_single_forum() ) {
 		global $wp_query;
 
 		$mb->forum_query = $wp_query;
@@ -75,7 +75,7 @@ function mb_sub_forum_query() {
 		'ignore_sticky_posts' => true,
 	);
 
-	if ( is_singular( mb_get_forum_post_type() ) ) {
+	if ( mb_is_single_forum() ) {
 		$defaults['post_parent'] = get_queried_object_id();
 	}
 
@@ -111,6 +111,23 @@ function mb_the_forum() {
 		return $mb->sub_forum_query->the_post();
 
 	return $mb->forum_query->the_post();
+}
+
+/* ====== Conditionals ====== */
+
+function mb_is_single_forum( $forum = '' ) {
+
+	if ( !is_singular( mb_get_forum_post_type() ) )
+		return false;
+
+	if ( !empty( $forum ) )
+		return is_single( $forum );
+
+	return true;
+}
+
+function mb_is_forum_archive() {
+	return is_post_type_archive( mb_get_forum_post_type() );
 }
 
 /* ====== Forum Type ====== */
@@ -700,7 +717,7 @@ function mb_get_forum_reply_count( $forum_id = 0 ) {
  * @return bool
  */
 function mb_is_forum_paged() {
-	return is_singular( mb_get_forum_post_type() ) && is_paged() ? true : false;
+	return mb_is_single_forum() && is_paged() ? true : false;
 }
 
 /**

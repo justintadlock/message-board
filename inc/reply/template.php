@@ -33,7 +33,7 @@ function mb_reply_query() {
 		'ignore_sticky_posts' => true,
 	);
 
-	if ( is_singular( mb_get_topic_post_type() ) ) {
+	if ( mb_is_single_topic() ) {
 		$defaults['post_parent'] = get_queried_object_id();
 	}
 
