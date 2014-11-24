@@ -37,6 +37,9 @@ final class Message_Board_Admin {
 
 		/* Admin notices. */
 		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+
+		/* Register styles. */
+		add_action( 'admin_enqueue_scripts', array( $this, 'register_styles' ) );
 	}
 
 	/**
@@ -98,6 +101,17 @@ final class Message_Board_Admin {
 				</p>
 			</div>
 		<?php }
+	}
+
+	/**
+	 * Registers the admin stylesheet.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return object
+	 */
+	public function register_styles() {
+		wp_register_style( 'message-board-admin', message_board()->dir_uri . 'css/admin.css' );
 	}
 
 	/**

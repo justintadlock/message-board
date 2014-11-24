@@ -1,0 +1,31 @@
+/**
+ * Admin CSS rules.
+ */
+
+/* ====== Edit Single Post Screen (post.php, post-new.php) ====== */
+
+/**
+ * Custom submit meta box. The .inside section needs its margin/padding reduced to 0 so that the "publish"
+ * section at the bottom stretches to the edges.
+ */
+#mb-submitdiv .inside {
+	margin:  0;
+	padding: 0;
+}
+
+/* ====== Edit Posts List Screen (edit.php) ====== */
+
+.edit-php .wp-list-table .column-forum,
+.edit-php .wp-list-table .column-topic,
+.edit-php .wp-list-table .column-datetime { 
+	width: 15%;
+}
+
+.edit-php .wp-list-table .column-status,
+.edit-php .wp-list-table .column-type,
+.edit-php .wp-list-table .column-forums,
+.edit-php .wp-list-table .column-topics,
+.edit-php .wp-list-table .column-replies,
+.edit-php .wp-list-table .column-voices {
+	width: 10%;
+}

@@ -13,16 +13,14 @@ function mb_post_forum_screen_load() {
 		if ( empty( $screen->post_type ) || !in_array( $screen->post_type, array( $forum_type, $topic_type, $reply_type ) ) )
 			return;
 
-		add_action( 'admin_head', 'mb_post_screen_styles' );
+		add_action( 'admin_enqueue_scripts', 'mb_post_screen_styles' );
 
 		add_action( "add_meta_boxes_{$screen->post_type}", 'mb_forum_add_meta_boxes', 0 );
 }
 
-function mb_post_screen_styles() { ?>
-	<style type="text/css">
-		#mb-submitdiv .inside { margin: 0; padding: 0; }
-	</style>
-<?php }
+function mb_post_screen_styles() {
+		wp_enqueue_style( 'message-board-admin' );
+	}
 
 /* Creates the meta box. */
 function mb_forum_add_meta_boxes( $post ) {

@@ -45,7 +45,7 @@ final class Message_Board_Admin_Edit_Forums {
 
 		add_filter( 'request', array( $this, 'request' ) );
 
-		add_action( 'admin_head', array( $this, 'print_styles'  ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'print_styles'  ) );
 
 		add_filter( "manage_edit-{$forum_type}_columns",          array( $this, 'edit_columns'            )        );
 		add_filter( "manage_edit-{$forum_type}_sortable_columns", array( $this, 'manage_sortable_columns' )        );
@@ -320,23 +320,9 @@ final class Message_Board_Admin_Edit_Forums {
 	 * @access public
 	 * @return void
 	 */
-	public function print_styles( ) { ?>
-		<style type="text/css">
-		.edit-php .wp-list-table .column-forum,
-		.edit-php .wp-list-table .column-forum,
-		.edit-php .wp-list-table .column-datetime { 
-			width: 15%;
-		}
-		.edit-php .wp-list-table .column-status,
-		.edit-php .wp-list-table .column-type,
-		.edit-php .wp-list-table .column-forums,
-		.edit-php .wp-list-table .column-topics,
-		.edit-php .wp-list-table .column-replies,
-		.edit-php .wp-list-table .column-voices {
-			width: 10%;
-		}
-		</style>
-	<?php }
+	public function print_styles() {
+		wp_enqueue_style( 'message-board-admin' );
+	}
 
 	/**
 	 * Returns the instance.
