@@ -1,5 +1,8 @@
 <?php
 
+/* Filter the posts found by the main query. */
+add_filter( 'the_posts', 'mb_the_posts', 10, 2 );
+
 /**
  * Checks if viewing the forum front page.
  *
@@ -9,9 +12,16 @@
  */
 function mb_is_forum_front() {
 	global $wp;
-	return 'board' === $wp->request ? true : false;
+	return mb_get_root_slug() === $wp->request ? true : false;
 }
 
+/**
+ * Checks if viewing the forum search page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
 function mb_is_forum_search() {
 
 	if ( is_search() && $type = get_query_var( 'post_type' ) ) {
@@ -24,9 +34,15 @@ function mb_is_forum_search() {
 	return false;
 }
 
+/**
+ * Checks if viewing the forum login page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
 function mb_is_forum_login() {
 	global $wp;
-
 	return mb_get_login_slug() === $wp->request ? true : false;
 }
 
@@ -39,21 +55,23 @@ function mb_is_forum_login() {
  */
 function mb_is_message_board() {
 
-	//$mb_vars = array( 'mb_user', 'mb_topics', 'mb_replies', 'mb_bookmarks', 'mb_subscriptions' );
+	$is_message_board = false;
 
 	if ( 1 == get_query_var( 'mb_profile' ) || get_query_var( 'mb_topics' ) || get_query_var( 'mb_replies' ) ||
 		get_query_var( 'mb_bookmarks' ) || get_query_var( 'mb_subscriptions' ) 
-		|| mb_is_user_view() || mb_is_forum_search() 
+		|| mb_is_user_view() 
+		|| mb_is_forum_search() 
 		|| mb_is_forum_front() 
 		|| mb_is_topic_archive()
 		|| mb_is_forum_archive()
 		|| mb_is_forum_login()
 		|| mb_is_single_topic()
 		|| mb_is_single_forum()
-		)
-		return true;
+	) {
+		$is_message_board = true;
+	}
 
-	return false;
+	return apply_filters( 'mb_is_message_board', $is_message_board );
 }
 
 /**
@@ -66,12 +84,14 @@ function mb_is_message_board() {
  */
 function mb_pre_get_posts( $query ) {
 
+	/* If viewing the forum archive page. */
 	if ( !is_admin() && $query->is_main_query() && mb_is_forum_archive() ) {
-		$query->set( 'post_type', mb_get_forum_post_type() );
-		$query->set( 'posts_per_page', -1 );
-		$query->set( 'nopaging', true );
-		$query->set( 'order', 'ASC' );
-		$query->set( 'orderby', 'menu_order title' );
+
+		$query->set( 'post_type',      mb_get_forum_post_type()    );
+		$query->set( 'post_status',    array( 'publish', 'close' ) );
+		$query->set( 'posts_per_page', mb_get_forums_per_page()    );
+		$query->set( 'order',          'ASC'                       );
+		$query->set( 'orderby',        'menu_order title'          );
 		$query->set( 'meta_query',
 			array(
 				array(
@@ -84,20 +104,22 @@ function mb_pre_get_posts( $query ) {
 		);
 	}
 
+	/* Is topic archive page. */
 	elseif ( !is_admin() && $query->is_main_query() && mb_is_topic_archive() ) {
 
-		$query->set( 'post_type',      mb_get_topic_post_type() );
+		$query->set( 'post_type',      mb_get_topic_post_type()    );
 		$query->set( 'post_status',    array( 'publish', 'close' ) );
-		$query->set( 'posts_per_page', mb_get_topics_per_page() );
-		$query->set( 'order',          'DESC'                   );
-		$query->set( 'orderby',        'menu_order'             );
+		$query->set( 'posts_per_page', mb_get_topics_per_page()    );
+		$query->set( 'order',          'DESC'                      );
+		$query->set( 'orderby',        'menu_order'                );
 	}
 
+	/* If viewing a user view. */
 	elseif ( !is_admin() && $query->is_main_query() && get_query_var( 'mb_user_view' ) ) {
 
 		if ( 'topics' === get_query_var( 'mb_user_view' ) ) {
 
-			$query->set( 'post_type',      mb_get_topic_post_type()            );
+			$query->set( 'post_type',      mb_get_topic_post_type() );
 			$query->set( 'posts_per_page', mb_get_topics_per_page() );
 			$query->set( 'order',          'DESC'                   );
 			$query->set( 'orderby',        'menu_order'             );
@@ -108,8 +130,8 @@ function mb_pre_get_posts( $query ) {
 			$bookmarks = get_user_meta( $user->ID, '_topic_bookmarks', true );
 			$favs      = wp_parse_id_list( $bookmarks );
 
-			$query->set( 'post__in',      $favs                     );
-			$query->set( 'post_type',     mb_get_topic_post_type()             );
+			$query->set( 'post__in',       $favs                    );
+			$query->set( 'post_type',      mb_get_topic_post_type() );
 			$query->set( 'posts_per_page', mb_get_topics_per_page() );
 			$query->set( 'order',          'DESC'                   );
 			$query->set( 'orderby',        'menu_order'             );
@@ -122,8 +144,8 @@ function mb_pre_get_posts( $query ) {
 			$subscriptions = get_user_meta( $user->ID, '_topic_subscriptions', true );
 			$subs = wp_parse_id_list( $subscriptions );
 
-			$query->set( 'post__in',      $subs                     );
-			$query->set( 'post_type',     mb_get_topic_post_type()             );
+			$query->set( 'post__in',       $subs                    );
+			$query->set( 'post_type',      mb_get_topic_post_type() );
 			$query->set( 'posts_per_page', mb_get_topics_per_page() );
 			$query->set( 'order',          'DESC'                   );
 			$query->set( 'orderby',        'menu_order'             );
@@ -132,7 +154,7 @@ function mb_pre_get_posts( $query ) {
 
 		} elseif ( 'replies' === get_query_var( 'mb_user_view' ) ) {
 
-			$query->set( 'post_type',      mb_get_reply_post_type()              );
+			$query->set( 'post_type',      mb_get_reply_post_type()  );
 			$query->set( 'posts_per_page', mb_get_replies_per_page() );
 			$query->set( 'order',          'DESC'                    );
 			$query->set( 'orderby',        'date'                    );
@@ -140,31 +162,43 @@ function mb_pre_get_posts( $query ) {
 		} elseif ( 'activity' === get_query_var( 'mb_user_view' ) ) {
 
 			$query->set( 'post_type',     array( mb_get_reply_post_type(), mb_get_topic_post_type() ) );
-			$query->set( 'posts_per_page', mb_get_replies_per_page()            );
-			$query->set( 'order',          'DESC'                               );
-			$query->set( 'orderby',        'date'                               );
+			$query->set( 'posts_per_page', mb_get_replies_per_page() );
+			$query->set( 'order',          'DESC'                    );
+			$query->set( 'orderby',        'date'                    );
 		}
 	}
 }
 
-// apply_filters_ref_array( 'posts_where', array( $where, &$this ) );
-
+/**
+ * Filter on 'posts_where' to make sure we're not loading posts by the author.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $where
+ * @param  object  $query
+ * @global object  $wpdb
+ * @return string
+ */
 function mb_auth_posts_where( $where, $query ) {
 	global $wpdb;
 
-	$author_id = get_query_var( 'author' );
+	$author_id = absint( get_query_var( 'author' ) );
 
-	$where = str_replace( " AND ({$wpdb->posts}.post_author = {$author_id})", '', $where );
-
-	return $where;
+	return str_replace( " AND ({$wpdb->posts}.post_author = {$author_id})", '', $where );
 }
 
-// apply_filters_ref_array( 'the_posts', array( $this->posts, &$this ) );
-
-add_filter( 'the_posts', 'mb_the_posts', 10, 2 );
-
+/**
+ * Filter on 'the_posts.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $posts
+ * @param  object $query
+ * @return array
+ */
 function mb_the_posts( $posts, $query ) {
 
+	/* If viewing the topic archive, put super sticky topics at the top. */
 	if ( !is_admin() && $query->is_main_query() && mb_is_topic_archive() ) {
 
 		$super_stickies = get_option( 'mb_super_sticky_topics', array() );
@@ -173,100 +207,109 @@ function mb_the_posts( $posts, $query ) {
 	}
 
 	// http://wordpress.stackexchange.com/questions/63599/custom-post-type-wp-query-and-orderby
-	if ( !is_admin() && $query->is_main_query() && mb_is_forum_archive() ) {
+	/* If viewing the forum archive, put forums in hierarchical order. */
+	elseif ( !is_admin() && $query->is_main_query() && mb_is_forum_archive() ) {
 
-    $refs = $list = array();
-    // Make heirarchical structure in one pass.
-    // Thanks again, Nate Weiner:
-    // http://blog.ideashower.com/post/15147134343/create-a-parent-child-array-structure-in-one-pass
-    foreach( $posts as $post ) {
-        $thisref = &$refs[$post->ID];
+		$refs = $list = array();
 
-        $thisref['post'] = $post;
+		foreach( $posts as $post ) {
+			$thisref = &$refs[ $post->ID ];
 
-        if( $post->post_parent == 0)
-            $list[$post->ID] = &$thisref;
-        else
-            $refs[$post->post_parent]['children'][$post->ID] = &$thisref;
-    }
+			$thisref['post'] = $post;
 
-    // Create single, sorted list
-    $result = array();
-    mb_recursively_flatten_list( $list, $result );
+			if ( $post->post_parent == 0 ) {
+				$list[ $post->ID ] = &$thisref;
+			} else {
+				$refs[ $post->post_parent ]['children'][ $post->ID ] = &$thisref;
+			}
+		}
 
-    return $result;
+		$result = array();
+		mb_recursively_flatten_list( $list, $result );
+		$posts = $result;
 	}
-/*
-	* @todo - add to forum topic query.
-	elseif ( !is_admin() && $query->is_main_query() ) {
-
-		$super_stickies = get_option( 'mb_super_sticky_topics', array() );
-		$topic_stickies = get_option( 'mb_sticky_topics',       array() );
-
-		$posts = mb_the_posts_stickies( $posts, array_merge( $super_stickies, $topic_stickies ) );
-	}
-*/
 
 	return $posts;
 }
 
+/**
+ * Helper function for flattening a list of parent/child posts.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $list
+ * @param  array  $result
+ * @return void
+ */
 function mb_recursively_flatten_list( $list, &$result ) {
-    foreach( $list as $node ) {
-        $result[] = $node['post'];
-        if( isset( $node['children'] ) )
-            mb_recursively_flatten_list( $node['children'], $result );
-    }
+
+	foreach( $list as $node ) {
+		$result[] = $node['post'];
+
+		if ( isset( $node['children'] ) ) {
+			mb_recursively_flatten_list( $node['children'], $result );
+		}
+	}
 }
 
+/**
+ * Adds sticky posts to the front of the line with any given set of posts and stickies.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $posts         Array of post objects.
+ * @param  array  $sticky_posts  Array of post IDs.
+ * @return array
+ */
 function mb_the_posts_stickies( $posts, $sticky_posts ) {
 
-		if ( !is_paged() && !empty( $sticky_posts ) ) {
+	/* Only do this if on the first page and we indeed have stickies. */
+	if ( !is_paged() && !empty( $sticky_posts ) ) {
 
-			$num_posts = count( $posts );
+		$num_posts     = count( $posts );
+		$sticky_offset = 0;
 
-			$sticky_offset = 0;
+		/* Loop over posts and relocate stickies to the front. */
+		for ( $i = 0; $i < $num_posts; $i++ ) {
 
-			// Loop over posts and relocate stickies to the front.
-			for ( $i = 0; $i < $num_posts; $i++ ) {
+			if ( in_array( $posts[ $i ]->ID, $sticky_posts ) ) {
 
-				if ( in_array( $posts[ $i ]->ID, $sticky_posts ) ) {
+				$sticky_post = $posts[ $i ];
 
-					$sticky_post = $posts[ $i ];
+				/* Remove sticky from current position. */
+				array_splice( $posts, $i, 1);
 
-					// Remove sticky from current position
-					array_splice( $posts, $i, 1);
+				/* Move to front, after other stickies. */
+				array_splice( $posts, $sticky_offset, 0, array( $sticky_post ) );
 
-					// Move to front, after other stickies
-					array_splice( $posts, $sticky_offset, 0, array( $sticky_post ) );
+				/* Increment the sticky offset. The next sticky will be placed at this offset. */
+				$sticky_offset++;
 
-					// Increment the sticky offset. The next sticky will be placed at this offset.
-					$sticky_offset++;
+				/* Remove post from sticky posts array. */
+				$offset = array_search( $sticky_post->ID, $sticky_posts );
 
-					// Remove post from sticky posts array
-					$offset = array_search( $sticky_post->ID, $sticky_posts );
-
-					unset( $sticky_posts[ $offset ] );
-				}
-			}
-
-			// Fetch sticky posts that weren't in the query results
-			if ( !empty( $sticky_posts ) ) {
-
-				$stickies = get_posts(
-					array(
-						'post__in'    => $sticky_posts,
-						'post_type'   => mb_get_topic_post_type(),
-						'post_status' => 'publish',
-						'nopaging'    => true
-					)
-				);
-
-				foreach ( $stickies as $sticky_post ) {
-					array_splice( $posts, $sticky_offset, 0, array( $sticky_post ) );
-					$sticky_offset++;
-				}
+				unset( $sticky_posts[ $offset ] );
 			}
 		}
+
+		/* Fetch sticky posts that weren't in the query results. */
+		if ( !empty( $sticky_posts ) ) {
+
+			$stickies = get_posts(
+				array(
+					'post__in'    => $sticky_posts,
+					'post_type'   => mb_get_topic_post_type(),
+					'post_status' => 'publish',
+					'nopaging'    => true
+				)
+			);
+
+			foreach ( $stickies as $sticky_post ) {
+				array_splice( $posts, $sticky_offset, 0, array( $sticky_post ) );
+				$sticky_offset++;
+			}
+		}
+	}
 
 	return $posts;
 }

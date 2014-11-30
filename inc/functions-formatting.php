@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Post kses filter for topics/replies.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $content
+ * @return string
+ */
 function mb_filter_post_kses( $content ) {
 	return current_user_can( 'unfiltered_html' ) ? $content : wp_filter_post_kses( $content );
 }
@@ -126,22 +134,64 @@ function mb_decodeit( $matches ) {
 	return "`$text`";
 }
 
-
-
-function _mb_encode_bad_empty(&$text, $key, $preg) {
-	if (strpos($text, '`') !== 0)
-		$text = preg_replace("|&lt;($preg)\s*?/*?&gt;|i", '<$1 />', $text);
+/**
+ * Helper function.
+ *
+ * @author    bbPress
+ * @license   http://www.gnu.org/licenses/gpl-2.0.html
+ * @link      http://bbpress.org
+ * @link      http://bbpress.org/download/legacy/
+ *
+ * @since  1.0.0
+ * @access private
+ * @param  string  $text
+ * @param  string  $key
+ * @param  string  $preg
+ * @return string
+ */
+function _mb_encode_bad_empty( &$text, $key, $preg ) {
+	if ( strpos( $text, '`' ) !== 0 )
+		$text = preg_replace( "|&lt;($preg)\s*?/*?&gt;|i", '<$1 />', $text );
 }
 
-function _mb_encode_bad_normal(&$text, $key, $preg) {
-	if (strpos($text, '`') !== 0)
-		$text = preg_replace("|&lt;(/?$preg)&gt;|i", '<$1>', $text);
+/**
+ * Helper function.
+ *
+ * @author    bbPress
+ * @license   http://www.gnu.org/licenses/gpl-2.0.html
+ * @link      http://bbpress.org
+ * @link      http://bbpress.org/download/legacy/
+ *
+ * @since  1.0.0
+ * @access private
+ * @param  string  $text
+ * @param  string  $key
+ * @param  string  $preg
+ * @return string
+ */
+function _mb_encode_bad_normal( &$text, $key, $preg ) {
+	if ( strpos( $text, '`' ) !== 0 )
+		$text = preg_replace( "|&lt;(/?$preg)&gt;|i", '<$1>', $text );
 }
 
+/**
+ * Helper function.
+ *
+ * @author    bbPress
+ * @license   http://www.gnu.org/licenses/gpl-2.0.html
+ * @link      http://bbpress.org
+ * @link      http://bbpress.org/download/legacy/
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $text
+ * @param  string  $key
+ * @param  string  $preg
+ * @return string
+ */
 function mb_encode_bad( $text ) {
-	//$text = esc_html( $text );
 
-	$text = preg_split('@(`[^`]*`)@m', $text, -1, PREG_SPLIT_NO_EMPTY + PREG_SPLIT_DELIM_CAPTURE);
+	$text = preg_split( '@(`[^`]*`)@m', $text, -1, PREG_SPLIT_NO_EMPTY + PREG_SPLIT_DELIM_CAPTURE );
 
 	$allowed = mb_allowed_tags();
 	$empty = array( 'br' => true, 'hr' => true, 'img' => true, 'input' => true, 'param' => true, 'area' => true, 'col' => true, 'embed' => true );
@@ -149,17 +199,22 @@ function mb_encode_bad( $text ) {
 	foreach ( $allowed as $tag => $args ) {
 		$preg = $args ? "$tag(?:\s.*?)?" : $tag;
 
-		if ( isset( $empty[$tag] ) )
-			array_walk($text, '_mb_encode_bad_empty', $preg);
+		if ( isset( $empty[ $tag ] ) )
+			array_walk( $text, '_mb_encode_bad_empty', $preg );
 		else
-			array_walk($text, '_mb_encode_bad_normal', $preg);
+			array_walk( $text, '_mb_encode_bad_normal', $preg );
 	}
 
-	return join('', $text);
+	return join( '', $text );
 }
 
-
-
+/**
+ * Returns allowed tags.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return array
+ */
 function mb_allowed_tags() {
 
 	$not_allowed = array(
@@ -198,5 +253,5 @@ function mb_allowed_tags() {
 			unset( $allowed[ $remove ] );
 	}
 
-	return $allowed;
+	return apply_filters( 'mb_allowed_tags', $allowed );
 }

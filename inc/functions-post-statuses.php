@@ -3,19 +3,53 @@
 /* Register post statuses. */
 add_action( 'init', 'mb_register_post_statuses' );
 
+/* Published status change. */
+add_action( 'publish_to_spam',  'mb_publish_to_spam'  );
+add_action( 'publish_to_trash', 'mb_publish_to_trash' );
+
+/* Closed status change. */
+add_action( 'close_to_spam',    'mb_close_to_spam'    );
+add_action( 'close_to_trash',   'mb_close_to_trash'   );
+
+/* Spam status change. */
+add_action( 'spam_to_publish',  'mb_spam_to_publish'  );
+add_action( 'spam_to_close',    'mb_spam_to_close'    );
+
+/* Trash status change. */
+add_action( 'trash_to_publish', 'mb_trash_to_publish' );
+add_action( 'trash_to_close',   'mb_trash_to_close'   );
+
+/**
+ * Returns an array of allowed post statuses for forums.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return array
+ */
 function mb_get_forum_post_statuses() {
-	$statuses = array( 'publish', 'close', 'trash' );
-	return apply_filters( 'mb_get_forum_post_statuses', $statuses );
+	return apply_filters( 'mb_get_forum_post_statuses', array( 'publish', 'close', 'trash' ) );
 }
 
+/**
+ * Returns an array of allowed post statuses for topics.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return array
+ */
 function mb_get_topic_post_statuses() {
-	$statuses = array( 'publish', 'close', 'spam', 'trash' );
-	return apply_filters( 'mb_get_topic_post_statuses', $statuses );
+	return apply_filters( 'mb_get_topic_post_statuses', array( 'publish', 'close', 'spam', 'trash' ) );
 }
 
+/**
+ * Returns an array of allowed post statuses for replies.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return array
+ */
 function mb_get_reply_post_statuses() {
-	$statuses = array( 'publish', 'spam', 'trash' );
-	return apply_filters( 'mb_get_reply_post_statuses', $statuses );
+	return apply_filters( 'mb_get_reply_post_statuses', array( 'publish', 'spam', 'trash' ) );
 }
 
 /**
@@ -65,43 +99,13 @@ function mb_register_post_statuses() {
 	);
 }
 
-
-//do_action( "{$old_status}_to_{$new_status}", $post );
-//do_action( 'transition_post_status', $new_status, $old_status, $post );
-//do_action( "{$new_status}_{$post->post_type}", $post->ID, $post );
-
-//add_action( 'publish_to_close', 'mb_publish_to_close' );
-add_action( 'publish_to_spam',  'mb_publish_to_spam'  );
-add_action( 'publish_to_trash', 'mb_publish_to_trash' );
-
-//add_action( 'close_to_publish', 'mb_close_to_publish' );
-add_action( 'close_to_spam',    'mb_close_to_spam'    );
-add_action( 'close_to_trash',   'mb_close_to_trash'   );
-
-add_action( 'spam_to_publish',  'mb_spam_to_publish'  );
-add_action( 'spam_to_close',    'mb_spam_to_close'    );
-//add_action( 'spam_to_trash',    'mb_spam_to_trash'    );
-
-add_action( 'trash_to_publish', 'mb_trash_to_publish' );
-add_action( 'trash_to_close',   'mb_trash_to_close'   );
-//add_action( 'trash_to_spam',    'mb_trash_to_spam'    );
-
-/* Actions? do nothing. */
-function mb_publish_to_close( $post ) {}
-/* actions? do nothing. */
-function mb_close_to_publish( $post ) {}
-/* actions? */
-function mb_spam_to_trash( $post ) {}
-/* actions? do nothing */
-function mb_trash_to_spam( $post ) {}
-
-/* Actions? 
- * topic:
- * - reset forum if topic latest
- * - change post status of replies to 'orphan'
- * reply:
- * - reset reply positions for topic
- * - reset topic if reply latest
+/**
+ * Resets topic/reply data when the post status is changed from 'publish' to 'spam'.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  $post  object
+ * @return void
  */
 function mb_publish_to_spam( $post ) {
 
@@ -112,6 +116,14 @@ function mb_publish_to_spam( $post ) {
 		mb_reset_reply_data( $post );
 }
 
+/**
+ * Resets topic/reply data when the post status is changed from 'publish' to 'trash'.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  $post  object
+ * @return void
+ */
 function mb_publish_to_trash( $post ) {
 
 	if ( mb_get_topic_post_type() === $post->post_type )
@@ -121,9 +133,13 @@ function mb_publish_to_trash( $post ) {
 		mb_reset_reply_data( $post );
 }
 
-/* actions?
- * - reset forum if topic latest
- * - change post status of replies to 'orphan'
+/**
+ * Resets topic data when the post status is changed from 'close' to 'spam'.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  $post  object
+ * @return void
  */
 function mb_close_to_spam( $post ) {
 
@@ -131,9 +147,13 @@ function mb_close_to_spam( $post ) {
 		mb_reset_topic_data( $post );
 }
 
-/* actions?
- * - reset forum if topic latest
- * - change post status of replies to 'orphan'
+/**
+ * Resets topic data when the post status is changed from 'close' to 'trash'.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  $post  object
+ * @return void
  */
 function mb_close_to_trash( $post ) {
 
@@ -141,13 +161,13 @@ function mb_close_to_trash( $post ) {
 		mb_reset_topic_data( $post );
 }
 
-/* Actions? 
- * topic:
- * - reset forum if topic latest
- * - change post status of replies to 'publish'
- * reply:
- * - reset reply positions for topic
- * - reset topic if reply latest
+/**
+ * Resets topic/reply data when the post status is changed from 'spam' to 'publish'.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  $post  object
+ * @return void
  */
 function mb_spam_to_publish( $post ) {
 
@@ -158,19 +178,27 @@ function mb_spam_to_publish( $post ) {
 		mb_reset_reply_data( $post, true );
 }
 
+/**
+ * Resets topic data when the post status is changed from 'spam' to 'close'.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  $post  object
+ * @return void
+ */
 function mb_spam_to_close( $post ) {
 
 	if ( mb_get_topic_post_type() === $post->post_type )
 		mb_reset_topic_data( $post, true );
 }
 
-/* Actions? 
- * topic:
- * - reset forum if topic latest
- * - change post status of replies to 'publish'
- * reply:
- * - reset reply positions for topic
- * - reset topic if reply latest
+/**
+ * Resets topic/reply data when the post status is changed from 'trash' to 'publish'.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  $post  object
+ * @return void
  */
 function mb_trash_to_publish( $post ) {
 
@@ -181,23 +209,16 @@ function mb_trash_to_publish( $post ) {
 		mb_reset_reply_data( $post, true );
 }
 
+/**
+ * Resets topic data when the post status is changed from 'trash' to 'close'.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  $post  object
+ * @return void
+ */
 function mb_trash_to_close( $post ) {
 
 	if ( mb_get_topic_post_type() === $post->post_type )
 		mb_reset_topic_data( $post, true );
-
-	elseif ( mb_get_reply_post_type() === $post->post_type )
-		mb_reset_reply_data( $post, true );
 }
-
-
-
-
-
-
-
-
-
-
-
-

@@ -28,60 +28,71 @@ function mb_template_include( $template ) {
 	$has_template = false;
 	$_templates   = array();
 
+	/* If viewing a single forum page. */
 	if ( mb_is_single_forum() ) {
 
 		$_templates[] = "{$dir}/single-forum.php";
 	}
 
+	/* If viewing the forum archive (default forum front). */
 	elseif ( mb_is_forum_archive() ) {
 
 		$_templates[] = "{$dir}/archive-forum.php";
 	}
 
+	/* If viewing single topic edit page. */
 	elseif ( mb_is_single_topic() && get_query_var( 'edit' ) && current_user_can( 'edit_post', absint( get_query_var( 'edit' ) ) ) ) {
 
 		$_templates[] = "{$dir}/edit.php";
 	}
 
+	/* If viewing a single topic. */
 	elseif ( mb_is_single_topic() ) {
 
 		$_templates[] = "{$dir}/single-topic.php";
 	}
 
+	/* If viewing the topic archive (possible forum front page). */
 	elseif ( mb_is_topic_archive() ) {
 
 		$_templates[] = "{$dir}/archive-topic.php";
 	}
 
+	/* If viewing a user view page. */
 	elseif ( is_author() && mb_is_user_view() ) {
 
 		$_templates[] = "{$dir}/single-user-topics.php";
 		$_templates[] = "{$dir}/single-user.php";
 	}
 
+	/* If viewing a user subscriptions page. */
 	elseif ( is_author() && get_query_var( 'mb_subscriptions' ) ) {
 
 		$_templates[] = "{$dir}/single-user-topics.php";
 		$_templates[] = "{$dir}/single-user.php";
 	}
 
+	/* If viewing a user topics page. */
 	elseif ( is_author() && get_query_var( 'mb_topics' ) ) {
 
 		$_templates[] = "{$dir}/single-user-topics.php";
 		$_templates[] = "{$dir}/single-user.php";
 	}
 
+	/* If viewing a user profile page. */
 	elseif ( 1 == get_query_var( 'mb_profile' ) ) {
 
 		$_templates[] = "{$dir}/single-user.php";
 	}
 
+	/* If viewing a search results page. */
 	elseif ( mb_is_forum_search() ) {
 
 		$_templates[] = "{$dir}/search.php";
 		$_templates[] = "{$dir}/archive-topic.php"; // temp
 	}
 
+	/* If viewing the forum login page. */
 	elseif ( mb_is_forum_login() ) {
 
 		$_templates[] = "{$dir}/login.php";

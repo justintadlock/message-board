@@ -29,9 +29,7 @@ add_filter( 'enter_title_here', 'mb_enter_title_here', 10, 2 );
  */
 function mb_register_post_types() {
 
-	/* Get plugin settings. */
-	//$settings = get_option( 'restaurant_settings', mb_get_default_settings() );
-
+	/* Set up the arguments for the 'forum' post type. */
 	$forum_args = array(
 		'description'         => '',
 		'public'              => true,
@@ -111,7 +109,7 @@ function mb_register_post_types() {
 		)
 	);
 
-	/* Set up the arguments for the post type. */
+	/* Set up the arguments for the 'forum_topic' post type. */
 	$topic_args = array(
 		'description'         => '',
 		'public'              => true,
@@ -190,7 +188,7 @@ function mb_register_post_types() {
 		)
 	);
 
-	/* Set up the arguments for the post type. */
+	/* Set up the arguments for the 'forum_reply' post type. */
 	$reply_args = array(
 		'description'         => '',
 		'public'              => true,
@@ -279,13 +277,15 @@ function mb_register_post_types() {
  */
 function mb_enter_title_here( $title, $post ) {
 
-	if ( 'topic' === $post->post_type )
+	if ( mb_get_topic_post_type() === $post->post_type )
 		$title = __( 'Enter topic name', 'message-board' );
 
 	return $title;
 }
 
 /**
+ * Post updated messages in the admin.
+ *
  * @since  1.0.0
  * @access public
  * @return void
@@ -293,8 +293,23 @@ function mb_enter_title_here( $title, $post ) {
 function mb_post_updated_messages( $messages ) {
 	global $post, $post_ID;
 
+	$forum_type = mb_get_forum_post_type();
 	$topic_type = mb_get_topic_post_type();
 	$reply_type = mb_get_reply_post_type();
+
+	$messages[ $forum_type ] = array(
+		 0 => '', // Unused. Messages start at index 1.
+		 1 => sprintf( __( 'Forum updated. <a href="%s">View forum</a>', 'message-board' ), esc_url( get_permalink( $post_ID ) ) ),
+		 2 => '',
+		 3 => '',
+		 4 => __( 'Forum updated.', 'message-board' ),
+		 5 => isset( $_GET['revision'] ) ? sprintf( __( 'Forum restored to revision from %s', 'message-board' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+		 6 => sprintf( __( 'Forum published. <a href="%s">View forum</a>', 'message-board' ), esc_url( get_permalink( $post_ID ) ) ),
+		 7 => __( 'Forum saved.', 'message-board' ),
+		 8 => '',
+		 9 => '',
+		10 => ''
+	);
 
 	$messages[ $topic_type ] = array(
 		 0 => '', // Unused. Messages start at index 1.
@@ -305,9 +320,9 @@ function mb_post_updated_messages( $messages ) {
 		 5 => isset( $_GET['revision'] ) ? sprintf( __( 'Topic restored to revision from %s', 'message-board' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
 		 6 => sprintf( __( 'Topic published. <a href="%s">View topic</a>', 'message-board' ), esc_url( get_permalink( $post_ID ) ) ),
 		 7 => __( 'Topic saved.', 'message-board' ),
-		 8 => sprintf( __( 'Topic submitted. <a target="_blank" href="%s">Preview topic</a>', 'message-board' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
-		 9 => sprintf( __( 'Topic scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview topic</a>', 'message-board' ), date_i18n( __( 'M j, Y @ G:i', 'message-board' ), strtotime( $post->post_date ) ), esc_url( get_permalink( $post_ID ) ) ),
-		10 => sprintf( __( 'Topic draft updated. <a target="_blank" href="%s">Preview topic</a>', 'message-board' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
+		 8 => '',
+		 9 => '',
+		10 => ''
 	);
 
 	$messages[ $reply_type ] = array(
@@ -319,9 +334,9 @@ function mb_post_updated_messages( $messages ) {
 		 5 => isset( $_GET['revision'] ) ? sprintf( __( 'Reply restored to revision from %s', 'message-board' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
 		 6 => sprintf( __( 'Reply published. <a href="%s">View reply</a>', 'message-board' ), esc_url( get_permalink( $post_ID ) ) ),
 		 7 => __( 'Reply saved.', 'message-board' ),
-		 8 => sprintf( __( 'Reply submitted. <a target="_blank" href="%s">Preview reply</a>', 'message-board' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
-		 9 => sprintf( __( 'Reply scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview reply</a>', 'message-board' ), date_i18n( __( 'M j, Y @ G:i', 'message-board' ), strtotime( $post->post_date ) ), esc_url( get_permalink( $post_ID ) ) ),
-		10 => sprintf( __( 'Reply draft updated. <a target="_blank" href="%s">Preview reply</a>', 'message-board' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
+		 8 => '',
+		 9 => '',
+		10 => ''
 	);
 
 	return $messages;

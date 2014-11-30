@@ -353,6 +353,9 @@ function mb_get_reply_forum_id( $reply_id = 0 ) {
 	return absint( $forum_id );
 }
 
+/* ====== Reply Topic ====== */
 
-
-
+function mb_get_reply_topic_id( $reply_id = 0 ) {
+	$reply_id = mb_get_reply_id( $reply_id );
+	return get_post_field( 'post_parent', $reply_id );
+}
