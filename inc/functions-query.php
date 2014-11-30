@@ -16,6 +16,17 @@ function mb_is_forum_front() {
 }
 
 /**
+ * Checks if viewing the user archive page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_user_archive() {
+	return get_query_var( 'mb_custom' ) && 'users' === get_query_var( 'mb_custom' ) ? true : false;
+}
+
+/**
  * Checks if viewing the forum search page.
  *
  * @since  1.0.0
@@ -67,6 +78,7 @@ function mb_is_message_board() {
 		|| mb_is_forum_login()
 		|| mb_is_single_topic()
 		|| mb_is_single_forum()
+		|| mb_is_user_archive()
 	) {
 		$is_message_board = true;
 	}
@@ -344,8 +356,10 @@ function mb_parse_query( $query ) {
 function mb_404_override() {
 	global $wp_query;
 
-	if ( mb_is_forum_front() || mb_is_forum_login() ) {
+	if ( mb_is_forum_front() || mb_is_forum_login() || mb_is_user_archive() ) {
 		status_header( 200 );
-		$wp_query->is_404 = false;
+		$wp_query->is_404        = false;
+		$wp_query->is_front_page = false;
+		$wp_query->is_home       = false;
 	}
 }

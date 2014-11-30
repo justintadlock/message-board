@@ -1,5 +1,33 @@
 <?php
 
+function mb_get_users_per_page() {
+	return apply_filters( 'mb_get_users_per_page', 30 );
+}
+
+function mb_get_users() {
+
+	$mb = message_board();
+
+	$page = is_paged() ? absint( get_query_var( 'page' ) ) : 1;
+
+	$offset = 1 === $page ? '' : ( $page - 1 ) * mb_get_users_per_page();
+
+	$mb->users_query = new WP_User_Query(
+		array(
+			'orderby'      => 'login',
+			'order'        => 'ASC',
+			'offset'       => $offset,
+			'search'       => '',
+			'number'       => mb_get_users_per_page(),
+			'count_total'  => false,
+			'fields'       => 'all',
+			'who'          => ''
+		)
+	);
+
+	return $mb->users_query->results;
+}
+
 function mb_user_profile_url( $user_id = 0 ) {
 	echo mb_get_user_profile_url( $user_id );
 }

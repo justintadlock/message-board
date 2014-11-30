@@ -81,6 +81,8 @@ function mb_query_vars( $vars ) {
 	if ( !array_search( 'edit', $vars ) )
 		$vars[] = 'edit';
 
+	$vars[] = 'mb_custom';
+
 	return $vars;
 }
 
@@ -109,13 +111,18 @@ function mb_rewrite_rules() {
 	add_rewrite_tag( '%' . $profile_query_var . '%', '([^/]+)' );
 	add_rewrite_tag( '%' . $user_query_var    . '%', '([^/]+)' );
 
+	$user_archive_slug = str_replace( mb_maybe_get_root_slug(), '', $user_slug );
+
+	add_rewrite_rule( $user_slug . '/?$',  'index.php?mb_custom=users', 'top' );
+	add_rewrite_rule( $user_slug . '/page/?([0-9]{1,})/?$', 'index.php?mb_custom=users&paged=$matches[2]', 'top' );
+
 	add_rewrite_rule( $user_slug . '/([^/]+)/([^/]+)/page/?([0-9]{1,})/?$', 'index.php?author_name=$matches[1]&' . $user_query_var . '=$matches[2]&paged=$matches[3]', 'top' );
 	add_rewrite_rule( $user_slug . '/([^/]+)/([^/]+)/feed/?$',              'index.php?author_name=$matches[1]&' . $user_query_var . '=$matches[2]&feed=$matches[3]',  'top' );
 	add_rewrite_rule( $user_slug . '/([^/]+)/([^/]+)/?$',                   'index.php?author_name=$matches[1]&' . $user_query_var . '=$matches[2]',                   'top' );
 	add_rewrite_rule( $user_slug . '/([^/]+)/?$',                           'index.php?author_name=$matches[1]&mb_profile=1',                                          'top' );
 
 	/* Login page. */
-	add_rewrite_rule( '^' . $root_slug . '/' . $login_slug . '$', 'index.php', 'top' );
+	add_rewrite_rule( $login_slug . '/?$', 'index.php?mb_custom=login', 'top' );
 }
 
 function mb_forum_rewrite_rules( $rules ) {

@@ -85,6 +85,13 @@ function mb_template_include( $template ) {
 		$_templates[] = "{$dir}/single-user.php";
 	}
 
+	/* If viewing the user archive. */
+	elseif ( mb_is_user_archive() ) {
+
+		$_templates[] = "{$dir}/archive-user.php";
+
+	}
+
 	/* If viewing a search results page. */
 	elseif ( mb_is_forum_search() ) {
 
