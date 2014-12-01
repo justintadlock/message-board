@@ -80,7 +80,7 @@ function mb_template_include( $template ) {
 	}
 
 	/* If viewing a user profile page. */
-	elseif ( 1 == get_query_var( 'mb_profile' ) ) {
+	elseif ( mb_is_single_user() ) {
 
 		$_templates[] = "{$dir}/single-user.php";
 	}

@@ -27,6 +27,19 @@ function mb_is_user_archive() {
 }
 
 /**
+ * Checks if viewing a single user page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_single_user() {
+	$is_user_page = get_query_var( 'mb_custom' ) && 'users' === get_query_var( 'mb_custom' ) ? true : false;
+
+	return $is_user_page && is_author() ? true : false;
+}
+
+/**
  * Checks if viewing the forum search page.
  *
  * @since  1.0.0
