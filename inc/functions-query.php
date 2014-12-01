@@ -53,8 +53,7 @@ function mb_is_forum_search() {
  * @return bool
  */
 function mb_is_forum_login() {
-	global $wp;
-	return mb_get_login_slug() === $wp->request ? true : false;
+	return get_query_var( 'mb_custom' ) && 'login' === get_query_var( 'mb_login' ) ? true : false;
 }
 
 /**
