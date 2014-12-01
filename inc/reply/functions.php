@@ -87,6 +87,9 @@ function mb_reset_reply_data( $post, $reset_latest = false ) {
 	/* If this is the last reply, reset forum latest data. */
 	if ( $post->ID === absint( $forum_last_reply ) || true === $reset_latest )
 		mb_reset_forum_latest( $forum_id );
+
+	/* Reset user topic count. */
+	mb_set_user_reply_count( $post->post_author );
 }
 
 /* Update all reply positions with a single query. */

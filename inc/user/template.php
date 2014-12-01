@@ -41,6 +41,54 @@ function mb_get_users() {
 	return $mb->users_query->results;
 }
 
+function mb_user_topic_count( $user_id = 0 ) {
+	echo mb_get_user_topic_count();
+}
+
+function mb_get_user_topic_count( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+
+	$count = get_post_meta( $user_id, '_topic_count', true );
+
+	if ( '' === $count )
+		$count = mb_set_user_topic_count( $user_id );
+
+	$count = !empty( $count ) ? absint( $count ) : 0;
+
+	return apply_filters( 'mb_get_user_topic_count', $count, $user_id );
+}
+
+function mb_user_reply_count( $user_id = 0 ) {
+	echo mb_get_user_reply_count();
+}
+
+function mb_get_user_reply_count( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+
+	$count = get_post_meta( $user_id, '_reply_count', true );
+
+	if ( '' === $count )
+		$count = mb_set_user_reply_count( $user_id );
+
+	$count = !empty( $count ) ? absint( $count ) : 0;
+
+	return apply_filters( 'mb_get_user_reply_count', $count, $user_id );
+}
+
+function mb_user_post_count( $user_id = 0 ) {
+	echo mb_get_user_post_count();
+}
+
+function mb_get_user_post_count( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+
+	$topic_count = mb_get_user_topic_count( $user_id );
+	$reply_count = mb_get_user_reply_count( $user_id );
+
+	$count = $topic_count + $reply_count;
+
+	return apply_filters( 'mb_get_user_post_count', $count, $user_id );
+}
 
 function mb_users_pagination( $args = array() ) {
 	$total_users = message_board()->users_query->total_users;

@@ -1,5 +1,29 @@
 <?php
 
+function mb_set_user_topic_count( $user_id ) {
+	global $wpdb;
+
+	$where = $wpdb->prepare( "WHERE post_author = %d AND post_type = %s AND (post_status = 'publish' OR post_status = 'close')", $user_id, mb_get_topic_post_type() );
+
+	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where" );
+
+	update_user_meta( $user_id, '_topic_count', $count );
+
+	return $count;
+}
+
+function mb_set_user_reply_count( $user_id ) {
+	global $wpdb;
+
+	$where = $wpdb->prepare( "WHERE post_author = %d AND post_type = %s AND post_status = 'publish'", $user_id, mb_get_reply_post_type() );
+
+	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where" );
+
+	update_user_meta( $user_id, '_reply_count', $count );
+
+	return $count;
+}
+
 function mb_get_user_subscriptions( $user_id ) {
 
 	$subscriptions = get_user_meta( $user_id, '_topic_subscriptions', true );

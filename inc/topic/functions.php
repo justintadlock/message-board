@@ -130,6 +130,9 @@ function mb_reset_topic_data( $post, $reset_latest = false ) {
 	/* If this is the last topic, reset forum latest data. */
 	if ( $post->ID === absint( $forum_last_topic ) || true === $reset_latest )
 		mb_reset_forum_latest( $forum_id );
+
+	/* Reset user topic count. */
+	mb_set_user_topic_count( $post->post_author );
 }
 
 

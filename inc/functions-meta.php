@@ -31,6 +31,8 @@ function mb_register_meta() {
 	/* User meta. */
 	register_meta( 'user', '_topic_subscriptions', 'esc_html', '__return_true' );
 	register_meta( 'user', '_topic_bookmarks',     'esc_html', '__return_true' );
+	register_meta( 'user', '_topic_count',         'absint',   '__return_true' );
+	register_meta( 'user', '_reply_count',         'absint',   '__return_true' );
 }
 
 /**

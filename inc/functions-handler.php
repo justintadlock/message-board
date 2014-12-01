@@ -107,6 +107,10 @@ function mb_handler_new_topic() {
 			mb_add_user_subscription( absint( $user_id ), $published );
 		}
 
+		/* Update user meta. */
+		$topic_count = mb_get_user_topic_count( $user_id );
+		update_user_meta( absint( $user_id ), '_topic_count', $topic_count + 1 );
+
 		/* Update forum meta. */
 
 		update_post_meta( $forum_id, '_forum_activity_datetime', $post_date );
@@ -209,6 +213,10 @@ function mb_handler_new_reply() {
 				mb_set_topic_subscribers( $topic_id );
 			}
 		}
+
+		/* Update user meta. */
+		$topic_count = mb_get_user_topic_count( $user_id );
+		update_user_meta( absint( $user_id ), '_topic_count', $topic_count + 1 );
 
 		/* Update topic. */
 
