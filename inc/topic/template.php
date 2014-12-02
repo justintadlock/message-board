@@ -1038,13 +1038,11 @@ function mb_topic_form() {
 	if ( !mb_is_single_forum() ) {
 		$default_fields['forum'] = '<p>';
 		$default_fields['forum'] .= sprintf( '<label for="mb_topic_forum">%s</label>', __( 'Select a forum:', 'message-board' ) );
-
-		$default_fields['forum'] .= wp_dropdown_pages(
+		$default_fields['forum'] .= mb_dropdown_forums(
 			array(
-				'post_type' => mb_get_forum_post_type(),
-				'name'      => 'mb_topic_forum',
-				'id'        => 'mb_topic_forum',
-				'echo'      => false,
+				'name' => 'mb_topic_forum',
+				'id'   => 'mb_topic_forum',
+				'echo' => false
 			)
 		);
 		$default_fields['forum'] .= '</select>';

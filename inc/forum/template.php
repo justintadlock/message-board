@@ -731,3 +731,60 @@ function mb_is_forum_paged() {
 function mb_forum_pagination( $args = array() ) {
 	return mb_pagination( $args, message_board()->topic_query );
 }
+
+function mb_dropdown_forums( $args = array() ) {
+
+	$defaults = array(
+		'post_type'   => mb_get_forum_post_type(),
+		'post_status' => array( 'publish', 'close' ),
+		'walker'      => new MB_Walker_Forum_Dropdown,
+	);
+
+	return wp_dropdown_pages( wp_parse_args( $args, $defaults ) );
+}
+
+
+class MB_Walker_Forum_Dropdown extends Walker_PageDropdown {
+
+	/**
+	 * @see Walker::start_el()
+	 * @since 1.0.0
+	 *
+	 * @param string $output Passed by reference. Used to append additional content.
+	 * @param object $page Page data object.
+	 * @param int $depth Depth of page in reference to parent pages. Used for padding.
+	 * @param array $args Uses 'selected' argument for selected page to set selected HTML attribute for option element.
+	 * @param int $id
+	 */
+	public function start_el( &$output, $page, $depth = 0, $args = array(), $id = 0 ) {
+
+		$forum_type = mb_get_forum_type_object( mb_get_forum_type( $page->ID ) );
+
+		$pad = str_repeat('&nbsp;', $depth * 3);
+
+		$output .= "\t<option class=\"level-$depth\" value=\"$page->ID\"";
+		if ( $page->ID == $args['selected'] )
+			$output .= ' selected="selected"';
+
+		if ( 'publish' !== $page->post_status || false === $forum_type->topics_allowed )
+			$output .= ' disabled="disabled"';
+		$output .= '>';
+
+		$title = $page->post_title;
+		if ( '' === $title ) {
+			$title = sprintf( __( '#%d (no title)' ), $page->ID );
+		}
+
+		/**
+		 * Filter the page title when creating an HTML drop-down list of pages.
+		 *
+		 * @since 3.1.0
+		 *
+		 * @param string $title Page title.
+		 * @param object $page  Page data object.
+		 */
+		$title = apply_filters( 'list_pages', $title, $page );
+		$output .= $pad . esc_html( $title );
+		$output .= "</option>\n";
+	}
+}
