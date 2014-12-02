@@ -11,10 +11,21 @@ function mb_get_user_id( $user_id = 0 ) {
 		$user_id = $user_id;
 	elseif ( !empty( $mb_user ) && is_object( $mb_user ) )
 		$user_id = $mb_user->ID;
+	elseif ( get_query_var( 'author' ) )
+		$user_id = get_query_var( 'author' );
 	else
 		$user_id  = get_current_user_id();
 
 	return absint( $user_id );
+}
+
+function mb_single_user_title( $prefix = '', $echo = true ) {
+	$title = apply_filters( 'mb_single_user_title', $prefix . get_the_author_meta( 'display_name', get_query_var( 'author' ) ) );
+
+	if ( false === $echo )
+		return $title;
+
+	echo $title;
 }
 
 function mb_get_users() {
@@ -121,6 +132,46 @@ function mb_get_user_profile_link( $user_id = 0 ) {
 	$link = sprintf( '<a class="user-profile-link" href="%s">%s</a>', esc_url( $url ), $name );
 
 	return apply_filters( 'mb_get_user_profile_link', $link, $user_id );
+}
+
+function mb_user_page_url( $slug = '', $user_id = 0 ) {
+	echo mb_get_user_page_url( $slug, $user_id );
+}
+
+function mb_get_user_page_url( $slug = '', $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+
+	$profile_url = mb_get_user_profile_url( $user_id );
+
+	if ( !empty( $slug ) ) {
+		$url = user_trailingslashit( trailingslashit( $profile_url ) . $slug );
+	} else {
+		$url = $profile_url;
+	}
+
+	return apply_filters( 'mb_get_user_page_url', $url, $user_id, $slug );
+}
+
+function mb_user_page_link( $slug = '', $user_id = 0 ) {
+	echo mb_get_user_page_link( $slug, $user_id );
+}
+
+function mb_get_user_page_link( $slug = '', $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+
+	$url = mb_get_user_page_url( $slug, $user_id );
+
+	if ( !empty( $slug ) ) {
+		$class = "user-{$slug}-link";
+		$title = $slug; //temp
+	} else {
+		$class = 'user-profile-link';
+		$title = __( 'Profile', 'message-board' );
+	}
+
+	$link = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $url ), sanitize_html_class( $class ), $title );
+
+	return apply_filters( 'mb_get_user_page_link', $link, $user_id, $slug );
 }
 
 function mb_user_topics_url( $user_id = 0 ) {
