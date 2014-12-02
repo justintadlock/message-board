@@ -9,9 +9,9 @@ add_action( 'add_meta_boxes_forum_topic', 'my_add_meta_boxes' );
 function my_add_meta_boxes( $post ) {
 
 	add_meta_box(
-		'mb-forum-parent',
-		__( 'Parent Forum', 'message-board' ),
-		'mb_forum_parent_meta_box',
+		'mb-forum-attributes',
+		__( 'Forum Attributes', 'message-board' ),
+		'mb_forum_attributes_meta_box',
 		'forum',
 		'side',
 		'core'
@@ -38,45 +38,47 @@ function my_add_meta_boxes( $post ) {
 }
 
 /* Displays the meta box. */
-function mb_forum_parent_meta_box( $post ) {
+function mb_forum_attributes_meta_box( $post ) {
 
 	wp_nonce_field( basename( __FILE__ ), 'mb_forum_data_nonce' );
 
-	$forum_types = mb_get_forum_type_objects();
+	$forum_types = mb_get_forum_type_objects(); ?>
 
-	echo '<p><label>';
-	_e( 'Forum Type:', 'message-board' );
-	echo '<br />';
-	echo '<select id="mb_forum_type" name="mb_forum_type">';
-	foreach ( $forum_types as $type ) {
-		printf( '<option value="%s"%s>%s</option>', esc_attr( $type->name ), selected( $type->name, mb_get_forum_type( $post->ID ), false ), esc_html( $type->label ) );
-	}
-	echo '</select></label></p>';
+	<p>
+		<strong><?php _e( 'Forum Type:', 'message-board' ); ?></strong>
+	</p>
+	<p>
+		<?php foreach ( $forum_types as $type ) : ?>
+			<label>
+				<input type="radio" name="mb_forum_type" value="<?php echo esc_attr( $type->name ); ?>"<?php checked( $type->name, mb_get_forum_type( $post->ID ) ); ?> /> <?php echo esc_html( $type->label ); ?>
+			</label>
+			<br />
+		<?php endforeach; ?>
+	</p>
 
-    $parents = get_posts(
-        array(
-            'post_type'   => 'forum', 
-            'orderby'     => 'title', 
-            'order'       => 'ASC', 
-            'numberposts' => -1,
-		'post__not_in' => array( $post->ID ),
-        )
-    );
+	<p>
+		<label id="mb_parent_forum">
+			<strong><?php _e( 'Parent Forum:', 'message-board' ); ?></strong>
+		</label>
+	</p>
+	<p>
+		<?php mb_dropdown_forums(
+			array(
+				'name'              => 'parent_id',
+				'id'                => 'mb_parent_forum',
+				'show_option_none'  => __( '&ndash;&ndash; No Parent &ndash;&ndash;', 'message-board' ),
+				'option_none_value' => 0,
+				'selected'          => $post->post_parent
+			)
+		); ?>
+	</p>
 
-    if ( !empty( $parents ) ) {
-
-	echo '<p><label>';
-	_e( 'Parent Forum:', 'message-board' );
-	echo '<br />';
-        echo '<select name="parent_id" class="widefat">'; // !Important! Don't change the 'parent_id' name attribute.
-	printf( '<option value="0"%s>%s</option>', selected( 0, $post->post_parent, false ), esc_html__( '--No Parent--', 'message-board' ) );
-
-        foreach ( $parents as $parent ) {
-            printf( '<option value="%s"%s>%s</option>', esc_attr( $parent->ID ), selected( $parent->ID, $post->post_parent, false ), esc_html( $parent->post_title ) );
-        }
-
-        echo '</select></label></p>';
-    }
+	<p>
+		<label for="mb_menu_order"><strong><?php _e( 'Order:', 'message-board' ); ?></strong></label>
+	</p>
+	<p>
+		<input type="number" name="menu_order" id="mb_menu_order" min="0" value="<?php echo esc_attr( $post->menu_order ); ?>" />
+	</p><?php
 }
 
 /* Displays the meta box. */
