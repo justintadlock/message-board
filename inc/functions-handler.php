@@ -92,7 +92,7 @@ function mb_handler_new_topic() {
 			'post_author'  => absint( $user_id ),
 			'post_title'   => $post_title,
 			'post_content' => $post_content,
-			'post_status'  => 'publish',
+			'post_status'  => 'open',
 			'post_type'    => mb_get_topic_post_type(),
 			'post_parent'  => $forum_id,
 		)
@@ -519,7 +519,7 @@ function mb_handler_open_close() {
 
 		elseif ( 'open' === $_GET['action'] && 'close' === $postarr['post_status'] ) {
 
-			$postarr['post_status'] = 'publish';
+			$postarr['post_status'] = 'open';
 
 			wp_update_post( $postarr );
 		}

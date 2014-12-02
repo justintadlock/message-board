@@ -74,9 +74,7 @@ function mb_forum_submit_meta_box( $post, $args = array() ) {
 							<?php _e( 'Status:', 'message-board' ) ?>
 							<select name='post_status' id='post_status'>
 							<?php foreach ( $avail_statuses as $status ) : ?>
-								<?php if ( 'publish' === $status && in_array( $post_type, array( mb_get_forum_post_type(), mb_get_topic_post_type() ) ) ) : ?>
-									<option<?php selected( $post->post_status, 'publish' ); ?> value='publish'><?php _e( 'Open', 'message-board' ); ?></option>
-								<?php elseif ( 'trash' !== $status ) : ?>
+								<?php if ( 'trash' !== $status ) : ?>
 									<?php $status_object = get_post_status_object( $status ); ?>
 									<option<?php selected( $post->post_status, $status ); ?> value='<?php echo esc_attr( $status ); ?>'><?php echo esc_html( $status_object->label ); ?></option>
 								<?php endif; ?>

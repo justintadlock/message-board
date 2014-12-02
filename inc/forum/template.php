@@ -163,7 +163,7 @@ function mb_is_forum_open( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 	$status   = get_post_status( $forum_id );
 
-	return apply_filters( 'mb_is_forum_open', in_array( $status, array( 'publish', 'inherit' ) ) ? true : false, $forum_id );
+	return apply_filters( 'mb_is_forum_open', in_array( $status, array( 'open', 'publish', 'inherit' ) ) ? true : false, $forum_id );
 }
 
 function mb_is_forum_closed( $forum_id = 0 ) {
@@ -736,7 +736,7 @@ function mb_dropdown_forums( $args = array() ) {
 
 	$defaults = array(
 		'post_type'   => mb_get_forum_post_type(),
-		'post_status' => array( 'publish', 'close' ),
+		'post_status' => array( 'open', 'publish', 'close' ),
 		'walker'      => new MB_Walker_Forum_Dropdown,
 	);
 
@@ -766,7 +766,7 @@ class MB_Walker_Forum_Dropdown extends Walker_PageDropdown {
 		if ( $page->ID == $args['selected'] )
 			$output .= ' selected="selected"';
 
-		if ( 'publish' !== $page->post_status || false === $forum_type->topics_allowed )
+		if ( !in_array( $page->post_status, array( 'open', 'publish' ) ) || false === $forum_type->topics_allowed )
 			$output .= ' disabled="disabled"';
 		$output .= '>';
 

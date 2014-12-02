@@ -38,7 +38,7 @@ function mb_topic_query() {
 
 		$defaults = array(
 			'post_type'           => mb_get_topic_post_type(),
-			'post_status'         => array( 'publish', 'close' ),
+			'post_status'         => array( 'open', 'publish', 'close' ),
 			'posts_per_page'      => $per_page,
 			'paged'               => get_query_var( 'paged' ),
 			'orderby'             => 'menu_order',
@@ -202,7 +202,7 @@ function mb_is_topic_open( $topic_id = 0 ) {
 	$status   = get_post_status( $topic_id );
 	$open     = false;
 
-	if ( mb_is_forum_open( $forum_id ) && 'publish' === $status )
+	if ( mb_is_forum_open( $forum_id ) && in_array( $status, array( 'open', 'publish' ) ) )
 		$open = true;
 
 	return apply_filters( 'mb_is_topic_open', $open, $topic_id );

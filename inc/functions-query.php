@@ -112,7 +112,7 @@ function mb_pre_get_posts( $query ) {
 	if ( !is_admin() && $query->is_main_query() && mb_is_forum_archive() ) {
 
 		$query->set( 'post_type',      mb_get_forum_post_type()    );
-		$query->set( 'post_status',    array( 'publish', 'close' ) );
+		$query->set( 'post_status',    array( 'open', 'publish', 'close' ) );
 		$query->set( 'posts_per_page', mb_get_forums_per_page()    );
 		$query->set( 'order',          'ASC'                       );
 		$query->set( 'orderby',        'menu_order title'          );
@@ -132,7 +132,7 @@ function mb_pre_get_posts( $query ) {
 	elseif ( !is_admin() && $query->is_main_query() && mb_is_topic_archive() ) {
 
 		$query->set( 'post_type',      mb_get_topic_post_type()    );
-		$query->set( 'post_status',    array( 'publish', 'close' ) );
+		$query->set( 'post_status',    array( 'open', 'publish', 'close' ) );
 		$query->set( 'posts_per_page', mb_get_topics_per_page()    );
 		$query->set( 'order',          'DESC'                      );
 		$query->set( 'orderby',        'menu_order'                );
@@ -323,7 +323,7 @@ function mb_the_posts_stickies( $posts, $sticky_posts ) {
 				array(
 					'post__in'    => $sticky_posts,
 					'post_type'   => mb_get_topic_post_type(),
-					'post_status' => 'publish',
+					'post_status' => array( 'open', 'publish' ),
 					'nopaging'    => true
 				)
 			);

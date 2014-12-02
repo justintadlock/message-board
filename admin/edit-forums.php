@@ -51,38 +51,9 @@ final class Message_Board_Admin_Edit_Forums {
 		add_filter( "manage_edit-{$forum_type}_sortable_columns", array( $this, 'manage_sortable_columns' )        );
 		add_action( "manage_{$forum_type}_posts_custom_column",   array( $this, 'manage_columns'          ), 10, 2 );
 
-		add_filter( "views_edit-{$forum_type}", array( $this, 'views' ) );
-
 		add_filter( 'page_row_actions', array( $this, 'row_actions' ), 10, 2 );
 
 		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
-	}
-
-	public function views( $views ) {
-
-		if ( isset( $views['publish'] ) ) {
-
-			$post_type = mb_get_forum_post_type();
-
-			$num_posts = wp_count_posts( $post_type, 'readable' );
-
-			$status = get_post_status_object( 'publish' );
-
-			$class = '';
-
-			$status_name = $status->name;
-
-			if ( isset( $_REQUEST['post_status'] ) && $status_name == $_REQUEST['post_status'] )
-				$class = ' class="current"';
-
-			$url = add_query_arg( array( 'post_status' => $status_name, 'post_type' => $post_type ), admin_url( 'edit.php' ) );
-
-			$text = sprintf( _n( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', number_format_i18n( $num_posts->$status_name ), 'message-board' ), number_format_i18n( $num_posts->$status_name ) );
-
-			$views[ $status_name ] = sprintf( '<a href="%s"%s>%s</a>', $url, $class, $text );
-		}
-
-		return $views;
 	}
 
 	public function admin_notices() {
@@ -198,9 +169,9 @@ final class Message_Board_Admin_Edit_Forums {
 				$status = get_post_status_object( get_post_status( $post_id ) );
 
 				if ( 'publish' === $status->name )
-					echo __( 'Open', 'message-board' );
-				else
-					echo $status->label;
+					wp_update_post( array( 'ID' => $post_id, 'post_status' => 'open' ) );
+				
+				echo $status->label;
 
 				break;
 

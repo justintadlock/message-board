@@ -6,6 +6,8 @@ add_action( 'init', 'mb_register_post_statuses' );
 /* Published status change. */
 add_action( 'publish_to_spam',  'mb_publish_to_spam'  );
 add_action( 'publish_to_trash', 'mb_publish_to_trash' );
+add_action( 'open_to_spam',     'mb_publish_to_spam'  );
+add_action( 'open_to_trash',    'mb_publish_to_trash' );
 
 /* Closed status change. */
 add_action( 'close_to_spam',    'mb_close_to_spam'    );
@@ -13,10 +15,12 @@ add_action( 'close_to_trash',   'mb_close_to_trash'   );
 
 /* Spam status change. */
 add_action( 'spam_to_publish',  'mb_spam_to_publish'  );
+add_action( 'spam_to_open',     'mb_spam_to_pubish'   );
 add_action( 'spam_to_close',    'mb_spam_to_close'    );
 
 /* Trash status change. */
 add_action( 'trash_to_publish', 'mb_trash_to_publish' );
+add_action( 'trash_to_open',    'mb_trash_to_publish' );
 add_action( 'trash_to_close',   'mb_trash_to_close'   );
 
 /**
@@ -27,7 +31,7 @@ add_action( 'trash_to_close',   'mb_trash_to_close'   );
  * @return array
  */
 function mb_get_forum_post_statuses() {
-	return apply_filters( 'mb_get_forum_post_statuses', array( 'publish', 'close', 'trash' ) );
+	return apply_filters( 'mb_get_forum_post_statuses', array( 'open', 'close', 'trash' ) );
 }
 
 /**
@@ -38,7 +42,7 @@ function mb_get_forum_post_statuses() {
  * @return array
  */
 function mb_get_topic_post_statuses() {
-	return apply_filters( 'mb_get_topic_post_statuses', array( 'publish', 'close', 'spam', 'trash' ) );
+	return apply_filters( 'mb_get_topic_post_statuses', array( 'open', 'close', 'spam', 'trash' ) );
 }
 
 /**
@@ -60,6 +64,18 @@ function mb_get_reply_post_statuses() {
  * @return void
  */
 function mb_register_post_statuses() {
+
+	/* forums, topics */
+	register_post_status(
+		'open',
+		array(
+			'label'                     => __( 'Open', 'message-board' ),
+			'label_count'               => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'message-board' ),
+			'public'                    => true,
+			'show_in_admin_status_list' => true,
+			'show_in_admin_all_list'    => true,
+		)
+	);
 
 	/* forums, topics */
 	register_post_status(

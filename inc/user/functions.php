@@ -3,7 +3,7 @@
 function mb_set_user_topic_count( $user_id ) {
 	global $wpdb;
 
-	$where = $wpdb->prepare( "WHERE post_author = %d AND post_type = %s AND (post_status = 'publish' OR post_status = 'close')", $user_id, mb_get_topic_post_type() );
+	$where = $wpdb->prepare( "WHERE post_author = %d AND post_type = %s AND (post_status = 'publish' OR post_status = 'close' OR post_status = 'open')", $user_id, mb_get_topic_post_type() );
 
 	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where" );
 
