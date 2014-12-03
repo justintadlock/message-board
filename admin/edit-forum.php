@@ -168,9 +168,9 @@ final class Message_Board_Admin_Edit_Forums {
 
 				$status = get_post_status_object( get_post_status( $post_id ) );
 
-				if ( 'publish' === $status->name )
-					wp_update_post( array( 'ID' => $post_id, 'post_status' => 'open' ) );
-				
+				if ( mb_get_publish_post_status() === $status->name )
+					wp_update_post( array( 'ID' => $post_id, 'post_status' => mb_get_open_post_status() ) );
+
 				echo $status->label;
 
 				break;
@@ -241,7 +241,7 @@ final class Message_Board_Admin_Edit_Forums {
 			$view_action = $actions['view'];
 			unset( $actions['view'] );
 
-			if ( 'spam' !== get_query_var( 'post_status' ) )
+			if ( mb_get_spam_post_status() !== get_query_var( 'post_status' ) )
 				$actions['view'] = $view_action;
 		}
 
@@ -264,7 +264,7 @@ final class Message_Board_Admin_Edit_Forums {
 
 				$is_closed = mb_is_forum_closed( $forum_id );
 
-				$new_status = $is_closed ? 'publish' : 'close';
+				$new_status = $is_closed ? mb_get_open_post_status() : mb_get_close_post_status();
 
 				if ( $postarr['post_status'] !== $new_status ) {
 
@@ -281,7 +281,6 @@ final class Message_Board_Admin_Edit_Forums {
 			exit();
 		}
 	}
-
 
 	/**
 	 * Style adjustments for the manage menu items screen, particularly for adjusting the thumbnail 

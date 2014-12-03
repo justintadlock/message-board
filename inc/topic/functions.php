@@ -7,7 +7,7 @@ function mb_get_topic_post_type() {
 function mb_get_multi_topic_reply_ids( $topic_ids ) {
 	global $wpdb;
 
-	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'open' AND post_parent IN ( " . implode( ',', $topic_ids ) . " ) ORDER BY post_date DESC", mb_get_reply_post_type() ) );
+	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s AND post_parent IN ( " . implode( ',', $topic_ids ) . " ) ORDER BY post_date DESC", mb_get_reply_post_type(), mb_get_open_post_status() ) );
 }
 
 function mb_get_topic_subscribers( $topic_id = 0 ) {
@@ -100,7 +100,7 @@ function mb_set_topic_reply_count( $topic_id ) {
 function mb_set_topic_voices( $topic_id ) {
 	global $wpdb;
 
-	$voices = $wpdb->get_col( $wpdb->prepare( "SELECT post_author FROM {$wpdb->posts} WHERE post_parent = %d AND post_type = %s AND post_status = 'open'", absint( $topic_id ), mb_get_reply_post_type() ) );
+	$voices = $wpdb->get_col( $wpdb->prepare( "SELECT post_author FROM {$wpdb->posts} WHERE post_parent = %d AND post_type = %s AND post_status = %s", absint( $topic_id ), mb_get_reply_post_type(), mb_get_open_post_status() ) );
 
 	$topic_author = mb_get_topic_author_id( $topic_id );
 

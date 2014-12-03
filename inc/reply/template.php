@@ -24,7 +24,7 @@ function mb_reply_query() {
 
 	$defaults = array(
 		'post_type'           => mb_get_reply_post_type(),
-		'post_status'         => 'publish',
+		'post_status'         => mb_get_publish_post_status(),
 		'posts_per_page'      => $per_page,
 		'paged'               => get_query_var( 'paged' ),
 		'orderby'             => 'menu_order',
@@ -139,7 +139,7 @@ function mb_get_reply_trash_link( $reply_id = 0 ) {
 
 	$link = '';
 
-	if ( 'trash' !== get_post_status( $reply_id ) ) {
+	if ( mb_get_trash_post_status() !== get_post_status( $reply_id ) ) {
 		$url = mb_get_reply_trash_url( $reply_id );
 
 		if ( !empty( $url ) )
@@ -162,7 +162,7 @@ function mb_is_reply_spam( $reply_id = 0 ) {
 	$reply_id = mb_get_reply_id( $reply_id );
 	$status   = get_post_status( $reply_id );
 
-	return apply_filters( 'mb_is_reply_spam', 'spam' === $status ? true : false, $reply_id );
+	return apply_filters( 'mb_is_reply_spam', mb_get_spam_post_status() === $status ? true : false, $reply_id );
 }
 
 function mb_reply_spam_url( $reply_id = 0 ) {

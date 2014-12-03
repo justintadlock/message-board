@@ -92,7 +92,7 @@ function mb_handler_new_topic() {
 			'post_author'  => absint( $user_id ),
 			'post_title'   => $post_title,
 			'post_content' => $post_content,
-			'post_status'  => 'open',
+			'post_status'  => mb_get_open_post_status(),
 			'post_type'    => mb_get_topic_post_type(),
 			'post_parent'  => $forum_id,
 		)
@@ -194,7 +194,7 @@ function mb_handler_new_reply() {
 			'post_author'  => absint( $user_id ),
 			'post_content' => $post_content,
 			'post_parent'  => $topic_id,
-			'post_status'  => 'publish',
+			'post_status'  => mb_get_publish_post_status(),
 			'post_type'    => mb_get_reply_post_type(),
 			'menu_order'   => $position
 		)
@@ -480,9 +480,9 @@ function mb_handler_spam() {
 
 		$postarr = get_post( $post_id, ARRAY_A );
 
-		if ( 'spam' !== $postarr['post_status'] ) {
+		if ( mb_get_spam_post_status() !== $postarr['post_status'] ) {
 
-			$postarr['post_status'] = 'spam';
+			$postarr['post_status'] = mb_get_spam_post_status();
 
 			wp_update_post( $postarr );
 		}
@@ -510,16 +510,16 @@ function mb_handler_open_close() {
 
 		$postarr = get_post( $post_id, ARRAY_A );
 
-		if ( 'close' === $_GET['action'] && 'close' !== $postarr['post_status'] ) {
+		if ( 'close' === $_GET['action'] && mb_get_close_post_status() !== $postarr['post_status'] ) {
 
-			$postarr['post_status'] = 'close';
+			$postarr['post_status'] = mb_get_close_post_status();
 
 			wp_update_post( $postarr );
 		}
 
-		elseif ( 'open' === $_GET['action'] && 'close' === $postarr['post_status'] ) {
+		elseif ( 'open' === $_GET['action'] && mb_get_close_post_status() === $postarr['post_status'] ) {
 
-			$postarr['post_status'] = 'open';
+			$postarr['post_status'] = mb_get_open_post_status();
 
 			wp_update_post( $postarr );
 		}
@@ -547,11 +547,11 @@ function mb_handler_trash() {
 
 		$postarr = get_post( $post_id, ARRAY_A );
 
-		if ( 'trash' === $_GET['action'] && 'trash' !== $postarr['post_status'] ) {
+		if ( 'trash' === $_GET['action'] && mb_get_trash_post_status() !== $postarr['post_status'] ) {
 			wp_trash_post( $post_id );
 		}
 
-		elseif ( 'untrash' === $_GET['action'] && 'trash' === $postarr['post_status'] ) {
+		elseif ( 'untrash' === $_GET['action'] && mb_get_trash_post_status() === $postarr['post_status'] ) {
 
 			wp_untrash_post( $post_id );
 		}

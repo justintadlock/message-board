@@ -38,7 +38,7 @@ function mb_topic_query() {
 
 		$defaults = array(
 			'post_type'           => mb_get_topic_post_type(),
-			'post_status'         => array( 'open', 'publish', 'close' ),
+			'post_status'         => array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status() ),
 			'posts_per_page'      => $per_page,
 			'paged'               => get_query_var( 'paged' ),
 			'orderby'             => 'menu_order',
@@ -170,7 +170,7 @@ function mb_get_topic_trash_link( $topic_id = 0 ) {
 
 	$link = '';
 
-	if ( 'trash' !== get_post_status( $topic_id ) ) {
+	if ( mb_get_trash_post_status() !== get_post_status( $topic_id ) ) {
 		$url = mb_get_topic_trash_url( $topic_id );
 
 		if ( !empty( $url ) )
@@ -202,7 +202,7 @@ function mb_is_topic_open( $topic_id = 0 ) {
 	$status   = get_post_status( $topic_id );
 	$open     = false;
 
-	if ( mb_is_forum_open( $forum_id ) && in_array( $status, array( 'open', 'publish' ) ) )
+	if ( mb_is_forum_open( $forum_id ) && mb_get_open_post_status() === $status )
 		$open = true;
 
 	return apply_filters( 'mb_is_topic_open', $open, $topic_id );
@@ -212,7 +212,7 @@ function mb_is_topic_closed( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 	$status   = get_post_status( $topic_id );
 
-	return apply_filters( 'mb_is_topic_closed', 'close' === $status ? true : false, $topic_id );
+	return apply_filters( 'mb_is_topic_closed', mb_get_close_post_status() === $status ? true : false, $topic_id );
 }
 
 function mb_topic_close_url( $topic_id = 0 ) {
@@ -269,7 +269,7 @@ function mb_is_topic_spam( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 	$status   = get_post_status( $topic_id );
 
-	return apply_filters( 'mb_is_topic_spam', 'spam' === $status ? true : false, $topic_id );
+	return apply_filters( 'mb_is_topic_spam', mb_get_spam_post_status() === $status ? true : false, $topic_id );
 }
 
 function mb_topic_spam_url( $topic_id = 0 ) {

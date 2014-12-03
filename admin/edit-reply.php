@@ -162,7 +162,7 @@ final class Message_Board_Admin_Edit_Replies {
 			$view_action = $actions['view'];
 			unset( $actions['view'] );
 
-			if ( 'spam' !== get_query_var( 'post_status' ) )
+			if ( mb_get_spam_post_status() !== get_query_var( 'post_status' ) )
 				$actions['view'] = $view_action;
 		}
 
@@ -186,7 +186,7 @@ final class Message_Board_Admin_Edit_Replies {
 
 				$is_spam = mb_is_reply_spam( $reply_id );
 
-				$new_status = $is_spam ? 'publish' : 'spam';
+				$new_status = $is_spam ? mb_get_publish_post_status() : mb_get_spam_post_status();
 
 				if ( $postarr['post_status'] !== $new_status ) {
 

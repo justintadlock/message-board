@@ -20,7 +20,7 @@ function mb_generate_reply_url( $reply_id = 0 ) {
 
 	$reply_id       = mb_get_reply_id( $reply_id );
 
-	if ( 'publish' !== get_post_status( $reply_id ) )
+	if ( mb_get_publish_post_status() !== get_post_status( $reply_id ) )
 		return '';
 
 	$per_page       = mb_get_replies_per_page();
@@ -55,7 +55,7 @@ function mb_generate_reply_url( $reply_id = 0 ) {
 function mb_get_topic_reply_ids( $topic_id ) {
 	global $wpdb;
 
-	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' AND post_parent = %d ORDER BY menu_order ASC", mb_get_reply_post_type(), absint( $topic_id ) ) );
+	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s AND post_parent = %d ORDER BY menu_order ASC", mb_get_reply_post_type(), mb_get_publish_post_status(), absint( $topic_id ) ) );
 }
 
 function mb_reset_reply_data( $post, $reset_latest = false ) {
@@ -98,8 +98,9 @@ function mb_reset_reply_positions( $topic_id ) {
 
 	$posts = $wpdb->get_results( 
 		$wpdb->prepare( 
-			"SELECT ID, menu_order FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' AND post_parent = %d ORDER BY post_date ASC", 
+			"SELECT ID, menu_order FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s AND post_parent = %d ORDER BY post_date ASC", 
 			mb_get_reply_post_type(), 
+			mb_get_open_post_status(),
 			absint( $topic_id ) 
 		) 
 	);
@@ -129,15 +130,21 @@ function mb_reset_reply_positions( $topic_id ) {
 function mb_set_reply_statuses( $topic_id, $status ) {
 	global $wpdb;
 
-	$allowed_statuses = array( 'publish', 'trash', 'spam', 'orphan' );
+	$allowed_statuses = array(
+		mb_get_publish_post_status(),
+		mb_get_trash_post_status(),
+		mb_get_spam_post_status(),
+		mb_get_orphan_post_status()
+	);
 
 	if ( !in_array( $status, $allowed_statuses ) )
 		return false;
 
 	$post_ids = $wpdb->get_results( 
 		$wpdb->prepare( 
-			"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' AND post_parent = %d ORDER BY post_date ASC", 
+			"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s AND post_parent = %d ORDER BY post_date ASC", 
 			mb_get_reply_post_type(), 
+			mb_get_open_post_status(),
 			absint( $topic_id ) 
 		) 
 	);

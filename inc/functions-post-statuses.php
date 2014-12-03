@@ -3,25 +3,97 @@
 /* Register post statuses. */
 add_action( 'init', 'mb_register_post_statuses' );
 
-/* Published status change. */
-add_action( 'publish_to_spam',  'mb_publish_to_spam'  );
-add_action( 'publish_to_trash', 'mb_publish_to_trash' );
-add_action( 'open_to_spam',     'mb_publish_to_spam'  );
-add_action( 'open_to_trash',    'mb_publish_to_trash' );
+/* Publish status change. */
+add_action( mb_get_publish_post_status() . '_to_' . mb_get_spam_post_status(),  'mb_publish_to_spam'  );
+add_action( mb_get_publish_post_status() . '_to_' . mb_get_trash_post_status(), 'mb_publish_to_trash' );
 
-/* Closed status change. */
-add_action( 'close_to_spam',    'mb_close_to_spam'    );
-add_action( 'close_to_trash',   'mb_close_to_trash'   );
+/* Open status change. */
+add_action( mb_get_open_post_status() . '_to_' . mb_get_spam_post_status(),     'mb_publish_to_spam'  );
+add_action( mb_get_open_post_status() . '_to_' . mb_get_trash_post_status(),    'mb_publish_to_trash' );
+
+/* Close status change. */
+add_action( mb_get_close_post_status() . '_to_' . mb_get_spam_post_status(),    'mb_close_to_spam'    );
+add_action( mb_get_close_post_status() . '_to_' . mb_get_trash_post_status(),   'mb_close_to_trash'   );
 
 /* Spam status change. */
-add_action( 'spam_to_publish',  'mb_spam_to_publish'  );
-add_action( 'spam_to_open',     'mb_spam_to_pubish'   );
-add_action( 'spam_to_close',    'mb_spam_to_close'    );
+add_action( mb_get_spam_post_status() . '_to_' . mb_get_publish_post_status(),  'mb_spam_to_publish'  );
+add_action( mb_get_spam_post_status() . '_to_' . mb_get_open_post_status(),     'mb_spam_to_pubish'   );
+add_action( mb_get_spam_post_status() . '_to_' . mb_get_close_post_status(),    'mb_spam_to_close'    );
 
 /* Trash status change. */
-add_action( 'trash_to_publish', 'mb_trash_to_publish' );
-add_action( 'trash_to_open',    'mb_trash_to_publish' );
-add_action( 'trash_to_close',   'mb_trash_to_close'   );
+add_action( mb_get_trash_post_status() . '_to_' . mb_get_publish_post_status(), 'mb_trash_to_publish' );
+add_action( mb_get_trash_post_status() . '_to_' . mb_get_open_post_status(),    'mb_trash_to_publish' );
+add_action( mb_get_trash_post_status() . '_to_' . mb_get_close_post_status(),   'mb_trash_to_close'   );
+
+/**
+ * Returns the slug for the "publish" post status.  Used by replies by default.  Note that this status 
+ * is not registered by default because it's a default WordPress post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_publish_post_status() {
+	return apply_filters( 'mb_get_open_post_status', 'publish' );
+}
+
+/**
+ * Returns the slug for the "trash" post status.  Used by forums, topics, and replies by default.  Note 
+ * that this status is not registered by default because it's a default WordPress post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_trash_post_status() {
+	return apply_filters( 'mb_get_open_post_status', 'trash' );
+}
+
+/**
+ * Returns the slug for the "open" post status.  Used by forums and topics by default.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_open_post_status() {
+	return apply_filters( 'mb_get_open_post_status', 'open' );
+}
+
+/**
+ * Returns the slug for the "close" post status.  Used by forums and topics by default.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_close_post_status() {
+	return apply_filters( 'mb_get_close_post_status', 'close' );
+}
+
+/**
+ * Returns the slug for the "spam" post status.  Used by topics and replies by default.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_spam_post_status() {
+	return apply_filters( 'mb_get_spam_post_status', 'spam' );
+}
+
+/**
+ * Returns the slug for the "orphan" post status.  Used by topics and replies by default.
+ *
+ * @note Not currently in use.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_orphan_post_status() {
+	return apply_filters( 'mb_get_orphan_post_status', 'orphan' );
+}
 
 /**
  * Returns an array of allowed post statuses for forums.
@@ -31,7 +103,8 @@ add_action( 'trash_to_close',   'mb_trash_to_close'   );
  * @return array
  */
 function mb_get_forum_post_statuses() {
-	return apply_filters( 'mb_get_forum_post_statuses', array( 'open', 'close', 'trash' ) );
+	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), 'trash' );
+	return apply_filters( 'mb_get_forum_post_statuses', $statuses );
 }
 
 /**
@@ -42,7 +115,8 @@ function mb_get_forum_post_statuses() {
  * @return array
  */
 function mb_get_topic_post_statuses() {
-	return apply_filters( 'mb_get_topic_post_statuses', array( 'open', 'close', 'spam', 'trash' ) );
+	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_spam_post_status(), 'trash' );
+	return apply_filters( 'mb_get_topic_post_statuses', $statuses );
 }
 
 /**
@@ -53,7 +127,8 @@ function mb_get_topic_post_statuses() {
  * @return array
  */
 function mb_get_reply_post_statuses() {
-	return apply_filters( 'mb_get_reply_post_statuses', array( 'publish', 'spam', 'trash' ) );
+	$statuses = array( 'publish', mb_get_spam_post_status(), 'trash' );
+	return apply_filters( 'mb_get_topic_post_statuses', $statuses );
 }
 
 /**
@@ -65,54 +140,49 @@ function mb_get_reply_post_statuses() {
  */
 function mb_register_post_statuses() {
 
-	/* forums, topics */
-	register_post_status(
-		'open',
-		array(
-			'label'                     => __( 'Open', 'message-board' ),
-			'label_count'               => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'message-board' ),
-			'public'                    => true,
-			'show_in_admin_status_list' => true,
-			'show_in_admin_all_list'    => true,
-		)
+	/* Open status args. */
+	$open_args = array(
+		'label'                     => __( 'Open', 'message-board' ),
+		'label_count'               => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'message-board' ),
+		'public'                    => true,
+		'show_in_admin_status_list' => true,
+		'show_in_admin_all_list'    => true,
 	);
 
-	/* forums, topics */
-	register_post_status(
-		'close',
-		array(
-			'label'                     => __( 'Closed', 'message-board' ),
-			'label_count'               => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'message-board' ),
-			'public'                    => true,
-			'show_in_admin_status_list' => true,
-			'show_in_admin_all_list'    => true,
-		)
+	/* Close status args. */
+	$close_args = array(
+		'label'                     => __( 'Closed', 'message-board' ),
+		'label_count'               => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'message-board' ),
+		'public'                    => true,
+		'show_in_admin_status_list' => true,
+		'show_in_admin_all_list'    => true,
 	);
 
-	/* topics, replies */
-	register_post_status(
-		'spam',
-		array(
-			'label'                     => __( 'Spam', 'message-board' ),
-			'label_count'               => _n_noop( 'Spam <span class="count">(%s)</span>', 'Spam <span class="count">(%s)</span>', 'message-board' ),
-			'public'                    => current_user_can( 'manage_forums' ) && !is_admin() ? true : false,
-			'exclude_from_search'       => true,
-			'show_in_admin_status_list' => true,
-			'show_in_admin_all_list'    => false,
-		)
+	/* Spam status args. */
+	$spam_args = array(
+		'label'                     => __( 'Spam', 'message-board' ),
+		'label_count'               => _n_noop( 'Spam <span class="count">(%s)</span>', 'Spam <span class="count">(%s)</span>', 'message-board' ),
+		'public'                    => current_user_can( 'manage_forums' ) && !is_admin() ? true : false,
+		'exclude_from_search'       => true,
+		'show_in_admin_status_list' => true,
+		'show_in_admin_all_list'    => false,
 	);
 
-	register_post_status(
-		'orphan',
-		array(
-			'label'                     => __( 'Orphan', 'message-board' ),
-			'label_count'               => _n_noop( 'Orphan <span class="count">(%s)</span>', 'Orphan <span class="count">(%s)</span>', 'message-board' ),
-			'public'                    => true,
-			'exclude_from_search'       => true,
-			'show_in_admin_status_list' => true,
-			'show_in_admin_all_list'    => false,
-		)
+	/* Orphan status args. */
+	$orphan_args = array(
+		'label'                     => __( 'Orphan', 'message-board' ),
+		'label_count'               => _n_noop( 'Orphan <span class="count">(%s)</span>', 'Orphan <span class="count">(%s)</span>', 'message-board' ),
+		'public'                    => true,
+		'exclude_from_search'       => true,
+		'show_in_admin_status_list' => true,
+		'show_in_admin_all_list'    => false,
 	);
+
+	/* Register post statuses. */
+	register_post_status( mb_get_open_post_status(),   $open_args   );
+	register_post_status( mb_get_close_post_status(),  $close_args  );
+	register_post_status( mb_get_spam_post_status(),   $spam_args   );
+	register_post_status( mb_get_orphan_post_status(), $orphan_args );
 }
 
 /**

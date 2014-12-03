@@ -124,9 +124,9 @@ final class Message_Board_Admin_Edit_Topics {
 
 				$status = get_post_status_object( get_post_status( $post_id ) );
 
-				if ( 'publish' === $status->name )
-					wp_update_post( array( 'ID' => $post_id, 'post_status' => 'open' ) );
-				
+				if ( mb_get_publish_post_status() === $status->name )
+					wp_update_post( array( 'ID' => $post_id, 'post_status' => mb_get_open_post_status() ) );
+
 				echo $status->label;
 
 				break;
@@ -207,7 +207,7 @@ final class Message_Board_Admin_Edit_Topics {
 			$view_action = $actions['view'];
 			unset( $actions['view'] );
 
-			if ( 'spam' !== get_query_var( 'post_status' ) )
+			if ( mb_get_spam_post_status() !== get_query_var( 'post_status' ) )
 				$actions['view'] = $view_action;
 		}
 
@@ -230,7 +230,7 @@ final class Message_Board_Admin_Edit_Topics {
 
 				$is_spam = mb_is_topic_spam( $topic_id );
 
-				$new_status = $is_spam ? 'publish' : 'spam';
+				$new_status = $is_spam ? mb_get_open_post_status() : mb_get_spam_post_status();
 
 				if ( $postarr['post_status'] !== $new_status ) {
 
@@ -261,7 +261,7 @@ final class Message_Board_Admin_Edit_Topics {
 
 				$is_closed = mb_is_topic_closed( $topic_id );
 
-				$new_status = $is_closed ? 'publish' : 'close';
+				$new_status = $is_closed ? mb_get_open_post_status() : mb_get_close_post_status();
 
 				if ( $postarr['post_status'] !== $new_status ) {
 
