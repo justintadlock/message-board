@@ -1,5 +1,29 @@
 <?php
 
+/**
+ * Checks if viewing the user archive page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_user_archive() {
+	return get_query_var( 'mb_custom' ) && 'users' === get_query_var( 'mb_custom' ) ? true : false;
+}
+
+/**
+ * Checks if viewing a single user page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_single_user() {
+	$is_user_page = get_query_var( 'mb_custom' ) && 'users' === get_query_var( 'mb_custom' ) ? true : false;
+
+	return $is_user_page && is_author() ? true : false;
+}
+
 function mb_get_users_per_page() {
 	return apply_filters( 'mb_get_users_per_page', 15 );
 }

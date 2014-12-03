@@ -11,45 +11,17 @@ add_filter( 'the_posts', 'mb_the_posts', 10, 2 );
  * @return bool
  */
 function mb_is_forum_front() {
-	global $wp;
-	return !mb_is_forum_search() && mb_get_root_slug() === $wp->request ? true : false;
-}
 
-/**
- * Checks if viewing the user archive page.
- *
- * @since  1.0.0
- * @access public
- * @return bool
- */
-function mb_is_user_archive() {
-	return get_query_var( 'mb_custom' ) && 'users' === get_query_var( 'mb_custom' ) ? true : false;
-}
+	$is_front = false;
+	$on_front = mb_get_show_on_front();
 
-/**
- * Checks if viewing a single user page.
- *
- * @since  1.0.0
- * @access public
- * @return bool
- */
-function mb_is_single_user() {
-	$is_user_page = get_query_var( 'mb_custom' ) && 'users' === get_query_var( 'mb_custom' ) ? true : false;
+	if ( 'forums' === $on_front && is_post_type_archive( mb_get_forum_post_type() ) )
+		$is_front = true;
 
-	return $is_user_page && is_author() ? true : false;
-}
+	elseif ( 'topics' === $on_front && is_post_type_archive( mb_get_topic_post_type() ) )
+		$is_front = true;
 
-/**
- * Checks if viewing the forum search page.
- *
- * @since  1.0.0
- * @access public
- * @return bool
- */
-function mb_is_forum_search() {
-	global $wp;
-
-	return is_search() && mb_get_root_slug() === $wp->request ? true : false;
+	return apply_filters( 'mb_is_forum_front', $is_front );
 }
 
 /**
@@ -268,7 +240,7 @@ function mb_the_posts( $posts, $query ) {
  */
 function mb_recursively_flatten_list( $list, &$result ) {
 
-	foreach( $list as $node ) {
+	foreach ( $list as $node ) {
 		$result[] = $node['post'];
 
 		if ( isset( $node['children'] ) ) {
@@ -350,7 +322,12 @@ function mb_the_posts_stickies( $posts, $sticky_posts ) {
  */
 function mb_parse_query( $query ) {
 
-	if ( mb_is_forum_front() ) {
+	if ( mb_is_forum_search() ) {
+		$query->is_404        = false;
+		$query->is_front_page = false;
+		$query->is_home       = false;
+		$query->is_post_type_archive = false;
+	} elseif ( mb_is_forum_front() ) {
 		$query->is_404 = false;
 		$query->is_home = false;
 	} elseif ( mb_is_user_view() ) {
@@ -374,13 +351,5 @@ function mb_404_override() {
 		$wp_query->is_404        = false;
 		$wp_query->is_front_page = false;
 		$wp_query->is_home       = false;
-	}
-
-	elseif ( mb_is_forum_search() ) {
-		status_header( 200 );
-		$wp_query->is_404        = false;
-		$wp_query->is_front_page = false;
-		$wp_query->is_home       = false;
-		$wp_query->is_post_type_archive = false;
 	}
 }

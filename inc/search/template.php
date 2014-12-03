@@ -1,6 +1,19 @@
 <?php
 
 /**
+ * Checks if viewing the forum search page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_forum_search() {
+	global $wp;
+
+	return is_search() && mb_get_root_slug() === $wp->request ? true : false;
+}
+
+/**
  *
  * @since  1.0.0
  * @access public
