@@ -1040,9 +1040,10 @@ function mb_topic_form() {
 		$default_fields['forum'] .= sprintf( '<label for="mb_topic_forum">%s</label>', __( 'Select a forum:', 'message-board' ) );
 		$default_fields['forum'] .= mb_dropdown_forums(
 			array(
-				'name' => 'mb_topic_forum',
-				'id'   => 'mb_topic_forum',
-				'echo' => false
+				'child_type' => mb_get_topic_post_type(),
+				'name'       => 'mb_topic_forum',
+				'id'         => 'mb_topic_forum',
+				'echo'       => false
 			)
 		);
 		$default_fields['forum'] .= '</select>';

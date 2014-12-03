@@ -110,9 +110,9 @@ function mb_forum_submit_meta_box( $post, $args = array() ) {
 
 			<div id="publishing-action">
 				<span class="spinner"></span>
-				<?php if ( ( 'publish' !== $post->post_status && 'close' !== $post->post_status ) || 0 == $post->ID ) : ?>
+				<?php if ( ( 'open' !== $post->post_status && 'close' !== $post->post_status && 'publish' !== $post->post_status ) || 0 == $post->ID ) : ?>
 					<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Publish', 'message-board' ) ?>" />
-					<?php submit_button( __( 'Publish', 'message-board' ), 'primary button-large', 'publish', false, array( 'accesskey' => 'p' ) ); ?>
+					<?php submit_button( __( 'Publish', 'message-board' ), 'primary button-large', 'mb-publish', false, array( 'accesskey' => 'p' ) ); ?>
 				<?php else : ?>
 					<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Update', 'message-board' ) ?>" />
 					<input name="save" type="submit" class="button button-primary button-large" id="publish" accesskey="p" value="<?php esc_attr_e( 'Update', 'message-board' ) ?>" />

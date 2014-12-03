@@ -735,6 +735,7 @@ function mb_forum_pagination( $args = array() ) {
 function mb_dropdown_forums( $args = array() ) {
 
 	$defaults = array(
+		'child_type'  => mb_get_forum_post_type(),
 		'post_type'   => mb_get_forum_post_type(),
 		'post_status' => array( 'open', 'publish', 'close' ),
 		'walker'      => new MB_Walker_Forum_Dropdown,
@@ -766,7 +767,7 @@ class MB_Walker_Forum_Dropdown extends Walker_PageDropdown {
 		if ( $page->ID == $args['selected'] )
 			$output .= ' selected="selected"';
 
-		if ( !in_array( $page->post_status, array( 'open', 'publish' ) ) || false === $forum_type->topics_allowed )
+		if ( mb_get_forum_post_type() !== $args['child_type'] && ( !in_array( $page->post_status, array( 'open', 'publish' ) ) || false === $forum_type->topics_allowed ) )
 			$output .= ' disabled="disabled"';
 		$output .= '>';
 
