@@ -222,12 +222,20 @@ final class Message_Board {
 
 		/* Load admin files. */
 		if ( is_admin() ) {
+
+			/* Common admin files. */
 			require_once( $this->dir_path . 'admin/admin.php' );
+			require_once( $this->dir_path . 'admin/meta-boxes.php' );
+
+			/* Edit posts screen files. */
 			require_once( $this->dir_path . 'admin/edit-forums.php' );
 			require_once( $this->dir_path . 'admin/edit-topics.php' );
 			require_once( $this->dir_path . 'admin/edit-replies.php' );
+
+			/* Post screen files. */
 			require_once( $this->dir_path . 'admin/post-forum.php' );
-			require_once( $this->dir_path . 'admin/meta-boxes.php' );
+			require_once( $this->dir_path . 'admin/post-topic.php' );
+			require_once( $this->dir_path . 'admin/post-reply.php' );
 		}
 	}
 

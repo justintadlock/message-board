@@ -13,6 +13,13 @@
 	padding: 0;
 }
 
+#mb-submitdiv input[type="radio"],
+#mb-forum-attributes input[type="radio"],
+#mb-topic-attributes input[type="radio"] {
+	margin:         2px 3px 5px 0;
+	vertical-align: middle;
+}
+
 /* ====== Edit Posts List Screen (edit.php) ====== */
 
 .edit-php .wp-list-table .column-forum,

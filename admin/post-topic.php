@@ -1,6 +1,6 @@
 <?php
 
-final class Message_Board_Admin_Post_Forum {
+final class Message_Board_Admin_Post_Topic {
 
 	/**
 	 * Holds the instances of this class.
@@ -33,7 +33,7 @@ final class Message_Board_Admin_Post_Forum {
 	function load_post() {
 		$screen = get_current_screen();
 
-		if ( empty( $screen->post_type ) || $screen->post_type !== mb_get_forum_post_type() )
+		if ( empty( $screen->post_type ) || $screen->post_type !== mb_get_topic_post_type() )
 			return;
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'print_styles' ) );
@@ -71,8 +71,8 @@ final class Message_Board_Admin_Post_Forum {
 		/* Add custom submit meta box. */
 		add_meta_box( 'mb-submitdiv', __( 'Publish', 'message-board' ), 'mb_submit_meta_box', $post->post_type, 'side', 'core' );
 
-		/* Add the forum attributes meta box. */
-		add_meta_box( 'mb-forum-attributes', __( 'Forum Attributes', 'message-board' ), 'mb_forum_attributes_meta_box', $post->post_type, 'side', 'core' );
+		/* Add topic attributes meta box. */
+		add_meta_box( 'mb-topic-attributes', __( 'Topic Attributes', 'message-board' ), 'mb_topic_attributes_meta_box', $post->post_type, 'side', 'core' );
 	}
 
 	/**
@@ -90,36 +90,38 @@ final class Message_Board_Admin_Post_Forum {
 		if ( !is_object( $post ) )
 			$post = get_post();
 
-		if ( mb_get_forum_post_type() !== $post->post_type )
+		if ( mb_get_topic_post_type() !== $post->post_type )
 			return;
 
-		if ( !isset( $_POST['mb_forum_attr_nonce'] ) || !wp_verify_nonce( $_POST['mb_forum_attr_nonce'], '_mb_forum_attr_nonce' ) )
+		if ( !isset( $_POST['mb_topic_attr_nonce'] ) || !wp_verify_nonce( $_POST['mb_topic_attr_nonce'], '_mb_topic_attr_nonce' ) )
 			return;
 
-		/* Return here if the template is not set. There's a chance it won't be if the post type doesn't have any templates. */
-		if ( !isset( $_POST['mb_forum_type'] ) )
-			return;
+		$super_stickies = get_option( 'mb_super_sticky_topics', array() );
+		$topic_stickies = get_option( 'mb_sticky_topics',       array() );
 
-		/* Get the posted meta value. */
-		$new_meta_value = $_POST['mb_forum_type'];
+		$is_sticky = $_POST['mb-topic-sticky'];
 
-		/* Set the $meta_key variable based off the post type name. */
-		$meta_key = "_forum_type";
+		if ( 'super-sticky' === $is_sticky && !in_array( $post_id, $super_stickies ) ) {
+			$super_stickies[] = $post_id;
+			update_option( 'mb_super_sticky_topics', $super_stickies );
+		}
 
-		/* Get the meta value of the meta key. */
-		$meta_value = get_post_meta( $post_id, $meta_key, true );
+		if ( 'sticky' === $is_sticky && !in_array( $post_id, $topic_stickies ) ) {
+			$topic_stickies[] = $post_id;
+			update_option( 'mb_sticky_topics', $topic_stickies );
+		}
 
-		/* If there is no new meta value but an old value exists, delete it. */
-		if ( current_user_can( 'delete_post_meta', $post_id ) && '' == $new_meta_value && $meta_value )
-			delete_post_meta( $post_id, $meta_key, $meta_value );
+		if ( 'super-sticky' !== $is_sticky && in_array( $post_id, $super_stickies ) ) {
+			$key = array_search( $post_id, $super_stickies );
+			unset( $super_stickies[ $key ] );
+			update_option( 'mb_super_sticky_topics', $super_stickies );
+		}
 
-		/* If a new meta value was added and there was no previous value, add it. */
-		elseif ( current_user_can( 'add_post_meta', $post_id, $meta_key ) && $new_meta_value && '' == $meta_value )
-			add_post_meta( $post_id, $meta_key, $new_meta_value, true );
-
-		/* If the new meta value does not match the old value, update it. */
-		elseif ( current_user_can( 'edit_post_meta', $post_id ) && $new_meta_value && $new_meta_value != $meta_value )
-			update_post_meta( $post_id, $meta_key, $new_meta_value );
+		if ( 'sticky' !== $is_sticky && in_array( $post_id, $topic_stickies ) ) {
+			$key = array_search( $post_id, $topic_stickies );
+			unset( $topic_stickies[ $key ] );
+			update_option( 'mb_sticky_topics', $topic_stickies );
+		}
 	}
 
 	/**
@@ -138,4 +140,4 @@ final class Message_Board_Admin_Post_Forum {
 	}
 }
 
-Message_Board_Admin_Post_Forum::get_instance();
+Message_Board_Admin_Post_Topic::get_instance();

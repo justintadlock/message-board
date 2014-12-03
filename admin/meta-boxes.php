@@ -1,46 +1,113 @@
 <?php
 
-/* Hook meta box to just the 'place' post type. */
-add_action( 'add_meta_boxes_forum', 'my_add_meta_boxes' );
-add_action( 'add_meta_boxes_forum_reply', 'my_add_meta_boxes' );
-add_action( 'add_meta_boxes_forum_topic', 'my_add_meta_boxes' );
+/**
+ * Custom `submitdiv` meta box.  This replaces the WordPress default because it has too many things 
+ * hardcoded that we cannot overwrite, particularly dealing with post statuses.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  object  $post
+ * @param  array   $args
+ * @return void
+ */
+function mb_submit_meta_box( $post, $args = array() ) {
+	global $action;
 
-/* Creates the meta box. */
-function my_add_meta_boxes( $post ) {
+	$post_type = $post->post_type;
+	$post_type_object = get_post_type_object( $post_type );
 
-	add_meta_box(
-		'mb-forum-attributes',
-		__( 'Forum Attributes', 'message-board' ),
-		'mb_forum_attributes_meta_box',
-		'forum',
-		'side',
-		'core'
-	);
+	if ( $post_type === mb_get_forum_post_type() )
+		$avail_statuses = mb_get_forum_post_statuses();
+	elseif ( $post_type === mb_get_topic_post_type() )
+		$avail_statuses = mb_get_topic_post_statuses();
+	else
+		$avail_statuses = mb_get_reply_post_statuses();
 
+	$can_publish = current_user_can( $post_type_object->cap->publish_posts ); ?>
 
-    add_meta_box(
-        'mb-reply-parent',
-        __( 'Parent Topic', 'message-board' ),
-        'mb_reply_parent_meta_box',
-        'forum_reply',
-        'side',
-        'core'
-    );
+	<div class="submitbox" id="submitpost">
 
-    add_meta_box(
-        'mb-topic-parent',
-        __( 'Forum', 'message-board' ),
-        'mb_topic_parent_meta_box',
-        'forum_topic',
-        'side',
-        'core'
-    );
-}
+		<div id="minor-publishing">
 
-/* Displays the meta box. */
+			<div style="display:none;">
+				<?php submit_button( __( 'Save', 'message-board' ), 'button', 'save' ); ?>
+			</div>
+
+			<div id="minor-publishing-actions">
+				<div class="clear"></div>
+			</div><!-- #minor-publishing-actions -->
+
+			<div id="misc-publishing-actions">
+
+				<div class="misc-pub-section misc-pub-post-status">
+
+					<div id="post-status-select">
+						<input type="hidden" name="hidden_post_status" id="hidden_post_status" value="<?php echo esc_attr( ('auto-draft' == $post->post_status ) ? 'draft' : $post->post_status); ?>" />
+							<?php foreach ( $avail_statuses as $status ) : ?>
+								<?php if ( 'trash' !== $status ) : // @todo - Better handling of next line. ?>
+									<?php $post_status = in_array( $post->post_status, $avail_statuses ) ? $post->post_status : 'open'; ?>
+									<?php $status_object = get_post_status_object( $status ); ?>
+									<label class="<?php echo esc_attr( $status ); ?>">
+									<input type="radio" value="<?php echo esc_attr( $status ); ?>"<?php checked( $post_status, $status ); ?> /> <?php echo $status_object->label; ?>
+									<br />
+								<?php endif; ?>
+							<?php endforeach; ?>
+					</div><!-- #post-status-select -->
+
+				</div><!-- .misc-pub-section -->
+
+				<?php do_action( 'post_submitbox_misc_actions' ); ?>
+
+			</div><!-- #misc-publishing-actions -->
+
+			<div class="clear"></div>
+
+		</div><!-- #minor-publishing -->
+
+		<div id="major-publishing-actions">
+
+			<?php do_action( 'post_submitbox_start' ); ?>
+
+			<div id="delete-action">
+				<?php if ( current_user_can( 'delete_post', $post->ID ) ) :
+					if ( !EMPTY_TRASH_DAYS ) :
+						$delete_text = __( 'Delete Permanently', 'message-board' );
+					else :
+						$delete_text = __( 'Move to Trash', 'message-board' );
+					endif; ?>
+					<a class="submitdelete deletion" href="<?php echo get_delete_post_link( $post->ID ); ?>"><?php echo $delete_text; ?></a>
+				<?php endif; ?>
+			</div><!-- #delete-action -->
+
+			<div id="publishing-action">
+				<span class="spinner"></span>
+				<?php if ( ( 'open' !== $post->post_status && 'close' !== $post->post_status && 'publish' !== $post->post_status ) || 0 == $post->ID ) : ?>
+					<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Publish', 'message-board' ) ?>" />
+					<?php submit_button( __( 'Publish', 'message-board' ), 'primary button-large', 'mb-publish', false, array( 'accesskey' => 'p' ) ); ?>
+				<?php else : ?>
+					<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Update', 'message-board' ) ?>" />
+					<input name="save" type="submit" class="button button-primary button-large" id="publish" accesskey="p" value="<?php esc_attr_e( 'Update', 'message-board' ) ?>" />
+				<?php endif; ?>
+			</div><!-- #publishing-action -->
+
+			<div class="clear"></div>
+
+		</div><!-- #major-publishing-actions -->
+
+	</div><!-- #submitpost -->
+<?php }
+
+/**
+ * Forum attribute meta box.  This handles the forum type, parent, and menu order.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  object  $post
+ * @return void
+ */
 function mb_forum_attributes_meta_box( $post ) {
 
-	wp_nonce_field( basename( __FILE__ ), 'mb_forum_data_nonce' );
+	wp_nonce_field( '_mb_forum_attr_nonce', 'mb_forum_attr_nonce' );
 
 	$forum_types = mb_get_forum_type_objects(); ?>
 
@@ -66,7 +133,7 @@ function mb_forum_attributes_meta_box( $post ) {
 			array(
 				'name'              => 'parent_id',
 				'id'                => 'mb_parent_forum',
-				'show_option_none'  => __( '&ndash;&ndash; No Parent &ndash;&ndash;', 'message-board' ),
+				'show_option_none'  => __( '(no parent)', 'message-board' ),
 				'option_none_value' => 0,
 				'selected'          => $post->post_parent
 			)
@@ -81,131 +148,28 @@ function mb_forum_attributes_meta_box( $post ) {
 	</p><?php
 }
 
-/* Displays the meta box. */
-function mb_topic_parent_meta_box( $post ) {
+/**
+ * Topic attributes meta box.  This handles whether the topic is sticky and the parent forum.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  object  $post
+ * @return void
+ */
+function mb_topic_attributes_meta_box( $post ) {
 
-    $parents = get_posts(
-        array(
-            'post_type'   => 'forum', 
-            'orderby'     => 'title', 
-            'order'       => 'ASC', 
-            'numberposts' => -1 
-        )
-    );
+	wp_nonce_field( '_mb_topic_attr_nonce', 'mb_topic_attr_nonce' );
 
-    if ( !empty( $parents ) ) {
-
-        echo '<select name="parent_id" class="widefat">'; // !Important! Don't change the 'parent_id' name attribute.
-
-        foreach ( $parents as $parent ) {
-            printf( '<option value="%s"%s>%s</option>', esc_attr( $parent->ID ), selected( $parent->ID, $post->post_parent, false ), esc_html( $parent->post_title ) );
-        }
-
-        echo '</select>';
-    }
-}
-
-// @todo - only load on edit forum screen.
-add_action( 'save_post', 'mb_meta_box_save_forum_data', 10, 2 );
-
-function mb_meta_box_save_forum_data( $post_id, $post = '' ) {
-
-	/* Fix for attachment save issue in WordPress 3.5. @link http://core.trac.wordpress.org/ticket/21963 */
-	if ( !is_object( $post ) )
-		$post = get_post();
-
-	if ( mb_get_forum_post_type() !== $post->post_type )
-		return;
-
-	/* Verify the nonce before proceeding. */
-	if ( !isset( $_POST['mb_forum_data_nonce'] ) || !wp_verify_nonce( $_POST['mb_forum_data_nonce'], basename( __FILE__ ) ) )
-		return;
-
-	/* Return here if the template is not set. There's a chance it won't be if the post type doesn't have any templates. */
-	if ( !isset( $_POST['mb_forum_type'] ) )
-		return;
-
-	/* Get the posted meta value. */
-	$new_meta_value = $_POST['mb_forum_type'];
-
-	/* Set the $meta_key variable based off the post type name. */
-	$meta_key = "_forum_type";
-
-	/* Get the meta value of the meta key. */
-	$meta_value = get_post_meta( $post_id, $meta_key, true );
-
-	/* If there is no new meta value but an old value exists, delete it. */
-	if ( current_user_can( 'delete_post_meta', $post_id ) && '' == $new_meta_value && $meta_value )
-		delete_post_meta( $post_id, $meta_key, $meta_value );
-
-	/* If a new meta value was added and there was no previous value, add it. */
-	elseif ( current_user_can( 'add_post_meta', $post_id, $meta_key ) && $new_meta_value && '' == $meta_value )
-		add_post_meta( $post_id, $meta_key, $new_meta_value, true );
-
-	/* If the new meta value does not match the old value, update it. */
-	elseif ( current_user_can( 'edit_post_meta', $post_id ) && $new_meta_value && $new_meta_value != $meta_value )
-		update_post_meta( $post_id, $meta_key, $new_meta_value );
-}
-
-/* Displays the meta box. */
-function mb_reply_parent_meta_box( $post ) {
-
-    $parents = get_posts(
-        array(
-            'post_type'   => 'forum_topic', 
-            'orderby'     => 'title', 
-            'order'       => 'ASC', 
-            'numberposts' => -1 
-        )
-    );
-
-    if ( !empty( $parents ) ) {
-
-        echo '<select name="parent_id" class="widefat">'; // !Important! Don't change the 'parent_id' name attribute.
-
-        foreach ( $parents as $parent ) {
-            printf( '<option value="%s"%s>%s</option>', esc_attr( $parent->ID ), selected( $parent->ID, $post->post_parent, false ), esc_html( $parent->post_title ) );
-        }
-
-        echo '</select>';
-    }
-}
-
-
-/* Set up the admin functionality. */
-add_action( 'admin_menu', 'mb_admin_setup' );
-
-function mb_admin_setup() {
-
-	/* Custom columns on the edit portfolio items screen. */
-	//add_filter( 'manage_edit-portfolio_item_columns', 'ccp_edit_portfolio_item_columns' );
-	//add_action( 'manage_portfolio_item_posts_custom_column', 'ccp_manage_portfolio_item_columns', 10, 2 );
-
-	/* Add meta boxes an save metadata. */
-	add_action( 'add_meta_boxes', 'mb_add_meta_boxes'             );
-	add_action( 'save_post',      'mb_topic_meta_box_save', 10, 2 );
-}
-
-function mb_add_meta_boxes( $post_type ) {
-
-	if ( 'forum_topic' === $post_type ) {
-
-		add_meta_box( 'mb-topic-info', __( 'Topic Info', 'message-board' ), 'mb_meta_box_topic_info', $post_type, 'side', 'core' );
-	}
-}
-
-function mb_meta_box_topic_info( $post, $metabox ) {
-
-	wp_nonce_field( basename( __FILE__ ), 'mb-meta-box-topic-info-nonce' );
+	$forum_type_object = get_post_type_object( mb_get_forum_post_type() );
 
 	$super_stickies = get_option( 'mb_super_sticky_topics', array() );
 	$topic_stickies = get_option( 'mb_sticky_topics',       array() );
-	$all_stickies   = array_merge( $super_stickies, $topic_stickies );
-
-	?>
+	$all_stickies   = array_merge( $super_stickies, $topic_stickies ); ?>
 
 	<p>
-		<strong><?php _e( 'Sticky Topic', 'message-board' ); ?></strong><br />
+		<strong><?php _e( 'Sticky Status:', 'message-board' ); ?></strong>
+	</p>
+	<p>
 		<label>
 			<input type="radio" name="mb-topic-sticky" value="" <?php checked( !in_array( $post->ID, $all_stickies ) ); ?> /> 
 			<?php _e( 'Not Sticky', 'message-board' ); ?>
@@ -221,51 +185,22 @@ function mb_meta_box_topic_info( $post, $metabox ) {
 			<?php _e( 'Super Sticky', 'message-board' ); ?>
 		</label>
 	</p>
-	<?php
 
-	/* Allow devs to hook in their own stuff here. */
-	do_action( 'mb_meta_box_topic_info', $post, $metabox );
+	<p>
+		<label id="mb_parent_forum">
+			<strong><?php echo $forum_type_object->labels->singular_name; ?></strong>
+		</label>
+	</p>
+	<p>
+		<?php mb_dropdown_forums(
+			array(
+				'child_type'        => mb_get_topic_post_type(),
+				'name'              => 'parent_id',
+				'id'                => 'mb_parent_forum',
+				'show_option_none'  => __( '&ndash;&ndash; No Parent &ndash;&ndash;', 'message-board' ),
+				'option_none_value' => 0,
+				'selected'          => $post->post_parent
+			)
+		); ?>
+	</p><?php
 }
-
-function mb_topic_meta_box_save( $post_id, $post ) {
-
-	if ( !isset( $_POST['mb-meta-box-topic-info-nonce'] ) || !wp_verify_nonce( $_POST['mb-meta-box-topic-info-nonce'], basename( __FILE__ ) ) )
-		return;
-
-	if ( 'forum_topic' !== $post->post_type )
-		return;
-
-	$super_stickies = get_option( 'mb_super_sticky_topics', array() );
-	$topic_stickies = get_option( 'mb_sticky_topics',       array() );
-
-	$is_sticky = $_POST['mb-topic-sticky'];
-
-	if ( 'super-sticky' === $is_sticky && !in_array( $post_id, $super_stickies ) ) {
-		$super_stickies[] = $post_id;
-		update_option( 'mb_super_sticky_topics', $super_stickies );
-	}
-
-	if ( 'sticky' === $is_sticky && !in_array( $post_id, $topic_stickies ) ) {
-		$topic_stickies[] = $post_id;
-		update_option( 'mb_sticky_topics', $topic_stickies );
-	}
-
-	if ( 'super-sticky' !== $is_sticky && in_array( $post_id, $super_stickies ) ) {
-		$key = array_search( $post_id, $super_stickies );
-		unset( $super_stickies[ $key ] );
-		update_option( 'mb_super_sticky_topics', $super_stickies );
-	}
-
-	if ( 'sticky' !== $is_sticky && in_array( $post_id, $topic_stickies ) ) {
-		$key = array_search( $post_id, $topic_stickies );
-		unset( $topic_stickies[ $key ] );
-		update_option( 'mb_sticky_topics', $topic_stickies );
-	}
-
-
-}
-
-
-
-
-
