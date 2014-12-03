@@ -125,31 +125,6 @@ function mb_rewrite_rules() {
 	add_rewrite_rule( $login_slug . '/?$', 'index.php?mb_custom=login', 'top' );
 }
 
-function mb_forum_rewrite_rules( $rules ) {
-
-	return $rules;
-
-	/**
-	$forum_slug = mb_get_forum_slug();
-
-	$rules = array(
-		$forum_slug . '/.+?/attachment/([^/]+)/?$' => 'index.php?attachment=$matches[1]',
-		$forum_slug . '/.+?/attachment/([^/]+)/trackback/?$' => 'index.php?attachment=$matches[1]&tb=1',
-		$forum_slug . '/.+?/attachment/([^/]+)/feed/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?attachment=$matches[1]&feed=$matches[2]',
-		$forum_slug . '/.+?/attachment/([^/]+)/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?attachment=$matches[1]&feed=$matches[2]',
-		$forum_slug . '/.+?/attachment/([^/]+)/comment-page-([0-9]{1,})/?$' => 'index.php?attachment=$matches[1]&cpage=$matches[2]',
-	//	$forum_slug . '/(.+?)/trackback/?$' => 'index.php?forum=$matches[1]&tb=1',
-		$forum_slug . '/(.+?)/feed/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?forum=$matches[1]&feed=$matches[2]',
-		$forum_slug . '/(.+?)/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?forum=$matches[1]&feed=$matches[2]',
-		$forum_slug . '/(.+?)/page/?([0-9]{1,})/?$' => 'index.php?forum=$matches[1]&paged=$matches[2]',
-	//	$forum_slug . '/(.+?)/comment-page-([0-9]{1,})/?$' => 'index.php?forum=$matches[1]&cpage=$matches[2]',
-		$forum_slug . '/(.+?)(/[0-9]+)?/?$' => 'index.php?forum=$matches[1]&page=$matches[2]',
-	);
-	/**/
-
-	return $rules;
-}
-
 /**
  * Overwrites the rewrite rules for the `forum_topic` post type.  In particular, we need to handle the 
  * pagination on singular topics because the `forum_reply` post type is paginated on this page.
