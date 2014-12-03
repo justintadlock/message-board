@@ -12,7 +12,7 @@ add_filter( 'the_posts', 'mb_the_posts', 10, 2 );
  */
 function mb_is_forum_front() {
 	global $wp;
-	return mb_get_root_slug() === $wp->request ? true : false;
+	return !mb_is_forum_search() && mb_get_root_slug() === $wp->request ? true : false;
 }
 
 /**
@@ -47,15 +47,9 @@ function mb_is_single_user() {
  * @return bool
  */
 function mb_is_forum_search() {
+	global $wp;
 
-	if ( is_search() && $type = get_query_var( 'post_type' ) ) {
-
-		$type = is_array( $type ) ? $type : array( $type );
-
-		return in_array( mb_get_topic_post_type(), $type ) || in_array( mb_get_reply_post_type(), $type ) ? true : false;
-	}
-
-	return false;
+	return is_search() && mb_get_root_slug() === $wp->request ? true : false;
 }
 
 /**
@@ -190,6 +184,13 @@ function mb_pre_get_posts( $query ) {
 			$query->set( 'order',          'DESC'                    );
 			$query->set( 'orderby',        'date'                    );
 		}
+	}
+
+	elseif ( !is_admin() && $query->is_main_query() && mb_is_forum_search() ) {
+
+		$query->set( 'post_type',      array( mb_get_forum_post_type(), mb_get_topic_post_type(), mb_get_reply_post_type() ) );
+		$query->set( 'post_status',    array( 'open', 'publish', 'close' ) );
+		$query->set( 'posts_per_page', mb_get_topics_per_page()    );
 	}
 }
 
@@ -373,5 +374,13 @@ function mb_404_override() {
 		$wp_query->is_404        = false;
 		$wp_query->is_front_page = false;
 		$wp_query->is_home       = false;
+	}
+
+	elseif ( mb_is_forum_search() ) {
+		status_header( 200 );
+		$wp_query->is_404        = false;
+		$wp_query->is_front_page = false;
+		$wp_query->is_home       = false;
+		$wp_query->is_post_type_archive = false;
 	}
 }

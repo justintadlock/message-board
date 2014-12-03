@@ -127,7 +127,7 @@ function mb_is_single_forum( $forum = '' ) {
 }
 
 function mb_is_forum_archive() {
-	return is_post_type_archive( mb_get_forum_post_type() );
+	return mb_is_forum_search() ? false : is_post_type_archive( mb_get_forum_post_type() );
 }
 
 /* ====== Forum Type ====== */

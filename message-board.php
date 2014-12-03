@@ -216,6 +216,9 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/user/functions.php' );
 		require_once( $this->dir_path . 'inc/user/template.php'  );
 
+		/* Load search files. */
+		require_once( $this->dir_path . '/inc/search/template.php' );
+
 		/* Templates. */
 		require_once( $this->dir_path . 'inc/template-hierarchy.php' );
 		require_once( $this->dir_path . 'inc/template.php'           );
