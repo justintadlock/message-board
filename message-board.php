@@ -224,13 +224,13 @@ final class Message_Board {
 		if ( is_admin() ) {
 
 			/* Common admin files. */
-			require_once( $this->dir_path . 'admin/admin.php' );
+			require_once( $this->dir_path . 'admin/admin.php'      );
 			require_once( $this->dir_path . 'admin/meta-boxes.php' );
 
 			/* Edit posts screen files. */
-			require_once( $this->dir_path . 'admin/edit-forums.php' );
-			require_once( $this->dir_path . 'admin/edit-topics.php' );
-			require_once( $this->dir_path . 'admin/edit-replies.php' );
+			require_once( $this->dir_path . 'admin/edit-forum.php' );
+			require_once( $this->dir_path . 'admin/edit-topic.php' );
+			require_once( $this->dir_path . 'admin/edit-reply.php' );
 
 			/* Post screen files. */
 			require_once( $this->dir_path . 'admin/post-forum.php' );
