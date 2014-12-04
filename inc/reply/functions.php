@@ -1,6 +1,103 @@
 <?php
 
+/* Filter the reply permalink. */
 add_filter( 'post_type_link', 'mb_reply_post_type_link', 10, 2 );
+
+/**
+ * Inserts a new reply and adds/updates metadata.  This is a wrapper for the `wp_insert_post()` function 
+ * and should be used in its place where possible.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $args
+ * @return int|WP_Error
+ */
+function mb_insert_reply( $args = array() ) {
+
+	/* Convert date. */
+	$post_date  = current_time( 'mysql' );
+	$post_epoch = mysql2date( 'U', $post_date );
+
+	/* Set up the defaults. */
+	$defaults = array(
+		'menu_order'   => 0,
+		'post_parent'  => 0,
+		'post_date'    => $post_date,
+		'post_author'  => get_current_user_id(),
+		'post_status'  => mb_get_publish_post_status(),
+	);
+
+	/* Allow devs to filter the defaults. */
+	$defaults = apply_filters( 'mb_insert_reply_defaults', $defaults );
+
+	/* Parse the args/defaults and apply filters. */
+	$args = apply_filters( 'mb_insert_reply_args', wp_parse_args( $args, $defaults ) );
+
+	/* Always make sure it's the correct post type. */
+	$args['post_type'] = mb_get_reply_post_type();
+
+	/* If there's no topic, what are we replying to? */
+	if ( 0 >= $args['post_parent'] )
+		return false;
+
+	/* If there's no `menu_order` set, add it. */
+	if ( 0 >= $args['menu_order'] )
+		$args['menu_order'] = absint( mb_get_topic_reply_count( $args['post_parent'] ) ) + 1;
+
+	/* Insert the topic. */
+	$published = wp_insert_post( $args );
+
+	/* If the post was published. */
+	if ( $published && !is_wp_error( $published ) ) {
+
+		/* Get the some IDs. */
+		$user_id  = mb_get_user_id(        $args['post_author'] );
+		$reply_id = mb_get_reply_id(       $published           );
+		$topic_id = mb_get_topic_id(       $args['post_parent'] );
+		$forum_id = mb_get_topic_forum_id( $topic_id            );
+
+		/* Update user meta. */
+		$topic_count = mb_get_user_topic_count( $user_id );
+		update_user_meta( $user_id, mb_get_user_topic_count_meta_key(), $topic_count + 1 );
+
+		/* Update reply meta. */
+		update_post_meta( $reply_id, mb_get_reply_forum_id_meta_key(), $forum_id );
+
+		/* Update topic menu order. */
+		wp_insert_post( array( 'ID' => $topic_id, 'menu_order' => $post_epoch ) );
+
+		/* Update topic meta. */
+		update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(),       $post_date  );
+		update_post_meta( $topic_id, mb_get_topic_activity_datetime_epoch_meta_key(), $post_epoch );
+		update_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key(),           $published  );
+
+		$voices = mb_get_topic_voices( $topic_id );
+
+		if ( empty( $voices ) || !in_array( $user_id, $voices ) ) {
+			$voices = mb_set_topic_voices( $topic_id );
+			update_post_meta( $topic_id, mb_get_topic_voice_count_meta_key(), count( $voices ) + 1 );
+		}
+
+		$count = get_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), true );
+		update_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), absint( $count ) + 1 );
+
+		/* Update forum meta. */
+		update_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key(),       $post_date );
+		update_post_meta( $forum_id, mb_get_forum_activity_datetime_epoch_meta_key(), mysql2date( 'U', $post_date ) );
+		update_post_meta( $forum_id, mb_get_forum_last_reply_id_meta_key(),           $published );
+		update_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(),           $topic_id );
+
+		$reply_count = get_post_meta( $forum_id, mb_get_forum_reply_count_meta_key(), true );
+		update_post_meta( $forum_id, mb_get_forum_reply_count_meta_key(), absint( $reply_count ) + 1 );
+
+		/* Notify subscribers. */
+		mb_notify_topic_subscribers( $topic_id, $reply_id );
+		//mb_notify_forum_subscribers();
+	}
+
+	/* Return the result of `wp_insert_post()`. */
+	return $published;
+}
 
 function mb_reply_post_type_link( $link, $post ) {
 

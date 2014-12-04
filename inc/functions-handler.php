@@ -167,27 +167,16 @@ function mb_handler_new_reply() {
 	$post_content = force_balance_tags( $post_content );
 	$post_content = mb_filter_post_kses( $post_content );
 
-	/* Post Date. */
-	$post_date = current_time( 'mysql' );
-
-	/* Reply position. */
-	$position = absint( mb_get_topic_reply_count( $topic_id ) ) + 1;
-
-	/* Publish a new forum topic. */
-	$published = wp_insert_post(
+	/* Publish a new reply. */
+	$published = mb_insert_reply(
 		array(
-			'post_date'    => $post_date,
-			'post_author'  => absint( $user_id ),
 			'post_content' => $post_content,
 			'post_parent'  => $topic_id,
-			'post_status'  => mb_get_publish_post_status(),
-			'post_type'    => mb_get_reply_post_type(),
-			'menu_order'   => $position
 		)
 	);
 
 	/* If the post was published. */
-	if ( $published ) {
+	if ( $published && !is_wp_error( $published ) ) {
 
 		/* If the user chose to subscribe to the topic. */
 		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] ) {
@@ -199,53 +188,6 @@ function mb_handler_new_reply() {
 				mb_set_topic_subscribers( $topic_id );
 			}
 		}
-
-		/* Update user meta. */
-		$topic_count = mb_get_user_topic_count( $user_id );
-		update_user_meta( absint( $user_id ), mb_get_user_topic_count_meta_key(), $topic_count + 1 );
-
-		/* Update topic. */
-
-		$old_topic               = get_post( $topic_id, 'ARRAY_A' );
-		$old_topic['menu_order'] = mysql2date( 'U', $post_date );
-		$old_topic['ID']         = $topic_id;
-
-		wp_insert_post( $old_topic );
-
-		/* Update forum meta. */
-
-		$forum_id = mb_get_topic_forum_id( $topic_id );
-
-		update_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key(),       $post_date );
-		update_post_meta( $forum_id, mb_get_forum_activity_datetime_epoch_meta_key(), mysql2date( 'U', $post_date ) );
-		update_post_meta( $forum_id, mb_get_forum_last_reply_id_meta_key(),           $published );
-		update_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(),           $topic_id );
-
-		$reply_count = get_post_meta( $forum_id, mb_get_forum_reply_count_meta_key(), true );
-		update_post_meta( $forum_id, mb_get_forum_reply_count_meta_key(), absint( $reply_count ) + 1 );
-
-		/* Update topic meta. */
-
-		update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(), $post_date                    );
-		update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(), mysql2date( 'U', $post_date ) );
-		update_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key(),     $published                    );
-
-		$voices = mb_get_topic_voices( $topic_id );
-
-		if ( empty( $voices ) || !in_array( $user_id, $voices ) ) {
-			$voices = mb_set_topic_voices( $topic_id );
-
-			$count = count( $voices ) + 1;
-
-			update_post_meta( $topic_id, mb_get_topic_voice_count_meta_key(), $count );
-		}
-
-		$count = get_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), true );
-
-		update_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), absint( $count ) + 1 );
-
-		/* Notify topic subscribers. */
-		mb_notify_topic_subscribers( $topic_id, $published );
 
 		/* Redirect to the published topic page. */
 		wp_safe_redirect( get_permalink( $published ) );
