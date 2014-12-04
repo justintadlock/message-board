@@ -153,7 +153,7 @@ function mb_forum_type_allows_topics( $type ) {
 /* ====== Forum Status ====== */
 
 /**
- * Whether the forum is open to new replies.
+ * Conditional check to see whether a forum has the "open" post status.
  *
  * @since  1.0.0
  * @access public
@@ -166,6 +166,13 @@ function mb_is_forum_open( $forum_id = 0 ) {
 	return apply_filters( 'mb_is_forum_open', mb_get_open_post_status() === $status ? true : false, $forum_id );
 }
 
+/**
+ * Conditional check to see whether a forum has the "close" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
 function mb_is_forum_closed( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 	$status   = get_post_status( $forum_id );
@@ -173,52 +180,84 @@ function mb_is_forum_closed( $forum_id = 0 ) {
 	return apply_filters( 'mb_is_forum_closed', mb_get_close_post_status() === $status ? true : false, $forum_id );
 }
 
-function mb_forum_close_url( $forum_id = 0 ) {
-	echo mb_get_forum_close_url( $forum_id );
+/**
+ * Conditional check to see whether a forum has the "trash" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_forum_trash( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+	$status   = get_post_status( $forum_id );
+
+	return apply_filters( 'mb_is_forum_trash', mb_get_trash_post_status() === $status ? true : false, $forum_id );
 }
 
-function mb_get_forum_close_url( $forum_id = 0 ) {
+function mb_forum_toggle_open_url( $forum_id = 0 ) {
+	echo mb_get_forum_toggle_open_close_url( $forum_id = 0 );
+}
+
+function mb_get_forum_toggle_open_url( $forum_id = 0 ) {
 
 	$forum_id = mb_get_forum_id( $forum_id );
 
-	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+	$action = mb_is_forum_open( $forum_id ) ? 'close' : 'open';
 
-	$url = esc_url( add_query_arg( array( 'action' => 'close', 'forum_id' => $forum_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+	$url = add_query_arg( array( 'forum_id' => $forum_id, 'action' => 'mb_toggle_open' ) );
+	$url = wp_nonce_url( $url, "open_forum_{$forum_id}", 'mb_nonce' );
 
-	return apply_filters( 'mb_get_forum_close_url', $url, $forum_id );
+	return $url;
 }
 
-function mb_forum_open_url( $forum_id = 0 ) {
-	echo mb_get_forum_open_url( $forum_id );
+function mb_forum_toggle_open_link( $forum_id = 0 ) {
+	echo mb_get_forum_toggle_open_link( $forum_id );
 }
 
-function mb_get_forum_open_url( $forum_id = 0 ) {
+function mb_get_forum_toggle_open_link( $forum_id = 0 ) {
 
-	$forum_id = mb_get_forum_id( $forum_id );
-	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
-	$url = esc_url( add_query_arg( array( 'action' => 'open', 'forum_id' => $forum_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
-
-	return apply_filters( 'mb_get_forum_unclose_url', $url, $forum_id );
-}
-
-function mb_forum_open_close_link( $forum_id = 0 ) {
-	echo mb_get_forum_open_close_link( $forum_id );
-}
-
-function mb_get_forum_open_close_link( $forum_id = 0 ) {
-
+	// @todo moderate cap check for specific forum
 	if ( !current_user_can( 'manage_forums' ) )
 		return '';
 
 	$forum_id = mb_get_forum_id( $forum_id );
 
-	if ( mb_is_forum_open( $forum_id ) ) {
-		$link = sprintf( '<a class="close-link" href="%s">%s</a>', mb_get_forum_close_url( $forum_id ), __( 'Close', 'message-board' ) );
-	}
-	else {
-		$link = sprintf( '<a class="open-link" href="%s">%s</a>', mb_get_forum_open_url( $forum_id ), __( 'Open', 'message-board' ) );
-	}
+	$status = mb_is_forum_open( $forum_id ) ? get_post_status_object( mb_get_close_post_status() ) : get_post_status_object( mb_get_open_post_status() );
+
+	$link = sprintf( '<a class="toggle-open-link" href="%s">%s</a>', mb_get_forum_toggle_open_url( $forum_id ), $status->label );
+
+	return $link;
+}
+
+function mb_forum_toggle_trash_url( $forum_id = 0 ) {
+	echo mb_get_forum_toggle_trash_url( $forum_id = 0 );
+}
+
+function mb_get_forum_toggle_trash_url( $forum_id = 0 ) {
+
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	$url = add_query_arg( array( 'forum_id' => $forum_id, 'action' => 'mb_toggle_trash' ) );
+	$url = wp_nonce_url( $url, "trash_forum_{$forum_id}", 'mb_nonce' );
+
+	return $url;
+}
+
+function mb_forum_toggle_trash_link( $forum_id = 0 ) {
+	echo mb_get_forum_toggle_trash_link( $forum_id );
+}
+
+function mb_get_forum_toggle_trash_link( $forum_id = 0 ) {
+
+	// @todo moderate cap check for specific forum
+	if ( !current_user_can( 'manage_forums' ) )
+		return '';
+
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	$text = mb_is_forum_trash( $forum_id ) ? __( 'Restore', 'message-board' ) : get_post_status_object( mb_get_trash_post_status() )->label;
+
+	$link = sprintf( '<a class="toggle-trash-link" href="%s">%s</a>', mb_get_forum_toggle_trash_url( $forum_id ), $text );
 
 	return $link;
 }

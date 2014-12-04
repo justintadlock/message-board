@@ -97,67 +97,29 @@ function mb_get_reply_edit_link( $reply_id = 0 ) {
 	return apply_filters( 'mb_get_reply_edit_link', $link );
 }
 
-/* ====== Reply Trash ====== */
-
-function mb_reply_trash_url( $reply_id = 0 ) {
-	echo mb_get_reply_trash_url( $reply_id );
-}
-
-function mb_get_reply_trash_url( $reply_id = 0 ) {
-	$reply_id = mb_get_reply_id( $reply_id );
-
-	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
-	$url = esc_url( add_query_arg( array( 'action' => 'trash', 'reply_id' => $reply_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
-
-	return apply_filters( 'mb_get_reply_trash_url', $url, $reply_id );
-}
-
-function mb_reply_untrash_url( $reply_id = 0 ) {
-	echo mb_get_reply_untrash_url( $reply_id );
-}
-
-function mb_get_reply_untrash_url( $reply_id = 0 ) {
-	$reply_id = mb_get_reply_id( $reply_id );
-
-	if ( is_singular( mb_get_reply_post_type() ) ) {
-		$redirect = mb_get_forum_url( mb_get_reply_forum_id( $reply_id ) );
-	} else {
-		$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-	}
-
-	$url = esc_url( add_query_arg( array( 'action' => 'untrash', 'reply_id' => $reply_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
-
-	return apply_filters( 'mb_get_reply_untrash_url', $url, $reply_id );
-}
-
-function mb_reply_trash_link( $reply_id = 0 ) {
-	echo mb_get_reply_trash_link( $reply_id );
-}
-
-function mb_get_reply_trash_link( $reply_id = 0 ) {
-
-	$link = '';
-
-	if ( mb_get_trash_post_status() !== get_post_status( $reply_id ) ) {
-		$url = mb_get_reply_trash_url( $reply_id );
-
-		if ( !empty( $url ) )
-			$link = sprintf( '<a href="%s" class="reply-trash-link trash-link">%s</a>', $url, __( 'Trash', 'message-board' ) );
-	}
-
-	else {
-		$url = mb_get_reply_untrash_url( $reply_id );
-
-		if ( !empty( $url ) )
-			$link = sprintf( '<a href="%s" class="reply-trash-link trash-link">%s</a>', $url, __( 'Restore', 'message-board' ) );
-	}
-
-	return apply_filters( 'mb_get_reply_trash_link', $link );
-}
-
 /* ====== Reply Status ====== */
 
+/**
+ * Conditional check to see whether a reply has the "publish" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_reply_published( $reply_id = 0 ) {
+	$reply_id = mb_get_reply_id( $reply_id );
+	$status   = get_post_status( $reply_id );
+
+	return apply_filters( 'mb_is_reply_published', mb_get_publish_post_status() === $status ? true : false, $reply_id );
+}
+
+/**
+ * Conditional check to see whether a reply has the "spam" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
 function mb_is_reply_spam( $reply_id = 0 ) {
 	$reply_id = mb_get_reply_id( $reply_id );
 	$status   = get_post_status( $reply_id );
@@ -165,51 +127,82 @@ function mb_is_reply_spam( $reply_id = 0 ) {
 	return apply_filters( 'mb_is_reply_spam', mb_get_spam_post_status() === $status ? true : false, $reply_id );
 }
 
-function mb_reply_spam_url( $reply_id = 0 ) {
-	echo mb_get_reply_spam_url( $reply_id );
+/**
+ * Conditional check to see whether a reply has the "trash" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_reply_trash( $reply_id = 0 ) {
+	$reply_id = mb_get_reply_id( $reply_id );
+	$status   = get_post_status( $reply_id );
+
+	return apply_filters( 'mb_is_reply_trash', mb_get_trash_post_status() === $status ? true : false, $reply_id );
 }
 
-function mb_get_reply_spam_url( $reply_id = 0 ) {
+function mb_reply_toggle_spam_url( $reply_id = 0 ) {
+	echo mb_get_reply_toggle_spam_spam_url( $reply_id = 0 );
+}
+
+function mb_get_reply_toggle_spam_url( $reply_id = 0 ) {
 
 	$reply_id = mb_get_reply_id( $reply_id );
-	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
-	$url = esc_url( add_query_arg( array( 'action' => 'spam', 'reply_id' => $reply_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+	$url = add_query_arg( array( 'reply_id' => $reply_id, 'action' => 'mb_toggle_spam' ) );
+	$url = wp_nonce_url( $url, "spam_reply_{$reply_id}", 'mb_nonce' );
 
-	return apply_filters( 'mb_get_reply_spam_url', $url, $reply_id );
+	return $url;
 }
 
-function mb_reply_unspam_url( $reply_id = 0 ) {
-	echo mb_get_reply_unspam_url( $reply_id );
+function mb_reply_toggle_spam_link( $reply_id = 0 ) {
+	echo mb_get_reply_toggle_spam_link( $reply_id );
 }
 
-function mb_get_reply_unspam_url( $reply_id = 0 ) {
+function mb_get_reply_toggle_spam_link( $reply_id = 0 ) {
 
-	$reply_id = mb_get_reply_id( $reply_id );
-	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
-	$url = esc_url( add_query_arg( array( 'action' => 'unspam', 'reply_id' => $reply_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
-
-	return apply_filters( 'mb_get_reply_unspam_url', $url, $reply_id );
-}
-
-function mb_reply_spam_link( $reply_id = 0 ) {
-	echo mb_get_reply_spam_link( $reply_id );
-}
-
-function mb_get_reply_spam_link( $reply_id = 0 ) {
-
+	// @todo moderate cap check for specific reply
 	if ( !current_user_can( 'manage_forums' ) )
 		return '';
 
 	$reply_id = mb_get_reply_id( $reply_id );
 
-	if ( !mb_is_reply_spam( $reply_id ) ) {
-		$link = sprintf( '<a class="spam-link" href="%s">%s</a>', mb_get_reply_spam_url( $reply_id ), __( 'Spam', 'message-board' ) );
-	}
-	else {
-		$link = sprintf( '<a class="spam-link" href="%s">%s</a>', mb_get_reply_spam_url( $reply_id ), __( 'Unspam', 'message-board' ) );
-	}
+	$text = mb_is_reply_spam( $reply_id ) ? __( 'Unspam', 'message-board' ) : get_post_status_object( mb_get_spam_post_status() )->label;
+
+	$link = sprintf( '<a class="toggle-spam-link" href="%s">%s</a>', mb_get_reply_toggle_spam_url( $reply_id ), $text );
+
+	return $link;
+}
+
+function mb_reply_toggle_trash_url( $reply_id = 0 ) {
+	echo mb_get_reply_toggle_trash_url( $reply_id = 0 );
+}
+
+function mb_get_reply_toggle_trash_url( $reply_id = 0 ) {
+
+	$reply_id = mb_get_reply_id( $reply_id );
+
+	$url = add_query_arg( array( 'reply_id' => $reply_id, 'action' => 'mb_toggle_trash' ) );
+	$url = wp_nonce_url( $url, "trash_reply_{$reply_id}", 'mb_nonce' );
+
+	return $url;
+}
+
+function mb_reply_toggle_trash_link( $reply_id = 0 ) {
+	echo mb_get_reply_toggle_trash_link( $reply_id );
+}
+
+function mb_get_reply_toggle_trash_link( $reply_id = 0 ) {
+
+	// @todo moderate cap check for specific reply
+	if ( !current_user_can( 'manage_forums' ) )
+		return '';
+
+	$reply_id = mb_get_reply_id( $reply_id );
+
+	$text = mb_is_reply_trash( $reply_id ) ? __( 'Restore', 'message-board' ) : get_post_status_object( mb_get_trash_post_status() )->label;
+
+	$link = sprintf( '<a class="toggle-trash-link" href="%s">%s</a>', mb_get_reply_toggle_trash_url( $reply_id ), $text );
 
 	return $link;
 }

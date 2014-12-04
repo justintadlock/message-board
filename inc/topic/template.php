@@ -124,73 +124,10 @@ function mb_get_topic_edit_link( $topic_id = 0 ) {
 	return apply_filters( 'mb_get_topic_edit_link', $link );
 }
 
-/* ====== Topic Trash ====== */
-
-function mb_topic_trash_url( $topic_id = 0 ) {
-	echo mb_get_topic_trash_url( $topic_id );
-}
-
-function mb_get_topic_trash_url( $topic_id = 0 ) {
-	$topic_id = mb_get_topic_id( $topic_id );
-
-	if ( mb_is_single_topic() ) {
-		$redirect = mb_get_forum_url( mb_get_topic_forum_id( $topic_id ) );
-	} else {
-		$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-	}
-
-	$url = esc_url( add_query_arg( array( 'action' => 'trash', 'topic_id' => $topic_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
-
-	return apply_filters( 'mb_get_topic_trash_url', $url, $topic_id );
-}
-
-function mb_topic_untrash_url( $topic_id = 0 ) {
-	echo mb_get_topic_untrash_url( $topic_id );
-}
-
-function mb_get_topic_untrash_url( $topic_id = 0 ) {
-	$topic_id = mb_get_topic_id( $topic_id );
-
-	if ( mb_is_single_topic() ) {
-		$redirect = mb_get_forum_url( mb_get_topic_forum_id( $topic_id ) );
-	} else {
-		$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-	}
-
-	$url = esc_url( add_query_arg( array( 'action' => 'untrash', 'topic_id' => $topic_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
-
-	return apply_filters( 'mb_get_topic_untrash_url', $url, $topic_id );
-}
-
-function mb_topic_trash_link( $topic_id = 0 ) {
-	echo mb_get_topic_trash_link( $topic_id );
-}
-
-function mb_get_topic_trash_link( $topic_id = 0 ) {
-
-	$link = '';
-
-	if ( mb_get_trash_post_status() !== get_post_status( $topic_id ) ) {
-		$url = mb_get_topic_trash_url( $topic_id );
-
-		if ( !empty( $url ) )
-			$link = sprintf( '<a href="%s" class="topic-trash-link trash-link">%s</a>', $url, __( 'Trash', 'message-board' ) );
-	}
-
-	else {
-		$url = mb_get_topic_untrash_url( $topic_id );
-
-		if ( !empty( $url ) )
-			$link = sprintf( '<a href="%s" class="topic-trash-link trash-link">%s</a>', $url, __( 'Restore', 'message-board' ) );
-	}
-
-	return apply_filters( 'mb_get_topic_trash_link', $link );
-}
-
 /* ====== Topic Status ====== */
 
 /**
- * Whether the topic is open to new replies.
+ * Conditional check to see whether a topic has the "open" post status.
  *
  * @since  1.0.0
  * @access public
@@ -198,16 +135,18 @@ function mb_get_topic_trash_link( $topic_id = 0 ) {
  */
 function mb_is_topic_open( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-	$forum_id = mb_get_topic_forum_id( $topic_id );
 	$status   = get_post_status( $topic_id );
-	$open     = false;
 
-	if ( mb_is_forum_open( $forum_id ) && mb_get_open_post_status() === $status )
-		$open = true;
-
-	return apply_filters( 'mb_is_topic_open', $open, $topic_id );
+	return apply_filters( 'mb_is_topic_open', mb_get_open_post_status() === $status ? true : false, $topic_id );
 }
 
+/**
+ * Conditional check to see whether a topic has the "close" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
 function mb_is_topic_closed( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 	$status   = get_post_status( $topic_id );
@@ -215,56 +154,13 @@ function mb_is_topic_closed( $topic_id = 0 ) {
 	return apply_filters( 'mb_is_topic_closed', mb_get_close_post_status() === $status ? true : false, $topic_id );
 }
 
-function mb_topic_close_url( $topic_id = 0 ) {
-	echo mb_get_topic_close_url( $topic_id );
-}
-
-function mb_get_topic_close_url( $topic_id = 0 ) {
-
-	$topic_id = mb_get_topic_id( $topic_id );
-
-	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
-	$url = esc_url( add_query_arg( array( 'action' => 'close', 'topic_id' => $topic_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
-
-	return apply_filters( 'mb_get_topic_close_url', $url, $topic_id );
-}
-
-function mb_topic_open_url( $topic_id = 0 ) {
-	echo mb_get_topic_open_url( $topic_id );
-}
-
-function mb_get_topic_open_url( $topic_id = 0 ) {
-
-	$topic_id = mb_get_topic_id( $topic_id );
-	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
-	$url = esc_url( add_query_arg( array( 'action' => 'open', 'topic_id' => $topic_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
-
-	return apply_filters( 'mb_get_topic_unclose_url', $url, $topic_id );
-}
-
-function mb_topic_open_close_link( $topic_id = 0 ) {
-	echo mb_get_topic_open_close_link( $topic_id );
-}
-
-function mb_get_topic_open_close_link( $topic_id = 0 ) {
-
-	if ( !current_user_can( 'manage_forums' ) )
-		return '';
-
-	$topic_id = mb_get_topic_id( $topic_id );
-
-	if ( !mb_is_topic_closed( $topic_id ) ) {
-		$link = sprintf( '<a class="close-link" href="%s">%s</a>', mb_get_topic_close_url( $topic_id ), __( 'Close', 'message-board' ) );
-	}
-	else {
-		$link = sprintf( '<a class="open-link" href="%s">%s</a>', mb_get_topic_open_url( $topic_id ), __( 'Open', 'message-board' ) );
-	}
-
-	return $link;
-}
-
+/**
+ * Conditional check to see whether a topic has the "spam" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
 function mb_is_topic_spam( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 	$status   = get_post_status( $topic_id );
@@ -272,56 +168,117 @@ function mb_is_topic_spam( $topic_id = 0 ) {
 	return apply_filters( 'mb_is_topic_spam', mb_get_spam_post_status() === $status ? true : false, $topic_id );
 }
 
-function mb_topic_spam_url( $topic_id = 0 ) {
-	echo mb_get_topic_spam_url( $topic_id );
+/**
+ * Conditional check to see whether a topic has the "trash" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_topic_trash( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$status   = get_post_status( $topic_id );
+
+	return apply_filters( 'mb_is_topic_trash', mb_get_trash_post_status() === $status ? true : false, $topic_id );
 }
 
-function mb_get_topic_spam_url( $topic_id = 0 ) {
+function mb_topic_toggle_open_url( $topic_id = 0 ) {
+	echo mb_get_topic_toggle_open_close_url( $topic_id = 0 );
+}
+
+function mb_get_topic_toggle_open_url( $topic_id = 0 ) {
 
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	if ( mb_is_single_topic() ) {
-		$redirect = mb_get_forum_url( mb_get_topic_forum_id( $topic_id ) );
-	} else {
-		$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-	}
+	$action = mb_is_topic_open( $topic_id ) ? 'close' : 'open';
 
-	$url = esc_url( add_query_arg( array( 'action' => 'spam', 'topic_id' => $topic_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
+	$url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_open' ) );
+	$url = wp_nonce_url( $url, "open_topic_{$topic_id}", 'mb_nonce' );
 
-	return apply_filters( 'mb_get_topic_spam_url', $url, $topic_id );
+	return $url;
 }
 
-function mb_topic_unspam_url( $topic_id = 0 ) {
-	echo mb_get_topic_unspam_url( $topic_id );
+function mb_topic_toggle_open_link( $topic_id = 0 ) {
+	echo mb_get_topic_toggle_open_link( $topic_id );
 }
 
-function mb_get_topic_unspam_url( $topic_id = 0 ) {
+function mb_get_topic_toggle_open_link( $topic_id = 0 ) {
 
-	$topic_id = mb_get_topic_id( $topic_id );
-	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
-	$url = esc_url( add_query_arg( array( 'action' => 'unspam', 'topic_id' => $topic_id, 'redirect' => esc_url( $redirect ) ), trailingslashit( home_url( 'board' ) ) ) );
-
-	return apply_filters( 'mb_get_topic_unspam_url', $url, $topic_id );
-}
-
-function mb_topic_spam_link( $topic_id = 0 ) {
-	echo mb_get_topic_spam_link( $topic_id );
-}
-
-function mb_get_topic_spam_link( $topic_id = 0 ) {
-
+	// @todo moderate cap check for specific topic
 	if ( !current_user_can( 'manage_forums' ) )
 		return '';
 
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	if ( !mb_is_topic_spam( $topic_id ) ) {
-		$link = sprintf( '<a class="spam-link" href="%s">%s</a>', mb_get_topic_spam_url( $topic_id ), __( 'Spam', 'message-board' ) );
-	}
-	else {
-		$link = sprintf( '<a class="spam-link" href="%s">%s</a>', mb_get_topic_spam_url( $topic_id ), __( 'Unspam', 'message-board' ) );
-	}
+	$status = mb_is_topic_open( $topic_id ) ? get_post_status_object( mb_get_close_post_status() ) : get_post_status_object( mb_get_open_post_status() );
+
+	$link = sprintf( '<a class="toggle-open-link" href="%s">%s</a>', mb_get_topic_toggle_open_url( $topic_id ), $status->label );
+
+	return $link;
+}
+
+function mb_topic_toggle_spam_url( $topic_id = 0 ) {
+	echo mb_get_topic_toggle_spam_unspam_url( $topic_id = 0 );
+}
+
+function mb_get_topic_toggle_spam_url( $topic_id = 0 ) {
+
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	$url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_spam' ) );
+	$url = wp_nonce_url( $url, "spam_topic_{$topic_id}", 'mb_nonce' );
+
+	return $url;
+}
+
+function mb_topic_toggle_spam_link( $topic_id = 0 ) {
+	echo mb_get_topic_toggle_spam_link( $topic_id );
+}
+
+function mb_get_topic_toggle_spam_link( $topic_id = 0 ) {
+
+	// @todo moderate cap check for specific topic
+	if ( !current_user_can( 'manage_forums' ) )
+		return '';
+
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	$text = mb_is_topic_spam( $topic_id ) ? __( 'Unspam', 'message-board' ) : get_post_status_object( mb_get_spam_post_status() )->label;
+
+	$link = sprintf( '<a class="toggle-spam-link" href="%s">%s</a>', mb_get_topic_toggle_spam_url( $topic_id ), $text );
+
+	return $link;
+}
+
+function mb_topic_toggle_trash_url( $topic_id = 0 ) {
+	echo mb_get_topic_toggle_trash_url( $topic_id = 0 );
+}
+
+function mb_get_topic_toggle_trash_url( $topic_id = 0 ) {
+
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	$url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_trash' ) );
+	$url = wp_nonce_url( $url, "trash_topic_{$topic_id}", 'mb_nonce' );
+
+	return $url;
+}
+
+function mb_topic_toggle_trash_link( $topic_id = 0 ) {
+	echo mb_get_topic_toggle_trash_link( $topic_id );
+}
+
+function mb_get_topic_toggle_trash_link( $topic_id = 0 ) {
+
+	// @todo moderate cap check for specific topic
+	if ( !current_user_can( 'manage_forums' ) )
+		return '';
+
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	$text = mb_is_topic_trash( $topic_id ) ? __( 'Restore', 'message-board' ) : get_post_status_object( mb_get_trash_post_status() )->label;
+
+	$link = sprintf( '<a class="toggle-trash-link" href="%s">%s</a>', mb_get_topic_toggle_trash_url( $topic_id ), $text );
 
 	return $link;
 }

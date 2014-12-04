@@ -19,6 +19,7 @@ function mb_register_meta() {
 	register_meta( 'post', '_forum_reply_count',             'absint',   '__return_true' );
 	register_meta( 'post', '_forum_type',                    'esc_html', '__return_true' );
 	register_meta( 'post', '_forum_level',                   'absint',   '__return_true' );
+	register_meta( 'post', '_forum_prev_status',             'esc_html', '__return_true' );
 
 	/* Topic meta. */
 	register_meta( 'post', '_topic_activity_datetime',       'esc_html',   '__return_true' );
@@ -27,6 +28,10 @@ function mb_register_meta() {
 	register_meta( 'post', '_topic_voices',                  'esc_html',   '__return_true' );
 	register_meta( 'post', '_topic_voice_count',             'absint',     '__return_true' );
 	register_meta( 'post', '_topic_reply_count',             'absint',     '__return_true' );
+	register_meta( 'post', '_topic_prev_status',             'esc_html',   '__return_true' );
+
+	/* Reply meta. */
+	register_meta( 'post', '_reply_prev_status', 'esc_html', '__return_true' );
 
 	/* User meta. */
 	register_meta( 'user', '_topic_subscriptions', 'esc_html', '__return_true' );

@@ -267,6 +267,29 @@ function mb_register_post_types() {
 }
 
 /**
+ * Changes the post type name to the "common" name used within the plugin.  Because the post type names 
+ * can be filtered, we need an easy way to track the common name.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $post_type
+ * @return string
+ */
+function mb_translate_post_type( $post_type ) {
+
+	$type = $post_type;
+
+	if ( mb_get_forum_post_type() === $post_type )
+		$type = 'forum';
+	elseif ( mb_get_topic_post_type() === $post_type )
+		$type = 'topic';
+	elseif ( mb_get_reply_post_type() === $post_type )
+		$type = 'reply';
+
+	return apply_filters( 'mb_translate_post_type', $type, $post_type );
+}
+
+/**
  * Custom "enter title here" text.
  *
  * @since  1.0.0

@@ -12,9 +12,13 @@ add_action( 'mb_template_redirect', 'mb_handler_edit_post'       );
 add_action( 'mb_template_redirect', 'mb_handler_topic_subscribe' );
 add_action( 'mb_template_redirect', 'mb_handler_topic_bookmark'  );
 
-add_action( 'mb_template_redirect', 'mb_handler_spam'       );
-add_action( 'mb_template_redirect', 'mb_handler_open_close' );
-add_action( 'mb_template_redirect', 'mb_handler_trash'      );
+add_action( 'mb_template_redirect', 'mb_handler_forum_toggle_open'  );
+add_action( 'mb_template_redirect', 'mb_handler_forum_toggle_trash' );
+add_action( 'mb_template_redirect', 'mb_handler_topic_toggle_open'  );
+add_action( 'mb_template_redirect', 'mb_handler_topic_toggle_spam'  );
+add_action( 'mb_template_redirect', 'mb_handler_topic_toggle_trash' );
+add_action( 'mb_template_redirect', 'mb_handler_reply_toggle_spam'  );
+add_action( 'mb_template_redirect', 'mb_handler_reply_toggle_trash' );
 
 /**
  * New topic handler. This function executes when a new topic is posted on the front end.
@@ -462,102 +466,156 @@ function mb_handler_topic_bookmark() {
 		}
 }
 
-// http://localhost/board/?action=spam&reply_id=2860&redirect=http://localhost/board/topics/sub-11/
-function mb_handler_spam() {
+function mb_handler_forum_toggle_open() {
 
-	if ( !is_user_logged_in() )
+	if ( !isset( $_GET['action'] ) || 'mb_toggle_open' !== $_GET['action'] || !isset( $_GET['forum_id'] ) )
 		return;
 
-	// @todo nonce?
-	// @todo cap check
+	$forum_id = mb_get_forum_id( $_GET['forum_id'] );
 
-	if ( !isset( $_GET['action'] ) || 'spam' !== $_GET['action'] )
+	/* Verify nonce. */
+	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "open_forum_{$forum_id}" ) )
 		return;
 
-	if ( isset( $_GET['reply_id'] ) || isset( $_GET['topic_id'] ) ) {
+	// @todo - moderate cap for this specific forum
+	if ( !current_user_can( 'manage_forums' ) )
+		return;
 
-		$post_id = isset( $_GET['reply_id'] ) ? absint( $_GET['reply_id'] ) : absint( $_GET['topic_id'] );
+	$updated = mb_is_forum_open( $forum_id ) ? mb_close_forum( $forum_id ) : mb_open_forum( $forum_id );
 
-		$postarr = get_post( $post_id, ARRAY_A );
+	$redirect = remove_query_arg( array( 'action', 'forum_id', 'mb_nonce' ) );
 
-		if ( mb_get_spam_post_status() !== $postarr['post_status'] ) {
-
-			$postarr['post_status'] = mb_get_spam_post_status();
-
-			wp_update_post( $postarr );
-		}
-	}
-
-	if ( isset( $_GET['redirect'] ) ) {
-		wp_safe_redirect( esc_url( strip_tags( $_GET['redirect'] ) ) );
-	}
+	wp_safe_redirect( esc_url( $redirect ) );
 }
 
-function mb_handler_open_close() {
+function mb_handler_topic_toggle_open() {
 
-	if ( !is_user_logged_in() )
+	if ( !isset( $_GET['action'] ) || 'mb_toggle_open' !== $_GET['action'] || !isset( $_GET['topic_id'] ) )
 		return;
 
-	// @todo nonce?
-	// @todo cap check
+	$topic_id = mb_get_topic_id( $_GET['topic_id'] );
 
-	if ( !isset( $_GET['action'] ) || !in_array( $_GET['action'], array( 'open', 'close' ) ) )
+	/* Verify nonce. */
+	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "open_topic_{$topic_id}" ) )
 		return;
 
-	if ( isset( $_GET['forum_id'] ) || isset( $_GET['topic_id'] ) ) {
+	// @todo - moderate cap for this specific topic
+	if ( !current_user_can( 'manage_forums' ) )
+		return;
 
-		$post_id = isset( $_GET['forum_id'] ) ? absint( $_GET['forum_id'] ) : absint( $_GET['topic_id'] );
+	$updated = mb_is_topic_open( $topic_id ) ? mb_close_topic( $topic_id ) : mb_open_topic( $topic_id );
 
-		$postarr = get_post( $post_id, ARRAY_A );
+	$redirect = remove_query_arg( array( 'action', 'topic_id', 'mb_nonce' ) );
 
-		if ( 'close' === $_GET['action'] && mb_get_close_post_status() !== $postarr['post_status'] ) {
-
-			$postarr['post_status'] = mb_get_close_post_status();
-
-			wp_update_post( $postarr );
-		}
-
-		elseif ( 'open' === $_GET['action'] && mb_get_close_post_status() === $postarr['post_status'] ) {
-
-			$postarr['post_status'] = mb_get_open_post_status();
-
-			wp_update_post( $postarr );
-		}
-	}
-
-	if ( isset( $_GET['redirect'] ) ) {
-		wp_safe_redirect( esc_url( strip_tags( $_GET['redirect'] ) ) );
-	}
+	wp_safe_redirect( esc_url( $redirect ) );
 }
 
-function mb_handler_trash() {
+function mb_handler_topic_toggle_spam() {
 
-	if ( !is_user_logged_in() )
+	if ( !isset( $_GET['action'] ) || 'mb_toggle_spam' !== $_GET['action'] || !isset( $_GET['topic_id'] ) )
 		return;
 
-	// @todo nonce?
-	// @todo cap check
+	$topic_id = mb_get_topic_id( $_GET['topic_id'] );
 
-	if ( !isset( $_GET['action'] ) || !in_array( $_GET['action'], array( 'trash', 'untrash' ) ) )
+	/* Verify nonce. */
+	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "spam_topic_{$topic_id}" ) )
 		return;
 
-	if ( isset( $_GET['reply_id'] ) || isset( $_GET['topic_id'] ) ) {
+	// @todo - moderate cap for this specific topic
+	if ( !current_user_can( 'manage_forums' ) )
+		return;
 
-		$post_id = isset( $_GET['reply_id'] ) ? absint( $_GET['reply_id'] ) : absint( $_GET['topic_id'] );
+	$updated = mb_is_topic_spam( $topic_id ) ? mb_unspam_topic( $topic_id ) : mb_spam_topic( $topic_id );
 
-		$postarr = get_post( $post_id, ARRAY_A );
+	$redirect = remove_query_arg( array( 'action', 'topic_id', 'mb_nonce' ) );
 
-		if ( 'trash' === $_GET['action'] && mb_get_trash_post_status() !== $postarr['post_status'] ) {
-			wp_trash_post( $post_id );
-		}
+	wp_safe_redirect( esc_url( $redirect ) );
+}
 
-		elseif ( 'untrash' === $_GET['action'] && mb_get_trash_post_status() === $postarr['post_status'] ) {
+function mb_handler_reply_toggle_spam() {
 
-			wp_untrash_post( $post_id );
-		}
-	}
+	if ( !isset( $_GET['action'] ) || 'mb_toggle_spam' !== $_GET['action'] || !isset( $_GET['reply_id'] ) )
+		return;
 
-	if ( isset( $_GET['redirect'] ) ) {
-		wp_safe_redirect( esc_url( strip_tags( $_GET['redirect'] ) ) );
-	}
+	$reply_id = mb_get_reply_id( $_GET['reply_id'] );
+
+	/* Verify nonce. */
+	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "spam_reply_{$reply_id}" ) )
+		return;
+
+	// @todo - moderate cap for this specific reply
+	if ( !current_user_can( 'manage_forums' ) )
+		return;
+
+	$updated = mb_is_reply_spam( $reply_id ) ? mb_unspam_reply( $reply_id ) : mb_spam_reply( $reply_id );
+
+	$redirect = remove_query_arg( array( 'action', 'reply_id', 'mb_nonce' ) );
+
+	wp_safe_redirect( esc_url( $redirect ) );
+}
+
+function mb_handler_forum_toggle_trash() {
+
+	if ( !isset( $_GET['action'] ) || 'mb_toggle_trash' !== $_GET['action'] || !isset( $_GET['forum_id'] ) )
+		return;
+
+	$forum_id = mb_get_forum_id( $_GET['forum_id'] );
+
+	/* Verify nonce. */
+	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "trash_forum_{$forum_id}" ) )
+		return;
+
+	// @todo - moderate cap for this specific forum
+	if ( !current_user_can( 'manage_forums' ) )
+		return;
+
+	$updated = mb_is_forum_trash( $forum_id ) ? wp_untrash_post( $forum_id ) : wp_trash_post( $forum_id );
+
+	$redirect = remove_query_arg( array( 'action', 'forum_id', 'mb_nonce' ) );
+
+	wp_safe_redirect( esc_url( $redirect ) );
+}
+
+function mb_handler_topic_toggle_trash() {
+
+	if ( !isset( $_GET['action'] ) || 'mb_toggle_trash' !== $_GET['action'] || !isset( $_GET['topic_id'] ) )
+		return;
+
+	$topic_id = mb_get_topic_id( $_GET['topic_id'] );
+
+	/* Verify nonce. */
+	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "trash_topic_{$topic_id}" ) )
+		return;
+
+	// @todo - moderate cap for this specific topic
+	if ( !current_user_can( 'manage_forums' ) )
+		return;
+
+	$updated = mb_is_topic_trash( $topic_id ) ? wp_untrash_post( $topic_id ) : wp_trash_post( $topic_id );
+
+	$redirect = remove_query_arg( array( 'action', 'topic_id', 'mb_nonce' ) );
+
+	wp_safe_redirect( esc_url( $redirect ) );
+}
+
+function mb_handler_reply_toggle_trash() {
+
+	if ( !isset( $_GET['action'] ) || 'mb_toggle_trash' !== $_GET['action'] || !isset( $_GET['reply_id'] ) )
+		return;
+
+	$reply_id = mb_get_reply_id( $_GET['reply_id'] );
+
+	/* Verify nonce. */
+	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "trash_reply_{$reply_id}" ) )
+		return;
+
+	// @todo - moderate cap for this specific reply
+	if ( !current_user_can( 'manage_forums' ) )
+		return;
+
+	$updated = mb_is_reply_trash( $reply_id ) ? wp_untrash_post( $reply_id ) : wp_trash_post( $reply_id );
+
+	$redirect = remove_query_arg( array( 'action', 'reply_id', 'mb_nonce' ) );
+
+	wp_safe_redirect( esc_url( $redirect ) );
 }
