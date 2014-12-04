@@ -15,7 +15,7 @@ add_action( 'transition_post_status', 'mb_transition_post_status', 10, 3 );
  * @return string
  */
 function mb_get_publish_post_status() {
-	return apply_filters( 'mb_get_open_post_status', 'publish' );
+	return apply_filters( 'mb_get_publish_post_status', 'publish' );
 }
 
 /**
@@ -27,7 +27,7 @@ function mb_get_publish_post_status() {
  * @return string
  */
 function mb_get_trash_post_status() {
-	return apply_filters( 'mb_get_open_post_status', 'trash' );
+	return apply_filters( 'mb_get_trash_post_status', 'trash' );
 }
 
 /**
