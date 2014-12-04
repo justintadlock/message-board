@@ -1,9 +1,5 @@
 <?php
 
-function mb_get_forum_post_type() {
-	return apply_filters( 'mb_get_forum_post_type', 'forum' );
-}
-
 add_action( 'init', 'mb_register_forum_types' );
 
 function mb_register_forum_types() {

@@ -1,19 +1,6 @@
 <?php
 
 /**
- * Returns the name of the topic post type. Developers can filter this to utilize their own post types. 
- * This is particularly useful if they're coming from a different plugin that used a different post 
- * type name.
- *
- * @since  1.0.0
- * @access public
- * @return string
- */
-function mb_get_topic_post_type() {
-	return apply_filters( 'mb_get_topic_post_type', 'forum_topic' );
-}
-
-/**
  * Inserts a new topic and adds/updates metadata.  This is a wrapper for the `wp_insert_post()` function 
  * and should be used in its place where possible.
  *

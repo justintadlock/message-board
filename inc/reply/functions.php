@@ -2,10 +2,6 @@
 
 add_filter( 'post_type_link', 'mb_reply_post_type_link', 10, 2 );
 
-function mb_get_reply_post_type() {
-	return apply_filters( 'mb_get_reply_post_type', 'forum_reply' );
-}
-
 function mb_reply_post_type_link( $link, $post ) {
 
 	if ( mb_get_reply_post_type() !== $post->post_type )

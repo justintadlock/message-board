@@ -21,6 +21,39 @@ add_filter( 'post_updated_messages', 'mb_post_updated_messages' );
 add_filter( 'enter_title_here', 'mb_enter_title_here', 10, 2 );
 
 /**
+ * Returns the name of the "forum" post type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_forum_post_type() {
+	return apply_filters( 'mb_get_forum_post_type', 'forum' );
+}
+
+/**
+ * Returns the name of the "topic" post type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_topic_post_type() {
+	return apply_filters( 'mb_get_topic_post_type', 'forum_topic' );
+}
+
+/**
+ * Returns the name of the "reply" post type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_reply_post_type() {
+	return apply_filters( 'mb_get_reply_post_type', 'forum_reply' );
+}
+
+/**
  * Registers post types needed by the plugin.
  *
  * @since  1.0.0
@@ -261,9 +294,9 @@ function mb_register_post_types() {
 	);
 
 	/* Register post types. */
-	register_post_type( mb_get_forum_post_type(), $forum_args );
-	register_post_type( mb_get_topic_post_type(), $topic_args );
-	register_post_type( mb_get_reply_post_type(), $reply_args );
+	register_post_type( mb_get_forum_post_type(), apply_filters( 'mb_forum_post_type_args', $forum_args ) );
+	register_post_type( mb_get_topic_post_type(), apply_filters( 'mb_topic_post_type_args', $topic_args ) );
+	register_post_type( mb_get_reply_post_type(), apply_filters( 'mb_reply_post_type_args', $reply_args ) );
 }
 
 /**
@@ -300,8 +333,11 @@ function mb_translate_post_type( $post_type ) {
  */
 function mb_enter_title_here( $title, $post ) {
 
-	if ( mb_get_topic_post_type() === $post->post_type )
-		$title = __( 'Enter topic name', 'message-board' );
+	if ( mb_get_forum_post_type() === $post->post_type )
+		$title = __( 'Enter forum title', 'message-board' );
+
+	elseif ( mb_get_topic_post_type() === $post->post_type )
+		$title = __( 'Enter topic title', 'message-board' );
 
 	return $title;
 }
