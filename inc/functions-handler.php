@@ -89,40 +89,22 @@ function mb_handler_new_topic() {
 	$post_date = current_time( 'mysql' );
 
 	/* Publish a new forum topic. */
-	$published = wp_insert_post(
+	$published = mb_insert_topic(
 		array(
-			'menu_order'   => mysql2date( 'U', $post_date ), // Saved as datetime epoch.
-			'post_date'    => $post_date,
-			'post_author'  => absint( $user_id ),
 			'post_title'   => $post_title,
 			'post_content' => $post_content,
-			'post_status'  => mb_get_open_post_status(),
-			'post_type'    => mb_get_topic_post_type(),
 			'post_parent'  => $forum_id,
 		)
 	);
 
 	/* If the post was published. */
-	if ( $published ) {
+	if ( $published && !is_wp_error( $published ) ) {
 
 		/* If the user chose to subscribe to the topic. */
 		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] ) {
 
 			mb_add_user_subscription( absint( $user_id ), $published );
 		}
-
-		/* Update user meta. */
-		$topic_count = mb_get_user_topic_count( $user_id );
-		update_user_meta( absint( $user_id ), '_topic_count', $topic_count + 1 );
-
-		/* Update forum meta. */
-
-		update_post_meta( $forum_id, '_forum_activity_datetime', $post_date );
-		update_post_meta( $forum_id, '_forum_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
-		update_post_meta( $forum_id, '_forum_last_topic_id', $published );
-
-		$topic_count = get_post_meta( $forum_id, '_forum_topic_count', true );
-		update_post_meta( $forum_id, '_forum_topic_count', absint( $topic_count ) + 1 );
 
 		/* Redirect to the published topic page. */
 		wp_safe_redirect( get_permalink( $published ) );
@@ -251,7 +233,7 @@ function mb_handler_new_reply() {
 		$voices = mb_get_topic_voices( $topic_id );
 
 		if ( empty( $voices ) || !in_array( $user_id, $voices ) ) {
-			add_post_meta( $topic_id, '_topic_voices', $user_id );
+			$voices = mb_set_topic_voices( $topic_id );
 
 			$count = count( $voices ) + 1;
 

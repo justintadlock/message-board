@@ -59,31 +59,4 @@ function mb_save_post( $post_id, $post = '' ) {
 		// @todo - this should only change when the post parent changes.
 		mb_set_forum_level( $post->ID );
 	}
-
-	elseif ( mb_get_topic_post_type() === $post->post_type ) {
-
-		$last_post_time = get_post_meta( $post_id, '_topic_activity_datetime', true );
-
-		if ( empty( $last_post_time ) ) {
-			add_post_meta( $post_id, '_topic_activity_datetime', $post->post_date );//current_time( 'mysql' ) );
-		}
-
-		$last_post_ymd = get_post_meta( $post_id, '_topic_activity_datetime_epoch', true );
-
-		if ( empty( $last_post_ymd ) ) {
-			add_post_meta( $post_id, '_topic_activity_datetime_epoch', mysql2date( 'U', $post->post_date ) );
-		}
-
-		$voices = mb_get_topic_voices( $post_id );
-
-		if ( empty( $voices ) || !in_array( $post->post_author, $voices ) ) {
-			add_post_meta( $post_id, '_topic_voices', $post->post_author );
-		}
-
-		$count = mb_get_topic_voice_count( $post_id );
-
-		if ( empty( $count ) ) {
-			add_post_meta( $post_id, '_topic_voice_count', $count );
-		}
-	}
 }

@@ -1,7 +1,89 @@
 <?php
 
+/**
+ * Returns the name of the topic post type. Developers can filter this to utilize their own post types. 
+ * This is particularly useful if they're coming from a different plugin that used a different post 
+ * type name.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
 function mb_get_topic_post_type() {
 	return apply_filters( 'mb_get_topic_post_type', 'forum_topic' );
+}
+
+/**
+ * Inserts a new topic and adds/updates metadata.  This is a wrapper for the `wp_insert_post()` function 
+ * and should be used in its place where possible.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $args
+ * @return int|WP_Error
+ */
+function mb_insert_topic( $args = array() ) {
+
+	/* Convert date. */
+	$post_date  = current_time( 'mysql' );
+	$post_epoch = mysql2date( 'U', $post_date );
+
+	/* Set up the defaults. */
+	$defaults = array(
+		'menu_order'   => $post_epoch,
+		'post_date'    => $post_date,
+		'post_author'  => get_current_user_id(),
+		'post_status'  => mb_get_open_post_status(),
+		'post_parent'  => mb_get_default_forum_id(),
+	);
+
+	/* Allow devs to filter the defaults. */
+	$defaults = apply_filters( 'mb_insert_topic_defaults', $defaults );
+
+	/* Parse the args/defaults and apply filters. */
+	$args = apply_filters( 'mb_insert_topic_args', wp_parse_args( $args, $defaults ) );
+
+	/* Always make sure it's the correct post type. */
+	$args['post_type'] = mb_get_topic_post_type();
+
+	/* Insert the topic. */
+	$published = wp_insert_post( $args );
+
+	/* If we have a published post, add some metadata. */
+	if ( $published && !is_wp_error( $published ) ) {
+
+		/* Get the User ID. */
+		$user_id = mb_get_user_id( $args['post_author'] );
+
+		/* Update user meta. */
+		$topic_count = mb_get_user_topic_count( $user_id );
+		update_user_meta( $user_id, '_topic_count', $topic_count + 1 );
+
+		/* Add topic meta. */
+		update_post_meta( $published, '_topic_activity_datetime',       $post_date  );
+		update_post_meta( $published, '_topic_activity_datetime_epoch', $post_epoch );
+		update_post_meta( $published, '_topic_voices',                  $user_id    );
+		update_post_meta( $published, '_topic_voice_count',             1           );
+		update_post_meta( $published, '_topic_reply_count',             0           );
+
+		/* If we have a forum ID. */
+		if ( 0 < $args->post_parent ) {
+
+			/* Get the forum ID. */
+			$forum_id = mb_get_forum_id( $args->post_parent );
+
+			/* Update forum meta. */
+			update_post_meta( $forum_id, '_forum_activity_datetime',       $post_date  );
+			update_post_meta( $forum_id, '_forum_activity_datetime_epoch', $post_epoch );
+			update_post_meta( $forum_id, '_forum_last_topic_id',           $published  );
+
+			$topic_count = get_post_meta( $forum_id, '_forum_topic_count', true );
+			update_post_meta( $forum_id, '_forum_topic_count', absint( $topic_count ) + 1 );
+		}
+	}
+
+	/* Return the result of `wp_insert_post()`. */
+	return $published;
 }
 
 function mb_get_multi_topic_reply_ids( $topic_ids ) {
