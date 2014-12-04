@@ -44,8 +44,8 @@ function mb_submit_meta_box( $post, $args = array() ) {
 					<div id="post-status-select">
 						<input type="hidden" name="hidden_post_status" id="hidden_post_status" value="<?php echo esc_attr( ('auto-draft' == $post->post_status ) ? 'draft' : $post->post_status); ?>" />
 							<?php foreach ( $avail_statuses as $status ) : ?>
-								<?php if ( 'trash' !== $status ) : // @todo - Better handling of next line. ?>
-									<?php $post_status = in_array( $post->post_status, $avail_statuses ) ? $post->post_status : 'open'; ?>
+								<?php if ( mb_get_trash_post_status() !== $status ) : // @todo - Better handling of next line. ?>
+									<?php $post_status = in_array( $post->post_status, $avail_statuses ) ? $post->post_status : mb_get_open_post_status(); ?>
 									<?php $status_object = get_post_status_object( $status ); ?>
 									<label class="<?php echo esc_attr( $status ); ?>">
 									<input type="radio" value="<?php echo esc_attr( $status ); ?>"<?php checked( $post_status, $status ); ?> /> <?php echo $status_object->label; ?>
@@ -81,7 +81,7 @@ function mb_submit_meta_box( $post, $args = array() ) {
 
 			<div id="publishing-action">
 				<span class="spinner"></span>
-				<?php if ( ( 'open' !== $post->post_status && 'close' !== $post->post_status && 'publish' !== $post->post_status ) || 0 == $post->ID ) : ?>
+				<?php if ( ( mb_get_open_post_status() !== $post->post_status && mb_get_close_post_status() !== $post->post_status && mb_get_publish_post_status() !== $post->post_status ) || 0 == $post->ID ) : ?>
 					<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Publish', 'message-board' ) ?>" />
 					<?php submit_button( __( 'Publish', 'message-board' ), 'primary button-large', 'mb-publish', false, array( 'accesskey' => 'p' ) ); ?>
 				<?php else : ?>

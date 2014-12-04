@@ -84,7 +84,7 @@ function mb_get_orphan_post_status() {
  * @return array
  */
 function mb_get_forum_post_statuses() {
-	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), 'trash' );
+	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_trash_post_status() );
 	return apply_filters( 'mb_get_forum_post_statuses', $statuses );
 }
 
@@ -96,7 +96,7 @@ function mb_get_forum_post_statuses() {
  * @return array
  */
 function mb_get_topic_post_statuses() {
-	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_spam_post_status(), 'trash' );
+	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_spam_post_status(), mb_get_trash_post_staatus() );
 	return apply_filters( 'mb_get_topic_post_statuses', $statuses );
 }
 
@@ -108,7 +108,7 @@ function mb_get_topic_post_statuses() {
  * @return array
  */
 function mb_get_reply_post_statuses() {
-	$statuses = array( 'publish', mb_get_spam_post_status(), 'trash' );
+	$statuses = array( mb_get_publish_post_status(), mb_get_spam_post_status(), mb_get_trash_post_status() );
 	return apply_filters( 'mb_get_topic_post_statuses', $statuses );
 }
 

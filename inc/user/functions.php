@@ -3,7 +3,13 @@
 function mb_set_user_topic_count( $user_id ) {
 	global $wpdb;
 
-	$where = $wpdb->prepare( "WHERE post_author = %d AND post_type = %s AND (post_status = 'publish' OR post_status = 'close' OR post_status = 'open')", $user_id, mb_get_topic_post_type() );
+	$open_status    = mb_get_open_post_status();
+	$close_status   = mb_get_close_post_status();
+	$publish_status = mb_get_publish_post_status();
+
+	$post_statuses = "post_status = '{$open_status}' OR post_status = '{$close_status}' OR post_status = '{$publish_status}'";
+
+	$where = $wpdb->prepare( "WHERE post_author = %d AND post_type = %s AND (%s)", $user_id, mb_get_topic_post_type(), $post_statuses );
 
 	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where" );
 
@@ -15,7 +21,8 @@ function mb_set_user_topic_count( $user_id ) {
 function mb_set_user_reply_count( $user_id ) {
 	global $wpdb;
 
-	$where = $wpdb->prepare( "WHERE post_author = %d AND post_type = %s AND post_status = 'publish'", $user_id, mb_get_reply_post_type() );
+	// @todo check all public reply statuses
+	$where = $wpdb->prepare( "WHERE post_author = %d AND post_type = %s AND post_status = %s", $user_id, mb_get_reply_post_type(), mb_get_publish_status() );
 
 	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where" );
 
