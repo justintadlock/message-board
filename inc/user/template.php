@@ -83,7 +83,7 @@ function mb_user_topic_count( $user_id = 0 ) {
 function mb_get_user_topic_count( $user_id = 0 ) {
 	$user_id = mb_get_user_id( $user_id );
 
-	$count = get_post_meta( $user_id, '_topic_count', true );
+	$count = get_user_meta( $user_id, mb_get_user_topic_count_meta_key(), true );
 
 	if ( '' === $count )
 		$count = mb_set_user_topic_count( $user_id );
@@ -100,7 +100,7 @@ function mb_user_reply_count( $user_id = 0 ) {
 function mb_get_user_reply_count( $user_id = 0 ) {
 	$user_id = mb_get_user_id( $user_id );
 
-	$count = get_post_meta( $user_id, '_reply_count', true );
+	$count = get_user_meta( $user_id, mb_get_user_reply_count_meta_key(), true );
 
 	if ( '' === $count )
 		$count = mb_set_user_reply_count( $user_id );

@@ -654,7 +654,7 @@ function mb_topic_last_active_time( $topic_id = 0 ) {
 function mb_get_topic_last_active_time( $topic_id = 0 ) {
 
 	$topic_id   = mb_get_topic_id( $topic_id );
-	$time       = get_post_meta( $topic_id, '_topic_activity_datetime', true );
+	$time       = get_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(), true );
 	$mysql_date = mysql2date( 'U', $time );
 	$now        = current_time( 'timestamp' );
 
@@ -677,7 +677,7 @@ function mb_topic_last_reply_id( $topic_id = 0 ) {
  */
 function mb_get_topic_last_reply_id( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-	$reply_id = get_post_meta( $topic_id, '_topic_last_reply_id', true );
+	$reply_id = get_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key(), true );
 
 	$mb_reply_id = !empty( $reply_id ) && is_numeric( $reply_id ) ? absint( $reply_id ) : 0;
 
@@ -770,7 +770,7 @@ function mb_topic_reply_count( $topic_id = 0 ) {
  */
 function mb_get_topic_reply_count( $topic_id = 0 ) {
 	$topic_id    = mb_get_topic_id( $topic_id );
-	$reply_count = get_post_meta( $topic_id, '_topic_reply_count', true );
+	$reply_count = get_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), true );
 
 	return apply_filters( 'mb_get_topic_reply_count', absint( $reply_count ), $topic_id );
 }
@@ -825,7 +825,7 @@ function mb_topic_voice_count( $topic_id = 0 ) {
  */
 function mb_get_topic_voice_count( $topic_id = 0 ) {
 	$topic_id     = mb_get_topic_id( $topic_id );
-	$voice_count  = get_post_meta( $topic_id, '_topic_voice_count', true );
+	$voice_count  = get_post_meta( $topic_id, mb_get_topic_voice_count_meta_key(), true );
 
 	$voice_count = $voice_count ? absint( $voice_count ) : count( mb_get_topic_voices( $topic_id ) );
 
@@ -844,7 +844,7 @@ function mb_get_topic_voices( $topic_id = 0 ) {
 	$topic_id     = mb_get_topic_id( $topic_id );
 
 	/* @todo - Make this a single call before release. */
-	$voices = get_post_meta( $topic_id, '_topic_voices' );
+	$voices = get_post_meta( $topic_id, mb_get_topic_voices_meta_key() );
 
 	/* @todo - remove count check and just use explode() before release. */
 	if ( 1 < count( $voices ) ) {
@@ -1295,7 +1295,7 @@ function mb_is_topic_user_bookmark( $user_id = 0, $topic_id = 0 ) {
 	$user_id  = 0 < $user_id ? $user_id : get_current_user_id();
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	$bookmarks = get_user_meta( $user_id, '_topic_bookmarks', true );
+	$bookmarks = get_user_meta( $user_id, mb_get_user_topic_bookmarks_meta_key(), true );
 
 	$favs = explode( ',', $bookmarks );
 

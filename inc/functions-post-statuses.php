@@ -185,7 +185,7 @@ function mb_transition_post_status( $new_status, $old_status, $post ) {
 
 	/* Keep track of the old post status by saving it as post meta. */
 	$type = mb_translate_post_type( $post->post_type );
-	update_post_meta( $post->ID, "_{$type}_prev_status", $old_status );
+	update_post_meta( $post->ID, call_user_func( "mb_get_{$type}_prev_status_meta_key" ), $old_status );
 
 	/* Get the post statuses we need to work with. */
 	$publish_status = mb_get_publish_post_status();
@@ -410,7 +410,7 @@ function mb_spam_topic( $topic_id ) {
  * @return int|WP_Error
  */
 function mb_unspam_topic( $topic_id ) {
-	$status = get_post_meta( $topic_id, '_topic_prev_status', true );
+	$status = get_post_meta( $topic_id, mb_get_topic_prev_status_meta_key(), true );
 	$status = !empty( $status ) ? $status : mb_get_open_post_status();
 	return mb_update_post_status( $topic_id, $status );
 }
@@ -436,7 +436,7 @@ function mb_spam_reply( $reply_id ) {
  * @return int|WP_Error
  */
 function mb_unspam_reply( $reply_id ) {
-	$status = get_post_meta( $reply_id, '_reply_prev_status', true );
+	$status = get_post_meta( $reply_id, mb_get_topic_prev_status_meta_key(), true );
 	$status = !empty( $status ) ? $status : mb_get_open_post_status();
 	return mb_update_post_status( $reply_id, $status );
 }

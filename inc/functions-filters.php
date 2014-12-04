@@ -25,7 +25,6 @@ add_filter( 'get_edit_post_link', 'mb_get_edit_post_link', 5, 2 );
 add_filter( 'map_meta_cap', 'mb_map_meta_cap', 10, 4 );
 
 /* Meta filters. See `meta.php`. */
-add_action( 'init',              'mb_register_meta'         );
 add_action( 'save_post',         'mb_save_post',      10, 2 );
 
 /* Rewrite filters. See `rewrite.php`. */

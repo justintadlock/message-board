@@ -104,7 +104,7 @@ final class Message_Board_Admin_Post_Forum {
 		$new_meta_value = $_POST['mb_forum_type'];
 
 		/* Set the $meta_key variable based off the post type name. */
-		$meta_key = "_forum_type";
+		$meta_key = mb_get_forum_type_meta_key();
 
 		/* Get the meta value of the meta key. */
 		$meta_value = get_post_meta( $post_id, $meta_key, true );

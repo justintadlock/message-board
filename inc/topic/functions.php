@@ -44,14 +44,14 @@ function mb_insert_topic( $args = array() ) {
 
 		/* Update user meta. */
 		$topic_count = mb_get_user_topic_count( $user_id );
-		update_user_meta( $user_id, '_topic_count', $topic_count + 1 );
+		update_user_meta( $user_id, mb_get_user_topic_count_meta_key(), $topic_count + 1 );
 
 		/* Add topic meta. */
-		update_post_meta( $published, '_topic_activity_datetime',       $post_date  );
-		update_post_meta( $published, '_topic_activity_datetime_epoch', $post_epoch );
-		update_post_meta( $published, '_topic_voices',                  $user_id    );
-		update_post_meta( $published, '_topic_voice_count',             1           );
-		update_post_meta( $published, '_topic_reply_count',             0           );
+		update_post_meta( $published, mb_get_topic_activity_datetime_meta_key(),       $post_date  );
+		update_post_meta( $published, mb_get_topic_activity_datetime_epoch_meta_key(), $post_epoch );
+		update_post_meta( $published, mb_get_topic_voices_meta_key(),                  $user_id    );
+		update_post_meta( $published, mb_get_topic_voice_count_meta_key(),             1           );
+		update_post_meta( $published, mb_get_topic_reply_count_meta_key(),             0           );
 
 		/* If we have a forum ID. */
 		if ( 0 < $args->post_parent ) {
@@ -60,12 +60,12 @@ function mb_insert_topic( $args = array() ) {
 			$forum_id = mb_get_forum_id( $args->post_parent );
 
 			/* Update forum meta. */
-			update_post_meta( $forum_id, '_forum_activity_datetime',       $post_date  );
-			update_post_meta( $forum_id, '_forum_activity_datetime_epoch', $post_epoch );
-			update_post_meta( $forum_id, '_forum_last_topic_id',           $published  );
+			update_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key(),       $post_date  );
+			update_post_meta( $forum_id, mb_get_forum_activity_datetime_epoch_meta_key(), $post_epoch );
+			update_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(),           $published  );
 
-			$topic_count = get_post_meta( $forum_id, '_forum_topic_count', true );
-			update_post_meta( $forum_id, '_forum_topic_count', absint( $topic_count ) + 1 );
+			$topic_count = get_post_meta( $forum_id, mb_get_forum_topic_count_meta_key(), true );
+			update_post_meta( $forum_id, mb_get_forum_topic_count_meta_key(), absint( $topic_count ) + 1 );
 		}
 	}
 
@@ -97,7 +97,7 @@ function mb_get_topic_subscribers( $topic_id = 0 ) {
 function mb_set_topic_subscribers( $topic_id ) {
 	global $wpdb;
 
-	$users = $wpdb->get_col( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = '_topic_subscriptions' and FIND_IN_SET( '{$topic_id}', meta_value ) > 0" );
+	$users = $wpdb->get_col( $wpdb->prepare( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s AND FIND_IN_SET( '{$topic_id}', meta_value ) > 0", mb_get_user_topic_subscriptions_meta_key() ) );
 	wp_cache_set( 'mb_get_topic_subscribers_' . $topic_id, $users, 'message-board-users' );
 
 	return $users;
@@ -121,7 +121,7 @@ function mb_get_topic_bookmarkers( $topic_id = 0 ) {
 function mb_set_topic_bookmarkers( $topic_id ) {
 	global $wpdb;
 
-	$users = $wpdb->get_col( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = '_topic_bookmarks' and FIND_IN_SET( '{$topic_id}', meta_value ) > 0" );
+	$users = $wpdb->get_col( $wpdb->prepare( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s and FIND_IN_SET( '{$topic_id}', meta_value ) > 0", mb_get_user_topic_bookmarks_meta_key() ) );
 	wp_cache_set( 'mb_get_topic_bookmarkers_' . $topic_id, $users, 'message-board-users' );
 
 	return $users;
@@ -138,17 +138,17 @@ function mb_reset_topic_latest( $topic_id ) {
 
 		$post_date = get_post_field( 'post_date', $last_reply_id );
 
-		update_post_meta( $topic_id, '_topic_activity_datetime',       $post_date );
-		update_post_meta( $topic_id, '_topic_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
-		update_post_meta( $topic_id, '_topic_last_reply_id',           $last_reply_id );
+		update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(),       $post_date );
+		update_post_meta( $topic_id, mb_get_topic_activity_datetime_epoch_meta_key(), mysql2date( 'U', $post_date ) );
+		update_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key(),           $last_reply_id );
 
 	} else {
 		$post_date = get_post_field( 'post_date', $topic_id );
 
-		update_post_meta( $topic_id, '_topic_activity_datetime',       $post_date );
-		update_post_meta( $topic_id, '_topic_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
+		update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(),       $post_date );
+		update_post_meta( $topic_id, mb_get_topic_activity_datetime_epoch_meta_key(), mysql2date( 'U', $post_date ) );
 
-		delete_post_meta( $topic_id, '_topic_last_reply_id' );
+		delete_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key() );
 	}
 
 	$postarr = array();
@@ -163,7 +163,7 @@ function mb_set_topic_reply_count( $topic_id ) {
 
 	$count = !empty( $replies ) ? count( $replies ) : 0;
 
-	update_post_meta( $topic_id, '_topic_reply_count', $count );
+	update_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), $count );
 }
 
 function mb_set_topic_voices( $topic_id ) {
@@ -177,8 +177,8 @@ function mb_set_topic_voices( $topic_id ) {
 	$voices = array_unique( $voices );
 
 	$_voices = implode( ',', wp_parse_id_list( array_filter( $voices ) ) );
-	update_post_meta( $topic_id, '_topic_voices', $_voices );
-	update_post_meta( $topic_id, '_topic_voice_count', count( $_voices ) );
+	update_post_meta( $topic_id, mb_get_topic_voices_meta_key(), $_voices );
+	update_post_meta( $topic_id, mb_get_topic_voice_count_meta_key(), count( $_voices ) );
 
 	return $voices;
 }

@@ -202,7 +202,7 @@ function mb_handler_new_reply() {
 
 		/* Update user meta. */
 		$topic_count = mb_get_user_topic_count( $user_id );
-		update_user_meta( absint( $user_id ), '_topic_count', $topic_count + 1 );
+		update_user_meta( absint( $user_id ), mb_get_user_topic_count_meta_key(), $topic_count + 1 );
 
 		/* Update topic. */
 
@@ -216,19 +216,19 @@ function mb_handler_new_reply() {
 
 		$forum_id = mb_get_topic_forum_id( $topic_id );
 
-		update_post_meta( $forum_id, '_forum_activity_datetime',       $post_date );
-		update_post_meta( $forum_id, '_forum_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
-		update_post_meta( $forum_id, '_forum_last_reply_id',           $published );
-		update_post_meta( $forum_id, '_forum_last_topic_id',           $topic_id );
+		update_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key(),       $post_date );
+		update_post_meta( $forum_id, mb_get_forum_activity_datetime_epoch_meta_key(), mysql2date( 'U', $post_date ) );
+		update_post_meta( $forum_id, mb_get_forum_last_reply_id_meta_key(),           $published );
+		update_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(),           $topic_id );
 
-		$reply_count = get_post_meta( $forum_id, '_forum_reply_count', true );
-		update_post_meta( $forum_id, '_forum_reply_count', absint( $reply_count ) + 1 );
+		$reply_count = get_post_meta( $forum_id, mb_get_forum_reply_count_meta_key(), true );
+		update_post_meta( $forum_id, mb_get_forum_reply_count_meta_key(), absint( $reply_count ) + 1 );
 
 		/* Update topic meta. */
 
-		update_post_meta( $topic_id, '_topic_activity_datetime',       $post_date );
-		update_post_meta( $topic_id, '_topic_activity_datetime_epoch', mysql2date( 'U', $post_date ) );
-		update_post_meta( $topic_id, '_topic_last_reply_id',           $published );
+		update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(), $post_date                    );
+		update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(), mysql2date( 'U', $post_date ) );
+		update_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key(),     $published                    );
 
 		$voices = mb_get_topic_voices( $topic_id );
 
@@ -237,12 +237,12 @@ function mb_handler_new_reply() {
 
 			$count = count( $voices ) + 1;
 
-			update_post_meta( $topic_id, '_topic_voice_count', $count );
+			update_post_meta( $topic_id, mb_get_topic_voice_count_meta_key(), $count );
 		}
 
-		$count = get_post_meta( $topic_id, '_topic_reply_count', true );
+		$count = get_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), true );
 
-		update_post_meta( $topic_id, '_topic_reply_count', absint( $count ) + 1 );
+		update_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), absint( $count ) + 1 );
 
 		/* Notify topic subscribers. */
 		mb_notify_topic_subscribers( $topic_id, $published );
@@ -407,7 +407,7 @@ function mb_handler_topic_bookmark() {
 
 		// mb_get_user_bookmarks( $user_id );
 
-		$bookmarks = get_user_meta( $user_id, '_topic_bookmarks', true );
+		$bookmarks = get_user_meta( $user_id, mb_get_user_topic_bookmarks_meta_key(), true );
 		$favs = explode( ',', $bookmarks );
 
 
@@ -416,7 +416,7 @@ function mb_handler_topic_bookmark() {
 
 			$new_bookmarks   = implode( ',', wp_parse_id_list( array_filter( $favs ) ) );
 
-			update_user_meta( $user_id, '_topic_bookmarks', $new_bookmarks );
+			update_user_meta( $user_id, mb_get_user_topic_bookmarks_meta_key(), $new_bookmarks );
 
 			mb_set_topic_bookmarkers( $topic_id );
 		}
@@ -425,7 +425,7 @@ function mb_handler_topic_bookmark() {
 
 		// mb_get_user_bookmarks( $user_id );
 
-		$bookmarks = get_user_meta( $user_id, '_topic_bookmarks', true );
+		$bookmarks = get_user_meta( $user_id, mb_get_user_topic_bookmarks_meta_key(), true );
 		$favs = explode( ',', $bookmarks );
 
 		if ( in_array( $topic_id, $favs ) ) {
@@ -436,7 +436,7 @@ function mb_handler_topic_bookmark() {
 
 			$new_bookmarks   = implode( ',', wp_parse_id_list( array_filter( $favs ) ) );
 
-			update_user_meta( $user_id, '_topic_bookmarks', $new_bookmarks );
+			update_user_meta( $user_id, mb_get_user_topic_bookmarks_meta_key(), $new_bookmarks );
 
 			mb_set_topic_bookmarkers( $topic_id );
 		}

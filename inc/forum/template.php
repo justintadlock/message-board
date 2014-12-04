@@ -139,7 +139,7 @@ function mb_forum_type( $forum_id = 0 ) {
 function mb_get_forum_type( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 
-	$forum_type = get_post_meta( $forum_id, '_forum_type', true );
+	$forum_type = get_post_meta( $forum_id, mb_get_forum_type_meta_key(), true );
 
 	$forum_type = !empty( $forum_type ) ? $forum_type : 'forum';
 
@@ -573,7 +573,7 @@ function mb_forum_last_active_time( $forum_id = 0 ) {
 function mb_get_forum_last_active_time( $forum_id = 0 ) {
 
 	$forum_id   = mb_get_forum_id( $forum_id );
-	$time       = get_post_meta( $forum_id, '_forum_activity_datetime', true );
+	$time       = get_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key(), true );
 	$mysql_date = mysql2date( 'U', $time );
 	$now        = current_time( 'timestamp' );
 
@@ -596,7 +596,7 @@ function mb_forum_last_reply_id( $forum_id = 0 ) {
  */
 function mb_get_forum_last_reply_id( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
-	$reply_id = get_post_meta( $forum_id, '_forum_last_reply_id', true );
+	$reply_id = get_post_meta( $forum_id, mb_get_form_last_reply_id_meta_key(), true );
 
 	$mb_reply_id = !empty( $reply_id ) && is_numeric( $reply_id ) ? absint( $reply_id ) : 0;
 
@@ -688,7 +688,7 @@ function mb_forum_last_topic_id( $forum_id ) {
 }
 
 function mb_get_forum_last_topic_id( $forum_id ) {
-	$topic_id = get_post_meta( $forum_id, '_forum_last_topic_id', true );
+	$topic_id = get_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(), true );
 
 	return !empty( $topic_id ) ? absint( $topic_id ) : 0;
 }
@@ -711,7 +711,7 @@ function mb_forum_topic_count( $forum_id = 0 ) {
 
 function mb_get_forum_topic_count( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
-	$count    = get_post_meta( $forum_id, '_forum_topic_count', true );
+	$count    = get_post_meta( $forum_id, mb_get_forum_topic_count_meta_key(), true );
 
 	if ( empty( $count ) )
 		$count = mb_set_forum_topic_count( $forum_id );
@@ -738,7 +738,7 @@ function mb_forum_reply_count( $forum_id = 0 ) {
 function mb_get_forum_reply_count( $forum_id = 0 ) {
 
 	$forum_id = mb_get_forum_id( $forum_id );
-	$count    = get_post_meta( $forum_id, '_forum_reply_count', true );
+	$count    = get_post_meta( $forum_id, mb_get_forum_reply_count_meta_key(), true );
 
 	if ( empty( $count ) )
 		$count = mb_set_forum_reply_count( $forum_id );

@@ -7,7 +7,7 @@ function mb_set_user_topic_count( $user_id ) {
 
 	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where" );
 
-	update_user_meta( $user_id, '_topic_count', $count );
+	update_user_meta( $user_id, mb_get_user_topic_count_meta_key(), $count );
 
 	return $count;
 }
@@ -19,14 +19,14 @@ function mb_set_user_reply_count( $user_id ) {
 
 	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where" );
 
-	update_user_meta( $user_id, '_reply_count', $count );
+	update_user_meta( $user_id, mb_get_user_reply_count_meta_key(), $count );
 
 	return $count;
 }
 
 function mb_get_user_subscriptions( $user_id ) {
 
-	$subscriptions = get_user_meta( $user_id, '_topic_subscriptions', true );
+	$subscriptions = get_user_meta( $user_id, mb_get_user_topic_subscriptions_meta_key(), true );
 
 	return !empty( $subscriptions ) ? explode( ',', $subscriptions ) : array();
 }
@@ -37,7 +37,7 @@ function mb_update_user_subscriptions( $user_id, $subs ) {
 		$subs = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
 	}
 
-	return update_user_meta( $user_id, '_topic_subscriptions', $subs );
+	return update_user_meta( $user_id, mb_get_user_topic_subscriptions_meta_key(), $subs );
 }
 
 function mb_add_user_subscription( $user_id, $topic_id ) {

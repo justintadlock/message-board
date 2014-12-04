@@ -50,7 +50,7 @@ function mb_get_forum_level( $forum_id = 0 ) {
 
 	$forum_id = mb_get_forum_id( $forum_id );
 
-	$forum_level = get_post_meta( $forum_id, '_forum_level', true );
+	$forum_level = get_post_meta( $forum_id, mb_get_forum_level_meta_key(), true );
 
 	if ( empty( $forum_level ) )
 		$forum_level = mb_set_forum_level( $forum_id );
@@ -78,7 +78,7 @@ function mb_set_forum_level( $forum_id ) {
 			$level++;
 		}
 
-	update_post_meta( $forum_id, '_forum_level', absint( $level ) );
+	update_post_meta( $forum_id, mb_get_forum_level_meta_key(), absint( $level ) );
 
 	return $level;
 }
@@ -89,7 +89,7 @@ function mb_set_forum_topic_count( $forum_id ) {
 
 	$count = !empty( $topic_ids ) ? count( $topic_ids ) : 0;
 
-	update_post_meta( $forum_id, '_forum_topic_count', $count );
+	update_post_meta( $forum_id, mb_get_forum_topic_count_meta_key(), $count );
 
 	return $count;
 }
@@ -105,7 +105,7 @@ function mb_set_forum_reply_count( $forum_id ) {
 		$count = !empty( $reply_ids ) ? count( $reply_ids ) : 0;
 	}
 
-	update_post_meta( $forum_id, '_forum_reply_count', $count );
+	update_post_meta( $forum_id, mb_get_forum_reply_count_meta_key(), $count );
 
 	return $count;
 }
@@ -135,35 +135,30 @@ function mb_reset_forum_latest( $forum_id ) {
 			$new_last_reply = array_shift( $reply_ids );
 			$new_last_topic = mb_get_reply_topic_id( $new_last_reply );
 
-			update_post_meta( $forum_id, '_forum_last_reply_id', $new_last_reply );
-			update_post_meta( $forum_id, '_forum_last_topic_id', $new_last_topic );
+			update_post_meta( $forum_id, mb_get_forum_last_reply_id_meta_key(), $new_last_reply );
+			update_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(), $new_last_topic );
 
 			$new_last_date = get_post( $new_last_reply )->post_date;
 
-			update_post_meta( $forum_id, '_forum_activity_datetime',       $new_last_date );
-			update_post_meta( $forum_id, '_forum_activity_datetime_epoch', mysql2date( 'U', $new_last_date ) );
+			update_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key(),       $new_last_date );
+			update_post_meta( $forum_id, mb_get_forum_activity_datetime_epoch_meta_key(), mysql2date( 'U', $new_last_date ) );
 		} else {
 
 			$new_last_topic = array_shift( $topic_ids );
 
-			delete_post_meta( $forum_id, '_forum_last_reply_id' );
+			delete_post_meta( $forum_id, mb_get_forum_last_reply_id_meta_key() );
 
-			update_post_meta( $forum_id, '_forum_last_topic_id', $new_last_topic );
+			update_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(), $new_last_topic );
 
 			$new_last_date = get_post( $new_last_topic )->post_date;
 
-			update_post_meta( $forum_id, '_forum_activity_datetime',       $new_last_date );
-			update_post_meta( $forum_id, '_forum_activity_datetime_epoch', mysql2date( 'U', $new_last_date ) );
+			update_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key(),       $new_last_date );
+			update_post_meta( $forum_id, mb_get_forum_activity_datetime_epoch_meta_key(), mysql2date( 'U', $new_last_date ) );
 		}
 	} else {
-		delete_post_meta( $forum_id, '_forum_last_reply_id' );
-		delete_post_meta( $forum_id, '_forum_last_topic_id' );
-		delete_post_meta( $forum_id, '_forum_activity_datetime' );
-		delete_post_meta( $forum_id, '_forum_activity_datetime_epoch' );
+		delete_post_meta( $forum_id, mb_get_forum_last_reply_id_meta_key()           );
+		delete_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key()           );
+		delete_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key()       );
+		delete_post_meta( $forum_id, mb_get_forum_activity_datetime_epoch_meta_key() );
 	}
 }
-
-
-
-
-

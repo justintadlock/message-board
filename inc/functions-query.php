@@ -85,7 +85,7 @@ function mb_pre_get_posts( $query ) {
 		$query->set( 'meta_query',
 			array(
 				array(
-					'key'     => '_forum_level',
+					'key'     => mb_get_forum_level_meta_key(),
 					'value'   => array( 1, 2 ),
 					'compare' => 'IN',
 					'type'    => 'NUMERIC'
@@ -117,7 +117,7 @@ function mb_pre_get_posts( $query ) {
 		} elseif ( 'bookmarks' === get_query_var( 'mb_user_view' ) ) {
 
 			$user      = get_user_by( 'slug', get_query_var( 'author_name' ) );
-			$bookmarks = get_user_meta( $user->ID, '_topic_bookmarks', true );
+			$bookmarks = get_user_meta( $user->ID, mb_get_user_topic_bookmarks_meta_key(), true );
 			$favs      = wp_parse_id_list( $bookmarks );
 
 			$query->set( 'post__in',       $favs                    );
@@ -131,7 +131,7 @@ function mb_pre_get_posts( $query ) {
 		} elseif ( 'subscriptions' === get_query_var( 'mb_user_view' ) ) {
 
 			$user = get_user_by( 'slug', get_query_var( 'author_name' ) );
-			$subscriptions = get_user_meta( $user->ID, '_topic_subscriptions', true );
+			$subscriptions = get_user_meta( $user->ID, mb_get_user_topic_subscriptions_meta_key(), true );
 			$subs = wp_parse_id_list( $subscriptions );
 
 			$query->set( 'post__in',       $subs                    );

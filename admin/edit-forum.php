@@ -108,7 +108,7 @@ final class Message_Board_Admin_Edit_Forums {
 				$vars,
 				array(
 					'orderby'  => 'meta_value_num',
-					'meta_key' => '_forum_topic_count'
+					'meta_key' => mb_get_forum_topic_count_meta_key()
 				)
 			);
 		}
@@ -119,7 +119,7 @@ final class Message_Board_Admin_Edit_Forums {
 				$vars,
 				array(
 					'orderby'  => 'meta_value_num',
-					'meta_key' => '_forum_reply_count'
+					'meta_key' => mb_get_forum_reply_count_meta_key()
 				)
 			);
 		}
