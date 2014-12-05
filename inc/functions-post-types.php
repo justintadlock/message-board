@@ -62,7 +62,15 @@ function mb_get_reply_post_type() {
  */
 function mb_register_post_types() {
 
-	/* Set up the arguments for the 'forum' post type. */
+	/* Get admin menu page. */
+	$menu_page = mb_get_admin_menu_page();
+
+	/* Get post type names. */
+	$forum_type = mb_get_forum_post_type();
+	$topic_type = mb_get_topic_post_type();
+	$reply_type = mb_get_reply_post_type();
+
+	/* Set up the arguments for the "forum" post type. */
 	$forum_args = array(
 		'description'         => '',
 		'public'              => true,
@@ -70,7 +78,7 @@ function mb_register_post_types() {
 		'exclude_from_search' => true,
 		'show_in_nav_menus'   => true,
 		'show_ui'             => true,
-		'show_in_menu'        => true,
+		'show_in_menu'        => "edit.php?post_type={$forum_type}" === $menu_page ? true : false,
 		'show_in_admin_bar'   => true,
 		'menu_position'       => null,
 		'menu_icon'           => 'dashicons-format-chat',
@@ -78,35 +86,10 @@ function mb_register_post_types() {
 		'delete_with_user'    => false,
 		'hierarchical'        => true,
 		'has_archive'         => 'forums' === mb_get_show_on_front() ? mb_get_root_slug() : mb_get_forum_slug(),
-		'query_var'           => mb_get_forum_post_type(),
+		'query_var'           => $forum_type,
 		'capability_type'     => 'forum',
 		'map_meta_cap'        => true,
-
-		'capabilities' => array(
-
-			// meta caps (don't assign these to roles)
-			'edit_post'              => 'edit_forum',
-			'read_post'              => 'read_forum',
-			'delete_post'            => 'delete_forum',
-
-			// primitive/meta caps
-			'create_posts'           => 'create_forums',
-
-			// primitive caps used outside of map_meta_cap()
-			'edit_posts'             => 'edit_forums',
-			'edit_others_posts'      => 'manage_forums',
-			'publish_posts'          => 'edit_forums',
-			'read_private_posts'     => 'read',
-
-			// primitive caps used inside of map_meta_cap()
-			'read'                   => 'read',
-			'delete_posts'           => 'manage_forums',
-			'delete_private_posts'   => 'manage_forums',
-			'delete_published_posts' => 'manage_forums',
-			'delete_others_posts'    => 'manage_forums',
-			'edit_private_posts'     => 'edit_forums',
-			'edit_published_posts'   => 'edit_forums'
-		),
+		'capabilities'        => mb_get_forum_capabilities(),
 
 		'rewrite' => array(
 			'slug'       => mb_get_forum_slug(),
@@ -142,7 +125,7 @@ function mb_register_post_types() {
 		)
 	);
 
-	/* Set up the arguments for the 'forum_topic' post type. */
+	/* Set up the arguments for the "topic" post type. */
 	$topic_args = array(
 		'description'         => '',
 		'public'              => true,
@@ -150,43 +133,18 @@ function mb_register_post_types() {
 		'exclude_from_search' => false,
 		'show_in_nav_menus'   => false,
 		'show_ui'             => true,
-		'show_in_menu'        => false,
+		'show_in_menu'        => "edit.php?post_type={$topic_type}" === $menu_page ? true : $menu_page,
 		'show_in_admin_bar'   => true,
 		'menu_position'       => null,
-		'menu_icon'           => null,
+		'menu_icon'           => 'dashicons-format-chat',
 		'can_export'          => true,
 		'delete_with_user'    => false,
 		'hierarchical'        => false,
 		'has_archive'         => 'topics' === mb_get_show_on_front() ? mb_get_root_slug() : mb_get_topic_slug(),
 		'query_var'           => mb_get_topic_post_type(),
-		'capability_type'     => 'forum_topic',
+		'capability_type'     => $topic_type,
 		'map_meta_cap'        => true,
-
-		'capabilities' => array(
-
-			// meta caps (don't assign these to roles)
-			'edit_post'              => 'edit_forum_topic',
-			'read_post'              => 'read_forum_topic',
-			'delete_post'            => 'delete_forum_topic',
-
-			// primitive/meta caps
-			'create_posts'           => 'create_forum_topics',
-
-			// primitive caps used outside of map_meta_cap()
-			'edit_posts'             => 'edit_forum_topics',
-			'edit_others_posts'      => 'manage_forums',
-			'publish_posts'          => 'edit_forum_topics',
-			'read_private_posts'     => 'read',
-
-			// primitive caps used inside of map_meta_cap()
-			'read'                   => 'read',
-			'delete_posts'           => 'manage_forums',
-			'delete_private_posts'   => 'manage_forums',
-			'delete_published_posts' => 'manage_forums',
-			'delete_others_posts'    => 'manage_forums',
-			'edit_private_posts'     => 'edit_forum_topics',
-			'edit_published_posts'   => 'edit_forum_topics'
-		),
+		'capabilities'        => mb_get_topic_capabilities(),
 
 		'rewrite' => array(
 			'slug'       => mb_get_topic_slug(),
@@ -204,7 +162,7 @@ function mb_register_post_types() {
 		'labels' => array(
 			'name'               => __( 'Topics',                   'message-board' ),
 			'singular_name'      => __( 'Topic',                    'message-board' ),
-			'menu_name'          => __( 'Topics',                   'message-board' ),
+			'menu_name'          => __( 'Message Board',            'message-board' ),
 			'name_admin_bar'     => __( 'Topic',                    'message-board' ),
 			'all_items'          => __( 'Topics',                   'message-board' ),
 			'add_new'            => __( 'Add Topic',                'message-board' ),
@@ -221,7 +179,7 @@ function mb_register_post_types() {
 		)
 	);
 
-	/* Set up the arguments for the 'forum_reply' post type. */
+	/* Set up the arguments for the "reply" post type. */
 	$reply_args = array(
 		'description'         => '',
 		'public'              => true,
@@ -229,45 +187,19 @@ function mb_register_post_types() {
 		'exclude_from_search' => false,
 		'show_in_nav_menus'   => false,
 		'show_ui'             => true,
-		'show_in_menu'        => false,
+		'show_in_menu'        => "edit.php?post_type={$reply_type}" === $menu_page ? true : $menu_page,
 		'show_in_admin_bar'   => false,
 		'menu_position'       => null,
-		'menu_icon'           => null,
+		'menu_icon'           => 'dashicons-format-chat',
 		'can_export'          => true,
 		'delete_with_user'    => false,
 		'hierarchical'        => false,
 		'has_archive'         =>  false,
-		'query_var'           => mb_get_reply_post_type(),
+		'query_var'           => $reply_type,
 		'capability_type'     => 'forum_reply',
 		'map_meta_cap'        => true,
-
-		'capabilities' => array(
-
-			// meta caps (don't assign these to roles)
-			'edit_post'              => 'edit_forum_reply',
-			'read_post'              => 'read_forum_reply',
-			'delete_post'            => 'delete_forum_reply',
-
-			// primitive/meta caps
-			'create_posts'           => 'create_forum_replies',
-
-			// primitive caps used outside of map_meta_cap()
-			'edit_posts'             => 'edit_forum_replies',
-			'edit_others_posts'      => 'manage_forums',
-			'publish_posts'          => 'edit_forum_replies',
-			'read_private_posts'     => 'read',
-
-			// primitive caps used inside of map_meta_cap()
-			'read'                   => 'read',
-			'delete_posts'           => 'manage_forums',
-			'delete_private_posts'   => 'manage_forums',
-			'delete_published_posts' => 'manage_forums',
-			'delete_others_posts'    => 'manage_forums',
-			'edit_private_posts'     => 'edit_forum_replies',
-			'edit_published_posts'   => 'edit_forum_replies'
-		),
-
-		'rewrite' => false,
+		'capabilities'        => mb_get_reply_capabilities(),
+		'rewrite'             => false,
 
 		'supports' => array(
 			'editor'
@@ -276,7 +208,7 @@ function mb_register_post_types() {
 		'labels' => array(
 			'name'               => __( 'Replies',                   'message-board' ),
 			'singular_name'      => __( 'Reply',                     'message-board' ),
-			'menu_name'          => __( 'Replies',                   'message-board' ),
+			'menu_name'          => __( 'Message Board',             'message-board' ),
 			'name_admin_bar'     => __( 'Reply',                     'message-board' ),
 			'all_items'          => __( 'Replies',                   'message-board' ),
 			'add_new'            => __( 'Add Reply',                 'message-board' ),
@@ -294,9 +226,42 @@ function mb_register_post_types() {
 	);
 
 	/* Register post types. */
-	register_post_type( mb_get_forum_post_type(), apply_filters( 'mb_forum_post_type_args', $forum_args ) );
-	register_post_type( mb_get_topic_post_type(), apply_filters( 'mb_topic_post_type_args', $topic_args ) );
-	register_post_type( mb_get_reply_post_type(), apply_filters( 'mb_reply_post_type_args', $reply_args ) );
+	register_post_type( $forum_type, apply_filters( 'mb_forum_post_type_args', $forum_args ) );
+	register_post_type( $topic_type, apply_filters( 'mb_topic_post_type_args', $topic_args ) );
+	register_post_type( $reply_type, apply_filters( 'mb_reply_post_type_args', $reply_args ) );
+}
+
+/**
+ * Returns the top-level menu page.  This function is needed because the WordPress admin function 
+ * `user_can_access_admin_page()` returns an incorrect result for sub-menu pages of post types 
+ * when the user doesn't have permission to view the top-level page.  What this function does is 
+ * change the top-level menu based on what capability the user does have.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_admin_menu_page() {
+
+	$forum_type = mb_get_forum_post_type();
+	$topic_type = mb_get_topic_post_type();
+	$reply_type = mb_get_reply_post_type();
+
+	/* Default page goes to the forum edit screen. */
+	$menu_page = "edit.php?post_type={$forum_type}";
+
+	/* If user can edit topics, use the topic edit screen. */
+	if ( !current_user_can( 'edit_forums' ) && current_user_can( 'edit_topics' ) ) {
+		$menu_page = "edit.php?post_type={$topic_type}";
+	}
+
+	/* Else, if user can edit replies, use the reply edit screen. */
+	elseif ( !current_user_can( 'edit_forums' ) && current_user_can( 'edit_replies' ) ) {
+		$menu_page = "edit.php?post_type={$topic_type}";
+	}
+	// @todo settings page if needed
+
+	return $menu_page;
 }
 
 /**

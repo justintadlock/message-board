@@ -53,33 +53,15 @@ final class Message_Board_Admin {
 	 */
 	function admin_menu() {
 
-		/* Get post type objects. */
-		$topic_object = get_post_type_object( $this->topic_type );
-		$reply_object = get_post_type_object( $this->reply_type );
-
-		/* Add the topic menu page. */
-		add_submenu_page( 
-			"edit.php?post_type={$this->forum_type}", 
-			$topic_object->labels->all_items, 
-			$topic_object->labels->all_items, 
-			$topic_object->cap->edit_posts, 
-			"edit.php?post_type={$this->topic_type}" 
-		);
-
-		/* Add the reply menu page. */
-		add_submenu_page( 
-			"edit.php?post_type={$this->forum_type}", 
-			$reply_object->labels->all_items, 
-			$reply_object->labels->all_items, 
-			$reply_object->cap->edit_posts, 
-			"edit.php?post_type={$this->reply_type}" 
-		);
+		/* Remove `post-new.php` submenu pages for topics and replies. */
+		remove_submenu_page( mb_get_admin_menu_page(), "post-new.php?post_type={$this->topic_type}" );
+		remove_submenu_page( mb_get_admin_menu_page(), "post-new.php?post_type={$this->reply_type}" );
 	}
 
 	function parent_file( $parent_file ) {
 
 		if ( "edit.php?post_type={$this->topic_type}" === $parent_file || "edit.php?post_type={$this->reply_type}" === $parent_file ) {
-			$parent_file = str_replace( array( $this->topic_type, $this->reply_type ), $this->forum_type, $parent_file );
+			$parent_file = mb_get_admin_menu_page();
 		}
 
 		return $parent_file;

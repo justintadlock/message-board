@@ -285,12 +285,21 @@ final class Message_Board {
 		if ( !empty( $role ) ) {
 
 			$role->add_cap( 'manage_forums' );
-			$role->add_cap( 'create_forums' );
-			$role->add_cap( 'edit_forums' );
-			$role->add_cap( 'create_forum_topics' );
-			$role->add_cap( 'edit_forum_topics' );
-			$role->add_cap( 'create_forum_replies' );
-			$role->add_cap( 'edit_forum_replies' );
+
+			$role->add_cap( 'create_forums'      );
+			$role->add_cap( 'edit_forums'        );
+			$role->add_cap( 'edit_others_forums' );
+			$role->add_cap( 'moderate_forums'    );
+
+			$role->add_cap( 'create_topics'      );
+			$role->add_cap( 'edit_topics'        );
+			$role->add_cap( 'edit_others_topics' );
+			$role->add_cap( 'moderate_topics'    );
+
+			$role->add_cap( 'create_replies'      );
+			$role->add_cap( 'edit_replies'        );
+			$role->add_cap( 'edit_others_replies' );
+			$role->add_cap( 'moderate_replies'    );
 		}
 	}
 }
