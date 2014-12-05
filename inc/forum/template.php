@@ -324,7 +324,7 @@ function mb_forum_id( $forum_id = 0 ) {
  * @return int
  */
 function mb_get_forum_id( $forum_id = 0 ) {
-	return apply_filters( 'mb_get_forum_id', mb_get_post_id( $forum_id ), $forum_id );
+	return apply_filters( 'mb_get_forum_id', absint( mb_get_post_id( $forum_id ) ), $forum_id );
 }
 
 /* ====== Forum Content ====== */

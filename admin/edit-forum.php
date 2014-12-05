@@ -80,9 +80,7 @@ final class Message_Board_Admin_Edit_Forums {
 	}
 
 	/**
-	 * Filter on the 'request' hook to change the 'order' and 'orderby' query variables when 
-	 * viewing the "edit menu items" screen in the admin.  This is to order the menu items 
-	 * alphabetically.
+	 * Filter on the `request` hook to change what posts are loaded.
 	 *
 	 * @since  1.0.0
 	 * @access public
@@ -91,40 +89,59 @@ final class Message_Board_Admin_Edit_Forums {
 	 */
 	public function request( $vars ) {
 
+		$new_vars = array();
+
 		/* Default ordering alphabetically. */
 		if ( !isset( $vars['order'] ) && !isset( $vars['orderby'] ) ) {
 			$vars = array_merge(
 				$vars,
 				array(
 					'order'   => 'ASC',
-					'orderby' => 'title'
+					'orderby' => 'menu_order title'
 				)
 			);
 		}
 
-		elseif ( isset( $vars['orderby'] ) && '_forum_topic_count' === $vars['orderby'] ) {
+		/* Load forums with a specific type. */
+		elseif ( isset( $_GET['forum_type'] ) ) {
 
-			$vars = array_merge(
-				$vars,
-				array(
-					'orderby'  => 'meta_value_num',
-					'meta_key' => mb_get_forum_topic_count_meta_key()
-				)
-			);
+			$forum_type = mb_get_forum_type_object( sanitize_key( $_GET['forum_type'] ) );
+
+			if ( $forum_type ) {
+				$new_vars['meta_key'] = mb_get_forum_type_meta_key();
+				$new_var['meta_value'] = $forum_type->name;
+			}
 		}
 
-		elseif ( isset( $vars['orderby'] ) && '_forum_reply_count' === $vars['orderby'] ) {
+		/* Order forums by their type. */
+		elseif ( isset( $vars['orderby'] ) && 'forum_type' === $vars['orderby'] ) {
 
-			$vars = array_merge(
-				$vars,
-				array(
-					'orderby'  => 'meta_value_num',
-					'meta_key' => mb_get_forum_reply_count_meta_key()
-				)
-			);
+			$new_vars['orderby']  = 'meta_value';
+			$new_vars['meta_key'] = mb_get_forum_type_meta_key();
 		}
 
-		return $vars;
+		/* Order forums by their topic count. */
+		elseif ( isset( $vars['orderby'] ) && 'topic_count' === $vars['orderby'] ) {
+
+			$new_vars['orderby']  = 'meta_value_num';
+			$new_vars['meta_key'] = mb_get_forum_topic_count_meta_key();
+		}
+
+		/* Order forums by their reply count. */
+		elseif ( isset( $vars['orderby'] ) && 'reply_count' === $vars['orderby'] ) {
+
+			$new_vars['orderby']  = 'meta_value_num';
+			$new_vars['meta_key'] = mb_get_forum_reply_count_meta_key();
+		}
+
+		/* Order forums by their author. */
+		elseif ( isset( $vars['orderby'] ) && 'post_author' === $vars['orderby'] ) {
+
+			$new_vars['orderby'] = 'post_author';
+		}
+
+		/* Return the vars, merging with the new ones. */
+		return array_merge( $vars, $new_vars );
 	}
 
 	public function edit_columns( $post_columns ) {
@@ -143,7 +160,9 @@ final class Message_Board_Admin_Edit_Forums {
 		if ( !isset( $_GET['post_status'] ) )
 			$columns['status']    = __( 'Status',     'message-board' );
 
-		$columns['type']      = __( 'Type',       'message-board' );
+		if ( !isset( $_GET['forum_type'] ) )
+			$columns['type']      = __( 'Type',       'message-board' );
+
 		$columns['topics']    = __( 'Topics',     'message-board' );
 		$columns['replies']   = __( 'Replies',    'message-board' );
 		$columns['datetime']  = __( 'Created',    'message-board' );
@@ -154,8 +173,9 @@ final class Message_Board_Admin_Edit_Forums {
 
 	public function manage_sortable_columns( $columns ) {
 
-		$columns['topics']  = array( '_forum_topic_count', true );
-		$columns['replies'] = array( '_forum_reply_count', true );
+		$columns['type']    = array( 'forum_type',  true );
+		$columns['topics']  = array( 'topic_count', true );
+		$columns['replies'] = array( 'reply_count', true );
 
 		return $columns;
 	}
@@ -166,20 +186,26 @@ final class Message_Board_Admin_Edit_Forums {
 
 			case 'status' :
 
+				$post_type = get_post_type( $post_id );
 				$status = get_post_status_object( get_post_status( $post_id ) );
 
 				if ( mb_get_publish_post_status() === $status->name )
 					wp_update_post( array( 'ID' => $post_id, 'post_status' => mb_get_open_post_status() ) );
 
-				echo $status->label;
+				$url = add_query_arg( array( 'post_status' => $status->name, 'post_type' => $post_type ), admin_url( 'edit.php' ) );
+
+				printf( '<a href="%s">%s</a>', $url, $status->label );
 
 				break;
 
 			case 'type' :
 
-				$type = mb_get_forum_type_object( mb_get_forum_type( $post_id ) );
+				$post_type = get_post_type( $post_id );
+				$forum_type = mb_get_forum_type_object( mb_get_forum_type( $post_id ) );
 
-				echo $type->label;
+				$url = add_query_arg( array( 'post_type' => $post_type, 'forum_type' => $forum_type->name ), admin_url( 'edit.php' ) );
+
+				printf( '<a href="%s">%s</a>', $url, $forum_type->label );
 
 				break;
 

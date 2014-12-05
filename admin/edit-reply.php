@@ -43,6 +43,8 @@ final class Message_Board_Admin_Edit_Replies {
 
 		do_action( 'mb_edit_replies_handler' );
 
+		add_filter( 'request', array( $this, 'request' ) );
+
 		add_action( 'admin_enqueue_scripts', array( $this, 'print_styles'  ) );
 
 		add_filter( "manage_edit-{$reply_type}_columns",          array( $this, 'edit_columns'            )        );
@@ -52,6 +54,54 @@ final class Message_Board_Admin_Edit_Replies {
 		add_filter( 'post_row_actions', array( $this, 'row_actions' ), 10, 2 );
 
 		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+	}
+
+	/**
+	 * Filter on the `request` hook to change what posts are loaded.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array  $vars
+	 * @return array
+	 */
+	public function request( $vars ) {
+
+		$new_vars = array();
+
+		/* Load replies of a specific topic. */
+		if ( isset( $_GET['post_parent'] ) ) {
+
+			$new_vars['post_parent'] = mb_get_topic_id( $_GET['post_parent'] );
+		}
+
+		/* Load replies of a specific forum. */
+		elseif ( isset( $_GET['mb_forum'] ) ) {
+
+			$new_vars['meta_key']  = mb_get_reply_forum_id_meta_key();
+			$new_vars['meta_value'] = mb_get_forum_id( $_GET['mb_forum'] );
+		}
+
+		/* Order replies by their forums. */
+		elseif ( isset( $vars['orderby'] ) && 'forum' === $vars['orderby'] ) {
+
+			$new_vars['orderby']  = 'meta_value_num';
+			$new_vars['meta_key'] = mb_get_reply_forum_id_meta_key();
+		}
+
+		/* Order replies by their topics. */
+		elseif ( isset( $vars['orderby'] ) && 'post_parent' === $vars['orderby'] ) {
+
+			$new_vars['orderby'] = 'post_parent';
+		}
+
+		/* Order replies by their author. */
+		elseif ( isset( $vars['orderby'] ) && 'post_author' === $vars['orderby'] ) {
+
+			$new_vars['orderby'] = 'post_author';
+		}
+
+		/* Return the vars, merging with the new ones. */
+		return array_merge( $vars, $new_vars );
 	}
 
 	public function admin_notices() {
@@ -100,8 +150,9 @@ final class Message_Board_Admin_Edit_Replies {
 
 	public function manage_sortable_columns( $columns ) {
 
-		//$columns['topics']  = array( '_forum_topic_count', true );
-		//$columns['replies'] = array( '_forum_reply_count', true );
+		$columns['forum']  = array( 'forum',       true );
+		$columns['topic']  = array( 'post_parent', true );
+		$columns['author'] = array( 'post_author', true );
 
 		return $columns;
 	}
@@ -112,13 +163,25 @@ final class Message_Board_Admin_Edit_Replies {
 
 			case 'forum' :
 
-				mb_forum_link( mb_get_reply_forum_id( $post_id ) );
+				$forum_id = mb_get_reply_forum_id( $post_id );
+
+				$post_type = get_post_type( $post_id );
+
+				$url = add_query_arg( array( 'post_type' => $post_type, 'mb_forum' => $forum_id ), admin_url( 'edit.php' ) );
+
+				printf( '<a href="%s">%s</a>', $url, mb_get_forum_title( $forum_id ) );
 
 				break;
 
 			case 'topic' :
 
-				mb_topic_link( mb_get_reply_topic_id( $post_id ) );
+				$topic_id = mb_get_reply_topic_id( $post_id );
+
+				$post_type = get_post_type( $post_id );
+
+				$url = add_query_arg( array( 'post_type' => $post_type, 'post_parent' => $topic_id ), admin_url( 'edit.php' ) );
+
+				printf( '<a href="%s">%s</a>', $url, mb_get_topic_title( $topic_id ) );
 
 				break;
 

@@ -43,6 +43,8 @@ final class Message_Board_Admin_Edit_Topics {
 
 		do_action( 'mb_edit_topics_handler' );
 
+		add_filter( 'request', array( $this, 'request' ) );
+
 		add_action( 'admin_enqueue_scripts', array( $this, 'print_styles'  ) );
 
 		add_filter( "manage_edit-{$topic_type}_columns",          array( $this, 'edit_columns'            )        );
@@ -52,6 +54,54 @@ final class Message_Board_Admin_Edit_Topics {
 		add_filter( 'post_row_actions', array( $this, 'row_actions' ), 10, 2 );
 
 		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+	}
+
+	/**
+	 * Filter on the `request` hook to change what posts are loaded.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array  $vars
+	 * @return array
+	 */
+	public function request( $vars ) {
+
+		$new_vars = array();
+
+		/* Load topics of a specific forum. */
+		if ( isset( $_GET['post_parent'] ) ) {
+
+			$new_vars['post_parent'] = mb_get_forum_id( $_GET['post_parent'] );
+		}
+
+		/* Order topics by their forums. */
+		elseif ( isset( $vars['orderby'] ) && 'post_parent' === $vars['orderby'] ) {
+
+			$new_vars['orderby'] = 'post_parent';
+		}
+
+		/* Order topics by their reply count. */
+		elseif ( isset( $vars['orderby'] ) && 'reply_count' === $vars['orderby'] ) {
+
+			$new_vars['orderby']  = 'meta_value_num';
+			$new_vars['meta_key'] = mb_get_topic_reply_count_meta_key();
+		}
+
+		/* Order topics by their voice count. */
+		elseif ( isset( $vars['orderby'] ) && 'voice_count' === $vars['orderby'] ) {
+
+			$new_vars['orderby']  = 'meta_value_num';
+			$new_vars['meta_key'] = mb_get_topic_voice_count_meta_key();
+		}
+
+		/* Order topics by their author. */
+		elseif ( isset( $vars['orderby'] ) && 'post_author' === $vars['orderby'] ) {
+
+			$new_vars['orderby'] = 'post_author';
+		}
+
+		/* Return the vars, merging with the new ones. */
+		return array_merge( $vars, $new_vars );
 	}
 
 	public function admin_notices() {
@@ -110,8 +160,10 @@ final class Message_Board_Admin_Edit_Topics {
 
 	public function manage_sortable_columns( $columns ) {
 
-		//$columns['topics']  = array( '_forum_topic_count', true );
-		//$columns['replies'] = array( '_forum_topic_count', true );
+		$columns['forum']   = array( 'post_parent', true );
+		$columns['replies'] = array( 'reply_count', true );
+		$columns['voices']  = array( 'voice_count', true );
+		$columns['author']  = array( 'post_author', true );
 
 		return $columns;
 	}
@@ -122,18 +174,27 @@ final class Message_Board_Admin_Edit_Topics {
 
 			case 'status' :
 
+				$post_type = get_post_type( $post_id );
 				$status = get_post_status_object( get_post_status( $post_id ) );
 
 				if ( mb_get_publish_post_status() === $status->name )
 					wp_update_post( array( 'ID' => $post_id, 'post_status' => mb_get_open_post_status() ) );
 
-				echo $status->label;
+				$url = add_query_arg( array( 'post_status' => $status->name, 'post_type' => $post_type ), admin_url( 'edit.php' ) );
+
+				printf( '<a href="%s">%s</a>', $url, $status->label );
 
 				break;
 
 			case 'forum' :
 
-				mb_forum_link( mb_get_topic_forum_id( $post_id ) );
+				$forum_id = mb_get_topic_forum_id( $post_id );
+
+				$post_type = get_post_type( $post_id );
+
+				$url = add_query_arg( array( 'post_type' => $post_type, 'post_parent' => $forum_id ), admin_url( 'edit.php' ) );
+
+				printf( '<a href="%s">%s</a>', $url, mb_get_forum_title( $forum_id ) );
 
 				break;
 
