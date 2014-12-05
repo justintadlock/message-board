@@ -96,7 +96,7 @@ function mb_get_forum_post_statuses() {
  * @return array
  */
 function mb_get_topic_post_statuses() {
-	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_spam_post_status(), mb_get_trash_post_staatus() );
+	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_spam_post_status(), mb_get_trash_post_status() );
 	return apply_filters( 'mb_get_topic_post_statuses', $statuses );
 }
 
