@@ -22,7 +22,7 @@ function mb_set_user_reply_count( $user_id ) {
 	global $wpdb;
 
 	// @todo check all public reply statuses
-	$where = $wpdb->prepare( "WHERE post_author = %d AND post_type = %s AND post_status = %s", $user_id, mb_get_reply_post_type(), mb_get_publish_status() );
+	$where = $wpdb->prepare( "WHERE post_author = %d AND post_type = %s AND post_status = %s", $user_id, mb_get_reply_post_type(), mb_get_publish_post_status() );
 
 	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where" );
 

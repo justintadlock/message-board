@@ -594,7 +594,7 @@ function mb_forum_last_reply_id( $forum_id = 0 ) {
  */
 function mb_get_forum_last_reply_id( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
-	$reply_id = get_post_meta( $forum_id, mb_get_form_last_reply_id_meta_key(), true );
+	$reply_id = get_post_meta( $forum_id, mb_get_forum_last_reply_id_meta_key(), true );
 
 	$mb_reply_id = !empty( $reply_id ) && is_numeric( $reply_id ) ? absint( $reply_id ) : 0;
 
