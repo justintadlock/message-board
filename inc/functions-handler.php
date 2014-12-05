@@ -401,8 +401,7 @@ function mb_handler_forum_toggle_open() {
 	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "open_forum_{$forum_id}" ) )
 		return;
 
-	// @todo - moderate cap for this specific forum
-	if ( !current_user_can( 'manage_forums' ) )
+	if ( !current_user_can( 'moderate_forum', $forum_id ) )
 		return;
 
 	$updated = mb_is_forum_open( $forum_id ) ? mb_close_forum( $forum_id ) : mb_open_forum( $forum_id );
@@ -423,8 +422,7 @@ function mb_handler_topic_toggle_open() {
 	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "open_topic_{$topic_id}" ) )
 		return;
 
-	// @todo - moderate cap for this specific topic
-	if ( !current_user_can( 'manage_forums' ) )
+	if ( !current_user_can( 'moderate_topic', $topic_id ) )
 		return;
 
 	$updated = mb_is_topic_open( $topic_id ) ? mb_close_topic( $topic_id ) : mb_open_topic( $topic_id );
@@ -445,8 +443,7 @@ function mb_handler_topic_toggle_spam() {
 	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "spam_topic_{$topic_id}" ) )
 		return;
 
-	// @todo - moderate cap for this specific topic
-	if ( !current_user_can( 'manage_forums' ) )
+	if ( !current_user_can( 'moderate_topic', $topic_id ) )
 		return;
 
 	$updated = mb_is_topic_spam( $topic_id ) ? mb_unspam_topic( $topic_id ) : mb_spam_topic( $topic_id );
@@ -489,8 +486,7 @@ function mb_handler_forum_toggle_trash() {
 	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "trash_forum_{$forum_id}" ) )
 		return;
 
-	// @todo - moderate cap for this specific forum
-	if ( !current_user_can( 'manage_forums' ) )
+	if ( !current_user_can( 'moderate_forum', $forum_id ) )
 		return;
 
 	$updated = mb_is_forum_trash( $forum_id ) ? wp_untrash_post( $forum_id ) : wp_trash_post( $forum_id );
@@ -511,8 +507,7 @@ function mb_handler_topic_toggle_trash() {
 	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "trash_topic_{$topic_id}" ) )
 		return;
 
-	// @todo - moderate cap for this specific topic
-	if ( !current_user_can( 'manage_forums' ) )
+	if ( !current_user_can( 'moderate_topic', $topic_id ) )
 		return;
 
 	$updated = mb_is_topic_trash( $topic_id ) ? wp_untrash_post( $topic_id ) : wp_trash_post( $topic_id );
@@ -533,8 +528,7 @@ function mb_handler_reply_toggle_trash() {
 	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "trash_reply_{$reply_id}" ) )
 		return;
 
-	// @todo - moderate cap for this specific reply
-	if ( !current_user_can( 'manage_forums' ) )
+	if ( !current_user_can( 'moderate_reply', $reply_id ) )
 		return;
 
 	$updated = mb_is_reply_trash( $reply_id ) ? wp_untrash_post( $reply_id ) : wp_trash_post( $reply_id );

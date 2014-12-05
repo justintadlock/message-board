@@ -216,11 +216,10 @@ function mb_forum_toggle_open_link( $forum_id = 0 ) {
 
 function mb_get_forum_toggle_open_link( $forum_id = 0 ) {
 
-	// @todo moderate cap check for specific forum
-	if ( !current_user_can( 'manage_forums' ) )
-		return '';
+	$forum_id = mb_get_topic_id( $forum_id );
 
-	$forum_id = mb_get_forum_id( $forum_id );
+	if ( !current_user_can( 'moderate_forum', $forum_id ) )
+		return '';
 
 	$status = mb_is_forum_open( $forum_id ) ? get_post_status_object( mb_get_close_post_status() ) : get_post_status_object( mb_get_open_post_status() );
 
@@ -249,11 +248,10 @@ function mb_forum_toggle_trash_link( $forum_id = 0 ) {
 
 function mb_get_forum_toggle_trash_link( $forum_id = 0 ) {
 
-	// @todo moderate cap check for specific forum
-	if ( !current_user_can( 'manage_forums' ) )
-		return '';
+	$forum_id = mb_get_topic_id( $forum_id );
 
-	$forum_id = mb_get_forum_id( $forum_id );
+	if ( !current_user_can( 'moderate_forum', $forum_id ) )
+		return '';
 
 	$text = mb_is_forum_trash( $forum_id ) ? __( 'Restore', 'message-board' ) : get_post_status_object( mb_get_trash_post_status() )->label;
 

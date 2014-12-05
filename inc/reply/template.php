@@ -89,12 +89,14 @@ function mb_reply_edit_link( $reply_id = 0 ) {
 }
 
 function mb_get_reply_edit_link( $reply_id = 0 ) {
-	$url = mb_get_reply_edit_url( $reply_id );
 
-	if ( !empty( $url ) )
+	$reply_id = mb_get_reply_id( $reply_id );
+	$link     = '';
+
+	if ( current_user_can( 'edit_reply', $reply_id ) && $url  = mb_get_reply_edit_url( $reply_id ) )
 		$link = sprintf( '<a href="%s" class="reply-edit-link edit-link">%s</a>', $url, __( 'Edit', 'message-board' ) );
 
-	return apply_filters( 'mb_get_reply_edit_link', $link );
+	return apply_filters( 'mb_get_reply_edit_link', $link, $reply_id );
 }
 
 /* ====== Reply Status ====== */
@@ -161,11 +163,10 @@ function mb_reply_toggle_spam_link( $reply_id = 0 ) {
 
 function mb_get_reply_toggle_spam_link( $reply_id = 0 ) {
 
-	// @todo moderate cap check for specific reply
-	if ( !current_user_can( 'manage_forums' ) )
-		return '';
-
 	$reply_id = mb_get_reply_id( $reply_id );
+
+	if ( !current_user_can( 'moderate_reply', $reply_id ) )
+		return '';
 
 	$text = mb_is_reply_spam( $reply_id ) ? __( 'Unspam', 'message-board' ) : get_post_status_object( mb_get_spam_post_status() )->label;
 
@@ -194,11 +195,10 @@ function mb_reply_toggle_trash_link( $reply_id = 0 ) {
 
 function mb_get_reply_toggle_trash_link( $reply_id = 0 ) {
 
-	// @todo moderate cap check for specific reply
-	if ( !current_user_can( 'manage_forums' ) )
-		return '';
-
 	$reply_id = mb_get_reply_id( $reply_id );
+
+	if ( !current_user_can( 'moderate_reply', $reply_id ) )
+		return '';
 
 	$text = mb_is_reply_trash( $reply_id ) ? __( 'Restore', 'message-board' ) : get_post_status_object( mb_get_trash_post_status() )->label;
 

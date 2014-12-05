@@ -237,6 +237,10 @@ function mb_register_post_types() {
  * when the user doesn't have permission to view the top-level page.  What this function does is 
  * change the top-level menu based on what capability the user does have.
  *
+ * @link https://core.trac.wordpress.org/ticket/29714
+ * @link https://core.trac.wordpress.org/ticket/22895
+ * @link https://core.trac.wordpress.org/ticket/16204
+ *
  * @since  1.0.0
  * @access public
  * @return string
