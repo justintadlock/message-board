@@ -13,12 +13,16 @@
 	padding: 0;
 }
 
+#misc-publishing-actions { padding-top: 0; }
+
 #mb-submitdiv input[type="radio"],
 #mb-forum-attributes input[type="radio"],
 #mb-topic-attributes input[type="radio"] {
 	margin:         2px 3px 5px 0;
 	vertical-align: middle;
 }
+
+#mb-submitdiv input[name="post_status"] { margin-left: 2px; }
 
 /* ====== Edit Posts List Screen (edit.php) ====== */
 

@@ -29,20 +29,22 @@ function mb_submit_meta_box( $post, $args = array() ) {
 
 		<div id="minor-publishing">
 
-			<div style="display:none;">
-				<?php submit_button( __( 'Save', 'message-board' ), 'button', 'save' ); ?>
-			</div>
-
-			<div id="minor-publishing-actions">
-				<div class="clear"></div>
-			</div><!-- #minor-publishing-actions -->
-
 			<div id="misc-publishing-actions">
 
 				<div class="misc-pub-section misc-pub-post-status">
+<?php $st_object = !empty( $post->post_status ) && in_array( $post->post_stats, $avail_statuses ) ? get_post_status_object( $post->post_status ) : get_post_status_object( mb_get_open_post_status() ); ?>
+						<p><label for="post_status"><?php printf( __( 'Status: %s', 'message-board' ), "<strong>{$st_object->label}</strong>" ); ?></label>
+<?php /*
+<a href="#post_status" class="edit-post-status hide-if-no-js">
+	<span aria-hidden="true"><?php _e( 'Edit' ); ?></span> 
+	<span class="screen-reader-text"><?php _e( 'Edit status' ); ?></span>
+</a>
+*/ ?>
+</p>
 
-					<div id="post-status-select">
+					<div id="post-status-select" <?php /*class="hide-if-js"*/ ?>>
 						<input type="hidden" name="hidden_post_status" id="hidden_post_status" value="<?php echo esc_attr( ('auto-draft' == $post->post_status ) ? 'draft' : $post->post_status); ?>" />
+							<div id="post_status">
 							<?php foreach ( $avail_statuses as $status ) : ?>
 								<?php if ( mb_get_trash_post_status() !== $status ) : // @todo - Better handling of next line. ?>
 									<?php if ( mb_get_reply_post_type() === $post->post_type ) : ?>
@@ -56,6 +58,7 @@ function mb_submit_meta_box( $post, $args = array() ) {
 									<br />
 								<?php endif; ?>
 							<?php endforeach; ?>
+							</div><!-- #post_status -->
 					</div><!-- #post-status-select -->
 
 				</div><!-- .misc-pub-section -->
