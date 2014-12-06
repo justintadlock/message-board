@@ -1,4 +1,14 @@
 <?php
+/**
+ * Handles all the functionality for the `edit.php` screen for the topic post type. 
+ *
+ * @package    MessageBoard
+ * @subpackage Admin
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 final class Message_Board_Admin_Edit_Topics {
 
@@ -22,6 +32,9 @@ final class Message_Board_Admin_Edit_Topics {
 
 		/* Only run our customization on the 'edit.php' page in the admin. */
 		add_action( 'load-edit.php', array( $this, 'load_edit' ) );
+
+		/* Hook to the topics handler. */
+		add_action( 'mb_load_edit_topic', array( $this, 'handler' ), 0 );
 	}
 
 	/**
@@ -32,28 +45,36 @@ final class Message_Board_Admin_Edit_Topics {
 	 * @return void
 	 */
 	public function load_edit() {
+
+		/* Get the current screen object. */
 		$screen = get_current_screen();
 
+		/* Get the forum post type name. */
 		$topic_type = mb_get_topic_post_type();
 
+		/* Bail if we're not on the edit topic screen. */
 		if ( !empty( $screen->post_type ) && $screen->post_type !== $topic_type )
 			return;
 
-		add_action( 'mb_edit_topics_handler', array( $this, 'handler' ), 0 );
+		/* Custom action for loading the edit screen. */
+		do_action( 'mb_load_edit_topic' );
 
-		do_action( 'mb_edit_topics_handler' );
-
+		/* Filter the `request` vars. */
 		add_filter( 'request', array( $this, 'request' ) );
 
+		/* Enqueue custom styles. */
 		add_action( 'admin_enqueue_scripts', array( $this, 'print_styles'  ) );
 
+		/* Add custom admin notices. */
+		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+
+		/* Handle custom columns. */
 		add_filter( "manage_edit-{$topic_type}_columns",          array( $this, 'edit_columns'            )        );
 		add_filter( "manage_edit-{$topic_type}_sortable_columns", array( $this, 'manage_sortable_columns' )        );
 		add_action( "manage_{$topic_type}_posts_custom_column",   array( $this, 'manage_columns'          ), 10, 2 );
 
+		/* Filter the row actions. */
 		add_filter( 'post_row_actions', array( $this, 'row_actions' ), 10, 2 );
-
-		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 	}
 
 	/**
@@ -104,60 +125,42 @@ final class Message_Board_Admin_Edit_Topics {
 		return array_merge( $vars, $new_vars );
 	}
 
-	public function admin_notices() {
-
-		$allowed_notices = array( 'spammed', 'unspammed', 'opened', 'closed' );
-
-		if ( isset( $_GET['mb_topic_notice'] ) && in_array( $_GET['mb_topic_notice'], $allowed_notices ) && isset( $_GET['topic_id'] ) ) {
-
-			$notice   = $_GET['mb_topic_notice'];
-			$topic_id = mb_get_topic_id( absint( $_GET['topic_id'] ) );
-
-			if ( 'spammed' === $notice )
-				$text = sprintf( __( 'The topic "%s" was successfully marked as spam.', 'message-board' ), mb_get_topic_title( $topic_id ) );
-
-			elseif ( 'unspammed' === $notice )
-				$text = sprintf( __( 'The topic "%s" was successfully removed from spam.', 'message-board' ), mb_get_topic_title( $topic_id ) );
-
-			elseif ( 'closed' === $notice )
-				$text = sprintf( __( 'The topic "%s" was successfully closed.', 'message-board' ), mb_get_topic_title( $topic_id ) );
-
-			elseif ( 'opened' === $notice )
-				$text = sprintf( __( 'The topic "%s" was successfully opened.', 'message-board' ), mb_get_topic_title( $topic_id ) );
-
-			if ( !empty( $text ) ) { ?>
-				<div class="updated">
-					<p><?php echo $text; ?>	</p>
-				</div>
-			<?php }
-		}
-	}
-
+	/**
+	 * Customize the columns on the edit post screen.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array  $post_columns
+	 * @return array
+	 */
 	public function edit_columns( $post_columns ) {
 
 		$screen     = get_current_screen();
 		$post_type  = $screen->post_type;
 		$columns    = array();
 
-		/* Adds the checkbox column. */
-		$columns['cb'] = $post_columns['cb'];
-
-		/* Add custom columns and overwrite the 'title' column. */
-		$columns['title']     = __( 'Topic',      'message-board' );
-
-		if ( !isset( $_GET['post_status'] ) )
-			$columns['status']    = __( 'Status',     'message-board' );
-
-		$columns['forum']     = __( 'Forum',      'message-board' );
-		$columns['replies']   = __( 'Replies',    'message-board' );
-		$columns['voices']    = __( 'Voices',     'message-board' );
-		$columns['author']    = __( 'Author',     'message-board' );
-		$columns['datetime']  = __( 'Created',    'message-board' );
+		/* Add custom columns. */
+		$columns['cb']       = $post_columns['cb'];
+		$columns['title']    = __( 'Topic',   'message-board' );
+		$columns['status']   = __( 'Status',  'message-board' );
+		$columns['forum']    = __( 'Forum',   'message-board' );
+		$columns['replies']  = __( 'Replies', 'message-board' );
+		$columns['voices']   = __( 'Voices',  'message-board' );
+		$columns['author']   = __( 'Author',  'message-board' );
+		$columns['datetime'] = __( 'Created', 'message-board' );
 
 		/* Return the columns. */
 		return $columns;
 	}
 
+	/**
+	 * Customize the sortable columns.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array  $columns
+	 * @return array
+	 */
 	public function manage_sortable_columns( $columns ) {
 
 		$columns['forum']   = array( 'post_parent', true );
@@ -168,80 +171,88 @@ final class Message_Board_Admin_Edit_Topics {
 		return $columns;
 	}
 
+	/**
+	 * Handles the output for custom columns.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  string  $column
+	 * @param  int     $post_id
+	 */
 	public function manage_columns( $column, $post_id ) {
 
-		switch( $column ) {
+		/* Post status column. */
+		if ( 'status' === $column ) {
 
-			case 'status' :
+			$post_type = mb_get_topic_post_type();
+			$status    = get_post_status_object( get_post_status( $post_id ) );
 
-				$post_type = get_post_type( $post_id );
-				$status = get_post_status_object( get_post_status( $post_id ) );
+			if ( mb_get_publish_post_status() === $status->name )
+				wp_update_post( array( 'ID' => $post_id, 'post_status' => mb_get_open_post_status() ) );
 
-				if ( mb_get_publish_post_status() === $status->name )
-					wp_update_post( array( 'ID' => $post_id, 'post_status' => mb_get_open_post_status() ) );
+			$url = add_query_arg( array( 'post_status' => $status->name, 'post_type' => $post_type ), admin_url( 'edit.php' ) );
 
-				$url = add_query_arg( array( 'post_status' => $status->name, 'post_type' => $post_type ), admin_url( 'edit.php' ) );
+			printf( '<a href="%s">%s</a>', $url, $status->label );
 
-				printf( '<a href="%s">%s</a>', $url, $status->label );
+		/* Topic forum column. */
+		} elseif ( 'forum' === $column ) {
 
-				break;
+			$post_type = mb_get_topic_post_type();
+			$forum_id  = mb_get_topic_forum_id( $post_id );
 
-			case 'forum' :
+			$url = add_query_arg( array( 'post_type' => $post_type, 'post_parent' => $forum_id ), admin_url( 'edit.php' ) );
 
-				$forum_id = mb_get_topic_forum_id( $post_id );
+			printf( '<a href="%s">%s</a>', $url, mb_get_forum_title( $forum_id ) );
 
-				$post_type = get_post_type( $post_id );
+		/* Replies column. */
+		} elseif ( 'replies' === $column ) {
 
-				$url = add_query_arg( array( 'post_type' => $post_type, 'post_parent' => $forum_id ), admin_url( 'edit.php' ) );
+			$reply_count = mb_get_topic_reply_count( $post_id );
 
-				printf( '<a href="%s">%s</a>', $url, mb_get_forum_title( $forum_id ) );
+			echo !empty( $reply_count ) ? absint( $reply_count ) : number_format_i18n( 0 );
 
-				break;
+		/* Voices column. */
+		} elseif ( 'voices' === $column ) {
 
-			case 'replies' :
+			$voice_count = mb_get_topic_voice_count( $post_id );
 
-				$reply_count = mb_get_topic_reply_count( $post_id );
+			echo !empty( $voice_count ) ? absint( $voice_count ) : number_format_i18n( 0 );
 
-				echo !empty( $reply_count ) ? absint( $reply_count ) : number_format_i18n( 0 );
+		/* Datetime column. */
+		} elseif ( 'datetime' === $column ) {
 
-				break;
-
-			case 'voices' :
-
-				$voice_count = mb_get_topic_voice_count( $post_id );
-
-				echo !empty( $voice_count ) ? absint( $voice_count ) : number_format_i18n( 0 );
-
-				break;
-
-			case 'datetime' :
-
-				the_time( get_option( 'date_format' ) );
-				echo '<br />';
-				the_time( get_option( 'time_format' ) );
-
-				break;
-
-			/* Just break out of the switch statement for everything else. */
-			default :
-				break;
+			the_time( get_option( 'date_format' ) );
+			echo '<br />';
+			the_time( get_option( 'time_format' ) );
 		}
 	}
 
+	/**
+	 * Custom row actions below the post title.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array   $actions
+	 * @param  object  $post
+	 * @return array
+	 */
 	function row_actions( $actions, $post ) {
+
+		$topic_id = mb_get_topic_id( $post->ID );
 
 		/* Remove quick edit. */
 		if ( isset( $actions['inline hide-if-no-js'] ) ) {
 			unset( $actions['inline hide-if-no-js'] );
 		}
 
-		// @todo - current_user_can( 'moderate_topic', $post->ID );
-		if ( current_user_can( 'manage_forums' ) ) {
+		/* Add spam toggle link if user has permission. */
+		if ( current_user_can( 'moderate_topic', $topic_id ) ) {
 
-			$topic_id = mb_get_topic_id( $post->ID );
+			/* Get post status objects. */
+			$spam_object  = get_post_status_object( mb_get_spam_post_status() );
 
 			/* Get spam link text. */
-			$spam_text = mb_is_topic_spam( $topic_id ) ? __( 'Not Spam', 'message-board' ) : __( 'Spam', 'message-board' );
+			$spam_text = mb_is_topic_spam( $topic_id ) ? __( 'Not Spam', 'message-board' ) : $spam_object->label;
 
 			/* Build spam toggle URL. */
 			$spam_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
@@ -249,18 +260,26 @@ final class Message_Board_Admin_Edit_Topics {
 			$spam_url = wp_nonce_url( $spam_url, "spam_topic_{$topic_id}" );
 
 			/* Add toggle spam action link. */
-			$actions['mb_toggle_spam'] = sprintf( '<a href="%s">%s</a>', esc_url( $spam_url ), $spam_text );
+			$actions['mb_toggle_spam'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $spam_url ), mb_is_topic_spam() ? 'restore' : 'spam', $spam_text );
+		}
 
-			/* Get close link text. */
-			$close_text = mb_is_topic_closed( $topic_id ) ? __( 'Open', 'message-board' ) : __( 'Close', 'message-board' );
+		/* Add open/close toggle link if user has permission and topic is not spam. */
+		if ( current_user_can( 'moderate_topic', $topic_id ) && !mb_is_topic_spam( $topic_id ) ) {
 
-			/* Build close toggle URL. */
-			$close_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
-			$close_url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_close' ), $close_url );
-			$close_url = wp_nonce_url( $close_url, "close_topic_{$topic_id}" );
+			/* Get post status objects. */
+			$open_object  = get_post_status_object( mb_get_open_post_status()  );
+			$close_object = get_post_status_object( mb_get_close_post_status() );
 
-			/* Add toggle close action link. */
-			$actions['mb_toggle_close'] = sprintf( '<a href="%s">%s</a>', esc_url( $close_url ), $close_text );
+			/* Get open/close link text. */
+			$open_text = mb_is_topic_open() ? $close_object->label : $open_object->label;
+
+			/* Build open/close toggle URL. */
+			$open_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
+			$open_url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_open' ), $open_url );
+			$open_url = wp_nonce_url( $open_url, "open_topic_{$topic_id}" );
+
+			/* Add toggle open/close action link. */
+			$actions['mb_toggle_open'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $open_url ), mb_is_topic_open() ? 'close' : 'open', $open_text );
 		}
 
 		/* Move view action to the end. */
@@ -275,74 +294,111 @@ final class Message_Board_Admin_Edit_Topics {
 		return $actions;
 	}
 
+	/**
+	 * Callback function for handling post status changes.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
 	public function handler() {
 
+		/* Checks if the spam toggle link was clicked. */
 		if ( isset( $_GET['action'] ) && 'mb_toggle_spam' === $_GET['action'] && isset( $_GET['topic_id'] ) ) {
 
 			$topic_id = absint( mb_get_topic_id( $_GET['topic_id'] ) );
 
+			/* Verify the nonce. */
 			check_admin_referer( "spam_topic_{$topic_id}" );
 
+			/* Assume the changed failed. */
 			$notice = 'failure';
 
-			$postarr = get_post( $topic_id, ARRAY_A );
+			/* Check if the forum is open. */
+			$is_spam = mb_is_topic_spam( $topic_id );
 
-			if ( !is_null( $postarr ) ) {
+			/* Update the post status. */
+			$updated = $is_spam ? mb_unspam_topic( $topic_id ) : mb_spam_topic( $topic_id );
 
-				$is_spam = mb_is_topic_spam( $topic_id );
-
-				$new_status = $is_spam ? mb_get_open_post_status() : mb_get_spam_post_status();
-
-				if ( $postarr['post_status'] !== $new_status ) {
-
-					$notice = $is_spam ? 'unspammed' : 'spammed';
-
-					$postarr['post_status'] = $new_status;
-
-					wp_update_post( $postarr );
-				}
+			/* If the status was updated, add notice slug. */
+			if ( $updated && !is_wp_error( $updated ) ) {
+				$notice = $is_spam ? 'restore' : mb_get_spam_post_status();
 			}
 
+			/* Redirect to correct admin page. */
 			$redirect = add_query_arg( array( 'topic_id' => $topic_id, 'mb_topic_notice' => $notice ), remove_query_arg( array( 'action', 'topic_id', '_wpnonce' ) ) );
 			wp_safe_redirect( $redirect );
+
+			/* Always exit for good measure. */
 			exit();
 		}
 
-		elseif ( isset( $_GET['action'] ) && 'mb_toggle_close' === $_GET['action'] && isset( $_GET['topic_id'] ) ) {
+		/* Checks if the open/close toggle link was clicked. */
+		elseif ( isset( $_GET['action'] ) && 'mb_toggle_open' === $_GET['action'] && isset( $_GET['topic_id'] ) ) {
 
 			$topic_id = absint( mb_get_topic_id( $_GET['topic_id'] ) );
 
-			check_admin_referer( "close_topic_{$topic_id}" );
+			/* Verify the nonce. */
+			check_admin_referer( "open_topic_{$topic_id}" );
 
+			/* Assume the changed failed. */
 			$notice = 'failure';
 
-			$postarr = get_post( $topic_id, ARRAY_A );
+			/* Check if the topic is open. */
+			$is_open = mb_is_topic_open( $topic_id );
 
-			if ( !is_null( $postarr ) ) {
+			/* Update the post status. */
+			$updated = $is_open ? mb_close_topic( $topic_id ) : mb_open_topic( $topic_id );
 
-				$is_closed = mb_is_topic_closed( $topic_id );
-
-				$new_status = $is_closed ? mb_get_open_post_status() : mb_get_close_post_status();
-
-				if ( $postarr['post_status'] !== $new_status ) {
-
-					$notice = $is_closed ? 'opened' : 'closed';
-
-					$postarr['post_status'] = $new_status;
-
-					wp_update_post( $postarr );
-				}
+			/* If the status was updated, add notice slug. */
+			if ( $updated && !is_wp_error( $updated ) ) {
+				$notice = $is_open ? mb_get_close_post_status() : mb_get_open_post_status();
 			}
 
+			/* Redirect to correct admin page. */
 			$redirect = add_query_arg( array( 'topic_id' => $topic_id, 'mb_topic_notice' => $notice ), remove_query_arg( array( 'action', 'topic_id', '_wpnonce' ) ) );
 			wp_safe_redirect( $redirect );
+
+			/* Always exit for good measure. */
 			exit();
 		}
 	}
 
 	/**
-	 * Style adjustments for the manage menu items screen, particularly for adjusting the thumbnail 
-	 * column in the table to make sure it doesn't take up too much space.
+	 * Displays admin notices for the edit forum screen.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function admin_notices() {
+
+		$allowed_notices = array( 'restore', mb_get_spam_post_status(), mb_get_open_post_status(), mb_get_close_post_status() );
+
+		if ( isset( $_GET['mb_topic_notice'] ) && in_array( $_GET['mb_topic_notice'], $allowed_notices ) && isset( $_GET['topic_id'] ) ) {
+
+			$notice   = $_GET['mb_topic_notice'];
+			$topic_id = mb_get_topic_id( absint( $_GET['topic_id'] ) );
+
+			if ( mb_get_spam_post_status() === $notice )
+				$text = sprintf( __( 'The topic "%s" was successfully marked as spam.', 'message-board' ), mb_get_topic_title( $topic_id ) );
+
+			elseif ( 'restore' === $notice )
+				$text = sprintf( __( 'The topic "%s" was successfully removed from spam.', 'message-board' ), mb_get_topic_title( $topic_id ) );
+
+			elseif ( mb_get_close_post_status() === $notice )
+				$text = sprintf( __( 'The topic "%s" was successfully closed.', 'message-board' ), mb_get_topic_title( $topic_id ) );
+
+			elseif ( mb_get_open_post_status() === $notice )
+				$text = sprintf( __( 'The topic "%s" was successfully opened.', 'message-board' ), mb_get_topic_title( $topic_id ) );
+
+			if ( !empty( $text ) )
+				printf( '<div class="updated"><p>%s</p></div>', $text );
+		}
+	}
+
+	/**
+	 * Enqueue the plugin admin CSS.
 	 *
 	 * @since  1.0.0
 	 * @access public
