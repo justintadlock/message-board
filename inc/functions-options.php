@@ -64,3 +64,25 @@ function mb_get_replies_per_page() {
 function mb_get_default_forum_id() {
 	return absint( apply_filters( 'mb_get_default_forum_id', 0 ) );
 }
+
+/**
+ * Returns an array of super sticky topics.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return array
+ */
+function mb_get_super_sticky_topics() {
+	return apply_filters( 'mb_get_super_sticky_topics', get_option( 'mb_super_sticky_topics', array() ) );
+}
+
+/**
+ * Returns an array of sticky topics.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return array
+ */
+function mb_get_sticky_topics() {
+	return apply_filters( 'mb_get_sticky_topics', get_option( 'mb_sticky_topics', array() ) );
+}

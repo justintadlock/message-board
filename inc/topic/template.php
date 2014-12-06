@@ -339,8 +339,8 @@ function mb_get_topic_labels( $topic_id = 0 ) {
  */
 function mb_is_topic_sticky( $topic_id = 0 ) {
 	$topic_id       = mb_get_topic_id( $topic_id );
-	$super_stickies = get_option( 'mb_super_sticky_topics', array() );
-	$topic_stickies = get_option( 'mb_sticky_topics',       array() );
+	$super_stickies = mb_get_super_sticky_topics();
+	$topic_stickies = mb_get_sticky_topics();
 	$stickies       = array_merge( $super_stickies, $topic_stickies );
 
 	return in_array( $topic_id, $stickies ) ? true : false;

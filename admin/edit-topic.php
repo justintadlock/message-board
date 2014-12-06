@@ -68,6 +68,9 @@ final class Message_Board_Admin_Edit_Topics {
 		/* Add custom admin notices. */
 		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 
+		/* Add custom views. */
+		add_filter( "views_edit-{$topic_type}", array( $this, 'views' ) );
+
 		/* Handle custom columns. */
 		add_filter( "manage_edit-{$topic_type}_columns",          array( $this, 'edit_columns'            )        );
 		add_filter( "manage_edit-{$topic_type}_sortable_columns", array( $this, 'manage_sortable_columns' )        );
@@ -75,6 +78,9 @@ final class Message_Board_Admin_Edit_Topics {
 
 		/* Filter the row actions. */
 		add_filter( 'post_row_actions', array( $this, 'row_actions' ), 10, 2 );
+
+		/* Filter post states (shown next to post title). */
+		add_filter( 'display_post_states', array( $this, 'display_post_states' ), 0, 2 );
 	}
 
 	/**
@@ -93,6 +99,15 @@ final class Message_Board_Admin_Edit_Topics {
 		if ( isset( $_GET['post_parent'] ) ) {
 
 			$new_vars['post_parent'] = mb_get_forum_id( $_GET['post_parent'] );
+		}
+
+		elseif ( isset( $_GET['show_super'] ) && 1 === absint( $_GET['show_super'] ) ) {
+
+			$new_vars['post__in'] = mb_get_super_sticky_topics();
+		}
+
+		elseif ( isset( $_GET['show_sticky'] ) && 1 === absint( $_GET['show_sticky'] ) ) {
+			$new_vars['post__in'] = mb_get_sticky_topics();
 		}
 
 		/* Order topics by their forums. */
@@ -123,6 +138,37 @@ final class Message_Board_Admin_Edit_Topics {
 
 		/* Return the vars, merging with the new ones. */
 		return array_merge( $vars, $new_vars );
+	}
+
+	/**
+	 * Add custom views (status list).
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array  $views
+	 * @return array
+	 */
+	public function views( $views ) {
+
+		$post_type = mb_get_topic_post_type();
+
+		$super  = mb_get_super_sticky_topics();
+		$sticky = mb_get_sticky_topics();
+
+		$super_count  = count( $super  );
+		$sticky_count = count( $sticky );
+
+		if ( 0 < $super_count ) {
+			$super_text = sprintf( _n( 'Super Sticky <span class="count">(%s)</span>', 'Super Sticky <span class="count">(%s)</span>', $super_count, 'message-board' ), number_format_i18n( $super_count ) );
+			$views['super-sticky'] = sprintf( '<a href="%s">%s</a>', add_query_arg( array( 'post_type' => $post_type, 'show_super' => 1 ), admin_url( 'edit.php' ) ), $super_text );
+		}
+
+		if ( 0 < $sticky_count ) {
+			$sticky_text = sprintf( _n( 'Sticky <span class="count">(%s)</span>', 'Sticky <span class="count">(%s)</span>', $sticky_count, 'message-board' ), number_format_i18n( $sticky_count ) );
+			$views['sticky'] = sprintf( '<a href="%s">%s</a>', add_query_arg( array( 'post_type' => $post_type, 'show_sticky' => 1 ), admin_url( 'edit.php' ) ), $sticky_text );
+		}
+
+		return $views;
 	}
 
 	/**
@@ -296,6 +342,27 @@ final class Message_Board_Admin_Edit_Topics {
 		}
 
 		return $actions;
+	}
+
+	/**
+	 * Filter for the `post_states` hook.  We're going to replace any defaults and roll our own.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array   $post_states
+	 * @param  object  $post
+	 */
+	public function display_post_states( $post_states, $post ) {
+
+		$states   = array();
+		$topic_id = mb_get_topic_id( $post->ID );
+
+		if ( mb_is_topic_super_sticky( $topic_id ) )
+			$states['super-sticky'] = __( 'Super Sticky', 'message-board' );
+		elseif ( mb_is_topic_sticky( $topic_id ) )
+			$states['sticky'] = __( 'Sticky', 'message-board' );
+
+		return $states;
 	}
 
 	/**
