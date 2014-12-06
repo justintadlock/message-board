@@ -1,4 +1,14 @@
 <?php
+/**
+ * Handles all the functionality for the `edit.php` screen for the reply post type. 
+ *
+ * @package    MessageBoard
+ * @subpackage Admin
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 final class Message_Board_Admin_Edit_Replies {
 
@@ -22,6 +32,9 @@ final class Message_Board_Admin_Edit_Replies {
 
 		/* Only run our customization on the 'edit.php' page in the admin. */
 		add_action( 'load-edit.php', array( $this, 'load_edit' ) );
+
+		/* Hook to the edit reply handler. */
+		add_action( 'mb_load_edit_reply', array( $this, 'handler' ), 0 );
 	}
 
 	/**
@@ -32,28 +45,36 @@ final class Message_Board_Admin_Edit_Replies {
 	 * @return void
 	 */
 	public function load_edit() {
+
+		/* Get the current screen object. */
 		$screen = get_current_screen();
 
+		/* Get the reply post type name. */
 		$reply_type = mb_get_reply_post_type();
 
+		/* Bail if we're not on the edit topic screen. */
 		if ( !empty( $screen->post_type ) && $screen->post_type !== $reply_type )
 			return;
 
-		add_action( 'mb_edit_replies_handler', array( $this, 'handler' ), 0 );
+		/* Custom action for loading the edit screen. */
+		do_action( 'mb_load_edit_reply' );
 
-		do_action( 'mb_edit_replies_handler' );
-
+		/* Filter the `request` vars. */
 		add_filter( 'request', array( $this, 'request' ) );
 
+		/* Enqueue custom styles. */
 		add_action( 'admin_enqueue_scripts', array( $this, 'print_styles'  ) );
 
+		/* Add custom admin notices. */
+		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+
+		/* Handle custom columns. */
 		add_filter( "manage_edit-{$reply_type}_columns",          array( $this, 'edit_columns'            )        );
 		add_filter( "manage_edit-{$reply_type}_sortable_columns", array( $this, 'manage_sortable_columns' )        );
 		add_action( "manage_{$reply_type}_posts_custom_column",   array( $this, 'manage_columns'          ), 10, 2 );
 
+		/* Filter the row actions. */
 		add_filter( 'post_row_actions', array( $this, 'row_actions' ), 10, 2 );
-
-		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 	}
 
 	/**
@@ -104,50 +125,40 @@ final class Message_Board_Admin_Edit_Replies {
 		return array_merge( $vars, $new_vars );
 	}
 
-	public function admin_notices() {
-
-		$allowed_notices = array( 'spammed', 'unspammed' );
-
-		if ( isset( $_GET['mb_reply_notice'] ) && in_array( $_GET['mb_reply_notice'], $allowed_notices ) && isset( $_GET['reply_id'] ) ) {
-
-			$notice   = $_GET['mb_reply_notice'];
-			$reply_id = mb_get_reply_id( absint( $_GET['reply_id'] ) );
-
-			if ( 'spammed' === $notice )
-				$text = sprintf( __( 'The reply "%s" was successfully marked as spam.', 'message-board' ), mb_get_reply_title( $reply_id ) );
-
-			elseif ( 'unspammed' === $notice )
-				$text = sprintf( __( 'The reply "%s" was successfully removed from spam.', 'message-board' ), mb_get_reply_title( $reply_id ) );
-
-			if ( !empty( $text ) ) { ?>
-				<div class="updated">
-					<p><?php echo $text; ?>	</p>
-				</div>
-			<?php }
-		}
-	}
-
+	/**
+	 * Customize the columns on the edit post screen.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array  $post_columns
+	 * @return array
+	 */
 	public function edit_columns( $post_columns ) {
 
 		$screen     = get_current_screen();
 		$post_type  = $screen->post_type;
 		$columns    = array();
-		$taxonomies = array();
 
-		/* Adds the checkbox column. */
-		$columns['cb'] = $post_columns['cb'];
-
-		/* Add custom columns and overwrite the 'title' column. */
-		$columns['title']     = __( 'Reply',      'message-board' );
-		$columns['forum']     = __( 'Forum',      'message-board' );
-		$columns['topic']     = __( 'Topic',      'message-board' );
-		$columns['author']    = __( 'Author',     'message-board' );
-		$columns['datetime']  = __( 'Created',    'message-board' );
+		/* Add custom columns. */
+		$columns['cb']        = $post_columns['cb'];
+		$columns['title']     = __( 'Reply',   'message-board' );
+		$columns['forum']     = __( 'Forum',   'message-board' );
+		$columns['topic']     = __( 'Topic',   'message-board' );
+		$columns['author']    = __( 'Author',  'message-board' );
+		$columns['datetime']  = __( 'Created', 'message-board' );
 
 		/* Return the columns. */
 		return $columns;
 	}
 
+	/**
+	 * Customize the sortable columns.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array  $columns
+	 * @return array
+	 */
 	public function manage_sortable_columns( $columns ) {
 
 		$columns['forum']  = array( 'forum',       true );
@@ -157,67 +168,81 @@ final class Message_Board_Admin_Edit_Replies {
 		return $columns;
 	}
 
+	/**
+	 * Handles the output for custom columns.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  string  $column
+	 * @param  int     $post_id
+	 */
 	public function manage_columns( $column, $post_id ) {
 
-		switch( $column ) {
+		/* Forum column. */
+		if ( 'forum' === $column ) {
 
-			case 'forum' :
+			$forum_id = mb_get_reply_forum_id( $post_id );
 
-				$forum_id = mb_get_reply_forum_id( $post_id );
+			$post_type = get_post_type( $post_id );
 
-				$post_type = get_post_type( $post_id );
+			$url = add_query_arg( array( 'post_type' => $post_type, 'mb_forum' => $forum_id ), admin_url( 'edit.php' ) );
 
-				$url = add_query_arg( array( 'post_type' => $post_type, 'mb_forum' => $forum_id ), admin_url( 'edit.php' ) );
+			printf( '<a href="%s">%s</a>', $url, mb_get_forum_title( $forum_id ) );
 
-				printf( '<a href="%s">%s</a>', $url, mb_get_forum_title( $forum_id ) );
+		/* Topic column. */
+		} elseif ( 'topic' === $column ) {
 
-				break;
+			$topic_id = mb_get_reply_topic_id( $post_id );
 
-			case 'topic' :
+			$post_type = get_post_type( $post_id );
 
-				$topic_id = mb_get_reply_topic_id( $post_id );
+			$url = add_query_arg( array( 'post_type' => $post_type, 'post_parent' => $topic_id ), admin_url( 'edit.php' ) );
 
-				$post_type = get_post_type( $post_id );
+			printf( '<a href="%s">%s</a>', $url, mb_get_topic_title( $topic_id ) );
 
-				$url = add_query_arg( array( 'post_type' => $post_type, 'post_parent' => $topic_id ), admin_url( 'edit.php' ) );
+		/* Datetime column. */
+		} elseif ( 'datetime' === $column ) {
 
-				printf( '<a href="%s">%s</a>', $url, mb_get_topic_title( $topic_id ) );
-
-				break;
-
-			case 'datetime' :
-
-				the_time( get_option( 'date_format' ) );
-				echo '<br />';
-				the_time( get_option( 'time_format' ) );
-
-				break;
-
-			/* Just break out of the switch statement for everything else. */
-			default :
-				break;
+			the_time( get_option( 'date_format' ) );
+			echo '<br />';
+			the_time( get_option( 'time_format' ) );
 		}
 	}
 
+	/**
+	 * Custom row actions below the post title.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array   $actions
+	 * @param  object  $post
+	 * @return array
+	 */
 	function row_actions( $actions, $post ) {
+
+		$reply_id = mb_get_reply_id( $post->ID );
 
 		/* Remove quick edit. */
 		if ( isset( $actions['inline hide-if-no-js'] ) ) {
 			unset( $actions['inline hide-if-no-js'] );
 		}
 
-		if ( current_user_can( 'manage_forums' ) ) {
+		/* Add spam toggle link if user has permission. */
+		if ( current_user_can( 'moderate_reply', $reply_id ) ) {
 
-			$reply_id = mb_get_reply_id( $post->ID );
-			$is_spam  = mb_is_reply_spam( $reply_id );
+			/* Get post status objects. */
+			$spam_object  = get_post_status_object( mb_get_spam_post_status() );
 
-			$text = $is_spam ? __( 'Not Spam', 'message-board' ) : __( 'Spam', 'message-board' );
+			/* Get spam link text. */
+			$spam_text = mb_is_reply_spam( $reply_id ) ? __( 'Not Spam', 'message-board' ) : $spam_object->label;
 
-			$url = remove_query_arg( array( 'reply_id', 'mb_reply_notice' ) );
-			$url = add_query_arg( array( 'reply_id' => $reply_id, 'action' => 'mb_toggle_spam' ), $url );
-			$url = wp_nonce_url( $url, "spam_reply_{$reply_id}" );
+			/* Build spam toggle URL. */
+			$spam_url = remove_query_arg( array( 'reply_id', 'mb_reply_notice' ) );
+			$spam_url = add_query_arg( array( 'reply_id' => $reply_id, 'action' => 'mb_toggle_spam' ), $spam_url );
+			$spam_url = wp_nonce_url( $spam_url, "spam_reply_{$reply_id}" );
 
-			$actions['mb_toggle_spam'] = sprintf( '<a href="%s">%s</a>', esc_url( $url ), $text );
+			/* Add toggle spam action link. */
+			$actions['mb_toggle_spam'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $spam_url ), mb_is_reply_spam( $reply_id ) ? 'restore' : 'spam', $spam_text );
 		}
 
 		/* Move view action to the end. */
@@ -232,44 +257,75 @@ final class Message_Board_Admin_Edit_Replies {
 		return $actions;
 	}
 
+	/**
+	 * Callback function for handling post status changes.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
 	public function handler() {
 
-		// @todo - nonce
+		/* Checks if the spam toggle link was clicked. */
 		if ( isset( $_GET['action'] ) && 'mb_toggle_spam' === $_GET['action'] && isset( $_GET['reply_id'] ) ) {
 
 			$reply_id = absint( $_GET['reply_id'] );
 
+			/* Verify the nonce. */
 			check_admin_referer( "spam_reply_{$reply_id}" );
 
+			/* Assume the changed failed. */
 			$notice = 'failure';
 
-			$postarr = get_post( $reply_id, ARRAY_A );
+			/* Check if the reply is open. */
+			$is_spam = mb_is_reply_spam( $reply_id );
 
-			if ( !is_null( $postarr ) ) {
+			/* Update the post status. */
+			$updated = $is_spam ? mb_unspam_reply( $reply_id ) : mb_spam_reply( $reply_id );
 
-				$is_spam = mb_is_reply_spam( $reply_id );
-
-				$new_status = $is_spam ? mb_get_publish_post_status() : mb_get_spam_post_status();
-
-				if ( $postarr['post_status'] !== $new_status ) {
-
-					$notice = $is_spam ? 'unspammed' : 'spammed';
-
-					$postarr['post_status'] = $new_status;
-
-					wp_update_post( $postarr );
-				}
+			/* If the status was updated, add notice slug. */
+			if ( $updated && !is_wp_error( $updated ) ) {
+				$notice = $is_spam ? 'restore' : mb_get_spam_post_status();
 			}
 
+			/* Redirect to correct admin page. */
 			$redirect = add_query_arg( array( 'reply_id' => $reply_id, 'mb_reply_notice' => $notice ), remove_query_arg( array( 'action', 'reply_id', '_wpnonce' ) ) );
 			wp_safe_redirect( $redirect );
+
+			/* Always exit for good measure. */
 			exit();
 		}
 	}
 
 	/**
-	 * Style adjustments for the manage menu items screen, particularly for adjusting the thumbnail 
-	 * column in the table to make sure it doesn't take up too much space.
+	 * Displays admin notices for the edit forum screen.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function admin_notices() {
+
+		$allowed_notices = array( 'restore', mb_get_spam_post_status() );
+
+		if ( isset( $_GET['mb_reply_notice'] ) && in_array( $_GET['mb_reply_notice'], $allowed_notices ) && isset( $_GET['reply_id'] ) ) {
+
+			$notice   = $_GET['mb_reply_notice'];
+			$reply_id = mb_get_reply_id( absint( $_GET['reply_id'] ) );
+
+			if ( mb_get_spam_post_status() === $notice )
+				$text = sprintf( __( 'The reply "%s" was successfully marked as spam.', 'message-board' ), mb_get_reply_title( $reply_id ) );
+
+			elseif ( 'restore' === $notice )
+				$text = sprintf( __( 'The reply "%s" was successfully removed from spam.', 'message-board' ), mb_get_reply_title( $reply_id ) );
+
+			if ( !empty( $text ) )
+				printf( '<div class="updated"><p>%s</p></div>', $text );
+		}
+	}
+
+	/**
+	 * Enqueue the plugin admin CSS.
 	 *
 	 * @since  1.0.0
 	 * @access public

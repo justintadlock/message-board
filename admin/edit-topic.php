@@ -49,7 +49,7 @@ final class Message_Board_Admin_Edit_Topics {
 		/* Get the current screen object. */
 		$screen = get_current_screen();
 
-		/* Get the forum post type name. */
+		/* Get the topic post type name. */
 		$topic_type = mb_get_topic_post_type();
 
 		/* Bail if we're not on the edit topic screen. */
@@ -385,7 +385,7 @@ final class Message_Board_Admin_Edit_Topics {
 			/* Assume the changed failed. */
 			$notice = 'failure';
 
-			/* Check if the forum is open. */
+			/* Check if the topic is open. */
 			$is_spam = mb_is_topic_spam( $topic_id );
 
 			/* Update the post status. */
