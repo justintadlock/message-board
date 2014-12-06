@@ -166,26 +166,26 @@ function mb_topic_attributes_meta_box( $post ) {
 
 	$forum_type_object = get_post_type_object( mb_get_forum_post_type() );
 
-	$super_stickies = get_option( 'mb_super_sticky_topics', array() );
-	$topic_stickies = get_option( 'mb_sticky_topics',       array() );
-	$all_stickies   = array_merge( $super_stickies, $topic_stickies ); ?>
+	$is_super   = mb_is_topic_super( $post->ID );
+	$is_sticky  = mb_is_topic_sticky( $post->ID );
+	$not_sticky = $is_super || $is_sticky ? false : true; ?>
 
 	<p>
 		<strong><?php _e( 'Sticky Status:', 'message-board' ); ?></strong>
 	</p>
 	<p>
 		<label>
-			<input type="radio" name="mb-topic-sticky" value="" <?php checked( !in_array( $post->ID, $all_stickies ) ); ?> /> 
+			<input type="radio" name="mb-topic-sticky" value="" <?php checked( $not_sticky, true ); ?> /> 
 			<?php _e( 'Not Sticky', 'message-board' ); ?>
 		</label>
 		<br />
 		<label>
-			<input type="radio" name="mb-topic-sticky" value="sticky" <?php checked( in_array( $post->ID, $topic_stickies ) ); ?> /> 
-			<?php _e( 'Forum Sticky', 'message-board' ); ?>
+			<input type="radio" name="mb-topic-sticky" value="sticky" <?php checked( $is_sticky, true ); ?> /> 
+			<?php _e( 'Sticky', 'message-board' ); ?>
 		</label>
 		<br />
 		<label>
-			<input type="radio" name="mb-topic-sticky" value="super-sticky" <?php checked( in_array( $post->ID, $super_stickies ) ); ?> /> 
+			<input type="radio" name="mb-topic-sticky" value="super" <?php checked( $is_super, true ); ?> /> 
 			<?php _e( 'Super Sticky', 'message-board' ); ?>
 		</label>
 	</p>

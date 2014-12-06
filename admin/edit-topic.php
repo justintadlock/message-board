@@ -103,7 +103,7 @@ final class Message_Board_Admin_Edit_Topics {
 
 		elseif ( isset( $_GET['show_super'] ) && 1 === absint( $_GET['show_super'] ) ) {
 
-			$new_vars['post__in'] = mb_get_super_sticky_topics();
+			$new_vars['post__in'] = mb_get_super_topics();
 		}
 
 		elseif ( isset( $_GET['show_sticky'] ) && 1 === absint( $_GET['show_sticky'] ) ) {
@@ -152,15 +152,15 @@ final class Message_Board_Admin_Edit_Topics {
 
 		$post_type = mb_get_topic_post_type();
 
-		$super  = mb_get_super_sticky_topics();
+		$super  = mb_get_super_topics();
 		$sticky = mb_get_sticky_topics();
 
 		$super_count  = count( $super  );
 		$sticky_count = count( $sticky );
 
 		if ( 0 < $super_count ) {
-			$super_text = sprintf( _n( 'Super Sticky <span class="count">(%s)</span>', 'Super Sticky <span class="count">(%s)</span>', $super_count, 'message-board' ), number_format_i18n( $super_count ) );
-			$views['super-sticky'] = sprintf( '<a href="%s">%s</a>', add_query_arg( array( 'post_type' => $post_type, 'show_super' => 1 ), admin_url( 'edit.php' ) ), $super_text );
+			$super_text = sprintf( _n( 'Super <span class="count">(%s)</span>', 'Super <span class="count">(%s)</span>', $super_count, 'message-board' ), number_format_i18n( $super_count ) );
+			$views['super'] = sprintf( '<a href="%s">%s</a>', add_query_arg( array( 'post_type' => $post_type, 'show_super' => 1 ), admin_url( 'edit.php' ) ), $super_text );
 		}
 
 		if ( 0 < $sticky_count ) {
@@ -357,8 +357,8 @@ final class Message_Board_Admin_Edit_Topics {
 		$states   = array();
 		$topic_id = mb_get_topic_id( $post->ID );
 
-		if ( mb_is_topic_super_sticky( $topic_id ) )
-			$states['super-sticky'] = __( 'Super Sticky', 'message-board' );
+		if ( mb_is_topic_super( $topic_id ) )
+			$states['super'] = __( 'Super Sticky', 'message-board' );
 		elseif ( mb_is_topic_sticky( $topic_id ) )
 			$states['sticky'] = __( 'Sticky', 'message-board' );
 

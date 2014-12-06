@@ -74,50 +74,6 @@ function mb_insert_topic( $args = array() ) {
 }
 
 /**
- * Adds a topic to the list of sticky topics.
- *
- * @since  1.0.0
- * @access public
- * @param  int    $topic_id
- * @return bool
- */
-function mb_add_sticky_topic( $topic_id ) {
-	$topic_id = mb_get_topic_id( $topic_id );
-	$stickies = mb_get_sticky_topics();
-
-	if ( !in_array( $topic_id, $stickies ) ) {
-		$stickies[] = $topic_id;
-		return update_option( 'mb_sticky_topics', $stickies );
-	}
-
-	return false;
-}
-
-/**
- * Removes a topic from the list of sticky topics.
- *
- * @since  1.0.0
- * @access public
- * @param  int    $topic_id
- * @return bool
- */
-function mb_remove_sticky_topic( $topic_id ) {
-	$topic_id = mb_get_topic_id( $topic_id );
-	$stickies = mb_get_sticky_topics();
-
-	if ( in_array( $topic_id, $stickies ) ) {
-		$key = array_search( $topic_id, $stickies );
-
-		if ( $key ) {
-			unset( $stickies[ $key ] );
-			return update_option( 'mb_sticky_topics', $stickies );
-		}
-	}
-
-	return false;
-}
-
-/**
  * Adds a topic to the list of super sticky topics.
  *
  * @since  1.0.0
@@ -127,12 +83,12 @@ function mb_remove_sticky_topic( $topic_id ) {
  */
 function mb_add_super_topic( $topic_id ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-	$supers   = mb_get_super_sticky_topics();
 
-	if ( !in_array( $topic_id, $supers ) ) {
-		$supers[] = $topic_id;
-		return update_option( 'mb_super_sticky_topics', $supers );
-	}
+	if ( mb_is_topic_sticky( $topic_id ) )
+		mb_remove_sticky_topic( $topic_id );
+
+	if ( !mb_is_topic_super( $topic_id ) )
+		return update_option( 'mb_super_topics', array_merge( mb_get_super_topics(), array( $topic_id ) ) );
 
 	return false;
 }
@@ -147,14 +103,58 @@ function mb_add_super_topic( $topic_id ) {
  */
 function mb_remove_super_topic( $topic_id ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-	$supers   = mb_get_super_sticky_topics();
 
-	if ( in_array( $topic_id, $supers ) ) {
-		$key = array_search( $topic_id, $supers );
+	if ( mb_is_topic_super( $topic_id ) ) {
+		$supers = mb_get_super_topics();
+		$key    = array_search( $topic_id, $supers );
 
-		if ( $key ) {
+		if ( isset( $supers[ $key ] ) ) {
 			unset( $supers[ $key ] );
-			return update_option( 'mb_super_sticky_topics', $supers );
+			return update_option( 'mb_super_topics', $supers );
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Adds a topic to the list of sticky topics.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $topic_id
+ * @return bool
+ */
+function mb_add_sticky_topic( $topic_id ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	if ( mb_is_topic_super( $topic_id ) )
+		mb_remove_super_topic( $topic_id );
+
+	if ( !mb_is_topic_sticky( $topic_id ) )
+		return update_option( 'mb_sticky_topics', array_merge( mb_get_sticky_topics(), array( $topic_id ) ) );
+
+	return false;
+}
+
+/**
+ * Removes a topic from the list of sticky topics.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $topic_id
+ * @return bool
+ */
+function mb_remove_sticky_topic( $topic_id ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	if ( mb_is_topic_sticky( $topic_id ) ) {
+		$stickies = mb_get_sticky_topics();
+		$key      = array_search( $topic_id, $stickies );
+
+		if ( isset( $supers[ $key ] ) ) {
+			unset( $stickies[ $key ] );
+			return update_option( 'mb_sticky_topics', $stickies );
 		}
 	}
 

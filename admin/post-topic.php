@@ -96,32 +96,19 @@ final class Message_Board_Admin_Post_Topic {
 		if ( !isset( $_POST['mb_topic_attr_nonce'] ) || !wp_verify_nonce( $_POST['mb_topic_attr_nonce'], '_mb_topic_attr_nonce' ) )
 			return;
 
-		$super_stickies = get_option( 'mb_super_sticky_topics', array() );
-		$topic_stickies = get_option( 'mb_sticky_topics',       array() );
+		$is_sticky = sanitize_key( $_POST['mb-topic-sticky'] );
 
-		$is_sticky = $_POST['mb-topic-sticky'];
+		if ( 'super' === $is_sticky && !mb_is_topic_super( $post_id ) )
+			mb_add_super_topic( $post_id );
 
-		if ( 'super-sticky' === $is_sticky && !in_array( $post_id, $super_stickies ) ) {
-			$super_stickies[] = $post_id;
-			update_option( 'mb_super_sticky_topics', $super_stickies );
-		}
+		elseif ( 'sticky' === $is_sticky && !mb_is_topic_sticky( $post_id ) )
+			mb_add_sticky_topic( $post_id );
 
-		if ( 'sticky' === $is_sticky && !in_array( $post_id, $topic_stickies ) ) {
-			$topic_stickies[] = $post_id;
-			update_option( 'mb_sticky_topics', $topic_stickies );
-		}
+		elseif ( '' === $is_sticky && mb_is_topic_super( $post_id ) )
+			mb_remove_super_topic( $post_id );
 
-		if ( 'super-sticky' !== $is_sticky && in_array( $post_id, $super_stickies ) ) {
-			$key = array_search( $post_id, $super_stickies );
-			unset( $super_stickies[ $key ] );
-			update_option( 'mb_super_sticky_topics', $super_stickies );
-		}
-
-		if ( 'sticky' !== $is_sticky && in_array( $post_id, $topic_stickies ) ) {
-			$key = array_search( $post_id, $topic_stickies );
-			unset( $topic_stickies[ $key ] );
-			update_option( 'mb_sticky_topics', $topic_stickies );
-		}
+		elseif ( '' === $is_sticky && mb_is_topic_sticky( $post_id ) )
+			mb_remove_sticky_topic( $post_id );
 	}
 
 	/**

@@ -306,7 +306,10 @@ function mb_get_topic_labels( $topic_id = 0 ) {
 	$topic_id       = mb_get_topic_id( $topic_id );
 	$labels = array();
 
-	if ( mb_is_topic_sticky( $topic_id ) )
+	if ( mb_is_topic_super( $topic_id ) )
+		$labels['super'] = __( '[Super Sticky]', 'message-board' );
+
+	elseif ( mb_is_topic_sticky( $topic_id ) )
 		$labels['sticky'] = __( '[Sticky]', 'message-board' );
 
 	if ( mb_is_topic_closed( $topic_id ) )
@@ -338,10 +341,8 @@ function mb_get_topic_labels( $topic_id = 0 ) {
  * @return bool
  */
 function mb_is_topic_sticky( $topic_id = 0 ) {
-	$topic_id       = mb_get_topic_id( $topic_id );
-	$super_stickies = mb_get_super_sticky_topics();
-	$topic_stickies = mb_get_sticky_topics();
-	$stickies       = array_merge( $super_stickies, $topic_stickies );
+	$topic_id = mb_get_topic_id( $topic_id );
+	$stickies = mb_get_sticky_topics();
 
 	return in_array( $topic_id, $stickies ) ? true : false;
 }
@@ -355,9 +356,9 @@ function mb_is_topic_sticky( $topic_id = 0 ) {
  * @param  int     $topic_id
  * @return bool
  */
-function mb_is_topic_super_sticky( $topic_id = 0 ) {
+function mb_is_topic_super( $topic_id = 0 ) {
 	$topic_id       = mb_get_topic_id( $topic_id );
-	$super_stickies = get_option( 'mb_super_sticky_topics', array() );
+	$super_stickies = mb_get_super_topics();
 
 	return in_array( $topic_id, $super_stickies ) ? true : false;
 }

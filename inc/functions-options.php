@@ -72,8 +72,8 @@ function mb_get_default_forum_id() {
  * @access public
  * @return array
  */
-function mb_get_super_sticky_topics() {
-	return apply_filters( 'mb_get_super_sticky_topics', get_option( 'mb_super_sticky_topics', array() ) );
+function mb_get_super_topics() {
+	return apply_filters( 'mb_get_super_sticky_topics', get_option( 'mb_super_topics', array() ) );
 }
 
 /**
