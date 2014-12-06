@@ -436,8 +436,8 @@ function mb_spam_reply( $reply_id ) {
  * @return int|WP_Error
  */
 function mb_unspam_reply( $reply_id ) {
-	$status = get_post_meta( $reply_id, mb_get_topic_prev_status_meta_key(), true );
-	$status = !empty( $status ) ? $status : mb_get_open_post_status();
+	$status = get_post_meta( $reply_id, mb_get_reply_prev_status_meta_key(), true );
+	$status = !empty( $status ) ? $status : mb_get_publish_post_status();
 	return mb_update_post_status( $reply_id, $status );
 }
 
