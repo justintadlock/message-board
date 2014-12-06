@@ -292,16 +292,20 @@ final class Message_Board_Admin_Edit_Forums {
 		/* Only add moderate links if the user has permission. */
 		if ( current_user_can( 'moderate_forum', $forum_id ) ) {
 
-			/* Get close link text. */
-			$close_text = mb_is_forum_closed( $forum_id ) ? __( 'Open', 'message-board' ) : __( 'Close', 'message-board' );
+			/* Get post status objects. */
+			$open_object  = get_post_status_object( mb_get_open_post_status()  );
+			$close_object = get_post_status_object( mb_get_close_post_status() );
 
-			/* Build close toggle URL. */
-			$close_url = remove_query_arg( array( 'forum_id', 'mb_forum_notice' ) );
-			$close_url = add_query_arg( array( 'forum_id' => $forum_id, 'action' => 'mb_toggle_close' ), $close_url );
-			$close_url = wp_nonce_url( $close_url, "close_forum_{$forum_id}" );
+			/* Get open/close link text. */
+			$open_text = mb_is_forum_open( $forum_id ) ? $close_object->label : $open_object->label;
 
-			/* Add toggle close action link. */
-			$actions['mb_toggle_close'] = sprintf( '<a href="%s">%s</a>', esc_url( $close_url ), $close_text );
+			/* Build open/close toggle URL. */
+			$open_url = remove_query_arg( array( 'forum_id', 'mb_forum_notice' ) );
+			$open_url = add_query_arg( array( 'forum_id' => $forum_id, 'action' => 'mb_toggle_open' ), $open_url );
+			$open_url = wp_nonce_url( $open_url, "open_forum_{$forum_id}" );
+
+			/* Add toggle open/close action link. */
+			$actions['mb_toggle_open'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $open_url ), mb_is_forum_open() ? 'close' : 'open', $open_text );
 		}
 
 		/* Move view action to the end. */
@@ -326,12 +330,12 @@ final class Message_Board_Admin_Edit_Forums {
 	public function handler() {
 
 		/* Checks if the close toggle link was clicked. */
-		if ( isset( $_GET['action'] ) && 'mb_toggle_close' === $_GET['action'] && isset( $_GET['forum_id'] ) ) {
+		if ( isset( $_GET['action'] ) && 'mb_toggle_open' === $_GET['action'] && isset( $_GET['forum_id'] ) ) {
 
 			$forum_id = absint( mb_get_forum_id( $_GET['forum_id'] ) );
 
 			/* Verify the nonce. */
-			check_admin_referer( "close_forum_{$forum_id}" );
+			check_admin_referer( "open_forum_{$forum_id}" );
 
 			/* Assume the changed failed. */
 			$notice = 'failure';
