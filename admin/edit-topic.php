@@ -208,8 +208,12 @@ final class Message_Board_Admin_Edit_Topics {
 		} elseif ( 'replies' === $column ) {
 
 			$reply_count = mb_get_topic_reply_count( $post_id );
+			$reply_count = !empty( $reply_count ) ? absint( $reply_count ) : number_format_i18n( 0 );
 
-			echo !empty( $reply_count ) ? absint( $reply_count ) : number_format_i18n( 0 );
+			if ( 0 < $reply_count && current_user_can( 'edit_replies' ) )
+				printf( '<a href="%s">%s</a>', add_query_arg( array( 'post_type' => mb_get_reply_post_type(), 'post_parent' => $post_id ), admin_url( 'edit.php' ) ), $reply_count );
+			else
+				echo $reply_count;
 
 		/* Voices column. */
 		} elseif ( 'voices' === $column ) {
