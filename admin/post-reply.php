@@ -36,6 +36,11 @@ final class Message_Board_Admin_Post_Reply {
 		if ( empty( $screen->post_type ) || $screen->post_type !== mb_get_reply_post_type() )
 			return;
 
+		if ( 'load-post-new.php' === current_filter() ) {
+			wp_safe_redirect( esc_url( add_query_arg( 'post_type', $screen->post_type, admin_url( 'edit.php' ) ) ) );
+			exit();
+		}
+
 		add_action( 'admin_enqueue_scripts', array( $this, 'print_styles' ) );
 
 		add_action( "add_meta_boxes_{$screen->post_type}", array( $this, 'add_meta_boxes' ) );

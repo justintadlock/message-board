@@ -22,6 +22,8 @@
 
 /* ====== Edit Posts List Screen (edit.php) ====== */
 
+.mb-reply a.add-new-h2 { display: none; }
+
 .edit-php .wp-list-table .column-forum,
 .edit-php .wp-list-table .column-topic,
 .edit-php .wp-list-table .column-datetime { 

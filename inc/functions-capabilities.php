@@ -141,13 +141,8 @@ function mb_get_reply_capabilities() {
  */
 function mb_map_meta_cap( $caps, $cap, $user_id, $args ) {
 
-	/* If in the admin, we don't want users to be able to create new topics. */
-	if ( is_admin() && in_array( $cap, array( 'create_topics', 'create_replies' ) ) ) {
-		$caps = array( 'do_not_allow' );
-	}
-
 	/* Meta cap for moderating a single forum. */
-	elseif ( 'moderate_forum' === $cap ) {
+	if ( 'moderate_forum' === $cap ) {
 
 		$caps = array();
 

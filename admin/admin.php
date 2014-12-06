@@ -40,6 +40,9 @@ final class Message_Board_Admin {
 
 		/* Register styles. */
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_styles' ) );
+
+		/* Add custom body class. */
+		add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
 	}
 
 	/**
@@ -94,6 +97,28 @@ final class Message_Board_Admin {
 	 */
 	public function register_styles() {
 		wp_register_style( 'message-board-admin', message_board()->dir_uri . 'css/admin.css' );
+	}
+
+	/**
+	 * Adds a custom admin body class.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  string  $class
+	 * @return string
+	 */
+	public function admin_body_class( $class ) {
+
+		$screen = get_current_screen();
+
+		if ( $this->forum_type === $screen->post_type )
+			$class .= 'mb-forum ';
+		elseif ( $this->topic_type === $screen->post_type )
+			$class .= 'mb-topic ';
+		elseif ( $this->reply_type === $screen->post_type )
+			$class .= 'mb-reply ';
+
+		return $class;
 	}
 
 	/**

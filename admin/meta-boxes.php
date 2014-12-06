@@ -60,6 +60,24 @@ function mb_submit_meta_box( $post, $args = array() ) {
 
 				</div><!-- .misc-pub-section -->
 
+<?php
+/* translators: Publish box date format, see http://php.net/date */
+$datef = __( 'M j, Y @ G:i' );
+if ( 0 != $post->ID ) {
+	$stamp = __('Date: <b>%1$s</b>');
+	$date = date_i18n( $datef, strtotime( $post->post_date ) );
+} else {
+	$stamp = __('Publish <b>immediately</b>');
+	$date = date_i18n( $datef, strtotime( current_time('mysql') ) );
+}
+
+?>
+
+<div class="misc-pub-section curtime misc-pub-curtime">
+	<span id="timestamp">
+	<?php printf($stamp, $date); ?></span>
+</div>
+
 				<?php do_action( 'post_submitbox_misc_actions' ); ?>
 
 			</div><!-- #misc-publishing-actions -->
@@ -198,12 +216,10 @@ function mb_topic_attributes_meta_box( $post ) {
 	<p>
 		<?php mb_dropdown_forums(
 			array(
-				'child_type'        => mb_get_topic_post_type(),
-				'name'              => 'parent_id',
-				'id'                => 'mb_parent_forum',
-				'show_option_none'  => __( '&ndash;&ndash; No Parent &ndash;&ndash;', 'message-board' ),
-				'option_none_value' => 0,
-				'selected'          => $post->post_parent
+				'child_type' => mb_get_topic_post_type(),
+				'name'       => 'parent_id',
+				'id'         => 'mb_parent_forum',
+				'selected'   => !empty( $post->post_parent ) ? $post->post_parent : mb_get_default_forum_id()
 			)
 		); ?>
 	</p><?php
