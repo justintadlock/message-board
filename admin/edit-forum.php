@@ -242,8 +242,12 @@ final class Message_Board_Admin_Edit_Forums {
 			case 'topics' :
 
 				$topic_count = mb_get_forum_topic_count( $post_id );
+				$topic_count = !empty( $topic_count ) ? absint( $topic_count ) : number_format_i18n( 0 );
 
-				echo !empty( $topic_count ) ? absint( $topic_count ) : number_format_i18n( 0 );
+				if ( 0 < $topic_count && current_user_can( 'edit_topics' ) )
+					printf( '<a href="%s">%s</a>', add_query_arg( array( 'post_type' => mb_get_topic_post_type(), 'post_parent' => $post_id ), admin_url( 'edit.php' ) ), $topic_count );
+				else
+					echo $topic_count;
 
 				break;
 
@@ -251,8 +255,12 @@ final class Message_Board_Admin_Edit_Forums {
 			case 'replies' :
 
 				$reply_count = mb_get_forum_reply_count( $post_id );
+				$reply_count = !empty( $reply_count ) ? absint( $reply_count ) : number_format_i18n( 0 );
 
-				echo !empty( $reply_count ) ? absint( $reply_count ) : number_format_i18n( 0 );
+				if ( 0 < $reply_count && current_user_can( 'edit_replies' ) )
+					printf( '<a href="%s">%s</a>', add_query_arg( array( 'post_type' => mb_get_reply_post_type(), 'mb_forum' => $post_id ), admin_url( 'edit.php' ) ), $reply_count );
+				else
+					echo $reply_count;
 
 				break;
 
