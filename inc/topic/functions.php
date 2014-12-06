@@ -73,6 +73,94 @@ function mb_insert_topic( $args = array() ) {
 	return $published;
 }
 
+/**
+ * Adds a topic to the list of sticky topics.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $topic_id
+ * @return bool
+ */
+function mb_add_sticky_topic( $topic_id ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$stickies = mb_get_sticky_topics();
+
+	if ( !in_array( $topic_id, $stickies ) ) {
+		$stickies[] = $topic_id;
+		return update_option( 'mb_sticky_topics', $stickies );
+	}
+
+	return false;
+}
+
+/**
+ * Removes a topic from the list of sticky topics.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $topic_id
+ * @return bool
+ */
+function mb_remove_sticky_topic( $topic_id ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$stickies = mb_get_sticky_topics();
+
+	if ( in_array( $topic_id, $stickies ) ) {
+		$key = array_search( $topic_id, $stickies );
+
+		if ( $key ) {
+			unset( $stickies[ $key ] );
+			return update_option( 'mb_sticky_topics', $stickies );
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Adds a topic to the list of super sticky topics.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $topic_id
+ * @return bool
+ */
+function mb_add_super_topic( $topic_id ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$supers   = mb_get_super_sticky_topics();
+
+	if ( !in_array( $topic_id, $supers ) ) {
+		$supers[] = $topic_id;
+		return update_option( 'mb_super_sticky_topics', $supers );
+	}
+
+	return false;
+}
+
+/**
+ * Removes a topic from the list of super sticky topics.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $topic_id
+ * @return bool
+ */
+function mb_remove_super_topic( $topic_id ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$supers   = mb_get_super_sticky_topics();
+
+	if ( in_array( $topic_id, $supers ) ) {
+		$key = array_search( $topic_id, $supers );
+
+		if ( $key ) {
+			unset( $supers[ $key ] );
+			return update_option( 'mb_super_sticky_topics', $supers );
+		}
+	}
+
+	return false;
+}
+
 function mb_get_multi_topic_reply_ids( $topic_ids ) {
 	global $wpdb;
 
@@ -203,6 +291,3 @@ function mb_reset_topic_data( $post, $reset_latest = false ) {
 	/* Reset user topic count. */
 	mb_set_user_topic_count( $post->post_author );
 }
-
-
-
