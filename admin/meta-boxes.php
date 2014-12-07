@@ -86,6 +86,10 @@ if ( 0 != $post->ID ) {
 	<?php printf($stamp, $date); ?></span>
 </div>
 
+				<div class="misc-pub-section">
+<i class="dashicons dashicons-admin-users"></i> Author: <strong><?php the_author_meta( 'display_name', $post->post_author ); ?></strong>
+				</div>
+
 				<?php do_action( 'post_submitbox_misc_actions' ); ?>
 
 			</div><!-- #misc-publishing-actions -->
