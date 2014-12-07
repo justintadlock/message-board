@@ -179,14 +179,3 @@ function mb_set_forum_type( $forum_id, $type ) {
 function mb_forum_type_allows_topics( $type ) {
 	return mb_get_forum_type_object( $type )->topics_allowed;
 }
-
-
-
-
-
-
-
-
-
-
-
