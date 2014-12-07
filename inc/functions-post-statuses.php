@@ -179,13 +179,23 @@ function mb_register_post_statuses() {
  */
 function mb_transition_post_status( $new_status, $old_status, $post ) {
 
+	/* Get post types. */
+	$forum_type = mb_get_forum_post_type();
+	$topic_type = mb_get_topic_post_type();
+	$reply_type = mb_get_reply_post_type();
+
 	/* If not one of our post types, bail. */
-	if ( !in_array( $post->post_type, array( mb_get_forum_post_type(), mb_get_topic_post_type(), mb_get_reply_post_type() ) ) )
+	if ( !in_array( $post->post_type, array( $forum_type, $topic_type, $reply_type ) ) )
 		return;
 
 	/* Keep track of the old post status by saving it as post meta. */
 	$type = mb_translate_post_type( $post->post_type );
 	update_post_meta( $post->ID, call_user_func( "mb_get_{$type}_prev_status_meta_key" ), $old_status );
+
+	/* Get post type statuses. */
+	$forum_statuses = mb_get_forum_post_statuses();
+	$topic_statuses = mb_get_topic_post_statuses();
+	$reply_statuses = mb_get_reply_post_statuses();
 
 	/* Get the post statuses we need to work with. */
 	$publish_status = mb_get_publish_post_status();
@@ -193,6 +203,14 @@ function mb_transition_post_status( $new_status, $old_status, $post ) {
 	$close_status   = mb_get_close_post_status();
 	$spam_status    = mb_get_spam_post_status();
 	$trash_status   = mb_get_trash_post_status();
+
+	/* If old status is not one of our stasuses but the new status is, assume we're publishing for the first time. */
+	//if ( $forum_type === $post->post_type && !in_array( $old_status, $forum_statuses ) && in_array( $new_status, $forum_statuses ) )
+
+	if ( $topic_type === $post->post_type && !in_array( $old_status, $topic_statuses ) && in_array( $new_status, $topic_statuses ) )
+		mb_insert_topic_data( $post );
+
+	//if ( $reply_type === $post->post_type && !in_array( $old_status, $reply_statuses ) && in_array( $new_status, $reply_statuses ) )
 
 	/* Publish status change. */
 	add_action( "{$publish_status}_to_{$spam_status}",  'mb_publish_to_spam'  );

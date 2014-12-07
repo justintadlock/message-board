@@ -76,6 +76,11 @@ if ( 0 != $post->ID ) {
 
 ?>
 
+<?php if ( mb_get_topic_post_type() === $post->post_type ) : ?>
+<?php $_m_order = 0 != $post->ID ? $post->post_date : current_time( 'mysql' ); ?>
+<input type="hidden" name="menu_order" value="<?php echo esc_attr( mysql2date( 'U', $_m_order ) ); ?>" />
+<?php endif; ?>
+
 <div class="misc-pub-section curtime misc-pub-curtime">
 	<span id="timestamp">
 	<?php printf($stamp, $date); ?></span>
@@ -106,7 +111,7 @@ if ( 0 != $post->ID ) {
 
 			<div id="publishing-action">
 				<span class="spinner"></span>
-				<?php if ( 0 == $post->ID ) : ?>
+				<?php if ( 0 == $post->ID || !in_array( $post->post_status, $avail_statuses ) ) : ?>
 					<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Publish', 'message-board' ) ?>" />
 					<?php submit_button( __( 'Publish', 'message-board' ), 'primary button-large', 'mb-publish', false, array( 'accesskey' => 'p' ) ); ?>
 				<?php else : ?>

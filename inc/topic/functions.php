@@ -34,43 +34,54 @@ function mb_insert_topic( $args = array() ) {
 	$args['post_type'] = mb_get_topic_post_type();
 
 	/* Insert the topic. */
-	$published = wp_insert_post( $args );
+	return wp_insert_post( $args );
+}
 
-	/* If we have a published post, add some metadata. */
-	if ( $published && !is_wp_error( $published ) ) {
+/**
+ * Function for inserting topic data when it's first published.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  object  $post
+ * @return void
+ */
+function mb_insert_topic_data( $post ) {
 
-		/* Get the User ID. */
-		$user_id = mb_get_user_id( $args['post_author'] );
+	/* Get the topic ID. */
+	$topic_id = mb_get_topic_id( $post->ID );
 
-		/* Update user meta. */
-		$topic_count = mb_get_user_topic_count( $user_id );
-		update_user_meta( $user_id, mb_get_user_topic_count_meta_key(), $topic_count + 1 );
+	/* Get the forum ID. */
+	$forum_id = mb_get_forum_id( $post->post_parent );
 
-		/* Add topic meta. */
-		update_post_meta( $published, mb_get_topic_activity_datetime_meta_key(),       $post_date  );
-		update_post_meta( $published, mb_get_topic_activity_datetime_epoch_meta_key(), $post_epoch );
-		update_post_meta( $published, mb_get_topic_voices_meta_key(),                  $user_id    );
-		update_post_meta( $published, mb_get_topic_voice_count_meta_key(),             1           );
-		update_post_meta( $published, mb_get_topic_reply_count_meta_key(),             0           );
+	/* Get the User ID. */
+	$user_id = mb_get_user_id( $post->post_author );
 
-		/* If we have a forum ID. */
-		if ( 0 < $args->post_parent ) {
+	/* Get the post date. */
+	$post_date  = $post->post_date;
+	$post_epoch = mysql2date( 'U', $post_date );
 
-			/* Get the forum ID. */
-			$forum_id = mb_get_forum_id( $args->post_parent );
+	/* Update user meta. */
+	$topic_count = mb_get_user_topic_count( $user_id );
+	update_user_meta( $user_id, mb_get_user_topic_count_meta_key(), $topic_count + 1 );
 
-			/* Update forum meta. */
-			update_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key(),       $post_date  );
-			update_post_meta( $forum_id, mb_get_forum_activity_datetime_epoch_meta_key(), $post_epoch );
-			update_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(),           $published  );
+	/* Add topic meta. */
+	update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(),       $post_date  );
+	update_post_meta( $topic_id, mb_get_topic_activity_datetime_epoch_meta_key(), $post_epoch );
+	update_post_meta( $topic_id, mb_get_topic_voices_meta_key(),                  $user_id    );
+	update_post_meta( $topic_id, mb_get_topic_voice_count_meta_key(),             1           );
+	update_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(),             0           );
 
-			$topic_count = get_post_meta( $forum_id, mb_get_forum_topic_count_meta_key(), true );
-			update_post_meta( $forum_id, mb_get_forum_topic_count_meta_key(), absint( $topic_count ) + 1 );
-		}
+	/* If we have a forum ID. */
+	if ( 0 < $forum_id ) {
+
+		/* Update forum meta. */
+		update_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key(),       $post_date  );
+		update_post_meta( $forum_id, mb_get_forum_activity_datetime_epoch_meta_key(), $post_epoch );
+		update_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(),           $topic_id   );
+
+		$topic_count = get_post_meta( $forum_id, mb_get_forum_topic_count_meta_key(), true );
+		update_post_meta( $forum_id, mb_get_forum_topic_count_meta_key(), absint( $topic_count ) + 1 );
 	}
-
-	/* Return the result of `wp_insert_post()`. */
-	return $published;
 }
 
 /**
