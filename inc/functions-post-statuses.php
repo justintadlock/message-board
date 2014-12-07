@@ -436,6 +436,32 @@ function mb_unspam_topic( $topic_id ) {
 }
 
 /**
+ * Changes a topic's post status to "orphan" if it has a different status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return int|WP_Error
+ */
+function mb_orphan_topic( $topic_id ) {
+	return mb_update_post_status( $topic_id, mb_get_orphan_post_status() );
+}
+
+/**
+ * Changes a topic's status from "orphan" to its previous status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return int|WP_Error
+ */
+function mb_unorphan_topic( $topic_id ) {
+	$status = get_post_meta( $topic_id, mb_get_topic_prev_status_meta_key(), true );
+	$status = !empty( $status ) ? $status : mb_get_orphan_post_status();
+	return mb_update_post_status( $topic_id, $status );
+}
+
+/**
  * Changes a reply's post status to "spam" if it has a different status.
  *
  * @since  1.0.0
@@ -458,6 +484,32 @@ function mb_spam_reply( $reply_id ) {
 function mb_unspam_reply( $reply_id ) {
 	$status = get_post_meta( $reply_id, mb_get_reply_prev_status_meta_key(), true );
 	$status = !empty( $status ) ? $status : mb_get_publish_post_status();
+	return mb_update_post_status( $reply_id, $status );
+}
+
+/**
+ * Changes a reply's post status to "orphan" if it has a different status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return int|WP_Error
+ */
+function mb_orphan_reply( $reply_id ) {
+	return mb_update_post_status( $reply_id, mb_get_orphan_post_status() );
+}
+
+/**
+ * Changes a reply's status from "orphan" to its previous status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return int|WP_Error
+ */
+function mb_unorphan_reply( $reply_id ) {
+	$status = get_post_meta( $reply_id, mb_get_reply_prev_status_meta_key(), true );
+	$status = !empty( $status ) ? $status : mb_get_orphan_post_status();
 	return mb_update_post_status( $reply_id, $status );
 }
 
