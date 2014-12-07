@@ -78,6 +78,9 @@ final class Message_Board_Admin_Edit_Replies {
 
 		/* Filter the row actions. */
 		add_filter( 'post_row_actions', array( $this, 'row_actions' ), 10, 2 );
+
+		/* Filter post states (shown next to post title). */
+		add_filter( 'display_post_states', array( $this, 'display_post_states' ), 0, 2 );
 	}
 
 	/**
@@ -275,6 +278,24 @@ final class Message_Board_Admin_Edit_Replies {
 		}
 
 		return $actions;
+	}
+
+	/**
+	 * Filter for the `post_states` hook.  We're going to replace any defaults and roll our own.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array   $post_states
+	 * @param  object  $post
+	 */
+	public function display_post_states( $post_states, $post ) {
+
+		$states   = array();
+		$reply_id = mb_get_reply_id( $post->ID );
+
+		$states['reply-id'] = "<small>(#{$reply_id})</small>";
+
+		return $states;
 	}
 
 	/**
