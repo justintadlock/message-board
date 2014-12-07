@@ -4,6 +4,43 @@
 add_action( 'init', 'mb_register_forum_types' );
 
 /**
+ * Inserts a new forum.  This is a wrapper for the `wp_insert_post()` function and should be used in its 
+ * place where possible.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $args
+ * @return int|WP_Error
+ */
+function mb_insert_forum( $args = array() ) {
+
+	/* Convert date. */
+	$post_date  = current_time( 'mysql' );
+	$post_epoch = mysql2date( 'U', $post_date );
+
+	/* Set up the defaults. */
+	$defaults = array(
+		'menu_order'   => 0,
+		'post_date'    => $post_date,
+		'post_author'  => get_current_user_id(),
+		'post_status'  => mb_get_open_post_status(),
+		'post_parent'  => 0,
+	);
+
+	/* Allow devs to filter the defaults. */
+	$defaults = apply_filters( 'mb_insert_forum_defaults', $defaults );
+
+	/* Parse the args/defaults and apply filters. */
+	$args = apply_filters( 'mb_insert_forum_args', wp_parse_args( $args, $defaults ) );
+
+	/* Always make sure it's the correct post type. */
+	$args['post_type'] = mb_get_forum_post_type();
+
+	/* Insert the topic. */
+	return wp_insert_post( $args );
+}
+
+/**
  * Function for inserting forum data when it's first published.
  *
  * @since  1.0.0
@@ -58,6 +95,12 @@ function mb_unregister_forum_type( $name ) {
 
 	if ( isset( $mb->forum_types[ $name ] ) )
 		unset( $mb->forum_types[ $name ] );
+}
+
+function mb_forum_type_exists( $name ) {
+	$mb = message_board();
+
+	return isset( $mb->forum_types[ $name ] );
 }
 
 function mb_get_forum_type_objects() {

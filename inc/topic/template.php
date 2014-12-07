@@ -1009,7 +1009,7 @@ function mb_topic_form() {
 
 	// content field
 	$default_fields['content']  = '<p>';
-	$default_fields['content'] .= sprintf( '<label for="mb_topic_content" name="mb_topic_content">%s</label>', __( 'Please put code in between <code>`backtick`</code> characters.', 'message-board' ) );
+	$default_fields['content'] .= sprintf( '<label for="mb_topic_content">%s</label>', __( 'Please put code in between <code>`backtick`</code> characters.', 'message-board' ) );
 	$default_fields['content'] .= '<textarea id="mb_topic_content" name="mb_topic_content"></textarea>';
 	$default_fields['content'] .= '</p>';
 

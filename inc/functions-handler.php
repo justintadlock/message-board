@@ -6,6 +6,7 @@ function mb_template_redirect() {
 	do_action( 'mb_template_redirect' );
 }
 
+add_action( 'mb_template_redirect', 'mb_handler_new_forum'       );
 add_action( 'mb_template_redirect', 'mb_handler_new_topic'       );
 add_action( 'mb_template_redirect', 'mb_handler_new_reply'       );
 add_action( 'mb_template_redirect', 'mb_handler_edit_post'       );
@@ -19,6 +20,101 @@ add_action( 'mb_template_redirect', 'mb_handler_topic_toggle_spam'  );
 add_action( 'mb_template_redirect', 'mb_handler_topic_toggle_trash' );
 add_action( 'mb_template_redirect', 'mb_handler_reply_toggle_spam'  );
 add_action( 'mb_template_redirect', 'mb_handler_reply_toggle_trash' );
+
+/**
+ * New forum handler. This function executes when a new topic is posted on the front end.
+ *
+ * @todo Separate some of the functionality into its own functions.
+ * @todo Use filter hooks for sanitizing rather than doing it directly in the function.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_handler_new_forum() {
+
+	/* Check if this is a new forum. */
+	if ( !isset( $_GET['mb_action'] ) || 'new-forum' !== $_GET['mb_action'] )
+		return;
+
+	/* Check if the new forum nonce was posted. */
+	if ( !isset( $_POST['mb_new_forum_nonce'] ) || !wp_verify_nonce( $_POST['mb_new_forum_nonce'], 'mb_new_forum_action' ) ) {
+		wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
+		exit();
+	}
+
+	/* Make sure the current user can create forums. */
+	if ( !current_user_can( 'create_forums' ) ) {
+		wp_die( 'Sorry, you cannot create new forums.', 'message-board' );
+		exit();
+	}
+
+	/* Make sure we have a user ID. */
+	if ( ! $user_id = get_current_user_id() ) {
+		wp_die( 'Did not recognize user.', 'message-board' );
+		exit();
+	}
+
+	/* Make sure we have a forum title. */
+	if ( empty( $_POST['mb_forum_title'] ) ) {
+		wp_die( __( 'You did not enter a forum title!', 'message-board' ) );
+		exit();
+	}
+
+	/* Post title. */
+	$post_title = esc_html( strip_tags( $_POST['mb_forum_title'] ) );
+
+	/* Post content. */
+	if ( !empty( $_POST['mb_forum_content'] ) ) {
+		$post_content = $_POST['mb_forum_content'];
+		$post_content = mb_encode_bad( $post_content );
+		$post_content = mb_code_trick( $post_content );
+		$post_content = force_balance_tags( $post_content );
+		$post_content = mb_filter_post_kses( $post_content );
+	} else {
+		$post_content = '';
+	}
+
+	/* Forum ID. */
+	$post_parent = 0 >= $_POST['mb_post_parent'] ? 0 : mb_get_forum_id( $_POST['mb_post_parent'] );
+
+	/* Menu order. */
+	$menu_order = 0 >= $_POST['mb_menu_order'] ? 0 : absint( $_POST['mb_menu_order'] );
+
+	/* Publish a new forum topic. */
+	$published = mb_insert_forum(
+		array(
+			'post_title'   => $post_title,
+			'post_content' => $post_content,
+			'post_parent'  => $post_parent,
+			'menu_order'   => $menu_order
+		)
+	);
+
+	/* If the post was published. */
+	if ( $published && !is_wp_error( $published ) ) {
+
+		/* Forum type. */
+		if ( isset( $_POST['mb_forum_type'] ) ) {
+			$forum_type = sanitize_key( $_POST['mb_forum_type'] );
+			$forum_type = mb_forum_type_exists( $forum_type ) ? $forum_type : 'forum';
+
+			update_post_meta( $published, mb_get_forum_type_meta_key(), $forum_type );
+		}
+
+		/* If the user chose to subscribe to the forum. */
+		/*
+		if ( isset( $_POST['mb_forum_subscribe'] ) && 1 == $_POST['mb_forum_subscribe'] ) {
+
+			mb_add_user_forum_subscription( absint( $user_id ), $published );
+		}
+		*/
+
+		/* Redirect to the published topic page. */
+		wp_safe_redirect( get_permalink( $published ) );
+		exit();
+	}
+}
 
 /**
  * New topic handler. This function executes when a new topic is posted on the front end.
