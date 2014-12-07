@@ -210,7 +210,8 @@ function mb_transition_post_status( $new_status, $old_status, $post ) {
 	if ( $topic_type === $post->post_type && !in_array( $old_status, $topic_statuses ) && in_array( $new_status, $topic_statuses ) )
 		mb_insert_topic_data( $post );
 
-	//if ( $reply_type === $post->post_type && !in_array( $old_status, $reply_statuses ) && in_array( $new_status, $reply_statuses ) )
+	elseif ( $reply_type === $post->post_type && !in_array( $old_status, $reply_statuses ) && in_array( $new_status, $reply_statuses ) )
+		mb_insert_reply_data( $post );
 
 	/* Publish status change. */
 	add_action( "{$publish_status}_to_{$spam_status}",  'mb_publish_to_spam'  );

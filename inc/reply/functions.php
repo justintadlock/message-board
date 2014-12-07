@@ -14,15 +14,11 @@ add_filter( 'post_type_link', 'mb_reply_post_type_link', 10, 2 );
  */
 function mb_insert_reply( $args = array() ) {
 
-	/* Convert date. */
-	$post_date  = current_time( 'mysql' );
-	$post_epoch = mysql2date( 'U', $post_date );
-
 	/* Set up the defaults. */
 	$defaults = array(
 		'menu_order'   => 0,
 		'post_parent'  => 0,
-		'post_date'    => $post_date,
+		'post_date'    => current_time( 'mysql' ),
 		'post_author'  => get_current_user_id(),
 		'post_status'  => mb_get_publish_post_status(),
 	);
@@ -45,58 +41,72 @@ function mb_insert_reply( $args = array() ) {
 		$args['menu_order'] = absint( mb_get_topic_reply_count( $args['post_parent'] ) ) + 1;
 
 	/* Insert the topic. */
-	$published = wp_insert_post( $args );
+	return wp_insert_post( $args );
+}
 
-	/* If the post was published. */
-	if ( $published && !is_wp_error( $published ) ) {
+/**
+ * Function for inserting reply data when it's first published.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  object  $post
+ * @return void
+ */
+function mb_insert_reply_data( $post ) {
 
-		/* Get the some IDs. */
-		$user_id  = mb_get_user_id(        $args['post_author'] );
-		$reply_id = mb_get_reply_id(       $published           );
-		$topic_id = mb_get_topic_id(       $args['post_parent'] );
-		$forum_id = mb_get_topic_forum_id( $topic_id            );
+	/* Get the reply ID. */
+	$reply_id = mb_get_reply_id( $post->ID );
 
-		/* Update user meta. */
-		$topic_count = mb_get_user_topic_count( $user_id );
-		update_user_meta( $user_id, mb_get_user_topic_count_meta_key(), $topic_count + 1 );
+	/* Get the topic ID. */
+	$topic_id = mb_get_topic_id( $post->post_parent );
 
-		/* Update reply meta. */
-		update_post_meta( $reply_id, mb_get_reply_forum_id_meta_key(), $forum_id );
+	/* Get the forum ID. */
+	$forum_id = mb_get_topic_forum_id( $topic_id );
 
-		/* Update topic menu order. */
-		wp_insert_post( array( 'ID' => $topic_id, 'menu_order' => $post_epoch ) );
+	/* Get the user ID. */
+	$user_id = mb_get_user_id( $post->post_author );
 
-		/* Update topic meta. */
-		update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(),       $post_date  );
-		update_post_meta( $topic_id, mb_get_topic_activity_datetime_epoch_meta_key(), $post_epoch );
-		update_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key(),           $published  );
+	/* Get the post date. */
+	$post_date  = $post->post_date;
+	$post_epoch = mysql2date( 'U', $post_date );
 
-		$voices = mb_get_topic_voices( $topic_id );
+	/* Update user meta. */
+	$topic_count = mb_get_user_topic_count( $user_id );
+	update_user_meta( $user_id, mb_get_user_topic_count_meta_key(), $topic_count + 1 );
 
-		if ( empty( $voices ) || !in_array( $user_id, $voices ) ) {
-			$voices = mb_set_topic_voices( $topic_id );
-			update_post_meta( $topic_id, mb_get_topic_voice_count_meta_key(), count( $voices ) + 1 );
-		}
+	/* Update reply meta. */
+	update_post_meta( $reply_id, mb_get_reply_forum_id_meta_key(), $forum_id );
 
-		$count = get_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), true );
-		update_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), absint( $count ) + 1 );
+	/* Update topic menu order. */
+	wp_insert_post( array( 'ID' => $topic_id, 'menu_order' => $post_epoch ) );
 
-		/* Update forum meta. */
-		update_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key(),       $post_date );
-		update_post_meta( $forum_id, mb_get_forum_activity_datetime_epoch_meta_key(), mysql2date( 'U', $post_date ) );
-		update_post_meta( $forum_id, mb_get_forum_last_reply_id_meta_key(),           $published );
-		update_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(),           $topic_id );
+	/* Update topic meta. */
+	update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(),       $post_date  );
+	update_post_meta( $topic_id, mb_get_topic_activity_datetime_epoch_meta_key(), $post_epoch );
+	update_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key(),           $reply_id  );
 
-		$reply_count = get_post_meta( $forum_id, mb_get_forum_reply_count_meta_key(), true );
-		update_post_meta( $forum_id, mb_get_forum_reply_count_meta_key(), absint( $reply_count ) + 1 );
+	$voices = mb_get_topic_voices( $topic_id );
 
-		/* Notify subscribers. */
-		mb_notify_topic_subscribers( $topic_id, $reply_id );
-		//mb_notify_forum_subscribers();
+	if ( empty( $voices ) || !in_array( $user_id, $voices ) ) {
+		$voices = mb_set_topic_voices( $topic_id );
+		update_post_meta( $topic_id, mb_get_topic_voice_count_meta_key(), count( $voices ) + 1 );
 	}
 
-	/* Return the result of `wp_insert_post()`. */
-	return $published;
+	$count = get_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), true );
+	update_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), absint( $count ) + 1 );
+
+	/* Update forum meta. */
+	update_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key(),       $post_date  );
+	update_post_meta( $forum_id, mb_get_forum_activity_datetime_epoch_meta_key(), $post_epoch );
+	update_post_meta( $forum_id, mb_get_forum_last_reply_id_meta_key(),           $reply_id   );
+	update_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(),           $topic_id   );
+
+	$reply_count = get_post_meta( $forum_id, mb_get_forum_reply_count_meta_key(), true );
+	update_post_meta( $forum_id, mb_get_forum_reply_count_meta_key(), absint( $reply_count ) + 1 );
+
+	/* Notify subscribers. */
+	mb_notify_topic_subscribers( $topic_id, $reply_id );
+	//mb_notify_forum_subscribers();
 }
 
 function mb_reply_post_type_link( $link, $post ) {
