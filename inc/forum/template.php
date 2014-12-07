@@ -130,26 +130,6 @@ function mb_is_forum_archive() {
 	return mb_is_forum_search() ? false : is_post_type_archive( mb_get_forum_post_type() );
 }
 
-/* ====== Forum Type ====== */
-
-function mb_forum_type( $forum_id = 0 ) {
-	echo mb_get_forum_type( $forum_id );
-}
-
-function mb_get_forum_type( $forum_id = 0 ) {
-	$forum_id = mb_get_forum_id( $forum_id );
-
-	$forum_type = get_post_meta( $forum_id, mb_get_forum_type_meta_key(), true );
-
-	$forum_type = !empty( $forum_type ) ? $forum_type : 'forum';
-
-	return apply_filters( 'mb_get_forum_type', $forum_type, $forum_id );
-}
-
-function mb_forum_type_allows_topics( $type ) {
-	return mb_get_forum_type_object( $type )->topics_allowed;
-}
-
 /* ====== Forum Status ====== */
 
 /**

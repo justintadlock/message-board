@@ -1,8 +1,5 @@
 <?php
 
-/* Register forum types. */
-add_action( 'init', 'mb_register_forum_types' );
-
 /**
  * Inserts a new forum.  This is a wrapper for the `wp_insert_post()` function and should be used in its 
  * place where possible.
@@ -61,56 +58,6 @@ function mb_insert_forum_data( $post ) {
 
 	/* Add forum meta. */
 	mb_set_forum_level( $forum_id );
-}
-
-function mb_register_forum_types() {
-
-	mb_register_forum_type( 'forum',    array( 'topics_allowed' => true,  'label' => __( 'Forum',    'message-board' ) ) );
-	mb_register_forum_type( 'category', array( 'topics_allowed' => false, 'label' => __( 'Category', 'message-board' ) ) );
-}
-
-function mb_register_forum_type( $name, $args = array() ) {
-
-	$mb = message_board();
-
-	$name = sanitize_key( $name );
-
-	if ( !isset( $mb->forum_types[ $name ] ) ) {
-
-		$defaults = array(
-			'topics_allowed' => true,
-			'label'          => '',
-		);
-
-		$args = wp_parse_args( $args, $defaults );
-
-		$args['name'] = $name;
-
-		$mb->forum_types[ $name ] = (object) $args;
-	}
-}
-
-function mb_unregister_forum_type( $name ) {
-	$mb = message_board();
-
-	if ( isset( $mb->forum_types[ $name ] ) )
-		unset( $mb->forum_types[ $name ] );
-}
-
-function mb_forum_type_exists( $name ) {
-	$mb = message_board();
-
-	return isset( $mb->forum_types[ $name ] );
-}
-
-function mb_get_forum_type_objects() {
-	return message_board()->forum_types;
-}
-
-function mb_get_forum_type_object( $name ) {
-	$mb = message_board();
-
-	return isset( $mb->forum_types[ $name ] ) ? $mb->forum_types[ $name ] : false;
 }
 
 function mb_get_forum_level( $forum_id = 0 ) {

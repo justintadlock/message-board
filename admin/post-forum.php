@@ -96,30 +96,9 @@ final class Message_Board_Admin_Post_Forum {
 		if ( !isset( $_POST['mb_forum_attr_nonce'] ) || !wp_verify_nonce( $_POST['mb_forum_attr_nonce'], '_mb_forum_attr_nonce' ) )
 			return;
 
-		/* Return here if the template is not set. There's a chance it won't be if the post type doesn't have any templates. */
-		if ( !isset( $_POST['mb_forum_type'] ) )
-			return;
-
-		/* Get the posted meta value. */
-		$new_meta_value = $_POST['mb_forum_type'];
-
-		/* Set the $meta_key variable based off the post type name. */
-		$meta_key = mb_get_forum_type_meta_key();
-
-		/* Get the meta value of the meta key. */
-		$meta_value = get_post_meta( $post_id, $meta_key, true );
-
-		/* If there is no new meta value but an old value exists, delete it. */
-		if ( current_user_can( 'delete_post_meta', $post_id ) && '' == $new_meta_value && $meta_value )
-			delete_post_meta( $post_id, $meta_key, $meta_value );
-
-		/* If a new meta value was added and there was no previous value, add it. */
-		elseif ( current_user_can( 'add_post_meta', $post_id, $meta_key ) && $new_meta_value && '' == $meta_value )
-			add_post_meta( $post_id, $meta_key, $new_meta_value, true );
-
-		/* If the new meta value does not match the old value, update it. */
-		elseif ( current_user_can( 'edit_post_meta', $post_id ) && $new_meta_value && $new_meta_value != $meta_value )
-			update_post_meta( $post_id, $meta_key, $new_meta_value );
+		/* Set the forum type. */
+		if ( isset( $_POST['mb_forum_type'] ) && mb_get_forum_type( $post_id ) !== $_POST['mb_forum_type'] )
+			mb_set_forum_type( $post_id, sanitize_key( $_POST['mb_forum_type'] ) );
 	}
 
 	/**

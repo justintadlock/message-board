@@ -96,10 +96,7 @@ function mb_handler_new_forum() {
 
 		/* Forum type. */
 		if ( isset( $_POST['mb_forum_type'] ) ) {
-			$forum_type = sanitize_key( $_POST['mb_forum_type'] );
-			$forum_type = mb_forum_type_exists( $forum_type ) ? $forum_type : 'forum';
-
-			update_post_meta( $published, mb_get_forum_type_meta_key(), $forum_type );
+			mb_set_forum_type( $published, sanitize_key( $_POST['mb_forum_type'] ) );
 		}
 
 		/* If the user chose to subscribe to the forum. */

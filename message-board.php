@@ -203,6 +203,7 @@ final class Message_Board {
 		/* Load forum files. */
 		require_once( $this->dir_path . 'inc/forum/functions.php' );
 		require_once( $this->dir_path . 'inc/forum/template.php'  );
+		require_once( $this->dir_path . 'inc/forum/types.php'     );
 
 		/* Load topic files. */
 		require_once( $this->dir_path . 'inc/topic/functions.php' );
