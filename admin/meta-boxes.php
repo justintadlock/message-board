@@ -32,7 +32,7 @@ function mb_submit_meta_box( $post, $args = array() ) {
 			<div id="misc-publishing-actions">
 
 				<div class="misc-pub-section misc-pub-post-status">
-<?php $st_object = !empty( $post->post_status ) && in_array( $post->post_stats, $avail_statuses ) ? get_post_status_object( $post->post_status ) : get_post_status_object( mb_get_open_post_status() ); ?>
+<?php $st_object = !empty( $post->post_status ) && in_array( $post->post_status, $avail_statuses ) ? get_post_status_object( $post->post_status ) : get_post_status_object( mb_get_open_post_status() ); ?>
 						<p><label for="post_status"><?php printf( __( 'Status: %s', 'message-board' ), "<strong>{$st_object->label}</strong>" ); ?></label>
 <?php /*
 <a href="#post_status" class="edit-post-status hide-if-no-js">
