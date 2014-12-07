@@ -1,6 +1,30 @@
 <?php
 
+/* Register forum types. */
 add_action( 'init', 'mb_register_forum_types' );
+
+/**
+ * Function for inserting forum data when it's first published.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  object  $post
+ * @return void
+ */
+function mb_insert_forum_data( $post ) {
+
+	/* Get the forum ID. */
+	$forum_id = mb_get_forum_id( $post->ID );
+
+	/* Get the User ID. */
+	$user_id = mb_get_user_id( $post->post_author );
+
+	/* Update user meta. */
+	mb_set_user_forum_count( $user_id );
+
+	/* Add forum meta. */
+	mb_set_forum_level( $forum_id );
+}
 
 function mb_register_forum_types() {
 

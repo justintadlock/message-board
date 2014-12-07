@@ -204,10 +204,11 @@ function mb_transition_post_status( $new_status, $old_status, $post ) {
 	$spam_status    = mb_get_spam_post_status();
 	$trash_status   = mb_get_trash_post_status();
 
-	/* If old status is not one of our stasuses but the new status is, assume we're publishing for the first time. */
-	//if ( $forum_type === $post->post_type && !in_array( $old_status, $forum_statuses ) && in_array( $new_status, $forum_statuses ) )
+	/* If old status is not one of our statuses but the new is, assume we're publishing for the first time. */
+	if ( $forum_type === $post->post_type && !in_array( $old_status, $forum_statuses ) && in_array( $new_status, $forum_statuses ) )
+		mb_insert_forum_data( $post );
 
-	if ( $topic_type === $post->post_type && !in_array( $old_status, $topic_statuses ) && in_array( $new_status, $topic_statuses ) )
+	elseif ( $topic_type === $post->post_type && !in_array( $old_status, $topic_statuses ) && in_array( $new_status, $topic_statuses ) )
 		mb_insert_topic_data( $post );
 
 	elseif ( $reply_type === $post->post_type && !in_array( $old_status, $reply_statuses ) && in_array( $new_status, $reply_statuses ) )

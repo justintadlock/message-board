@@ -76,6 +76,23 @@ function mb_get_users() {
 	return $mb->users_query->results;
 }
 
+function mb_user_forum_count( $user_id = 0 ) {
+	echo mb_get_user_forum_count();
+}
+
+function mb_get_user_forum_count( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+
+	$count = get_user_meta( $user_id, mb_get_user_forum_count_meta_key(), true );
+
+	if ( '' === $count )
+		$count = mb_set_user_forum_count( $user_id );
+
+	$count = !empty( $count ) ? absint( $count ) : 0;
+
+	return apply_filters( 'mb_get_user_forum_count', $count, $user_id );
+}
+
 function mb_user_topic_count( $user_id = 0 ) {
 	echo mb_get_user_topic_count();
 }
