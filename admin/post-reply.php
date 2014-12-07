@@ -73,6 +73,9 @@ final class Message_Board_Admin_Post_Reply {
 
 		/* Add custom submit meta box. */
 		add_meta_box( 'mb-submitdiv', __( 'Publish', 'message-board' ), 'mb_submit_meta_box', $post->post_type, 'side', 'core' );
+
+		/* Add reply info meta box. */
+		add_meta_box( 'mb-reply-info', __( 'Reply Info', 'message-board' ), 'mb_reply_info_meta_box', $post->post_type, 'side', 'core' );
 	}
 
 	/**

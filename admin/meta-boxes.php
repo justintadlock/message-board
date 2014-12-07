@@ -236,3 +236,25 @@ function mb_topic_attributes_meta_box( $post ) {
 		); ?>
 	</p><?php
 }
+
+/**
+ * Reply info meta box.  Displays relevant information about the reply.  This box doesn't have editable 
+ * content in it.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  object  $post
+ * @return void
+ */
+function mb_reply_info_meta_box( $post ) {
+
+	$reply_id = mb_get_reply_id( $post->ID );
+	$topic_id = mb_get_reply_topic_id( $reply_id );
+	$forum_id = mb_get_reply_forum_id( $reply_id );
+
+	$topic_object = get_post_type_object( mb_get_topic_post_type() );
+	$forum_object = get_post_type_object( mb_get_forum_post_type() ); ?>
+
+	<p><?php printf( __( 'Topic: %s', 'message-board' ), mb_get_topic_link( $topic_id ) ); ?></p>
+	<p><?php printf( __( 'Forum: %s', 'message-board' ), mb_get_forum_link( $forum_id ) ); ?></p>
+<?php }
