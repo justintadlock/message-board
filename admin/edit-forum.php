@@ -68,6 +68,9 @@ final class Message_Board_Admin_Edit_Forums {
 		/* Add custom admin notices. */
 		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 
+		/* Filter the bulk actions. */
+		add_filter( "bulk_actions-{$screen->id}", array( $this, 'bulk_actions' ) );
+
 		/* Handle custom columns. */
 		add_filter( "manage_edit-{$forum_type}_columns",          array( $this, 'edit_columns'            )        );
 		add_filter( "manage_edit-{$forum_type}_sortable_columns", array( $this, 'manage_sortable_columns' )        );
@@ -141,6 +144,23 @@ final class Message_Board_Admin_Edit_Forums {
 
 		/* Return the vars, merging with the new ones. */
 		return array_merge( $vars, $new_vars );
+	}
+
+	/**
+	 * Customize the bulk actions drop-down.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array  $actions
+	 * @return array
+	 */
+	public function bulk_actions( $actions ) {
+
+		/* If the edit action is set, remove it. */
+		if ( isset( $actions['edit'] ) )
+			unset( $actions['edit'] );
+
+		return $actions;
 	}
 
 	/**

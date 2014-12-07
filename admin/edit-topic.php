@@ -71,6 +71,9 @@ final class Message_Board_Admin_Edit_Topics {
 		/* Add custom views. */
 		add_filter( "views_edit-{$topic_type}", array( $this, 'views' ) );
 
+		/* Filter the bulk actions. */
+		add_filter( "bulk_actions-{$screen->id}", array( $this, 'bulk_actions' ) );
+
 		/* Handle custom columns. */
 		add_filter( "manage_edit-{$topic_type}_columns",          array( $this, 'edit_columns'            )        );
 		add_filter( "manage_edit-{$topic_type}_sortable_columns", array( $this, 'manage_sortable_columns' )        );
@@ -169,6 +172,23 @@ final class Message_Board_Admin_Edit_Topics {
 		}
 
 		return $views;
+	}
+
+	/**
+	 * Customize the bulk actions drop-down.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array  $actions
+	 * @return array
+	 */
+	public function bulk_actions( $actions ) {
+
+		/* If the edit action is set, remove it. */
+		if ( isset( $actions['edit'] ) )
+			unset( $actions['edit'] );
+
+		return $actions;
 	}
 
 	/**
