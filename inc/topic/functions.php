@@ -1,5 +1,8 @@
 <?php
 
+/* Filter to make sure we get a topic post parent. */
+add_filter( 'wp_insert_post_parent', 'mb_insert_topic_post_parent', 10, 3 );
+
 /**
  * Inserts a new topic and adds/updates metadata.  This is a wrapper for the `wp_insert_post()` function 
  * and should be used in its place where possible.
@@ -82,6 +85,24 @@ function mb_insert_topic_data( $post ) {
 		$topic_count = get_post_meta( $forum_id, mb_get_forum_topic_count_meta_key(), true );
 		update_post_meta( $forum_id, mb_get_forum_topic_count_meta_key(), absint( $topic_count ) + 1 );
 	}
+}
+
+/**
+ * Attempt to always make sure that topics have a post parent.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $post_parent
+ * @param  int     $post_id
+ * @param  array   $new_postarr
+ * @return int
+ */
+function mb_insert_topic_post_parent( $post_parent, $post_id, $new_postarr ) {
+
+	if ( mb_get_topic_post_type() === $new_postarr['post_type'] && 0 >= $post_parent )
+		$post_parent = mb_get_default_forum_id();
+
+	return $post_parent;
 }
 
 /**
