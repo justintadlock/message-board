@@ -34,13 +34,16 @@
 	width: 15%;
 }
 
-.edit-php .wp-list-table .column-status,
 .edit-php .wp-list-table .column-type,
-.edit-php .wp-list-table .column-forums,
+.edit-php .wp-list-table .column-forums {
+	width: 10%;
+}
+
+.edit-php .wp-list-table .column-status,
 .edit-php .wp-list-table .column-topics,
 .edit-php .wp-list-table .column-replies,
 .edit-php .wp-list-table .column-voices {
-	width: 10%;
+	width: 8%;
 }
 
 /* Row actions. */
