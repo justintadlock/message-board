@@ -34,7 +34,6 @@ function mb_register_meta() {
 	register_meta( 'post', mb_get_topic_prev_status_meta_key(),             'esc_html',   '__return_true' );
 
 	/* Reply meta. */
-	register_meta( 'post', mb_get_reply_forum_id_meta_key(),    'absint',   '__return_true' );
 	register_meta( 'post', mb_get_reply_prev_status_meta_key(), 'esc_html', '__return_true' );
 
 	/* User meta. */
@@ -220,17 +219,6 @@ function mb_get_topic_reply_count_meta_key() {
  */
 function mb_get_topic_prev_status_meta_key() {
 	return apply_filters( 'mb_get_topic_prev_status_meta_key', '_topic_prev_status' );
-}
-
-/**
- * Returns the meta key used for the "forum ID" for the "reply" post type.
- *
- * @since  1.0.0
- * @access public
- * @return string
- */
-function mb_get_reply_forum_id_meta_key() {
-	return apply_filters( 'mb_get_reply_forum_id_meta_key', '_reply_forum_id' );
 }
 
 /**

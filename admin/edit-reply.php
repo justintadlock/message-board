@@ -104,15 +104,17 @@ final class Message_Board_Admin_Edit_Replies {
 		/* Load replies of a specific forum. */
 		elseif ( isset( $_GET['mb_forum'] ) ) {
 
-			$new_vars['meta_key']  = mb_get_reply_forum_id_meta_key();
-			$new_vars['meta_value'] = mb_get_forum_id( $_GET['mb_forum'] );
+			$topic_ids = mb_get_forum_topic_ids( mb_get_forum_id( $_GET['mb_forum'] ) );
+
+			$new_vars['post_parent__in'] = (array)$topic_ids;
 		}
 
 		/* Order replies by their forums. */
 		elseif ( isset( $vars['orderby'] ) && 'forum' === $vars['orderby'] ) {
 
-			$new_vars['orderby']  = 'meta_value_num';
-			$new_vars['meta_key'] = mb_get_reply_forum_id_meta_key();
+			// @todo - Fix or remove
+			//$new_vars['orderby']  = 'meta_value_num';
+			//$new_vars['meta_key'] = mb_get_reply_forum_id_meta_key();
 		}
 
 		/* Order replies by their topics. */

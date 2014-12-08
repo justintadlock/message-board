@@ -74,9 +74,6 @@ function mb_insert_reply_data( $post ) {
 	$topic_count = mb_get_user_topic_count( $user_id );
 	update_user_meta( $user_id, mb_get_user_topic_count_meta_key(), $topic_count + 1 );
 
-	/* Update reply meta. */
-	update_post_meta( $reply_id, mb_get_reply_forum_id_meta_key(), $forum_id );
-
 	/* Update topic menu order. */
 	wp_insert_post( array( 'ID' => $topic_id, 'menu_order' => $post_epoch ) );
 

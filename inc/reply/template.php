@@ -335,15 +335,9 @@ function mb_get_reply_form() {
 
 function mb_get_reply_forum_id( $reply_id = 0 ) {
 
-	$forum_id = get_post_meta( $reply_id, mb_get_reply_forum_id_meta_key(), true );
+	$reply_id = mb_get_reply_id( $reply_id );
 
-	if ( empty( $forum_id ) ) {
-		$topic_id = mb_get_reply_topic_id( $reply_id );
-		$forum_id = mb_get_topic_forum_id( $topic_id );
-		update_post_meta( $reply_id, mb_get_reply_forum_id_meta_key(), $forum_id );
-	}
-
-	return absint( $forum_id );
+	return mb_get_topic_forum_id( mb_get_reply_topic_id( $reply_id ) );
 }
 
 /* ====== Reply Topic ====== */
