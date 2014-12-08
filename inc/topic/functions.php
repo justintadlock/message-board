@@ -78,11 +78,11 @@ function mb_insert_topic_data( $post ) {
 	update_user_meta( $user_id, mb_get_user_topic_count_meta_key(), $topic_count + 1 );
 
 	/* Add topic meta. */
-	update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(),       $post_date  );
-	update_post_meta( $topic_id, mb_get_topic_activity_datetime_epoch_meta_key(), $post_epoch );
-	update_post_meta( $topic_id, mb_get_topic_voices_meta_key(),                  $user_id    );
-	update_post_meta( $topic_id, mb_get_topic_voice_count_meta_key(),             1           );
-	update_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(),             0           );
+	mb_set_topic_activity_datetime( $topic_id, $post_date  );
+	mb_set_topic_activity_epoch(    $topic_id, $post_epoch );
+	mb_set_topic_voices(            $topic_id, $user_id    );
+	mb_set_topic_voice_count(       $topic_id, 1           );
+	mb_set_topic_reply_count(       $topic_id, 0           );
 
 	/* If we have a forum ID. */
 	if ( 0 < $forum_id ) {
@@ -280,17 +280,19 @@ function mb_reset_topic_latest( $topic_id ) {
 		$reply_ids = array_reverse( $reply_ids );
 		$last_reply_id = array_shift( $reply_ids );
 
-		$post_date = get_post_field( 'post_date', $last_reply_id );
+		$post_date  = get_post_field( 'post_date', $last_reply_id );
+		$post_epoch = mysql2date( 'U', $post_date );
 
-		update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(),       $post_date );
-		update_post_meta( $topic_id, mb_get_topic_activity_datetime_epoch_meta_key(), mysql2date( 'U', $post_date ) );
-		update_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key(),           $last_reply_id );
+		mb_set_topic_activity_datetime( $topic_id, $post_date     );
+		mb_set_topic_activity_epoch(    $topic_id, $post_epoch    );
+		mb_set_topic_last_reply_id(     $topic_id, $last_reply_id );
 
 	} else {
-		$post_date = get_post_field( 'post_date', $topic_id );
+		$post_date  = get_post_field( 'post_date', $topic_id );
+		$post_epoch = mysql2date( 'U', $post_date );
 
-		update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(),       $post_date );
-		update_post_meta( $topic_id, mb_get_topic_activity_datetime_epoch_meta_key(), mysql2date( 'U', $post_date ) );
+		mb_set_topic_activity_datetime( $topic_id, $post_date     );
+		mb_set_topic_activity_epoch(    $topic_id, $post_epoch    );
 
 		delete_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key() );
 	}
@@ -309,13 +311,13 @@ function mb_reset_topic_latest( $topic_id ) {
  * @param  int     $topic_id
  * @return array
  */
-function mb_set_topic_reply_count( $topic_id ) {
+function mb_reset_topic_reply_count( $topic_id ) {
 
 	$replies = mb_get_topic_reply_ids( $topic_id );
 
 	$count = !empty( $replies ) ? count( $replies ) : 0;
 
-	update_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), $count );
+	mb_set_topic_reply_count( $topic_id, $count );
 }
 
 /**
@@ -326,19 +328,18 @@ function mb_set_topic_reply_count( $topic_id ) {
  * @param  int     $topic_id
  * @return array
  */
-function mb_set_topic_voices( $topic_id ) {
+function mb_reset_topic_voices( $topic_id ) {
 	global $wpdb;
 
-	$voices = $wpdb->get_col( $wpdb->prepare( "SELECT post_author FROM {$wpdb->posts} WHERE post_parent = %d AND post_type = %s AND post_status = %s", absint( $topic_id ), mb_get_reply_post_type(), mb_get_open_post_status() ) );
+	$voices = $wpdb->get_col( $wpdb->prepare( "SELECT post_author FROM {$wpdb->posts} WHERE post_parent = %d AND post_type = %s AND post_status = %s", absint( $topic_id ), mb_get_reply_post_type(), mb_get_publish_post_status() ) );
 
 	$topic_author = mb_get_topic_author_id( $topic_id );
 
 	$voices = array_merge( array( $topic_author ), (array)$voices );
 	$voices = array_unique( $voices );
 
-	$_voices = implode( ',', wp_parse_id_list( array_filter( $voices ) ) );
-	update_post_meta( $topic_id, mb_get_topic_voices_meta_key(), $_voices );
-	update_post_meta( $topic_id, mb_get_topic_voice_count_meta_key(), count( $_voices ) );
+	mb_set_topic_voices(      $topic_id, $voices          );
+	mb_set_topic_voice_count( $topic_id, count( $voices ) );
 
 	return $voices;
 }
@@ -370,4 +371,83 @@ function mb_reset_topic_data( $post, $reset_latest = false ) {
 
 	/* Reset user topic count. */
 	mb_set_user_topic_count( $post->post_author );
+}
+
+/**
+ * Sets the topic last activity datetime.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @param  string  $datetime
+ * @return bool
+ */
+function mb_set_topic_activity_datetime( $topic_id, $datetime ) {
+	return update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(), $datetime );
+}
+
+/**
+ * Sets the topic last activity datetime epoch.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @param  int     $epoch
+ * @return bool
+ */
+function mb_set_topic_activity_epoch( $topic_id, $epoch ) {
+	return 	update_post_meta( $topic_id, mb_get_topic_activity_datetime_epoch_meta_key(), $epoch );
+}
+
+/**
+ * Sets the topic voices.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int           $topic_id
+ * @param  array|string  $voices
+ * @return bool
+ */
+function mb_set_topic_voices( $topic_id, $voices ) {
+	$voices = implode( ',', wp_parse_id_list( $voices ) );
+	return update_post_meta( $topic_id, mb_get_topic_voices_meta_key(), $voices );
+}
+
+/**
+ * Sets the topic voice count.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @param  int     $count
+ * @return bool
+ */
+function mb_set_topic_voice_count( $topic_id, $count ) {
+	return update_post_meta( $topic_id, mb_get_topic_voice_count_meta_key(), $count );
+}
+
+/**
+ * Sets the topic reply count.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @param  int     $count
+ * @return bool
+ */
+function mb_set_topic_reply_count( $topic_id, $count ) {
+	return update_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), $count );
+}
+
+/**
+ * Sets the topic last reply ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @param  int     $reply_id
+ * @return bool
+ */
+function mb_set_topic_last_reply_id( $topic_id, $reply_id ) {
+	return update_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key(), $reply_id );
 }

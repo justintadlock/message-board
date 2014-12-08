@@ -766,7 +766,7 @@ function mb_topic_reply_count( $topic_id = 0 ) {
  * @since  1.0.0
  * @access public
  * @param  int     $topic_id
- * @return string
+ * @return int
  */
 function mb_get_topic_reply_count( $topic_id = 0 ) {
 	$topic_id    = mb_get_topic_id( $topic_id );
@@ -849,7 +849,7 @@ function mb_get_topic_voices( $topic_id = 0 ) {
 	/* @todo - remove count check and just use explode() before release. */
 	if ( 1 < count( $voices ) ) {
 		delete_post_meta( $topic_id, '_topic_voices' );
-		$voices = mb_set_topic_voices( $topic_id );
+		$voices = mb_reset_topic_voices( $topic_id );
 	} else {
 		$voices = explode( ',', array_shift( $voices ) );
 	}

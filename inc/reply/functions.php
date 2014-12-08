@@ -78,28 +78,29 @@ function mb_insert_reply_data( $post ) {
 	wp_insert_post( array( 'ID' => $topic_id, 'menu_order' => $post_epoch ) );
 
 	/* Update topic meta. */
-	update_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(),       $post_date  );
-	update_post_meta( $topic_id, mb_get_topic_activity_datetime_epoch_meta_key(), $post_epoch );
-	update_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key(),           $reply_id  );
+	mb_set_topic_activity_datetime( $topic_id, $post_date  );
+	mb_set_topic_activity_epoch( $topic_id, $post_epoch );
+	mb_set_topic_last_reply_id( $topic_id, $reply_id  );
 
 	$voices = mb_get_topic_voices( $topic_id );
 
-	if ( empty( $voices ) || !in_array( $user_id, $voices ) ) {
-		$voices = mb_set_topic_voices( $topic_id );
-		update_post_meta( $topic_id, mb_get_topic_voice_count_meta_key(), count( $voices ) + 1 );
+	if ( !in_array( $user_id, $voices ) ) {
+		$voices[] = $user_id;
+		mb_set_topic_voices( $topic_id, $voices );
+		mb_set_topic_voice_count( $topic_id, count( $voices ) + 1 );
 	}
 
-	$count = get_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), true );
-	update_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), absint( $count ) + 1 );
+	$topic_reply_count = mb_get_topic_reply_count( $topic_id );
+	mb_set_topic_reply_count( $topic_id, absint( $topic_reply_count ) + 1 );
 
-	$reply_count = mb_get_forum_reply_count( $forum_id );
+	$forum_reply_count = absint( mb_get_forum_reply_count( $forum_id ) ) + 1;
 
 	/* Update forum meta. */
-	mb_set_forum_activity_datetime( $forum_id, $post_date                 );
-	mb_set_forum_activity_epoch(    $forum_id, $post_epoch                );
-	mb_set_forum_last_reply_id(     $forum_id, $reply_id                  );
-	mb_set_forum_last_topic_id(     $forum_id, $topic_id                  );
-	mb_set_forum_reply_count(       $forum_id, absint( $reply_count ) + 1 );
+	mb_set_forum_activity_datetime( $forum_id, $post_date         );
+	mb_set_forum_activity_epoch(    $forum_id, $post_epoch        );
+	mb_set_forum_last_reply_id(     $forum_id, $reply_id          );
+	mb_set_forum_last_topic_id(     $forum_id, $topic_id          );
+	mb_set_forum_reply_count(       $forum_id, $forum_reply_count );
 
 	/* Notify subscribers. */
 	mb_notify_topic_subscribers( $topic_id, $reply_id );
@@ -169,10 +170,10 @@ function mb_reset_reply_data( $post, $reset_latest = false ) {
 	$forum_last_reply = mb_get_forum_last_reply_id( $forum_id );
 
 	/* Reset topic reply count. */
-	mb_set_topic_reply_count( $topic_id );
+	mb_reset_topic_reply_count( $topic_id );
 
 	/* Reset topic voices. */
-	mb_set_topic_voices( $topic_id );
+	mb_reset_topic_voices( $topic_id );
 
 	/* Reset reply positions. */
 	mb_reset_reply_positions( $topic_id );
