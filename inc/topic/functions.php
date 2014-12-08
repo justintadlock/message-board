@@ -77,13 +77,13 @@ function mb_insert_topic_data( $post ) {
 	/* If we have a forum ID. */
 	if ( 0 < $forum_id ) {
 
-		/* Update forum meta. */
-		update_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key(),       $post_date  );
-		update_post_meta( $forum_id, mb_get_forum_activity_datetime_epoch_meta_key(), $post_epoch );
-		update_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(),           $topic_id   );
+		$topic_count = mb_get_forum_topic_count( $forum_id = 0 );
 
-		$topic_count = get_post_meta( $forum_id, mb_get_forum_topic_count_meta_key(), true );
-		update_post_meta( $forum_id, mb_get_forum_topic_count_meta_key(), absint( $topic_count ) + 1 );
+		/* Update forum meta. */
+		mb_set_forum_activity_datetime( $forum_id, $post_date                 );
+		mb_set_forum_activity_epoch(    $forum_id, $post_epoch                );
+		mb_set_forum_last_topic_id(     $forum_id, $topic_id                  );
+		mb_set_forum_topic_count(       $forum_id, absint( $topic_count ) + 1 );
 	}
 }
 
@@ -311,10 +311,10 @@ function mb_reset_topic_data( $post, $reset_latest = false ) {
 	$forum_last_topic = mb_get_forum_last_topic_id( $forum_id );
 
 	/* Reset forum topic count. */
-	mb_set_forum_topic_count( $forum_id );
+	mb_reset_forum_topic_count( $forum_id );
 
 	/* Reset forum reply count. */
-	mb_set_forum_reply_count( $forum_id );
+	mb_reset_forum_reply_count( $forum_id );
 
 	/* If this is the last topic, reset forum latest data. */
 	if ( $post->ID === absint( $forum_last_topic ) || true === $reset_latest )

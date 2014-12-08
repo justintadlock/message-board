@@ -691,10 +691,10 @@ function mb_get_forum_topic_count( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 	$count    = get_post_meta( $forum_id, mb_get_forum_topic_count_meta_key(), true );
 
-	if ( empty( $count ) )
-		$count = mb_set_forum_topic_count( $forum_id );
+	if ( '' === $count )
+		$count = mb_reset_forum_topic_count( $forum_id );
 
-	return $count;
+	return absint( $count );
 }
 
 function mb_forum_post_count( $forum_id = 0 ) {
@@ -718,8 +718,8 @@ function mb_get_forum_reply_count( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 	$count    = get_post_meta( $forum_id, mb_get_forum_reply_count_meta_key(), true );
 
-	if ( empty( $count ) )
-		$count = mb_set_forum_reply_count( $forum_id );
+	if ( '' === $count )
+		$count = mb_reset_forum_reply_count( $forum_id );
 
 	return $count;
 }
