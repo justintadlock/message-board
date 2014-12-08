@@ -1,4 +1,14 @@
 <?php
+/**
+ * Plugin functions and filters for the forum post type.
+ *
+ * @package    MessageBoard
+ * @subpackage Admin
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 /**
  * Inserts a new forum.  This is a wrapper for the `wp_insert_post()` function and should be used in its 
@@ -60,6 +70,14 @@ function mb_insert_forum_data( $post ) {
 	mb_set_forum_level( $forum_id );
 }
 
+/**
+ * Gets a forum's level in the hierarchy.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $forum_id
+ * @return int
+ */
 function mb_get_forum_level( $forum_id = 0 ) {
 
 	$forum_id = mb_get_forum_id( $forum_id );
@@ -72,31 +90,39 @@ function mb_get_forum_level( $forum_id = 0 ) {
 	return apply_filters( 'mb_get_forum_level', $forum_level, $forum_id );
 }
 
+/**
+ * Sets a forum's level.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return int
+ */
 function mb_set_forum_level( $forum_id ) {
 
-	$level = 1;
-	$post_id = $forum_id;
+	$level   = 0;
+	$forum_id = mb_get_forum_id( $forum_id );
 
-		while ( $post_id ) {
+	while ( 0 < $forum_id ) {
 
-			/* Get the post by ID. */
-			$post = get_post( $post_id );
+		$level++;
 
-			/* If there's no longer a post parent, break out of the loop. */
-			if ( 0 >= $post->post_parent )
-				break;
-
-			/* Change the post ID to the parent post to continue looping. */
-			$post_id = $post->post_parent;
-
-			$level++;
-		}
+		$forum_id = mb_get_forum_id( get_post( $forum_id )->post_parent );
+	}
 
 	update_post_meta( $forum_id, mb_get_forum_level_meta_key(), absint( $level ) );
 
 	return $level;
 }
 
+/**
+ * Set the forum topic count.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $forum_id
+ * @return int
+ */
 function mb_set_forum_topic_count( $forum_id ) {
 
 	$topic_ids = mb_get_forum_topic_ids( $forum_id );
@@ -108,6 +134,14 @@ function mb_set_forum_topic_count( $forum_id ) {
 	return $count;
 }
 
+/**
+ * Set the forum reply count.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $forum_id
+ * @return int
+ */
 function mb_set_forum_reply_count( $forum_id ) {
 
 	$count     = 0;
@@ -124,6 +158,14 @@ function mb_set_forum_reply_count( $forum_id ) {
 	return $count;
 }
 
+/**
+ * Returns an array of topic IDs for the forum.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $forum_id
+ * @return array
+ */
 function mb_get_forum_topic_ids( $forum_id ) {
 	global $wpdb;
 
@@ -137,6 +179,14 @@ function mb_get_forum_topic_ids( $forum_id ) {
 	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND (" . implode( ' OR ', $statuses ) . ") AND post_parent = %s ORDER BY menu_order DESC", mb_get_topic_post_type(), absint( $forum_id ) ) );
 }
 
+/**
+ * Resets the forum's "latest" data.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $forum_id
+ * @return int
+ */
 function mb_reset_forum_latest( $forum_id ) {
 
 	$topic_ids = mb_get_forum_topic_ids( $forum_id );
