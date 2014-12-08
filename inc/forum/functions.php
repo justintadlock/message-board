@@ -3,7 +3,7 @@
  * Plugin functions and filters for the forum post type.
  *
  * @package    MessageBoard
- * @subpackage Admin
+ * @subpackage Includes
  * @author     Justin Tadlock <justin@justintadlock.com>
  * @copyright  Copyright (c) 2014, Justin Tadlock
  * @link       https://github.com/justintadlock/message-board

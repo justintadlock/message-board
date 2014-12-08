@@ -1,11 +1,21 @@
 <?php
+/**
+ * Plugin functions and filters for the topic post type.
+ *
+ * @package    MessageBoard
+ * @subpackage Includes
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 /* Filter to make sure we get a topic post parent. */
 add_filter( 'wp_insert_post_parent', 'mb_insert_topic_post_parent', 10, 3 );
 
 /**
- * Inserts a new topic and adds/updates metadata.  This is a wrapper for the `wp_insert_post()` function 
- * and should be used in its place where possible.
+ * Inserts a new topic.  This is a wrapper for the `wp_insert_post()` function and should be used in 
+ * its place where possible.
  *
  * @since  1.0.0
  * @access public
@@ -193,60 +203,74 @@ function mb_remove_sticky_topic( $topic_id ) {
 	return false;
 }
 
+/**
+ * Get an array of reply IDs for multiple topics.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array   $topic_ids
+ * @return array
+ */
 function mb_get_multi_topic_reply_ids( $topic_ids ) {
 	global $wpdb;
 
 	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s AND post_parent IN ( " . implode( ',', $topic_ids ) . " ) ORDER BY post_date DESC", mb_get_reply_post_type(), mb_get_publish_post_status() ) );
 }
 
+/**
+ * Get an array of user IDs for users who are subscribed to the topic.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return array
+ */
 function mb_get_topic_subscribers( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-
-	if ( empty( $topic_id ) )
-		return;
 
 	$users = wp_cache_get( 'mb_get_topic_subscribers_' . $topic_id, 'message-board-users' );
 
 	if ( false === $users ) {
-		$users = mb_set_topic_subscribers( $topic_id );
+		global $wpdb;
+
+		$users = $wpdb->get_col( $wpdb->prepare( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s AND FIND_IN_SET( '{$topic_id}', meta_value ) > 0", mb_get_user_topic_subscriptions_meta_key() ) );
+		wp_cache_set( 'mb_get_topic_subscribers_' . $topic_id, $users, 'message-board-users' );
 	}
 
 	return apply_filters( 'mb_get_topic_subscribers', $users );
 }
 
-function mb_set_topic_subscribers( $topic_id ) {
-	global $wpdb;
-
-	$users = $wpdb->get_col( $wpdb->prepare( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s AND FIND_IN_SET( '{$topic_id}', meta_value ) > 0", mb_get_user_topic_subscriptions_meta_key() ) );
-	wp_cache_set( 'mb_get_topic_subscribers_' . $topic_id, $users, 'message-board-users' );
-
-	return $users;
-}
-
+/**
+ * Get an array of user IDs for users who have bookmarked to the topic.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return array
+ */
 function mb_get_topic_bookmarkers( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-
-	if ( empty( $topic_id ) )
-		return;
 
 	$users = wp_cache_get( 'mb_get_topic_bookmarkers_' . $topic_id, 'message-board-users' );
 
 	if ( false === $users ) {
-		$users = mb_set_topic_bookmarkers();
+		global $wpdb;
+
+		$users = $wpdb->get_col( $wpdb->prepare( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s and FIND_IN_SET( '{$topic_id}', meta_value ) > 0", mb_get_user_topic_bookmarks_meta_key() ) );
+		wp_cache_set( 'mb_get_topic_bookmarkers_' . $topic_id, $users, 'message-board-users' );
 	}
 
 	return apply_filters( 'mb_get_topic_bookmarkers', $users );
 }
 
-function mb_set_topic_bookmarkers( $topic_id ) {
-	global $wpdb;
-
-	$users = $wpdb->get_col( $wpdb->prepare( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s and FIND_IN_SET( '{$topic_id}', meta_value ) > 0", mb_get_user_topic_bookmarks_meta_key() ) );
-	wp_cache_set( 'mb_get_topic_bookmarkers_' . $topic_id, $users, 'message-board-users' );
-
-	return $users;
-}
-
+/**
+ * Resets the topic's latest data.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
 function mb_reset_topic_latest( $topic_id ) {
 
 	$reply_ids = mb_get_topic_reply_ids( $topic_id );
@@ -277,6 +301,14 @@ function mb_reset_topic_latest( $topic_id ) {
 	wp_update_post( $postarr );
 }
 
+/**
+ * Resets the topic reply count.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return array
+ */
 function mb_set_topic_reply_count( $topic_id ) {
 
 	$replies = mb_get_topic_reply_ids( $topic_id );
@@ -286,6 +318,14 @@ function mb_set_topic_reply_count( $topic_id ) {
 	update_post_meta( $topic_id, mb_get_topic_reply_count_meta_key(), $count );
 }
 
+/**
+ * Resets the topic voices.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return array
+ */
 function mb_set_topic_voices( $topic_id ) {
 	global $wpdb;
 
@@ -303,6 +343,14 @@ function mb_set_topic_voices( $topic_id ) {
 	return $voices;
 }
 
+/**
+ * Resets topic data.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return array
+ */
 function mb_reset_topic_data( $post, $reset_latest = false ) {
 
 	$post = is_object( $post ) ? $post : get_post( $post );
