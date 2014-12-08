@@ -297,10 +297,7 @@ function mb_reset_topic_latest( $topic_id ) {
 		delete_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key() );
 	}
 
-	$postarr = array();
-	$postarr['ID'] = absint( $topic_id );
-	$postarr['menu_order'] = mysql2date( 'U', $post_date );
-	wp_update_post( $postarr );
+	mb_set_topic_position( absint( $topic_id ), mysql2date( 'U', $post_date ) );
 }
 
 /**
@@ -371,6 +368,21 @@ function mb_reset_topic_data( $post, $reset_latest = false ) {
 
 	/* Reset user topic count. */
 	mb_set_user_topic_count( $post->post_author );
+}
+
+/**
+ * Sets the `menu_order` for a topic.  This is how we save the topic position.  The position should 
+ * either be based on the datetime epoch of the topic's last reply if there is one or of the topic 
+ * itself if there are no replies.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @param  int     $position
+ * @return bool
+ */
+function mb_set_topic_position( $topic_id, $position ) {
+	return wp_update_post( array( 'ID' => $topic_id, 'menu_order' => $position ) );
 }
 
 /**
