@@ -352,6 +352,31 @@ final class Message_Board_Admin_Edit_Topics {
 			$actions['mb_toggle_open'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $open_url ), mb_is_topic_open() ? 'close' : 'open', $open_text );
 		}
 
+		/* Add sticky toggle link if user has permission and topic is not spam. */
+		if ( current_user_can( 'moderate_topic', $topic_id ) && !mb_is_topic_spam( $topic_id ) ) {
+
+			/* Get post status objects. */
+			$open_object  = get_post_status_object( mb_get_open_post_status()  );
+			$close_object = get_post_status_object( mb_get_close_post_status() );
+
+			$current_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
+
+			/* Build sticky text. */
+			$sticky_text = mb_is_topic_sticky( $topic_id ) ? __( 'Unstick',  'message-board' ) : __( 'Stick', 'message-board' );
+			$super_text  = mb_is_topic_super(  $topic_id ) ? __( 'Unsuper',  'message-board' ) : __( 'Super', 'message-board' );
+
+			/* Build sticky toggle URL. */
+			$sticky_url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_sticky' ), $current_url );
+			$sticky_url = wp_nonce_url( $sticky_url, "sticky_topic_{$topic_id}" );
+
+			/* Build super toggle URL. */
+			$super_url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_super' ), $current_url );
+			$super_url = wp_nonce_url( $super_url, "super_topic_{$topic_id}" );
+
+			$actions['mb_toggle_sticky'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $sticky_url ), 'sticky', $sticky_text );
+			$actions['mb_toggle_super']  = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $super_url  ), 'super',  $super_text  );
+		}
+
 		/* Move view action to the end. */
 		if ( isset( $actions['view'] ) ) {
 			$view_action = $actions['view'];
@@ -453,6 +478,66 @@ final class Message_Board_Admin_Edit_Topics {
 			/* Always exit for good measure. */
 			exit();
 		}
+
+		/* Checks if the sticky toggle link was clicked. */
+		elseif ( isset( $_GET['action'] ) && 'mb_toggle_sticky' === $_GET['action'] && isset( $_GET['topic_id'] ) ) {
+
+			$topic_id = absint( mb_get_topic_id( $_GET['topic_id'] ) );
+
+			/* Verify the nonce. */
+			check_admin_referer( "sticky_topic_{$topic_id}" );
+
+			/* Assume the changed failed. */
+			$notice = 'failure';
+
+			/* Check if the topic is sticky. */
+			$is_sticky = mb_is_topic_sticky( $topic_id );
+
+			/* Update the post status. */
+			$updated = $is_sticky ? mb_remove_sticky_topic( $topic_id ) : mb_add_sticky_topic( $topic_id );
+
+			/* If the status was updated, add notice slug. */
+			if ( $updated && !is_wp_error( $updated ) ) {
+				$notice = $is_sticky ? 'unsticky' : 'sticky';
+			}
+
+			/* Redirect to correct admin page. */
+			$redirect = add_query_arg( array( 'topic_id' => $topic_id, 'mb_topic_notice' => $notice ), remove_query_arg( array( 'action', 'topic_id', '_wpnonce' ) ) );
+			wp_safe_redirect( $redirect );
+
+			/* Always exit for good measure. */
+			exit();
+		}
+
+		/* Checks if the super toggle link was clicked. */
+		elseif ( isset( $_GET['action'] ) && 'mb_toggle_super' === $_GET['action'] && isset( $_GET['topic_id'] ) ) {
+
+			$topic_id = absint( mb_get_topic_id( $_GET['topic_id'] ) );
+
+			/* Verify the nonce. */
+			check_admin_referer( "super_topic_{$topic_id}" );
+
+			/* Assume the changed failed. */
+			$notice = 'failure';
+
+			/* Check if the topic is sticky. */
+			$is_super = mb_is_topic_super( $topic_id );
+
+			/* Update the post status. */
+			$updated = $is_super ? mb_remove_super_topic( $topic_id ) : mb_add_super_topic( $topic_id );
+
+			/* If the status was updated, add notice slug. */
+			if ( $updated && !is_wp_error( $updated ) ) {
+				$notice = $is_sticky ? 'unsuper' : 'super';
+			}
+
+			/* Redirect to correct admin page. */
+			$redirect = add_query_arg( array( 'topic_id' => $topic_id, 'mb_topic_notice' => $notice ), remove_query_arg( array( 'action', 'topic_id', '_wpnonce' ) ) );
+			wp_safe_redirect( $redirect );
+
+			/* Always exit for good measure. */
+			exit();
+		}
 	}
 
 	/**
@@ -464,7 +549,7 @@ final class Message_Board_Admin_Edit_Topics {
 	 */
 	public function admin_notices() {
 
-		$allowed_notices = array( 'restore', mb_get_spam_post_status(), mb_get_open_post_status(), mb_get_close_post_status() );
+		$allowed_notices = array( 'restore', mb_get_spam_post_status(), mb_get_open_post_status(), mb_get_close_post_status(), 'sticky', 'unsticky', 'super', 'unsuper' );
 
 		if ( isset( $_GET['mb_topic_notice'] ) && in_array( $_GET['mb_topic_notice'], $allowed_notices ) && isset( $_GET['topic_id'] ) ) {
 
@@ -482,6 +567,18 @@ final class Message_Board_Admin_Edit_Topics {
 
 			elseif ( mb_get_open_post_status() === $notice )
 				$text = sprintf( __( 'The topic "%s" was successfully opened.', 'message-board' ), mb_get_topic_title( $topic_id ) );
+
+			elseif ( 'sticky' === $notice )
+				$text = sprintf( __( 'The topic "%s" was successfully added as a sticky topic.', 'message-board' ), mb_get_topic_title( $topic_id ) );
+
+			elseif ( 'unsticky' === $notice )
+				$text = sprintf( __( 'The topic "%s" was successfully removed from sticky topics.', 'message-board' ), mb_get_topic_title( $topic_id ) );
+
+			elseif ( 'super' === $notice )
+				$text = sprintf( __( 'The topic "%s" was successfully added as a super sticky topic.', 'message-board' ), mb_get_topic_title( $topic_id ) );
+
+			elseif ( 'unsuper' === $notice )
+				$text = sprintf( __( 'The topic "%s" was successfully removed from super sticky topics.', 'message-board' ), mb_get_topic_title( $topic_id ) );
 
 			if ( !empty( $text ) )
 				printf( '<div class="updated"><p>%s</p></div>', $text );

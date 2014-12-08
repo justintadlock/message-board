@@ -194,7 +194,7 @@ function mb_remove_sticky_topic( $topic_id ) {
 		$stickies = mb_get_sticky_topics();
 		$key      = array_search( $topic_id, $stickies );
 
-		if ( isset( $supers[ $key ] ) ) {
+		if ( isset( $stickies[ $key ] ) ) {
 			unset( $stickies[ $key ] );
 			return update_option( 'mb_sticky_topics', $stickies );
 		}
