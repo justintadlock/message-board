@@ -37,6 +37,8 @@ function mb_forum_query() {
 			'ignore_sticky_posts' => true,
 		);
 
+		add_filter( 'the_posts', 'mb_posts_hierarchy_filter', 10, 2 );
+
 		$mb->forum_query = new WP_Query( $defaults );
 	}
 
@@ -76,8 +78,21 @@ function mb_sub_forum_query() {
 	);
 
 	if ( mb_is_single_forum() ) {
-		$defaults['post_parent'] = get_queried_object_id();
+		$defaults['child_of'] = get_queried_object_id();
+
+		$forum_level = mb_get_forum_level( get_queried_object_id() );
+
+		$defaults['meta_query']  = array(
+			array(
+				'key'     => mb_get_forum_level_meta_key(),
+				'value'   => array( $forum_level + 1, $forum_level + 2 ),
+				'compare' => 'IN',
+				'type'    => 'NUMERIC'
+			)
+		);
 	}
+
+	add_filter( 'the_posts', 'mb_posts_hierarchy_filter', 10, 2 );
 
 	if ( !empty( $defaults['post_parent'] ) || !empty( $defaults['child_of'] ) )
 		$mb->sub_forum_query = new WP_Query( $defaults );

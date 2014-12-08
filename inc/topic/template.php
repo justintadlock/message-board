@@ -48,6 +48,7 @@ function mb_topic_query() {
 
 		if ( mb_is_single_forum() ) {
 			$defaults['post_parent'] = get_queried_object_id();
+			add_filter( 'the_posts', 'mb_posts_sticky_filter', 10, 2 );
 		}
 
 		$mb->topic_query = new WP_Query( $defaults );

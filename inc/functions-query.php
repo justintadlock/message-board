@@ -1,8 +1,5 @@
 <?php
 
-/* Filter the posts found by the main query. */
-add_filter( 'the_posts', 'mb_the_posts', 10, 2 );
-
 /**
  * Checks if viewing the forum front page.
  *
@@ -92,6 +89,8 @@ function mb_pre_get_posts( $query ) {
 				)
 			)
 		);
+
+		add_filter( 'the_posts', 'mb_posts_hierarchy_filter', 10, 2 );
 	}
 
 	/* Is topic archive page. */
@@ -102,6 +101,8 @@ function mb_pre_get_posts( $query ) {
 		$query->set( 'posts_per_page', mb_get_topics_per_page()    );
 		$query->set( 'order',          'DESC'                      );
 		$query->set( 'orderby',        'menu_order'                );
+
+		add_filter( 'the_posts', 'mb_posts_super_filter', 10, 2 );
 	}
 
 	/* If viewing a user view. */
@@ -185,7 +186,42 @@ function mb_auth_posts_where( $where, $query ) {
 }
 
 /**
- * Filter on 'the_posts.
+ * Puts forums in the correct, hierarchical order.  Meant to be used as a filter on `the_posts`.
+ *
+ * @link   http://wordpress.stackexchange.com/questions/63599/custom-post-type-wp-query-and-orderby
+ * @since  1.0.0
+ * @access public
+ * @param  array  $posts
+ * @param  object $query
+ * @return array
+ */
+function mb_posts_hierarchy_filter( $posts, $query ) {
+
+	$post_parent = mb_is_single_forum() ? get_queried_object_id() : 0;
+
+	$refs = $list = array();
+
+	foreach ( $posts as $post ) {
+		$thisref = &$refs[ $post->ID ];
+
+		$thisref['post'] = $post;
+
+		if ( $post_parent === $post->post_parent )
+			$list[ $post->ID ] = &$thisref;
+		else
+			$refs[ $post->post_parent ]['children'][ $post->ID ] = &$thisref;
+	}
+
+	$result = array();
+	mb_recursively_flatten_list( $list, $result );
+
+	remove_filter( 'the_posts', 'mb_posts_hierarchy_filter' );
+
+	return $result;
+}
+
+/**
+ * Adds super sticky posts to the posts array.  Meant to be used as a filter on `the_posts`.
  *
  * @since  1.0.0
  * @access public
@@ -193,40 +229,28 @@ function mb_auth_posts_where( $where, $query ) {
  * @param  object $query
  * @return array
  */
-function mb_the_posts( $posts, $query ) {
+function mb_posts_super_filter( $posts, $query ) {
 
-	/* If viewing the topic archive, put super sticky topics at the top. */
-	if ( !is_admin() && $query->is_main_query() && mb_is_topic_archive() ) {
+	remove_filter( 'the_posts', 'mb_posts_super_filter' );
 
-		$super_stickies = get_option( 'mb_super_sticky_topics', array() );
+	return mb_add_stickies( $posts, mb_get_super_topics() );
+}
 
-		$posts = mb_the_posts_stickies( $posts, $super_stickies );
-	}
+/**
+ * Adds sticky posts to the posts array.  Meant to be used as a filter on `the_posts`.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $posts
+ * @param  object $query
+ * @return array
+ */
+function mb_posts_sticky_filter( $posts, $query ) {
 
-	// http://wordpress.stackexchange.com/questions/63599/custom-post-type-wp-query-and-orderby
-	/* If viewing the forum archive, put forums in hierarchical order. */
-	elseif ( !is_admin() && $query->is_main_query() && mb_is_forum_archive() ) {
+	remove_filter( 'the_posts', 'mb_posts_sticky_filter' );
 
-		$refs = $list = array();
-
-		foreach( $posts as $post ) {
-			$thisref = &$refs[ $post->ID ];
-
-			$thisref['post'] = $post;
-
-			if ( $post->post_parent == 0 ) {
-				$list[ $post->ID ] = &$thisref;
-			} else {
-				$refs[ $post->post_parent ]['children'][ $post->ID ] = &$thisref;
-			}
-		}
-
-		$result = array();
-		mb_recursively_flatten_list( $list, $result );
-		$posts = $result;
-	}
-
-	return $posts;
+	$forum_id = mb_is_single_forum() ? get_queried_object_id() : 0;
+	return mb_add_stickies( $posts, mb_get_sticky_topics(), $forum_id );
 }
 
 /**
@@ -256,9 +280,10 @@ function mb_recursively_flatten_list( $list, &$result ) {
  * @access public
  * @param  array  $posts         Array of post objects.
  * @param  array  $sticky_posts  Array of post IDs.
+ * @param  int    $forum_id      Limit to specific forum.
  * @return array
  */
-function mb_the_posts_stickies( $posts, $sticky_posts ) {
+function mb_add_stickies( $posts, $sticky_posts, $forum_id = 0 ) {
 
 	/* Only do this if on the first page and we indeed have stickies. */
 	if ( !is_paged() && !empty( $sticky_posts ) ) {
@@ -292,14 +317,17 @@ function mb_the_posts_stickies( $posts, $sticky_posts ) {
 		/* Fetch sticky posts that weren't in the query results. */
 		if ( !empty( $sticky_posts ) ) {
 
-			$stickies = get_posts(
-				array(
+			$args = array(
 					'post__in'    => $sticky_posts,
 					'post_type'   => mb_get_topic_post_type(),
 					'post_status' => array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status() ),
 					'nopaging'    => true
-				)
 			);
+
+			if ( 0 < $forum_id )
+				$args['post_parent'] = $forum_id;
+
+			$stickies = get_posts( $args );
 
 			foreach ( $stickies as $sticky_post ) {
 				array_splice( $posts, $sticky_offset, 0, array( $sticky_post ) );
