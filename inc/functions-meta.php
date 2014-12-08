@@ -297,24 +297,3 @@ function mb_get_user_topic_count_meta_key() {
 function mb_get_user_reply_count_meta_key() {
 	return apply_filters( 'mb_get_user_reply_count_meta_key', '_reply_count' );
 }
-
-/**
- * Saves forum topic metadata when a forum topic is saved.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $post_id
- * @param  object  $post
- * @return void
- */
-function mb_save_post( $post_id, $post = '' ) {
-
-	if ( empty( $post ) )
-		return;
-
-	if ( mb_get_forum_post_type() === $post->post_type ) {
-
-		// @todo - this should only change when the post parent changes.
-		mb_set_forum_level( $post->ID );
-	}
-}

@@ -21,9 +21,6 @@ add_filter( 'post_title', 'mb_forum_reply_title_filter', 5, 2 );
 /* Edit post link filters. */
 add_filter( 'get_edit_post_link', 'mb_get_edit_post_link', 5, 2 );
 
-/* Meta filters. See `meta.php`. */
-add_action( 'save_post',         'mb_save_post',      10, 2 );
-
 /* Rewrite filters. See `rewrite.php`. */
 add_action( 'init',                      'mb_rewrite_rules',            5     );
 add_filter( 'forum_topic_rewrite_rules', 'mb_forum_topic_rewrite_rules'       );
