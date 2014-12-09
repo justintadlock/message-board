@@ -52,6 +52,23 @@ function mb_the_reply() {
 	return message_board()->reply_query->the_post();
 }
 
+/* ====== Conditionals ====== */
+
+function mb_is_single_reply( $reply = '' ) {
+
+	if ( !is_singular( mb_get_reply_post_type() ) )
+		return false;
+
+	if ( !empty( $reply ) )
+		return is_single( $reply );
+
+	return true;
+}
+
+function mb_is_reply_archive() {
+	return is_post_type_archive( mb_get_reply_post_type() );
+}
+
 /* ====== Reply Position ====== */
 
 function mb_reply_position( $reply_id = 0 ) {
@@ -208,12 +225,42 @@ function mb_get_reply_toggle_trash_link( $reply_id = 0 ) {
 
 /* ====== Reply ID ====== */
 
+/**
+ * Displays the reply ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
 function mb_reply_id( $reply_id = 0 ) {
 	echo mb_get_reply_id( $reply_id );
 }
 
+/**
+ * Returns the reply ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return int
+ */
 function mb_get_reply_id( $reply_id = 0 ) {
-	return apply_filters( 'mb_get_reply_id', mb_get_post_id( $reply_id ), $reply_id );
+	$mb = message_board();
+
+	if ( is_numeric( $reply_id ) && 0 < $reply_id )
+		$_reply_id = $reply_id;
+
+	elseif ( !empty( $mb->reply_query->in_the_loop ) && isset( $mb->reply_query->post->ID ) )
+		$_reply_id = $mb->reply_query->post->ID;
+
+	elseif ( mb_is_single_reply() )
+		$_reply_id = get_queried_object_id();
+
+	else
+		$_reply_id = 0;
+
+	return apply_filters( 'mb_get_reply_id', absint( $_reply_id ), $reply_id );
 }
 
 /* ====== Reply Content ====== */
