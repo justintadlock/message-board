@@ -123,6 +123,20 @@ function mb_get_forum_type_object( $name ) {
 }
 
 /**
+ * Conditional check to see if a forum has the "category" type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $forum_id
+ * @return bool
+ */
+function mb_is_forum_category( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	return 'category' === mb_get_forum_type( $forum_id ) ? true : false;
+}
+
+/**
  * Displays the forum type for a specific forum.
  *
  * @since  1.0.0
