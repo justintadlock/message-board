@@ -33,9 +33,8 @@ function mb_reply_query() {
 		'ignore_sticky_posts' => true,
 	);
 
-	if ( mb_is_single_topic() ) {
-		$defaults['post_parent'] = get_queried_object_id();
-	}
+	if ( $mb->topic_query->in_the_loop || mb_is_single_topic() )
+		$defaults['post_parent'] = mb_get_topic_id();
 
 	$mb->reply_query = new WP_Query( $defaults );
 

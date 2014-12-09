@@ -20,22 +20,26 @@ function mb_forum_query() {
 		return $have_posts;
 	}
 
-	if ( mb_is_forum_archive() || mb_is_single_forum() ) {
+	if ( mb_is_forum_archive() ) {
 		global $wp_query;
 
 		$mb->forum_query = $wp_query;
 	}
 
 	else {
+		$per_page = mb_get_forums_per_page();
 
 		$defaults = array(
 			'post_type'           => mb_get_forum_post_type(),
-			'nopaging'            => true,
-			'posts_per_page'      => -1,
-			'orderby'             => 'title',
+			'posts_per_page'      => $per_page,
+			'paged'               => get_query_var( 'paged' ),
+			'orderby'             => 'menu_order title',
 			'order'               => 'ASC',
 			'ignore_sticky_posts' => true,
 		);
+
+		if ( mb_is_single_forum() )
+			$defaults['post_parent'] = get_queried_object_id();
 
 		add_filter( 'the_posts', 'mb_posts_hierarchy_filter', 10, 2 );
 
@@ -52,52 +56,43 @@ function mb_forum_query() {
  * @access public
  * @return bool
  */
-function mb_sub_forum_query() {
+function mb_subforum_query() {
 	$mb = message_board();
 
-	if ( !is_null( $mb->sub_forum_query->query ) ) {
+	if ( !is_null( $mb->subforum_query->query ) ) {
 
-		$have_posts = $mb->sub_forum_query->have_posts();
+		$have_posts = $mb->subforum_query->have_posts();
 
-		if ( empty( $have_posts ) )
+		if ( empty( $have_posts ) ) {
 			wp_reset_postdata();
+			$mb->subforum_query->query = null;
+		}
 
 		return $have_posts;
 	}
 
-	add_action( 'loop_end',             'mb_sub_forum_loop_end' );
-	add_filter( 'mb_in_sub_forum_loop', '__return_true'         );
+	add_action( 'loop_end',             'mb_subforum_loop_end' );
+	add_filter( 'mb_in_subforum_loop', '__return_true'         );
 
 	$defaults = array(
 		'post_type'           => mb_get_forum_post_type(),
 		'nopaging'            => true,
 		'posts_per_page'      => -1,
-		'orderby'             => 'title',
+		'orderby'             => 'menu_order title',
 		'order'               => 'ASC',
 		'ignore_sticky_posts' => true,
 	);
 
-	if ( mb_is_single_forum() ) {
-		$defaults['child_of'] = get_queried_object_id();
+	if ( $mb->forum_query->in_the_loop )
+		$defaults['post_parent'] = mb_get_forum_id();
+	elseif ( mb_is_single_forum() )
+		$defaults['post_parent'] = get_queried_object_id();
 
-		$forum_level = mb_get_forum_level( get_queried_object_id() );
+	//add_filter( 'the_posts', 'mb_posts_hierarchy_filter', 10, 2 );
 
-		$defaults['meta_query']  = array(
-			array(
-				'key'     => mb_get_forum_level_meta_key(),
-				'value'   => array( $forum_level + 1, $forum_level + 2 ),
-				'compare' => 'IN',
-				'type'    => 'NUMERIC'
-			)
-		);
-	}
+	$mb->subforum_query = new WP_Query( $defaults );
 
-	add_filter( 'the_posts', 'mb_posts_hierarchy_filter', 10, 2 );
-
-	if ( !empty( $defaults['post_parent'] ) || !empty( $defaults['child_of'] ) )
-		$mb->sub_forum_query = new WP_Query( $defaults );
-
-	return $mb->sub_forum_query->have_posts();
+	return $mb->subforum_query->have_posts();
 }
 
 /**
@@ -107,9 +102,9 @@ function mb_sub_forum_query() {
  * @access public
  * @return void
  */
-function mb_sub_forum_loop_end() {
-	remove_action( 'loop_end',             'mb_sub_forum_loop_end' );
-	remove_filter( 'mb_in_sub_forum_loop', '__return_true'         );
+function mb_subforum_loop_end() {
+	remove_action( 'loop_end',             'mb_subforum_loop_end' );
+	remove_filter( 'mb_in_subforum_loop', '__return_true'         );
 }
 
 /**
@@ -120,12 +115,11 @@ function mb_sub_forum_loop_end() {
  * @return void
  */
 function mb_the_forum() {
-	$mb = message_board();
+	return message_board()->forum_query->the_post();
+}
 
-	if ( apply_filters( 'mb_in_sub_forum_loop', false ) )
-		return $mb->sub_forum_query->the_post();
-
-	return $mb->forum_query->the_post();
+function mb_the_subforum() {
+	return message_board()->subforum_query->the_post();
 }
 
 /* ====== Conditionals ====== */
@@ -319,7 +313,24 @@ function mb_forum_id( $forum_id = 0 ) {
  * @return int
  */
 function mb_get_forum_id( $forum_id = 0 ) {
-	return apply_filters( 'mb_get_forum_id', absint( mb_get_post_id( $forum_id ) ), $forum_id );
+	$mb = message_board();
+
+	if ( is_numeric( $forum_id ) && 0 < $forum_id )
+		$_forum_id = $forum_id;
+
+	elseif ( !empty( $mb->subforum_query->in_the_loop ) && isset( $mb->subforum_query->post->ID ) )
+		$_forum_id = $mb->subforum_query->post->ID;
+
+	elseif ( !empty( $mb->forum_query->in_the_loop ) && isset( $mb->forum_query->post->ID ) )
+		$_forum_id = $mb->forum_query->post->ID;
+
+	elseif ( mb_is_single_forum() )
+		$_forum_id = get_queried_object_id();
+
+	else
+		$_forum_id = 0;
+
+	return apply_filters( 'mb_get_forum_id', absint( $_forum_id ), $forum_id );
 }
 
 /* ====== Forum Content ====== */

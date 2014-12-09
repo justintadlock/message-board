@@ -387,7 +387,21 @@ function mb_topic_id( $topic_id = 0 ) {
  * @return int
  */
 function mb_get_topic_id( $topic_id = 0 ) {
-	return apply_filters( 'mb_get_topic_id', mb_get_post_id( $topic_id ), $topic_id );
+	$mb = message_board();
+
+	if ( is_numeric( $topic_id ) && 0 < $topic_id )
+		$_topic_id = $topic_id;
+
+	elseif ( !empty( $mb->topic_query->in_the_loop ) && isset( $mb->topic_query->post->ID ) )
+		$_topic_id = $mb->topic_query->post->ID;
+
+	elseif ( mb_is_single_topic() )
+		$_topic_id = get_queried_object_id();
+
+	else
+		$_topic_id = 0;
+
+	return apply_filters( 'mb_get_topic_id', absint( $_topic_id ), $topic_id );
 }
 
 /* ====== Topic Content ====== */

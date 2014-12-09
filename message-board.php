@@ -84,14 +84,14 @@ final class Message_Board {
 	public $forum_query;
 
 	/**
-	 * Sub-forum query.  Is assigned a WP_Query object.  This is only useful on single forum views. 
-	 * It is used to display the sub-forums of the current forum.
+	 * Sub-forum query.  Is assigned a WP_Query object.  This is only useful when getting the sub-forums 
+	 * of a particular forum.
 	 *
 	 * @since  1.0.0
 	 * @access public
 	 * @var    object
 	 */
-	public $sub_forum_query;
+	public $subforum_query;
 
 	/**
 	 * Topic query.  Is assigned a WP_Query object.  On topic single/archive views, this is the 
@@ -164,7 +164,7 @@ final class Message_Board {
 
 		/* Set up the forum queries. */
 		$this->forum_query     = new WP_Query();
-		$this->sub_forum_query = new WP_Query();
+		$this->subforum_query = new WP_Query();
 		$this->topic_query     = new WP_Query();
 		$this->reply_query     = new WP_Query();
 		$this->search_query    = new WP_Query();

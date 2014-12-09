@@ -79,16 +79,7 @@ function mb_pre_get_posts( $query ) {
 		$query->set( 'posts_per_page', mb_get_forums_per_page()    );
 		$query->set( 'order',          'ASC'                       );
 		$query->set( 'orderby',        'menu_order title'          );
-		$query->set( 'meta_query',
-			array(
-				array(
-					'key'     => mb_get_forum_level_meta_key(),
-					'value'   => array( 1, 2 ),
-					'compare' => 'IN',
-					'type'    => 'NUMERIC'
-				)
-			)
-		);
+		$query->set( 'post_parent',    0                           );
 
 		add_filter( 'the_posts', 'mb_posts_hierarchy_filter', 10, 2 );
 	}
