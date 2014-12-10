@@ -135,6 +135,7 @@ function mb_register_post_statuses() {
 	/* Open status args. */
 	$open_args = array(
 		'label'                     => __( 'Open', 'message-board' ),
+		'label_verb'                => __( 'Open', 'message-board' ), // custom
 		'label_count'               => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => true,
 		'show_in_admin_status_list' => true,
@@ -143,7 +144,8 @@ function mb_register_post_statuses() {
 
 	/* Close status args. */
 	$close_args = array(
-		'label'                     => __( 'Close', 'message-board' ),
+		'label'                     => __( 'Closed', 'message-board' ),
+		'label_verb'                => __( 'Close',  'message-board' ), // custom
 		'label_count'               => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => true,
 		'show_in_admin_status_list' => true,
@@ -153,6 +155,7 @@ function mb_register_post_statuses() {
 	/* Spam status args. */
 	$spam_args = array(
 		'label'                     => __( 'Spam', 'message-board' ),
+		'label_verb'                => __( 'Spam', 'message-board' ), // custom
 		'label_count'               => _n_noop( 'Spam <span class="count">(%s)</span>', 'Spam <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => current_user_can( 'manage_forums' ) && !is_admin() ? true : false,
 		'exclude_from_search'       => true,
@@ -163,6 +166,7 @@ function mb_register_post_statuses() {
 	/* Orphan status args. */
 	$orphan_args = array(
 		'label'                     => __( 'Orphan', 'message-board' ),
+		'label_verb'                => __( 'Orphan', 'message-board' ), // custom
 		'label_count'               => _n_noop( 'Orphan <span class="count">(%s)</span>', 'Orphan <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => true,
 		'exclude_from_search'       => true,

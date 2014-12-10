@@ -322,7 +322,7 @@ final class Message_Board_Admin_Edit_Topics {
 			$spam_object  = get_post_status_object( mb_get_spam_post_status() );
 
 			/* Get spam link text. */
-			$spam_text = mb_is_topic_spam( $topic_id ) ? __( 'Not Spam', 'message-board' ) : $spam_object->label;
+			$spam_text = mb_is_topic_spam( $topic_id ) ? __( 'Not Spam', 'message-board' ) : $spam_object->label_verb;
 
 			/* Build spam toggle URL. */
 			$spam_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
@@ -341,7 +341,7 @@ final class Message_Board_Admin_Edit_Topics {
 			$close_object = get_post_status_object( mb_get_close_post_status() );
 
 			/* Get open/close link text. */
-			$open_text = mb_is_topic_open() ? $close_object->label : $open_object->label;
+			$open_text = mb_is_topic_open() ? $close_object->label_verb : $open_object->label_verb;
 
 			/* Build open/close toggle URL. */
 			$open_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
@@ -354,10 +354,6 @@ final class Message_Board_Admin_Edit_Topics {
 
 		/* Add sticky toggle link if user has permission and topic is not spam. */
 		if ( current_user_can( 'moderate_topic', $topic_id ) && !mb_is_topic_spam( $topic_id ) ) {
-
-			/* Get post status objects. */
-			$open_object  = get_post_status_object( mb_get_open_post_status()  );
-			$close_object = get_post_status_object( mb_get_close_post_status() );
 
 			$current_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
 

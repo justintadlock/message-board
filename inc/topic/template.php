@@ -212,7 +212,7 @@ function mb_get_topic_toggle_open_link( $topic_id = 0 ) {
 
 	$status = mb_is_topic_open( $topic_id ) ? get_post_status_object( mb_get_close_post_status() ) : get_post_status_object( mb_get_open_post_status() );
 
-	$link = sprintf( '<a class="toggle-open-link" href="%s">%s</a>', mb_get_topic_toggle_open_url( $topic_id ), $status->label );
+	$link = sprintf( '<a class="toggle-open-link" href="%s">%s</a>', mb_get_topic_toggle_open_url( $topic_id ), $status->label_verb );
 
 	return $link;
 }
@@ -242,7 +242,7 @@ function mb_get_topic_toggle_spam_link( $topic_id = 0 ) {
 	if ( !current_user_can( 'moderate_topic', $topic_id ) )
 		return '';
 
-	$text = mb_is_topic_spam( $topic_id ) ? __( 'Unspam', 'message-board' ) : get_post_status_object( mb_get_spam_post_status() )->label;
+	$text = mb_is_topic_spam( $topic_id ) ? __( 'Unspam', 'message-board' ) : get_post_status_object( mb_get_spam_post_status() )->label_verb;
 
 	$link = sprintf( '<a class="toggle-spam-link" href="%s">%s</a>', mb_get_topic_toggle_spam_url( $topic_id ), $text );
 
