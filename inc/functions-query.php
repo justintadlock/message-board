@@ -376,9 +376,6 @@ function mb_parse_query( $query ) {
 	} elseif ( mb_is_forum_front() ) {
 		$query->is_404 = false;
 		$query->is_home = false;
-	} elseif ( mb_is_user_view() ) {
-		$query->is_home = false;
-		$query->is_archive = true;
 	}
 }
 

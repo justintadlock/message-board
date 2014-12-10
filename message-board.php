@@ -56,15 +56,6 @@ final class Message_Board {
 	public $dir_uri = '';
 
 	/**
-	 * Array of "views" for user pages.
-	 *
-	 * @since  1.0.0
-	 * @access public
-	 * @var    array
-	 */
-	public $user_views = array();
-
-	/**
 	 * Forum types (e.g., forum, category).
 	 *
 	 * @since  1.0.0
@@ -191,7 +182,6 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/functions-query.php'          );
 		require_once( $this->dir_path . 'inc/functions-capabilities.php'   );
 		require_once( $this->dir_path . 'inc/functions-rewrite.php'        );
-		require_once( $this->dir_path . 'inc/functions-view.php'           );
 		require_once( $this->dir_path . 'inc/functions-handler.php'        );
 		require_once( $this->dir_path . 'inc/functions-shortcodes.php'     );
 		require_once( $this->dir_path . 'inc/functions-options.php'        );
