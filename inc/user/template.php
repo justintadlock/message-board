@@ -113,7 +113,7 @@ function mb_get_user_forum_count( $user_id = 0 ) {
 }
 
 function mb_user_topic_count( $user_id = 0 ) {
-	echo mb_get_user_topic_count();
+	echo mb_get_user_topic_count( $user_id );
 }
 
 function mb_get_user_topic_count( $user_id = 0 ) {
@@ -130,7 +130,7 @@ function mb_get_user_topic_count( $user_id = 0 ) {
 }
 
 function mb_user_reply_count( $user_id = 0 ) {
-	echo mb_get_user_reply_count();
+	echo mb_get_user_reply_count( $user_id );
 }
 
 function mb_get_user_reply_count( $user_id = 0 ) {

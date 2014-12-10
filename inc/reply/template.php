@@ -309,7 +309,10 @@ function mb_reply_author_id( $reply_id = 0 ) {
 }
 
 function mb_get_reply_author_id( $reply_id = 0 ) {
-	return apply_filters( 'mb_get_reply_author_id', mb_get_post_author_id( $reply_id ), $reply_id );
+	$reply_id  = mb_get_reply_id( $reply_id );
+	$author_id = get_post_field( 'post_author', $reply_id );
+
+	return apply_filters( 'mb_get_reply_author_id', absint( $author_id ), $reply_id );
 }
 
 function mb_reply_author( $reply_id = 0 ) {

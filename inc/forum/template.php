@@ -477,7 +477,10 @@ function mb_forum_author_id( $forum_id = 0 ) {
  * @return int
  */
 function mb_get_forum_author_id( $forum_id = 0 ) {
-	return apply_filters( 'mb_get_forum_author_id', mb_get_post_author_id( $forum_id ), $forum_id );
+	$forum_id  = mb_get_forum_id( $forum_id );
+	$author_id = get_post_field( 'post_author', $forum_id );
+
+	return apply_filters( 'mb_get_forum_author_id', absint( $author_id ), $forum_id );
 }
 
 /**

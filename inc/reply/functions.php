@@ -87,7 +87,7 @@ function mb_insert_reply_data( $post ) {
 	if ( !in_array( $user_id, $voices ) ) {
 		$voices[] = $user_id;
 		mb_set_topic_voices( $topic_id, $voices );
-		mb_set_topic_voice_count( $topic_id, count( $voices ) + 1 );
+		mb_set_topic_voice_count( $topic_id, count( $voices ) );
 	}
 
 	$topic_reply_count = mb_get_topic_reply_count( $topic_id );

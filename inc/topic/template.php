@@ -550,7 +550,10 @@ function mb_topic_author_id( $topic_id = 0 ) {
  * @return int
  */
 function mb_get_topic_author_id( $topic_id = 0 ) {
-	return apply_filters( 'mb_get_topic_author_id', mb_get_post_author_id( $topic_id ), $topic_id );
+	$topic_id  = mb_get_topic_id( $topic_id );
+	$author_id = get_post_field( 'post_author', $topic_id );
+
+	return apply_filters( 'mb_get_topic_author_id', absint( $author_id ), $topic_id );
 }
 
 /**
