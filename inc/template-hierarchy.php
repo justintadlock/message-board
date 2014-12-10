@@ -34,6 +34,11 @@ function mb_get_theme_template_folder() {
  */
 function mb_template_include( $template ) {
 
+	/* If not viewing a message board page, bail. */
+	if ( !mb_is_message_board() )
+		return $template;
+
+	/* Set up some default variables. */
 	$dir          = mb_get_theme_template_folder();
 	$has_template = false;
 	$_templates   = array();
@@ -102,12 +107,15 @@ function mb_template_include( $template ) {
 		$_templates[] = "{$dir}/login.php";
 	}
 
-	if ( !empty( $_templates ) ) {
-		$_templates[] = "{$dir}/board.php";
-		$has_template = locate_template( apply_filters( 'mb_template_hierarchy', $_templates ) );
+	/* Add the fallback template. */
+	$_templates[] = "{$dir}/board.php";
 
-		return apply_filters( 'mb_template_include', !empty( $has_template ) ? $has_template : $template );
-	}
+	/* Check to see if we can find one of our templates. */
+	$has_template = locate_template( apply_filters( 'mb_template_hierarchy', $_templates, $dir ) );
 
-	return $template;
+	/* If we have a template, use it.  Otherwise, fall back to WP. */
+	$template = !empty( $has_template ) ? $has_template : $template;
+
+	/* Return the template and allow devs to overwrite. */
+	return apply_filters( 'mb_template_include', $template, $dir );
 }
