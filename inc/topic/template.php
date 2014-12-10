@@ -25,7 +25,7 @@ function mb_topic_query() {
 	}
 
 	/* Use the main WP query when viewing a single topic or topic archive. */
-	if ( mb_is_single_topic() || mb_is_topic_archive() ) {
+	if ( mb_is_single_topic() || mb_is_topic_archive() || mb_is_user_page( array( 'topics', 'topic-subscriptions', 'bookmarks' ) ) ) {
 		global $wp_the_query;
 		
 		$mb->topic_query = $wp_the_query;

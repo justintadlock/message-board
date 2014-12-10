@@ -49,6 +49,11 @@ function mb_set_user_reply_count( $user_id ) {
 	return $count;
 }
 
+function mb_get_user_topic_subscriptions( $user_id ) {
+	return mb_get_user_subscriptions( $user_id );
+}
+
+// @todo mb_get_user_topic_subscriptions()
 function mb_get_user_subscriptions( $user_id ) {
 
 	$subscriptions = get_user_meta( $user_id, mb_get_user_topic_subscriptions_meta_key(), true );
@@ -56,6 +61,14 @@ function mb_get_user_subscriptions( $user_id ) {
 	return !empty( $subscriptions ) ? explode( ',', $subscriptions ) : array();
 }
 
+function mb_get_user_forum_subscriptions( $user_id ) {
+
+	$subscriptions = get_user_meta( $user_id, mb_get_user_forum_subscriptions_meta_key(), true );
+
+	return !empty( $subscriptions ) ? explode( ',', $subscriptions ) : array();
+}
+
+// @todo mb_update_user_topic_subscriptions()
 function mb_update_user_subscriptions( $user_id, $subs ) {
 
 	if ( is_array( $subs ) ) {
@@ -65,6 +78,7 @@ function mb_update_user_subscriptions( $user_id, $subs ) {
 	return update_user_meta( $user_id, mb_get_user_topic_subscriptions_meta_key(), $subs );
 }
 
+// @todo mb_add_user_topic_subscription
 function mb_add_user_subscription( $user_id, $topic_id ) {
 
 	$subs = mb_get_user_subscriptions( $user_id );
@@ -79,6 +93,23 @@ function mb_add_user_subscription( $user_id, $topic_id ) {
 	return false;
 }
 
+function mb_add_user_forum_subscription( $user_id, $forum_id ) {
+
+	$subs = mb_get_user_forum_subscriptions( $user_id );
+
+	/* If ID not already in subscriptions list. */
+	if ( !in_array( $forum_id, $subs ) ) {
+		$subs[] = $forum_id;
+
+		$subs = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
+
+		return update_user_meta( $user_id, mb_get_user_forum_subscriptions_meta_key(), $subs );
+	}
+
+	return false;
+}
+
+// @todo mb_remove_user_topic_subscription()
 function mb_remove_user_subscription( $user_id, $topic_id ) {
 
 	$subs = mb_get_user_subscriptions( $user_id );
@@ -90,6 +121,24 @@ function mb_remove_user_subscription( $user_id, $topic_id ) {
 		unset( $subs[ $_sub ] );
 
 		return mb_update_user_subscriptions( $user_id, $subs );
+	}
+
+	return false;
+}
+
+function mb_remove_user_forum_subscription( $user_id, $forum_id ) {
+
+	$subs = mb_get_user_forum_subscriptions( $user_id );
+
+	if ( in_array( $forum_id, $subs ) ) {
+
+		$_sub = array_search( $forum_id, $subs );
+
+		unset( $subs[ $_sub ] );
+
+		$subs = implode( ',', wp_parse_id_list( array_filter( $subs ) ) );
+
+		return update_user_meta( $user_id, mb_get_user_forum_subscriptions_meta_key(), $subs );
 	}
 
 	return false;

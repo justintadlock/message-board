@@ -47,17 +47,16 @@ function mb_is_message_board() {
 
 	$is_message_board = false;
 
-	if ( 1 == get_query_var( 'mb_profile' ) || get_query_var( 'mb_topics' ) || get_query_var( 'mb_replies' ) ||
-		get_query_var( 'mb_bookmarks' ) || get_query_var( 'mb_subscriptions' ) 
-		|| mb_is_user_view() 
-		|| mb_is_forum_search() 
-		|| mb_is_forum_front() 
-		|| mb_is_topic_archive()
-		|| mb_is_forum_archive()
+	if ( 
+		   mb_is_forum_search() 
 		|| mb_is_forum_login()
-		|| mb_is_single_topic()
-		|| mb_is_single_forum()
+		|| mb_is_forum_archive()
+		|| mb_is_topic_archive()
+		|| mb_is_reply_archive()
 		|| mb_is_user_archive()
+		|| mb_is_single_forum()
+		|| mb_is_single_topic()
+		|| mb_is_single_user()
 	) {
 		$is_message_board = true;
 	}
@@ -101,20 +100,38 @@ function mb_pre_get_posts( $query ) {
 	}
 
 	/* If viewing a user view. */
-	elseif ( !is_admin() && $query->is_main_query() && get_query_var( 'mb_user_view' ) ) {
+	elseif ( !is_admin() && $query->is_main_query() && mb_is_user_page() ) {
 
-		if ( 'topics' === get_query_var( 'mb_user_view' ) ) {
+		if ( mb_is_user_page( 'forums' ) ) {
+
+			$query->set( 'post_type',      mb_get_forum_post_type() );
+			$query->set( 'posts_per_page', mb_get_forums_per_page() );
+			$query->set( 'order',          'ASC'                    );
+			$query->set( 'orderby',        'title'                  );
+
+		} elseif ( mb_is_user_page( 'topics' ) ) {
 
 			$query->set( 'post_type',      mb_get_topic_post_type() );
 			$query->set( 'posts_per_page', mb_get_topics_per_page() );
 			$query->set( 'order',          'DESC'                   );
 			$query->set( 'orderby',        'menu_order'             );
 
-		} elseif ( 'bookmarks' === get_query_var( 'mb_user_view' ) ) {
+		} elseif ( mb_is_user_page( 'replies' ) ) {
 
-			$user      = get_user_by( 'slug', get_query_var( 'author_name' ) );
-			$bookmarks = get_user_meta( $user->ID, mb_get_user_topic_bookmarks_meta_key(), true );
-			$favs      = wp_parse_id_list( $bookmarks );
+			$query->set( 'post_type',      mb_get_reply_post_type()  );
+			$query->set( 'posts_per_page', mb_get_replies_per_page() );
+			$query->set( 'order',          'DESC'                    );
+			$query->set( 'orderby',        'date'                    );
+
+		} elseif ( mb_is_user_page( 'bookmarks' ) ) {
+
+			$user = get_user_by( 'slug', get_query_var( 'author_name' ) );
+			$favs = get_user_meta( $user->ID, mb_get_user_topic_bookmarks_meta_key(), true );
+			$favs = wp_parse_id_list( $favs );
+
+			/* Empty array with `post_in` hack. @link https://core.trac.wordpress.org/ticket/28099 */
+			if ( empty( $favs ) )
+				$favs = array( 0 );
 
 			$query->set( 'post__in',       $favs                    );
 			$query->set( 'post_type',      mb_get_topic_post_type() );
@@ -124,11 +141,14 @@ function mb_pre_get_posts( $query ) {
 
 			add_filter( 'posts_where', 'mb_auth_posts_where', 10, 2 );
 
-		} elseif ( 'subscriptions' === get_query_var( 'mb_user_view' ) ) {
+		} elseif ( mb_is_user_page( 'topic-subscriptions' ) ) {
 
 			$user = get_user_by( 'slug', get_query_var( 'author_name' ) );
-			$subscriptions = get_user_meta( $user->ID, mb_get_user_topic_subscriptions_meta_key(), true );
-			$subs = wp_parse_id_list( $subscriptions );
+			$subs = mb_get_user_topic_subscriptions( $user->ID );
+
+			/* Empty array with `post_in` hack. @link https://core.trac.wordpress.org/ticket/28099 */
+			if ( empty( $subs ) )
+				$subs = array( 0 );
 
 			$query->set( 'post__in',       $subs                    );
 			$query->set( 'post_type',      mb_get_topic_post_type() );
@@ -138,19 +158,22 @@ function mb_pre_get_posts( $query ) {
 
 			add_filter( 'posts_where', 'mb_auth_posts_where', 10, 2 );
 
-		} elseif ( 'replies' === get_query_var( 'mb_user_view' ) ) {
+		} elseif ( mb_is_user_page( 'forum-subscriptions' ) ) {
 
-			$query->set( 'post_type',      mb_get_reply_post_type()  );
-			$query->set( 'posts_per_page', mb_get_replies_per_page() );
-			$query->set( 'order',          'DESC'                    );
-			$query->set( 'orderby',        'date'                    );
+			$user = get_user_by( 'slug', get_query_var( 'author_name' ) );
+			$subs = mb_get_user_forum_subscriptions( $user->ID );
 
-		} elseif ( 'activity' === get_query_var( 'mb_user_view' ) ) {
+			/* Empty array with `post_in` hack. @link https://core.trac.wordpress.org/ticket/28099 */
+			if ( empty( $subs ) )
+				$subs = array( 0 );
 
-			$query->set( 'post_type',     array( mb_get_reply_post_type(), mb_get_topic_post_type() ) );
-			$query->set( 'posts_per_page', mb_get_replies_per_page() );
-			$query->set( 'order',          'DESC'                    );
-			$query->set( 'orderby',        'date'                    );
+			$query->set( 'post__in',       $subs                    );
+			$query->set( 'post_type',      mb_get_forum_post_type() );
+			$query->set( 'posts_per_page', mb_get_forums_per_page() );
+			$query->set( 'order',          'DESC'                   );
+			$query->set( 'orderby',        'menu_order'             );
+
+			add_filter( 'posts_where', 'mb_auth_posts_where', 10, 2 );
 		}
 	}
 

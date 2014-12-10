@@ -122,7 +122,7 @@ function mb_rewrite_rules() {
 	add_rewrite_rule( $user_slug . '/?$',  'index.php?mb_custom=users', 'top' );
 	add_rewrite_rule( $user_slug . '/page/?([0-9]{1,})/?$', 'index.php?mb_custom=users&paged=$matches[1]', 'top' );
 
-	$user_pages = 'forums|topics|replies|bookmarks|subscriptions';
+	$user_pages = 'forums|topics|replies|bookmarks|topic-subscriptions|forum-subscriptions';
 
 	/* Single user rewrite rules. */
 	add_rewrite_rule( $user_slug . '/([^/]+)/(' . $user_pages . ')/page/?([0-9]{1,})/?$', 'index.php?mb_custom=users&author_name=$matches[1]&' . $user_page_qv . '=$matches[2]&paged=$matches[3]', 'top' );

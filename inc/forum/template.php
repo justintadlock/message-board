@@ -20,7 +20,7 @@ function mb_forum_query() {
 		return $have_posts;
 	}
 
-	if ( mb_is_forum_archive() ) {
+	if ( mb_is_forum_archive() || mb_is_user_page( array( 'forums', 'forum-subscriptions' ) ) ) {
 		global $wp_query;
 
 		$mb->forum_query = $wp_query;

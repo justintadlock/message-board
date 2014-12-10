@@ -58,24 +58,12 @@ function mb_template_include( $template ) {
 		$_templates[] = "{$dir}/archive-topic.php";
 	}
 
-	/* If viewing a user view page. */
-	elseif ( is_author() && mb_is_user_view() ) {
+	/* If viewing a user sub-page. */
+	elseif ( mb_is_user_page() ) {
 
-		$_templates[] = "{$dir}/single-user-topics.php";
-		$_templates[] = "{$dir}/single-user.php";
-	}
+		$page = sanitize_key( get_query_var( 'mb_user_page' ) );
 
-	/* If viewing a user subscriptions page. */
-	elseif ( is_author() && get_query_var( 'mb_subscriptions' ) ) {
-
-		$_templates[] = "{$dir}/single-user-topics.php";
-		$_templates[] = "{$dir}/single-user.php";
-	}
-
-	/* If viewing a user topics page. */
-	elseif ( is_author() && get_query_var( 'mb_topics' ) ) {
-
-		$_templates[] = "{$dir}/single-user-topics.php";
+		$_templates[] = "{$dir}/single-user-{$page}.php";
 		$_templates[] = "{$dir}/single-user.php";
 	}
 
@@ -89,7 +77,6 @@ function mb_template_include( $template ) {
 	elseif ( mb_is_user_archive() ) {
 
 		$_templates[] = "{$dir}/archive-user.php";
-
 	}
 
 	/* If viewing a search results page. */

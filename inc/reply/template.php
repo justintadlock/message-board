@@ -20,23 +20,32 @@ function mb_reply_query() {
 		return $have_posts;
 	}
 
-	$per_page = mb_get_replies_per_page();
+	if ( mb_is_reply_archive() || mb_is_user_page( 'replies' ) ) {
+		global $wp_query;
 
-	$defaults = array(
-		'post_type'           => mb_get_reply_post_type(),
-		'post_status'         => mb_get_publish_post_status(),
-		'posts_per_page'      => $per_page,
-		'paged'               => get_query_var( 'paged' ),
-		'orderby'             => 'menu_order',
-		'order'               => 'ASC',
-		'hierarchical'        => false,
-		'ignore_sticky_posts' => true,
-	);
+		$mb->reply_query = $wp_query;
+	}
 
-	if ( $mb->topic_query->in_the_loop || mb_is_single_topic() )
-		$defaults['post_parent'] = mb_get_topic_id();
+	else {
 
-	$mb->reply_query = new WP_Query( $defaults );
+		$per_page = mb_get_replies_per_page();
+
+		$defaults = array(
+			'post_type'           => mb_get_reply_post_type(),
+			'post_status'         => mb_get_publish_post_status(),
+			'posts_per_page'      => $per_page,
+			'paged'               => get_query_var( 'paged' ),
+			'orderby'             => 'menu_order',
+			'order'               => 'ASC',
+			'hierarchical'        => false,
+			'ignore_sticky_posts' => true,
+		);
+
+		if ( $mb->topic_query->in_the_loop || mb_is_single_topic() )
+			$defaults['post_parent'] = mb_get_topic_id();
+
+		$mb->reply_query = new WP_Query( $defaults );
+	}
 
 	return $mb->reply_query->have_posts();
 }

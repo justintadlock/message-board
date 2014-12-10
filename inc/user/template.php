@@ -8,7 +8,9 @@
  * @return bool
  */
 function mb_is_user_archive() {
-	return get_query_var( 'mb_custom' ) && 'users' === get_query_var( 'mb_custom' ) ? true : false;
+	$is_user_archive = get_query_var( 'mb_custom' ) && 'users' === get_query_var( 'mb_custom' ) ? true : false;
+
+	return $is_user_archive && !is_author() ? true : false;
 }
 
 /**
@@ -19,13 +21,30 @@ function mb_is_user_archive() {
  * @return bool
  */
 function mb_is_single_user() {
-	$is_user_page = get_query_var( 'mb_custom' ) && 'users' === get_query_var( 'mb_custom' ) ? true : false;
+	$is_user_archive = get_query_var( 'mb_custom' ) && 'users' === get_query_var( 'mb_custom' ) ? true : false;
 
-	return $is_user_page && is_author() ? true : false;
+	return $is_user_archive && is_author() ? true : false;
 }
 
-function mb_get_users_per_page() {
-	return apply_filters( 'mb_get_users_per_page', 15 );
+function mb_is_user_page( $page = '' ) {
+
+	if ( !mb_is_single_user() )
+		return false;
+
+	elseif ( empty( $page ) )
+		return true;
+
+	foreach ( (array) $page as $_p ) {
+
+		if ( get_query_var( 'mb_user_page' ) === $_p )
+			return true;
+	}
+
+	return false;
+}
+
+function mb_user_id( $user_id = 0 ) {
+	echo mb_get_user_id( $user_id );
 }
 
 function mb_get_user_id( $user_id = 0 ) {
