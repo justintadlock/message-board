@@ -1,18 +1,22 @@
 <?php
 
+/* Topic/Reply content filters. */
+$hooks = array( 'mb_get_forum_content', 'mb_get_topic_content', 'mb_get_reply_content' );
+
 global $wp_embed;
 
-/* Topic/Reply content filters. */
-add_filter( 'mb_get_post_content',                   'mb_code_trick',        0 );
-add_filter( 'mb_get_post_content', array( $wp_embed, 'run_shortcode' ),      5 );
-add_filter( 'mb_get_post_content', array( $wp_embed, 'autoembed'     ),      5 );
-add_filter( 'mb_get_post_content',                   'wptexturize',          10 );
-add_filter( 'mb_get_post_content',                   'convert_smilies',      15 );
-add_filter( 'mb_get_post_content',                   'convert_chars',        20 );
-add_filter( 'mb_get_post_content',                   'wpautop',              25 );
-add_filter( 'mb_get_post_content',                   'mb_do_shortcode',      30 );
-add_filter( 'mb_get_post_content',                   'mb_shortcode_unautop', 35 );
-add_filter( 'mb_get_post_content',                   'make_clickable',       40 );
+foreach ( $hooks as $hook ) {
+	add_filter( $hook,                   'mb_code_trick',        0 );
+	add_filter( $hook, array( $wp_embed, 'run_shortcode' ),      5 );
+	add_filter( $hook, array( $wp_embed, 'autoembed'     ),      5 );
+	add_filter( $hook,                   'wptexturize',          10 );
+	add_filter( $hook,                   'convert_smilies',      15 );
+	add_filter( $hook,                   'convert_chars',        20 );
+	add_filter( $hook,                   'wpautop',              25 );
+	add_filter( $hook,                   'mb_do_shortcode',      30 );
+	add_filter( $hook,                   'mb_shortcode_unautop', 35 );
+	add_filter( $hook,                   'make_clickable',       40 );
+}
 
 /* Reply title filters. */
 add_filter( 'the_title', 'mb_forum_reply_title_filter', 5, 2 );
@@ -20,16 +24,6 @@ add_filter( 'post_title', 'mb_forum_reply_title_filter', 5, 2 );
 
 /* Edit post link filters. */
 add_filter( 'get_edit_post_link', 'mb_get_edit_post_link', 5, 2 );
-
-/* Rewrite filters. See `rewrite.php`. */
-add_action( 'init',                      'mb_rewrite_rules',            5     );
-add_filter( 'forum_topic_rewrite_rules', 'mb_forum_topic_rewrite_rules'       );
-add_filter( 'redirect_canonical',        'mb_redirect_canonical',       10, 2 );
-
-/* Query filters. See `query.php`. */
-add_action( 'pre_get_posts',     'mb_pre_get_posts'   );
-add_action( 'parse_query',       'mb_parse_query'     );
-add_filter( 'template_redirect', 'mb_404_override', 0 );
 
 /* Misc. */
 add_filter( 'wp_title',   'mb_wp_title'   );

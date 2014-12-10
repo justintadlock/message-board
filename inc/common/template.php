@@ -60,10 +60,6 @@ function mb_get_thread_position( $post_id = 0 ) {
 
 /* ====== Post ID ====== */
 
-function mb_post_id( $post_id = 0 ) {
-	echo mb_get_post_id( $post_id );
-}
-
 function mb_get_post_id( $post_id = 0 ) {
 
 	if ( is_numeric( $post_id ) && 0 < $post_id )

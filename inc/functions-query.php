@@ -1,5 +1,9 @@
 <?php
 
+add_action( 'pre_get_posts',     'mb_pre_get_posts'   );
+add_action( 'parse_query',       'mb_parse_query'     );
+add_filter( 'template_redirect', 'mb_404_override', 0 );
+
 /**
  * Checks if viewing the forum front page.
  *

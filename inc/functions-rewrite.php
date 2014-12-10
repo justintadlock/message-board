@@ -1,5 +1,11 @@
 <?php
 
+/* Add custom rewrite rules. */
+add_action( 'init', 'mb_rewrite_rules', 5 );
+
+/* Cancel redirect on paged single forums and topics. */
+add_filter( 'redirect_canonical', 'mb_redirect_canonical', 10, 2 );
+
 /* Custom query vars. */
 add_filter( 'query_vars', 'mb_query_vars' );
 
@@ -97,29 +103,31 @@ function mb_query_vars( $vars ) {
  */
 function mb_rewrite_rules() {
 
-	/* Slugs and query vars. */
+	$topic_type = mb_get_topic_post_type();
 
-	$root_slug  = mb_get_root_slug();
+	/* Overwrite the topic rewrite rules. */
+	add_filter( "{$topic_type}_rewrite_rules", 'mb_forum_topic_rewrite_rules' );
+
+	/* Get slugs. */
 	$user_slug  = mb_get_user_slug();
 	$login_slug = mb_get_login_slug();
 
-	$profile_query_var = 'mb_profile';
-	$user_query_var    = 'mb_user_view';
+	/* Get query vars. */
+	$user_page_qv = 'mb_user_page';
 
-	/* Rewrite tags. */
+	/* Add rewrite tag for single user pages. */
+	add_rewrite_tag( '%' . $user_page_qv . '%', '([^/]+)' );
 
-	add_rewrite_tag( '%' . $profile_query_var . '%', '([^/]+)' );
-	add_rewrite_tag( '%' . $user_query_var    . '%', '([^/]+)' );
-
-	$user_archive_slug = str_replace( mb_maybe_get_root_slug(), '', $user_slug );
-
+	/* User archive rewrite rules. */
 	add_rewrite_rule( $user_slug . '/?$',  'index.php?mb_custom=users', 'top' );
 	add_rewrite_rule( $user_slug . '/page/?([0-9]{1,})/?$', 'index.php?mb_custom=users&paged=$matches[1]', 'top' );
 
-	add_rewrite_rule( $user_slug . '/([^/]+)/([^/]+)/page/?([0-9]{1,})/?$', 'index.php?mb_custom=users&author_name=$matches[1]&' . $user_query_var . '=$matches[2]&paged=$matches[3]', 'top' );
-	add_rewrite_rule( $user_slug . '/([^/]+)/([^/]+)/feed/?$',              'index.php?mb_custom=users&author_name=$matches[1]&' . $user_query_var . '=$matches[2]&feed=$matches[3]',  'top' );
-	add_rewrite_rule( $user_slug . '/([^/]+)/([^/]+)/?$',                   'index.php?mb_custom=users&author_name=$matches[1]&' . $user_query_var . '=$matches[2]',                   'top' );
-	add_rewrite_rule( $user_slug . '/([^/]+)/?$',                           'index.php?mb_custom=users&author_name=$matches[1]',                                                       'top' );
+	$user_pages = 'forums|topics|replies|bookmarks|subscriptions';
+
+	/* Single user rewrite rules. */
+	add_rewrite_rule( $user_slug . '/([^/]+)/(' . $user_pages . ')/page/?([0-9]{1,})/?$', 'index.php?mb_custom=users&author_name=$matches[1]&' . $user_page_qv . '=$matches[2]&paged=$matches[3]', 'top' );
+	add_rewrite_rule( $user_slug . '/([^/]+)/(' . $user_pages . ')/?$',                   'index.php?mb_custom=users&author_name=$matches[1]&' . $user_page_qv . '=$matches[2]',                   'top' );
+	add_rewrite_rule( $user_slug . '/([^/]+)/?$',                                         'index.php?mb_custom=users&author_name=$matches[1]',                                                     'top' );
 
 	/* Login page. */
 	add_rewrite_rule( $login_slug . '/?$', 'index.php?mb_custom=login', 'top' );
