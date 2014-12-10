@@ -957,7 +957,7 @@ function mb_forum_form() {
 	// menu order field
 	$default_fields['menu_order']  = '<p>';
 	$default_fields['menu_order'] .= sprintf( '<label for="mb_menu_order">%s</label>', __( 'Order:', 'message-board' ) );
-	$default_fields['menu_order'] .= '<input type="number" id="mb_menu_order" name="mb_menu_order" min="0" value="0" />';
+	$default_fields['menu_order'] .= '<input type="number" id="mb_menu_order" name="mb_menu_order" value="0" />';
 	$default_fields['menu_order'] .= '</p>';
 
 	// content field

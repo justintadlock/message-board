@@ -178,7 +178,7 @@ function mb_forum_attributes_meta_box( $post ) {
 		<label for="mb_menu_order"><strong><?php _e( 'Order:', 'message-board' ); ?></strong></label>
 	</p>
 	<p>
-		<input type="number" name="menu_order" id="mb_menu_order" min="0" value="<?php echo esc_attr( $post->menu_order ); ?>" />
+		<input type="number" name="menu_order" id="mb_menu_order" value="<?php echo esc_attr( $post->menu_order ); ?>" />
 	</p><?php
 }
 
