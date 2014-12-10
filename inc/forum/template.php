@@ -33,8 +33,7 @@ function mb_forum_query() {
 			'post_type'           => mb_get_forum_post_type(),
 			'posts_per_page'      => $per_page,
 			'paged'               => get_query_var( 'paged' ),
-			'orderby'             => 'menu_order title',
-			'order'               => 'ASC',
+			'orderby'             => array( 'menu_order' => 'ASC', 'title' => 'ASC' ),
 			'ignore_sticky_posts' => true,
 		);
 
@@ -78,8 +77,7 @@ function mb_subforum_query() {
 		'post_type'           => mb_get_forum_post_type(),
 		'nopaging'            => true,
 		'posts_per_page'      => -1,
-		'orderby'             => 'menu_order title',
-		'order'               => 'ASC',
+		'orderby'             => array( 'menu_order' => 'ASC', 'title' => 'ASC' ),
 		'ignore_sticky_posts' => true,
 	);
 

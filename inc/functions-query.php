@@ -96,8 +96,7 @@ function mb_pre_get_posts( $query ) {
 		$query->set( 'post_type',      mb_get_forum_post_type()    );
 		$query->set( 'post_status',    array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status() ) );
 		$query->set( 'posts_per_page', mb_get_forums_per_page()    );
-		$query->set( 'order',          'ASC'                       );
-		$query->set( 'orderby',        'menu_order title'          );
+		$query->set( 'orderby',        array( 'menu_order' => 'ASC', 'title' => 'ASC' ) );
 		$query->set( 'post_parent',    0                           );
 
 		add_filter( 'the_posts', 'mb_posts_hierarchy_filter', 10, 2 );
