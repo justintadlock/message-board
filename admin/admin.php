@@ -1,13 +1,46 @@
 <?php
+/**
+ * Sets up the plugin admin.
+ *
+ * @package    MessageBoard
+ * @subpackage Admin
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 final class Message_Board_Admin {
 
+	/**
+	 * Forum post type name.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @var    string
+	 */
 	public $forum_type;
+
+	/**
+	 * Topic post type name.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @var    string
+	 */
 	public $topic_type;
+
+	/**
+	 * Reply post type name.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @var    string
+	 */
 	public $reply_type;
 
 	/**
-	 * Holds the instances of this class.
+	 * Holds the instance of this class.
 	 *
 	 * @since  1.0.0
 	 * @access private
@@ -61,6 +94,14 @@ final class Message_Board_Admin {
 		remove_submenu_page( mb_get_admin_menu_page(), "post-new.php?post_type={$this->reply_type}" );
 	}
 
+	/**
+	 * Corrects the parent file for post type screens.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  string  $parent_file
+	 * @return string
+	 */
 	function parent_file( $parent_file ) {
 
 		if ( "edit.php?post_type={$this->topic_type}" === $parent_file || "edit.php?post_type={$this->reply_type}" === $parent_file ) {
@@ -79,7 +120,7 @@ final class Message_Board_Admin {
 	 */
 	function admin_notices() { 
 
-		if ( !current_theme_supports( 'message-board' ) ) { ?>
+		if ( !current_theme_supports( 'message-board' ) && current_user_can( 'switch_themes' ) ) { ?>
 			<div class="error">
 				<p>
 				<?php _e( 'The theme you are currently using does not support the Message Board plugin. Please activate a theme with support to continue enjoying full use of the plugin.', 'message-board' ); ?>
@@ -113,8 +154,10 @@ final class Message_Board_Admin {
 
 		if ( $this->forum_type === $screen->post_type )
 			$class .= 'mb-forum ';
+
 		elseif ( $this->topic_type === $screen->post_type )
 			$class .= 'mb-topic ';
+
 		elseif ( $this->reply_type === $screen->post_type )
 			$class .= 'mb-reply ';
 
