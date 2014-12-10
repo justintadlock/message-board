@@ -908,80 +908,10 @@ function mb_get_forum_form_link( $args = array() ) {
 /**
  * Displays the new forum form.
  *
- * @todo Set up system of hooks.
- *
  * @since  1.0.0
  * @access public
  * @return void
  */
 function mb_forum_form() {
-
-	if ( !current_user_can( 'create_forums' ) )
-		return; 
-
-	$form  = sprintf( '<form id="forum-form" method="post" action="%s">', add_query_arg( 'mb_action', 'new-forum', home_url( mb_get_root_slug() ) ) );
-	$form .= '<fieldset>';
-	$form .= sprintf( '<legend>%s</legend>', __( 'Add New Forum', 'message-board' ) );
-
-	// title field
-	$default_fields['title']  = '<p>';
-	$default_fields['title'] .= sprintf( '<label for="mb_forum_title">%s</label>', __( 'Forum Title:', 'message-board' ) );
-	$default_fields['title'] .= '<input type="text" id="mb_forum_title" name="mb_forum_title" />';
-	$default_fields['title'] .= '</p>';
-
-	// forum field
-	if ( !mb_is_single_forum() ) {
-		$default_fields['forum'] = '<p>';
-		$default_fields['forum'] .= sprintf( '<label for="mb_post_parent">%s</label>', __( 'Parent Forum:', 'message-board' ) );
-		$default_fields['forum'] .= mb_dropdown_forums(
-			array(
-				'name'              => 'mb_post_parent',
-				'id'                => 'mb_post_parent',
-				'show_option_none'  => __( '(no parent)', 'message-board' ),
-				'option_none_value' => 0,
-				'selected'          => 0,
-				'echo'              => false
-			)
-		);
-		$default_fields['forum'] .= '</select>';
-		$default_fields['forum'] .= '</p>';
-	}
-
-	// forum type field
-	$default_fields['forum_type']   = '<p>';
-	$default_fields['forum_type'] .= sprintf( '<label for="mb_forum_type">%s</label>', __( 'Forum Type:', 'message-board' ) );
-	$default_fields['forum_type'] .= '<select id="mb_forum_type" name="mb_forum_type">';
-	foreach ( mb_get_forum_type_objects() as $forum_type ) {
-		$default_fields['forum_type'] .= sprintf( '<option value="%s">%s</option>', esc_attr( $forum_type->name ), esc_html( $forum_type->label ) );
-	}
-	$default_fields['forum_type'] .= '</select>';
-	$default_fields['forum_type'] .= '</p>';
-
-	// menu order field
-	$default_fields['menu_order']  = '<p>';
-	$default_fields['menu_order'] .= sprintf( '<label for="mb_menu_order">%s</label>', __( 'Order:', 'message-board' ) );
-	$default_fields['menu_order'] .= '<input type="number" id="mb_menu_order" name="mb_menu_order" value="0" />';
-	$default_fields['menu_order'] .= '</p>';
-
-	// content field
-	$default_fields['content']  = '<p>';
-	$default_fields['content'] .= sprintf( '<label for="mb_forum_content">%s</label>', __( 'Description:', 'message-board' ) );
-	$default_fields['content'] .= '<textarea id="mb_forum_content" name="mb_forum_content"></textarea>';
-	$default_fields['content'] .= '</p>';
-
-	$default_fields = apply_filters( 'mb_forum_form_fields', $default_fields );
-
-	foreach ( $default_fields as $key => $field ) {
-		$form .= $field;
-	}
-
-	$form .= sprintf( '<p><input type="submit" value="%s" /></p>', esc_attr__( 'Submit', 'message-board' ) );
-
-	//$form .= sprintf( '<p><label><input type="checkbox" name="mb_forum_subscribe" value="1" /> %s</label></p>', __( 'Notify me of topics and posts via email', 'message-board' ) );
-
-	$form .= wp_nonce_field( 'mb_new_forum_action', 'mb_new_forum_nonce', false, false );
-	$form .= '</fieldset>';
-	$form .= '</form>';
-
-	echo $form;
+	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-forum.php' );
 }

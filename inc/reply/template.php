@@ -342,7 +342,7 @@ function mb_get_reply_author_profile_link( $reply_id = 0 ) {
 /* ====== Reply Form ====== */
 
 function mb_reply_form_action_url() {
-	echo mb_get_topic_form_action_url();
+	echo mb_get_reply_form_action_url();
 }
 
 function mb_get_reply_form_action_url() {
@@ -350,43 +350,7 @@ function mb_get_reply_form_action_url() {
 }
 
 function mb_reply_form() {
-	echo mb_get_reply_form();
-}
-
-function mb_get_reply_form() {
-
-	if ( !current_user_can( 'create_forum_replies' ) || !mb_is_topic_open( get_queried_object_id() ) )
-		return; 
-
-	$form  = sprintf( '<form id="reply-form" method="post" action="%s">', mb_get_reply_form_action_url() );
-	$form .= '<fieldset>';
-	$form .= sprintf( '<legend>%s</legend>', __( 'Leave A Reply', 'message-board' ) );
-
-	// content field
-	$default_fields['content']  = '<p>';
-	$default_fields['content'] .= sprintf( '<label for="mb_reply_content" name="mb_reply_content">%s</label>', __( 'Please put code in between <code>`backtick`</code> characters.', 'message-board' ) );
-	$default_fields['content'] .= '<textarea id="mb_reply_content" name="mb_reply_content"></textarea>';
-	$default_fields['content'] .= '</p>';
-
-	$default_fields = apply_filters( 'mb_reply_form_fields', $default_fields );
-
-	foreach ( $default_fields as $key => $field ) {
-
-		$form .= $field;
-	}
-
-	$form .= sprintf( '<p><input type="submit" value="%s" /></p>', esc_attr__( 'Submit', 'message-board' ) );
-	$form .= sprintf( '<input type="hidden" name="mb_reply_topic_id" value="%s" />', absint( get_queried_object_id() ) );
-
-	if ( !mb_is_user_subscribed_topic( get_current_user_id(), get_queried_object_id() ) ) {
-		$form .= sprintf( '<p><label><input type="checkbox" name="mb_topic_subscribe" value="1" /> %s</label></p>', __( 'Notify me of follow-up posts via email', 'message-board' ) );
-	}
-
-	$form .= wp_nonce_field( 'mb_new_reply_action', 'mb_new_reply_nonce', false, false );
-	$form .= '</fieldset>';
-	$form .= '</form>';
-
-	return apply_filters( 'mb_get_reply_form', $form );
+	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-reply.php' );
 }
 
 /* ====== Reply Forum ====== */
