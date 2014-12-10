@@ -1,7 +1,23 @@
 <?php
+/**
+ * Handles query-related functionality.  In particular, this file's main purpose is to make sure each 
+ * page is loading the posts that it is supposed to load.
+ *
+ * @package    MessageBoard
+ * @subpackage Includes
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
+/* Filter the arguments for grabbing posts. */
 add_action( 'pre_get_posts',     'mb_pre_get_posts'   );
+
+/* Filter parse query. */
 add_action( 'parse_query',       'mb_parse_query'     );
+
+/* Make sure we don't get a 404 on some custom pages. */
 add_filter( 'template_redirect', 'mb_404_override', 0 );
 
 /**

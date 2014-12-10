@@ -1,13 +1,17 @@
 <?php
 /**
- * File for registering custom post types.
+ * Sets up functions dealing with custom post types.  Registers post types.  Handles callbacks for some 
+ * post-type related filters hooks.
+ *
+ * Note that the default post type names registered are `forum`, `forum_topic`, and `forum_reply`.  If 
+ * coming from a different WordPress forum plugin, you can filter these names to be something that 
+ * matched your old plugin.
  *
  * @package    MessageBoard
  * @subpackage Includes
- * @since      1.0.0
  * @author     Justin Tadlock <justin@justintadlock.com>
  * @copyright  Copyright (c) 2014, Justin Tadlock
- * @link       http://themehybrid.com/plugins/message-board
+ * @link       https://github.com/justintadlock/message-board
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 

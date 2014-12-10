@@ -1,4 +1,14 @@
 <?php
+/**
+ * Registers custom metadata and handles custom meta functions.
+ *
+ * @package    MessageBoard
+ * @subpackage Includes
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 /* Register custom meta keys. */
 add_action( 'init', 'mb_register_meta' );

@@ -1,4 +1,14 @@
 <?php
+/**
+ * Handles the template hierarchy.
+ *
+ * @package    MessageBoard
+ * @subpackage Includes
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 /* Override the template hierarchy when viewing the forums. */
 add_filter( 'template_include', 'mb_template_include' );

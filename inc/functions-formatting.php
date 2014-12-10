@@ -1,4 +1,14 @@
 <?php
+/**
+ * Formatting functions. These mostly deal with formatting the content.
+ *
+ * @package    MessageBoard
+ * @subpackage Includes
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 /**
  * Post kses filter for topics/replies.

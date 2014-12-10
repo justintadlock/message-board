@@ -1,4 +1,14 @@
 <?php
+/**
+ * Plugin capabilities (i.e., permissions).
+ *
+ * @package    MessageBoard
+ * @subpackage Includes
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 /* Filter meta cap checks. */
 add_filter( 'map_meta_cap', 'mb_map_meta_cap', 10, 4 );

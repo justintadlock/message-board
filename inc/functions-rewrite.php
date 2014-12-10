@@ -1,4 +1,15 @@
 <?php
+/**
+ * Adds custom rewrite rules and related functionality.  This file houses the functions for getting the 
+ * correct slugs for various pages of the board.
+ *
+ * @package    MessageBoard
+ * @subpackage Includes
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 /* Add custom rewrite rules. */
 add_action( 'init', 'mb_rewrite_rules', 5 );
@@ -91,7 +102,6 @@ function mb_query_vars( $vars ) {
 
 	return $vars;
 }
-
 
 /**
  * Sets up custom rewrite rules for pages that aren't handled by the CPT and CT APIs but are needed by 
