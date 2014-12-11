@@ -3,6 +3,12 @@
  * Sets up custom post status functions.  Registers post statuses with WordPress.  Handles callbacks for 
  * when a post status changes.
  *
+ * In many ways, this is the heart and soul behind the plugin.  If nothing else, it's probably the most 
+ * important bit.  It's easy to create new posts with WordPress.  What to do when a single post's status 
+ * changes is what gets interesting.  Throw the three distinct post types that it takes to build a forum 
+ * into the mix, you either have something that's going to fall apart miserably or something that's truly 
+ * a work of art.  Let's shoot for the latter.
+ *
  * @package    MessageBoard
  * @subpackage Includes
  * @author     Justin Tadlock <justin@justintadlock.com>
@@ -204,8 +210,7 @@ function mb_transition_post_status( $new_status, $old_status, $post ) {
 		return;
 
 	/* Keep track of the old post status by saving it as post meta. */
-	$type = mb_translate_post_type( $post->post_type );
-	update_post_meta( $post->ID, call_user_func( "mb_get_{$type}_prev_status_meta_key" ), $old_status );
+	update_post_meta( $post->ID, mb_get_prev_status_meta_key(), $old_status );
 
 	/* Get post type statuses. */
 	$forum_statuses = mb_get_forum_post_statuses();
@@ -445,9 +450,7 @@ function mb_spam_topic( $topic_id ) {
  * @return int|WP_Error
  */
 function mb_unspam_topic( $topic_id ) {
-	$status = get_post_meta( $topic_id, mb_get_topic_prev_status_meta_key(), true );
-	$status = !empty( $status ) ? $status : mb_get_open_post_status();
-	return mb_update_post_status( $topic_id, $status );
+	return mb_restore_post_status( $topic_id );
 }
 
 /**
@@ -471,9 +474,7 @@ function mb_orphan_topic( $topic_id ) {
  * @return int|WP_Error
  */
 function mb_unorphan_topic( $topic_id ) {
-	$status = get_post_meta( $topic_id, mb_get_topic_prev_status_meta_key(), true );
-	$status = !empty( $status ) ? $status : mb_get_orphan_post_status();
-	return mb_update_post_status( $topic_id, $status );
+	return mb_restore_post_status( $topic_id );
 }
 
 /**
@@ -497,9 +498,7 @@ function mb_spam_reply( $reply_id ) {
  * @return int|WP_Error
  */
 function mb_unspam_reply( $reply_id ) {
-	$status = get_post_meta( $reply_id, mb_get_reply_prev_status_meta_key(), true );
-	$status = !empty( $status ) ? $status : mb_get_publish_post_status();
-	return mb_update_post_status( $reply_id, $status );
+	return mb_restore_post_status( $reply_id );
 }
 
 /**
@@ -523,9 +522,39 @@ function mb_orphan_reply( $reply_id ) {
  * @return int|WP_Error
  */
 function mb_unorphan_reply( $reply_id ) {
-	$status = get_post_meta( $reply_id, mb_get_reply_prev_status_meta_key(), true );
-	$status = !empty( $status ) ? $status : mb_get_orphan_post_status();
-	return mb_update_post_status( $reply_id, $status );
+	return mb_restore_post_status( $reply_id );
+}
+
+/**
+ * Gets a post's previous post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $post_id
+ * @return string
+ */
+function mb_get_prev_post_status( $post_id ) {
+	$status = get_post_meta( $post_id, mb_get_prev_status_meta_key(), true );
+
+	if ( empty( $status ) )
+		$status = mb_get_publish_post_status();
+
+	if ( in_array( get_post_type( $post_id ), array( mb_get_forum_post_type(), mb_get_topic_post_type() ) ) )
+		$status = mb_get_open_post_status();
+
+	return $status;
+}
+
+/**
+ * Helper function for quicky restoring a post's previous status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $post_id
+ * @return int|WP_Error
+ */
+function mb_restore_post_status( $post_id ) {
+	return mb_update_post_status( $post_id, mb_get_prev_post_status( $post_id ) );
 }
 
 /**
