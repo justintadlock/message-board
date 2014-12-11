@@ -55,3 +55,11 @@
 
 .row-actions .mb_toggle_spam a.spam        { color: #a00; }
 .row-actions .mb_toggle_spam a.spam:hover { color: #f00; }
+
+/* ====== Users Screen (users.php) ====== */
+
+.users-php .wp-list-table .column-topics,
+.users-php .wp-list-table .column-replies {
+	width:      8%;
+	text-align: center;
+}

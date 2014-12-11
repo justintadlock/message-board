@@ -230,6 +230,9 @@ final class Message_Board {
 			require_once( $this->dir_path . 'admin/post-forum.php' );
 			require_once( $this->dir_path . 'admin/post-topic.php' );
 			require_once( $this->dir_path . 'admin/post-reply.php' );
+
+			/* User screen files. */
+			require_once( $this->dir_path . 'admin/users.php' );
 		}
 	}
 
