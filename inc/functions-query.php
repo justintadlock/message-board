@@ -49,7 +49,62 @@ function mb_is_forum_front() {
  * @return bool
  */
 function mb_is_forum_login() {
-	return get_query_var( 'mb_custom' ) && 'login' === get_query_var( 'mb_login' ) ? true : false;
+	return get_query_var( 'mb_custom' ) && 'login' === get_query_var( 'mb_custom' ) ? true : false;
+}
+
+/**
+ * Checks if viewing the edit page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_edit() {
+	return get_query_var( 'mb_custom' ) && 'edit' === get_query_var( 'mb_custom' ) ? true : false;
+}
+
+/**
+ * Checks if viewing the edit page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_forum_edit() {
+	return mb_is_edit() && is_numeric( get_query_var( 'forum_id' ) ) ? true : false;
+}
+
+/**
+ * Checks if viewing the edit page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_topic_edit() {
+	return mb_is_edit() && is_numeric( get_query_var( 'topic_id' ) ) ? true : false;
+}
+
+/**
+ * Checks if viewing the edit page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_reply_edit() {
+	return mb_is_edit() && is_numeric( get_query_var( 'reply_id' ) ) ? true : false;
+}
+
+/**
+ * Checks if viewing the edit page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_user_edit() {
+	return mb_is_edit() && is_numeric( get_query_var( 'user_id' ) ) ? true : false;
 }
 
 /**
@@ -66,6 +121,7 @@ function mb_is_message_board() {
 	if ( 
 		   mb_is_forum_search() 
 		|| mb_is_forum_login()
+		|| mb_is_edit()
 		|| mb_is_forum_archive()
 		|| mb_is_topic_archive()
 		|| mb_is_reply_archive()
@@ -404,7 +460,7 @@ function mb_parse_query( $query ) {
 function mb_404_override() {
 	global $wp_query;
 
-	if ( mb_is_forum_front() || mb_is_forum_login() || mb_is_user_archive() ) {
+	if ( mb_is_forum_front() || mb_is_forum_login() || mb_is_user_archive() || mb_is_edit() ) {
 		status_header( 200 );
 		$wp_query->is_404        = false;
 		$wp_query->is_front_page = false;

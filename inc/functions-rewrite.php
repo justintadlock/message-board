@@ -87,6 +87,17 @@ function mb_get_login_slug() {
 }
 
 /**
+ * Returns the edit slug.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_edit_slug() {
+	return apply_filters( 'mb_get_edit_slug', mb_maybe_get_root_slug() . 'edit' );
+}
+
+/**
  * Adds custom query vars.
  *
  * @since  1.0.0
@@ -95,10 +106,11 @@ function mb_get_login_slug() {
  */
 function mb_query_vars( $vars ) {
 
-	if ( !array_search( 'edit', $vars ) )
-		$vars[] = 'edit';
-
 	$vars[] = 'mb_custom';
+	$vars[] = 'forum_id';
+	$vars[] = 'topic_id';
+	$vars[] = 'reply_id';
+	$vars[] = 'user_id';
 
 	return $vars;
 }
@@ -121,6 +133,7 @@ function mb_rewrite_rules() {
 	/* Get slugs. */
 	$user_slug  = mb_get_user_slug();
 	$login_slug = mb_get_login_slug();
+	$edit_slug  = mb_get_edit_slug();
 
 	/* Get query vars. */
 	$user_page_qv = 'mb_user_page';
@@ -141,6 +154,9 @@ function mb_rewrite_rules() {
 
 	/* Login page. */
 	add_rewrite_rule( $login_slug . '/?$', 'index.php?mb_custom=login', 'top' );
+
+	/* Edit page. */
+	add_rewrite_rule( $edit_slug . '/?$', 'index.php?mb_custom=edit', 'top' );
 }
 
 /**

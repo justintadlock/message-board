@@ -398,6 +398,9 @@ function mb_get_topic_id( $topic_id = 0 ) {
 	elseif ( mb_is_single_topic() )
 		$_topic_id = get_queried_object_id();
 
+	elseif ( get_query_var( 'topic_id' ) )
+		$_topic_id = get_query_var( 'topic_id' );
+
 	else
 		$_topic_id = 0;
 
@@ -426,8 +429,15 @@ function mb_topic_content( $topic_id = 0 ) {
  * @param  int     $topic_id
  * @return string
  */
-function mb_get_topic_content( $topic_id = 0 ) {
-	return apply_filters( 'mb_get_topic_content', mb_get_post_content( $topic_id ), $topic_id );
+function mb_get_topic_content( $topic_id = 0, $mode = 'display' ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	$content = mb_get_post_content( $topic_id );
+
+	if ( 'raw' === $mode )
+		return $content;
+	else
+		return apply_filters( 'mb_get_topic_content', mb_get_post_content( $topic_id ), $topic_id );
 }
 
 /* ====== Topic Title ====== */
@@ -471,6 +481,7 @@ function mb_topic_title( $topic_id = 0 ) {
  * @return string
  */
 function mb_get_topic_title( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id( $topic_id );
 	return apply_filters( 'mb_get_topic_title', mb_get_post_title( $topic_id ), $topic_id );
 }
 
@@ -990,6 +1001,19 @@ function mb_get_topic_form_link( $args = array() ) {
  */
 function mb_topic_form() {
 	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-topic.php' );
+}
+
+/**
+ * Displays the edit topic form.
+ *
+ * @todo Set up system of hooks.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_topic_edit_form() {
+	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-edit-topic.php' );
 }
 
 /**

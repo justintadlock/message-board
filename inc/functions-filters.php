@@ -121,7 +121,15 @@ function mb_get_edit_post_link( $url, $post_id ) {
 
 	$post_type = get_post_type( $post_id );
 
-	if ( mb_get_topic_post_type() === $post_type || mb_get_reply_post_type() === $post_type ) {
+	if ( mb_get_forum_post_type() === $post_type )
+		$url = add_query_arg( array( 'forum_id' => $post_id ), home_url( mb_get_edit_slug() ) );
+	elseif ( mb_get_topic_post_type() === $post_type )
+		$url = add_query_arg( array( 'topic_id' => $post_id ), home_url( mb_get_edit_slug() ) );
+	elseif ( mb_get_reply_post_type() === $post_type )
+		$url = add_query_arg( array( 'reply_id' => $post_id ), home_url( mb_get_edit_slug() ) );
+
+
+	/*if ( mb_get_topic_post_type() === $post_type || mb_get_reply_post_type() === $post_type ) {
 
 		if ( mb_get_topic_post_type() === $post_type ) {
 			$topic_link = get_permalink( $post_id );
@@ -140,7 +148,7 @@ function mb_get_edit_post_link( $url, $post_id ) {
 		}
 
 		$url = esc_url( $url );
-	}
+	} */
 
 	return $url;
 }

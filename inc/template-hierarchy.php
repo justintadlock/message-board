@@ -55,12 +55,6 @@ function mb_template_include( $template ) {
 		$_templates[] = "{$dir}/archive-forum.php";
 	}
 
-	/* If viewing single topic edit page. */
-	elseif ( mb_is_single_topic() && get_query_var( 'edit' ) && current_user_can( 'edit_post', absint( get_query_var( 'edit' ) ) ) ) {
-
-		$_templates[] = "{$dir}/edit.php";
-	}
-
 	/* If viewing a single topic. */
 	elseif ( mb_is_single_topic() ) {
 
@@ -105,6 +99,21 @@ function mb_template_include( $template ) {
 	elseif ( mb_is_forum_login() ) {
 
 		$_templates[] = "{$dir}/login.php";
+	}
+
+	/* If viewing single topic edit page. */
+	elseif ( mb_is_edit() ) {
+
+		if ( mb_is_forum_edit() )
+			$_templates[] = "{$dir}/edit-forum.php";
+		elseif ( mb_is_topic_edit() )
+			$_templates[] = "{$dir}/edit-topic.php";
+		elseif ( mb_is_reply_edit() )
+			$_templates[] = "{$dir}/edit-reply.php";
+		elseif ( mb_is_user_edit() )
+			$_templates[] = "{$dir}/edit-user.php";
+
+		$_templates[] = "{$dir}/edit.php";
 	}
 
 	/* Add the fallback template. */

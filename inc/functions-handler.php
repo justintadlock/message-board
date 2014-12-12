@@ -20,6 +20,9 @@ add_action( 'mb_template_redirect', 'mb_handler_new_forum'       );
 add_action( 'mb_template_redirect', 'mb_handler_new_topic'       );
 add_action( 'mb_template_redirect', 'mb_handler_new_reply'       );
 add_action( 'mb_template_redirect', 'mb_handler_edit_post'       );
+add_action( 'mb_template_redirect', 'mb_handler_edit_access'     );
+add_action( 'mb_template_redirect', 'mb_handler_edit_topic'      );
+add_action( 'mb_template_redirect', 'mb_handler_edit_reply'      );
 add_action( 'mb_template_redirect', 'mb_handler_topic_subscribe' );
 add_action( 'mb_template_redirect', 'mb_handler_topic_bookmark'  );
 
@@ -214,6 +217,89 @@ function mb_handler_new_topic() {
 	}
 }
 
+function mb_handler_edit_topic() {
+
+	/* Check if this is a new topic. */
+	if ( !isset( $_GET['message-board'] ) || 'edit-topic' !== $_GET['message-board'] )
+		return;
+
+	/* Check if the new topic nonce was posted. */
+	if ( !isset( $_POST['mb_edit_topic_nonce'] ) || !wp_verify_nonce( $_POST['mb_edit_topic_nonce'], 'mb_edit_topic_action' ) ) {
+		wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
+		exit;
+	}
+
+	/* Make sure we have a topic ID. */
+	if ( !isset( $_POST['mb_topic_id'] ) ) {
+		wp_die( __( 'What are you editing?', 'message-board' ) );
+		exit();
+	}
+
+	$topic_id = mb_get_topic_id( $_POST['mb_topic_id'] );
+
+	/* Make sure the current user can create forum topics. */
+	if ( !current_user_can( 'edit_topic', $topic_id ) ) {
+		wp_die( 'You do not have permission to edit this topic.', 'message-board' );
+		exit;
+	}
+
+	/* Make sure we have a topic title. */
+	if ( empty( $_POST['mb_topic_title'] ) ) {
+		wp_die( __( 'You did not enter a topic title!', 'message-board' ) );
+		exit;
+	}
+
+	/* Make sure we have topic content. */
+	if ( empty( $_POST['mb_topic_content'] ) ) {
+		wp_die( __( 'You did not enter any content!', 'message-board' ) );
+		exit;
+	}
+
+	/* Make sure we have a forum. */
+	if ( empty( $_POST['mb_topic_forum'] ) ) {
+		wp_die( __( 'No forum specified.', 'message-board' ) );
+		exit;
+	}
+
+	/* Post title. */
+	$post_title = esc_html( strip_tags( $_POST['mb_topic_title'] ) );
+
+	/* Post content. */
+	$post_content = $_POST['mb_topic_content'];
+	$post_content = mb_encode_bad( $post_content );
+	$post_content = mb_code_trick( $post_content );
+	$post_content = force_balance_tags( $post_content );
+	$post_content = mb_filter_post_kses( $post_content );
+
+	/* Forum ID. */
+	$forum_id = absint( $_POST['mb_topic_forum'] );
+
+	/* Publish a new forum topic. */
+	$published = wp_update_post(
+		array(
+			'ID'           => $topic_id,
+			'post_title'   => $post_title,
+			'post_content' => $post_content,
+			'post_parent'  => $forum_id,
+		)
+	);
+
+	/* If the post was published. */
+	if ( $published && !is_wp_error( $published ) ) {
+
+		/* If the user chose to subscribe to the topic. */
+		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] ) {
+
+			mb_add_user_subscription( absint( $user_id ), $published );
+		} else {
+			mb_remove_user_subscription( absint( $user_id ), $published );
+		}
+
+		/* Redirect to the published topic page. */
+		wp_safe_redirect( get_permalink( $published ) );
+	}
+}
+
 /**
  * New reply handler. This function executes when a new reply is posted on the front end.
  *
@@ -294,6 +380,100 @@ function mb_handler_new_reply() {
 
 		/* Redirect to the published topic page. */
 		wp_safe_redirect( get_permalink( $published ) );
+	}
+}
+
+function mb_handler_edit_reply() {
+
+	/* Check if this is a new reply. */
+	if ( !isset( $_GET['message-board'] ) || !in_array( $_GET['message-board'], array( 'edit-reply' ) ) )
+		return;
+
+	/* Check if the new reply nonce was posted. */
+	if ( !isset( $_POST['mb_edit_reply_nonce'] ) || !wp_verify_nonce( $_POST['mb_edit_reply_nonce'], 'mb_edit_reply_action' ) ) {
+		wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
+		exit;
+	}
+	/* Make sure we have a reply ID. */
+	if ( !isset( $_POST['mb_reply_id'] ) ) {
+		wp_die( __( 'What are you editing?', 'message-board' ) );
+		exit();
+	}
+
+	$reply_id = mb_get_reply_id( $_POST['mb_reply_id'] );
+
+	/* Make sure the current user can create forum replies. */
+	if ( !current_user_can( 'edit_reply', $reply_id ) ) {
+		wp_die( 'You do not have permission to edit this reply.', 'message-board' );
+		exit;
+	}
+
+	/* Make sure we have a topic ID. */
+	if ( empty( $_POST['mb_reply_topic_id'] ) ) {
+		wp_die( __( 'Forum topic not specified.', 'message-board' ) );
+		exit;
+	}
+
+	/* Make sure we have reply content. */
+	if ( empty( $_POST['mb_reply_content'] ) ) {
+		wp_die( __( 'You did not enter any content!', 'message-board' ) );
+		exit;
+	}
+
+	/* Parent post ID. */
+	$topic_id = absint( $_POST['mb_reply_topic_id'] );
+
+	/* Post content. */
+	$post_content = $_POST['mb_reply_content'];
+	$post_content = mb_encode_bad( $post_content );
+	$post_content = mb_code_trick( $post_content );
+	$post_content = force_balance_tags( $post_content );
+	$post_content = mb_filter_post_kses( $post_content );
+
+	/* Publish a new reply. */
+	$published = wp_update_post(
+		array(
+			'ID'           => $reply_id,
+			'post_content' => $post_content,
+			'post_parent'  => $topic_id,
+		)
+	);
+
+	/* If the post was published. */
+	if ( $published && !is_wp_error( $published ) ) {
+
+		/* If the user chose to subscribe to the topic. */
+		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] ) {
+
+			$subscribed = mb_add_user_subscription( absint( $user_id ), $topic_id );
+		} else {
+			$subscribed = mb_remove_user_subscription( absint( $user_id ), $topic_id );
+		}
+
+			if ( !empty( $subscribed ) ) {
+				/* Resets topic subscribers cache. */
+				mb_set_topic_subscribers( $topic_id );
+			}
+
+		/* Redirect to the published topic page. */
+		wp_safe_redirect( get_permalink( $published ) );
+	}
+}
+
+function mb_handler_edit_access() {
+
+	if ( mb_is_edit() ) {
+
+		if ( mb_is_forum_edit() && !current_user_can( 'edit_forum', absint( get_query_var( 'forum_id' ) ) ) )
+			wp_die( 'You do not have permission to edit this forum.', 'message-board' );
+		elseif ( mb_is_topic_edit() && !current_user_can( 'edit_topic', absint( get_query_var( 'topic_id' ) ) ) )
+			wp_die( 'You do not have permission to edit this topic.', 'message-board' );
+		elseif ( mb_is_reply_edit() && !current_user_can( 'edit_reply', absint( get_query_var( 'reply_id' ) ) ) )
+			wp_die( 'You do not have permission to edit this reply.', 'message-board' );
+		elseif ( mb_is_user_edit() && !current_user_can( 'edit_user', absint( get_query_var( 'user_id' ) ) ) )
+			wp_die( 'You do not have permission to edit this user.', 'message-board' );
+		elseif ( !mb_is_forum_edit() && !mb_is_topic_edit() && !mb_is_reply_edit() && !mb_is_user_edit() )
+			wp_die( 'Whoah, partner!', 'message-board' );
 	}
 }
 
