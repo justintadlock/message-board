@@ -56,7 +56,7 @@ if ( !current_user_can( 'create_forums' ) )
 				<input type="checkbox" name="mb_forum_subscribe" value="1" /> 
 				<?php _e( 'Notify me of topics and posts via email', 'message-board' ); ?>
 			</label>
-		<p>
+		</p>
 
 		<?php if ( mb_is_single_forum() ) : ?>
 

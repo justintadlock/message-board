@@ -325,6 +325,9 @@ function mb_get_forum_id( $forum_id = 0 ) {
 	elseif ( mb_is_single_forum() )
 		$_forum_id = get_queried_object_id();
 
+	elseif ( get_query_var( 'forum_id' ) )
+		$_forum_id = get_query_var( 'forum_id' );
+
 	else
 		$_forum_id = 0;
 
@@ -353,8 +356,15 @@ function mb_forum_content( $forum_id = 0 ) {
  * @param  int     $forum_id
  * @return string
  */
-function mb_get_forum_content( $forum_id = 0 ) {
-	return apply_filters( 'mb_get_forum_content', mb_get_post_content( $forum_id ), $forum_id );
+function mb_get_forum_content( $forum_id = 0, $mode = 'display' ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	$content = mb_get_post_content( $forum_id );
+
+	if ( 'raw' === $mode )
+		return $content;
+	else
+		return apply_filters( 'mb_get_forum_content', $content, $forum_id );
 }
 
 /* ====== Forum Title ====== */
@@ -398,6 +408,7 @@ function mb_forum_title( $forum_id = 0 ) {
  * @return string
  */
 function mb_get_forum_title( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
 	return apply_filters( 'mb_get_forum_title', mb_get_post_title( $forum_id ), $forum_id );
 }
 
@@ -700,6 +711,22 @@ function mb_get_forum_last_topic_id( $forum_id ) {
 
 /* ====== Subforums ====== */
 
+function mb_get_forum_order( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	$order = get_post( $forum_id )->menu_order;
+
+	return apply_filters( 'mb_get_forum_order', $order, $forum_id );
+}
+
+function mb_get_forum_parent_id( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	$parent_id = get_post( $forum_id )->post_parent;
+
+	return apply_filters( 'mb_get_forum_parent_id', $parent_id, $forum_id );
+}
+
 function mb_is_subforum( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 
@@ -914,4 +941,15 @@ function mb_get_forum_form_link( $args = array() ) {
  */
 function mb_forum_form() {
 	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-forum.php' );
+}
+
+/**
+ * Displays the edit forum form.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_forum_edit_form() {
+	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-edit-forum.php' );
 }

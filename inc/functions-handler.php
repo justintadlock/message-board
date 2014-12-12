@@ -21,6 +21,7 @@ add_action( 'mb_template_redirect', 'mb_handler_new_topic'       );
 add_action( 'mb_template_redirect', 'mb_handler_new_reply'       );
 add_action( 'mb_template_redirect', 'mb_handler_edit_post'       );
 add_action( 'mb_template_redirect', 'mb_handler_edit_access'     );
+add_action( 'mb_template_redirect', 'mb_handler_edit_forum'      );
 add_action( 'mb_template_redirect', 'mb_handler_edit_topic'      );
 add_action( 'mb_template_redirect', 'mb_handler_edit_reply'      );
 add_action( 'mb_template_redirect', 'mb_handler_topic_subscribe' );
@@ -97,6 +98,91 @@ function mb_handler_new_forum() {
 	/* Publish a new forum topic. */
 	$published = mb_insert_forum(
 		array(
+			'post_title'   => $post_title,
+			'post_content' => $post_content,
+			'post_parent'  => $post_parent,
+			'menu_order'   => $menu_order
+		)
+	);
+
+	/* If the post was published. */
+	if ( $published && !is_wp_error( $published ) ) {
+
+		/* Forum type. */
+		if ( isset( $_POST['mb_forum_type'] ) ) {
+			mb_set_forum_type( $published, sanitize_key( $_POST['mb_forum_type'] ) );
+		}
+
+		/* If the user chose to subscribe to the forum. */
+		/*
+		if ( isset( $_POST['mb_forum_subscribe'] ) && 1 == $_POST['mb_forum_subscribe'] ) {
+
+			mb_add_user_forum_subscription( absint( $user_id ), $published );
+		}
+		*/
+
+		/* Redirect to the published topic page. */
+		wp_safe_redirect( get_permalink( $published ) );
+		exit();
+	}
+}
+
+function mb_handler_edit_forum() {
+
+	/* Check if this is a new forum. */
+	if ( !isset( $_GET['message-board'] ) || 'edit-forum' !== $_GET['message-board'] )
+		return;
+
+	/* Check if the new forum nonce was posted. */
+	if ( !isset( $_POST['mb_edit_forum_nonce'] ) || !wp_verify_nonce( $_POST['mb_edit_forum_nonce'], 'mb_edit_forum_action' ) ) {
+		wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
+		exit();
+	}
+
+	/* Make sure we have a forum ID. */
+	if ( !isset( $_POST['mb_forum_id'] ) ) {
+		wp_die( __( 'What are you editing?', 'message-board' ) );
+		exit();
+	}
+
+	$forum_id = mb_get_forum_id( $_POST['mb_forum_id'] );
+
+	/* Make sure the current user can edit this forum. */
+	if ( !current_user_can( 'edit_forum', $forum_id ) ) {
+		wp_die( 'You do not have permission to edit this forum.', 'message-board' );
+		exit();
+	}
+
+	/* Make sure we have a forum title. */
+	if ( empty( $_POST['mb_forum_title'] ) ) {
+		wp_die( __( 'You did not enter a forum title!', 'message-board' ) );
+		exit();
+	}
+
+	/* Post title. */
+	$post_title = esc_html( strip_tags( $_POST['mb_forum_title'] ) );
+
+	/* Post content. */
+	if ( !empty( $_POST['mb_forum_content'] ) ) {
+		$post_content = $_POST['mb_forum_content'];
+		$post_content = mb_encode_bad( $post_content );
+		$post_content = mb_code_trick( $post_content );
+		$post_content = force_balance_tags( $post_content );
+		$post_content = mb_filter_post_kses( $post_content );
+	} else {
+		$post_content = '';
+	}
+
+	/* Forum ID. */
+	$post_parent = isset( $_POST['mb_post_parent'] ) ? absint( $_POST['mb_post_parent'] ) : mb_get_forum_parent_id( $forum_id );
+
+	/* Menu order. */
+	$menu_order = isset( $_POST['mb_menu_order'] ) ? intval( $_POST['mb_menu_order'] ) : mb_get_forum_order( $forum_id );
+
+	/* Publish a new forum topic. */
+	$published = wp_update_post(
+		array(
+			'ID'           => $forum_id,
 			'post_title'   => $post_title,
 			'post_content' => $post_content,
 			'post_parent'  => $post_parent,

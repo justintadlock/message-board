@@ -2,7 +2,7 @@
 	return; 
 ?>
 
-<form id="topic-form" method="post" action="<?php echo esc_url( add_query_arg( 'message-board', 'edit-reply', user_trailingslashit( home_url() ) ) ); ?>">
+<form id="reply-form" method="post" action="<?php echo esc_url( add_query_arg( 'message-board', 'edit-reply', user_trailingslashit( home_url() ) ) ); ?>">
 
 	<fieldset>
 		<legend><?php _e( 'Edit Reply', 'message-board' ); ?></legend>
