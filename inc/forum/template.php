@@ -941,7 +941,7 @@ function mb_get_forum_form_link( $args = array() ) {
  * @return void
  */
 function mb_forum_form() {
-	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-forum.php' );
+	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-new-forum.php' );
 }
 
 /**

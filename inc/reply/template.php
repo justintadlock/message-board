@@ -352,15 +352,9 @@ function mb_get_reply_author_profile_link( $reply_id = 0 ) {
 /* ====== Reply Form ====== */
 
 function mb_reply_form() {
-	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-reply.php' );
+	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-new-reply.php' );
 }
-/**
- * Displays the edit topic form.
- *
- * @since  1.0.0
- * @access public
- * @return void
- */
+
 function mb_reply_edit_form() {
 	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-edit-reply.php' );
 }

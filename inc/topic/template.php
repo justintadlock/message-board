@@ -1001,7 +1001,7 @@ function mb_get_topic_form_link( $args = array() ) {
  * @return void
  */
 function mb_topic_form() {
-	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-topic.php' );
+	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-new-topic.php' );
 }
 
 /**
