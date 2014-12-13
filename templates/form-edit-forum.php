@@ -3,7 +3,7 @@ if ( !current_user_can( 'edit_forum', mb_get_forum_id() ) )
 	return;
 ?>
 
-<form id="forum-form" method="post" action="<?php echo esc_url( add_query_arg( 'message-board', 'edit-forum', user_trailingslashit( home_url() ) ) ); ?>">
+<form id="forum-form" method="post" action="<?php mb_forum_url(); ?>">
 
 	<fieldset>
 		<legend><?php _e( 'Edit Forum', 'message-board' ); ?></legend>

@@ -12,10 +12,10 @@
  */
 
 /* Filter the arguments for grabbing posts. */
-add_action( 'pre_get_posts',     'mb_pre_get_posts'   );
+add_action( 'pre_get_posts', 'mb_pre_get_posts' );
 
 /* Filter parse query. */
-add_action( 'parse_query',       'mb_parse_query'     );
+add_action( 'parse_query', 'mb_parse_query' );
 
 /* Make sure we don't get a 404 on some custom pages. */
 add_filter( 'template_redirect', 'mb_404_override', 0 );
@@ -60,7 +60,7 @@ function mb_is_forum_login() {
  * @return bool
  */
 function mb_is_edit() {
-	return get_query_var( 'mb_custom' ) && 'edit' === get_query_var( 'mb_custom' ) ? true : false;
+	return 'edit' === mb_get_board_action() ? true : false;
 }
 
 /**
@@ -460,10 +460,12 @@ function mb_parse_query( $query ) {
 function mb_404_override() {
 	global $wp_query;
 
-	if ( mb_is_forum_front() || mb_is_forum_login() || mb_is_user_archive() || mb_is_edit() ) {
+	if ( mb_is_forum_login() || mb_is_user_archive() || mb_is_edit() ) {
 		status_header( 200 );
 		$wp_query->is_404        = false;
 		$wp_query->is_front_page = false;
 		$wp_query->is_home       = false;
+		$wp_query->is_archive    = false;
+		$wp_query->is_post_type_archive = false;
 	}
 }

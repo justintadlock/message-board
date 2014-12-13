@@ -19,11 +19,12 @@ function mb_template_redirect() {
 add_action( 'mb_template_redirect', 'mb_handler_new_forum'       );
 add_action( 'mb_template_redirect', 'mb_handler_new_topic'       );
 add_action( 'mb_template_redirect', 'mb_handler_new_reply'       );
-add_action( 'mb_template_redirect', 'mb_handler_edit_post'       );
+
 add_action( 'mb_template_redirect', 'mb_handler_edit_access'     );
 add_action( 'mb_template_redirect', 'mb_handler_edit_forum'      );
 add_action( 'mb_template_redirect', 'mb_handler_edit_topic'      );
 add_action( 'mb_template_redirect', 'mb_handler_edit_reply'      );
+
 add_action( 'mb_template_redirect', 'mb_handler_topic_subscribe' );
 add_action( 'mb_template_redirect', 'mb_handler_topic_bookmark'  );
 
@@ -34,6 +35,30 @@ add_action( 'mb_template_redirect', 'mb_handler_topic_toggle_spam'  );
 add_action( 'mb_template_redirect', 'mb_handler_topic_toggle_trash' );
 add_action( 'mb_template_redirect', 'mb_handler_reply_toggle_spam'  );
 add_action( 'mb_template_redirect', 'mb_handler_reply_toggle_trash' );
+
+function mb_is_board_action() {
+	$allowed = array( 'edit' );
+	$action  = get_query_var( 'mb_action' );
+
+	return !empty( $action ) && in_array( $action, $allowed ) ? true : false;
+}
+
+function mb_get_board_action() {
+	return mb_is_board_action() ? sanitize_key( get_query_var( 'mb_action' ) ) : '';
+}
+
+function mb_check_post_nonce( $name, $action ) {
+
+	if ( !isset( $_POST[ $name ] ) )
+		return false;
+
+	if ( !wp_verify_nonce( $_POST[ $name ], $action ) ) {
+		wp_die( __( 'Whoah, partner!', 'message-board' ) );
+		exit();
+	}
+
+	return true;
+}
 
 /**
  * New forum handler. This function executes when a new topic is posted on the front end.
@@ -47,15 +72,8 @@ add_action( 'mb_template_redirect', 'mb_handler_reply_toggle_trash' );
  */
 function mb_handler_new_forum() {
 
-	/* Check if this is a new forum. */
-	if ( !isset( $_GET['mb_action'] ) || 'new-forum' !== $_GET['mb_action'] )
+	if ( !mb_check_post_nonce( 'mb_new_forum_nonce', 'mb_new_forum_action' ) )
 		return;
-
-	/* Check if the new forum nonce was posted. */
-	if ( !isset( $_POST['mb_new_forum_nonce'] ) || !wp_verify_nonce( $_POST['mb_new_forum_nonce'], 'mb_new_forum_action' ) ) {
-		wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
-		exit();
-	}
 
 	/* Make sure the current user can create forums. */
 	if ( !current_user_can( 'create_forums' ) ) {
@@ -129,15 +147,8 @@ function mb_handler_new_forum() {
 
 function mb_handler_edit_forum() {
 
-	/* Check if this is a new forum. */
-	if ( !isset( $_GET['message-board'] ) || 'edit-forum' !== $_GET['message-board'] )
+	if ( !mb_check_post_nonce( 'mb_edit_forum_nonce', 'mb_edit_forum_action' ) )
 		return;
-
-	/* Check if the new forum nonce was posted. */
-	if ( !isset( $_POST['mb_edit_forum_nonce'] ) || !wp_verify_nonce( $_POST['mb_edit_forum_nonce'], 'mb_edit_forum_action' ) ) {
-		wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
-		exit();
-	}
 
 	/* Make sure we have a forum ID. */
 	if ( !isset( $_POST['mb_forum_id'] ) ) {
@@ -224,15 +235,8 @@ function mb_handler_edit_forum() {
  */
 function mb_handler_new_topic() {
 
-	/* Check if this is a new topic. */
-	if ( !isset( $_GET['message-board'] ) || 'new-topic' !== $_GET['message-board'] )
+	if ( !mb_check_post_nonce( 'mb_new_topic_nonce', 'mb_new_topic_action' ) )
 		return;
-
-	/* Check if the new topic nonce was posted. */
-	if ( !isset( $_POST['mb_new_topic_nonce'] ) || !wp_verify_nonce( $_POST['mb_new_topic_nonce'], 'mb_new_topic_action' ) ) {
-		wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
-		exit;
-	}
 
 	/* Make sure the current user can create forum topics. */
 	if ( !current_user_can( 'create_forum_topics' ) ) {
@@ -305,15 +309,8 @@ function mb_handler_new_topic() {
 
 function mb_handler_edit_topic() {
 
-	/* Check if this is a new topic. */
-	if ( !isset( $_GET['message-board'] ) || 'edit-topic' !== $_GET['message-board'] )
+	if ( !mb_check_post_nonce( 'mb_edit_topic_nonce', 'mb_edit_topic_action' ) )
 		return;
-
-	/* Check if the new topic nonce was posted. */
-	if ( !isset( $_POST['mb_edit_topic_nonce'] ) || !wp_verify_nonce( $_POST['mb_edit_topic_nonce'], 'mb_edit_topic_action' ) ) {
-		wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
-		exit;
-	}
 
 	/* Make sure we have a topic ID. */
 	if ( !isset( $_POST['mb_topic_id'] ) ) {
@@ -398,15 +395,8 @@ function mb_handler_edit_topic() {
  */
 function mb_handler_new_reply() {
 
-	/* Check if this is a new reply. */
-	if ( !isset( $_GET['message-board'] ) || !in_array( $_GET['message-board'], array( 'new-reply' ) ) )
+	if ( !mb_check_post_nonce( 'mb_new_reply_nonce', 'mb_new_reply_action' ) )
 		return;
-
-	/* Check if the new reply nonce was posted. */
-	if ( !isset( $_POST['mb_new_reply_nonce'] ) || !wp_verify_nonce( $_POST['mb_new_reply_nonce'], 'mb_new_reply_action' ) ) {
-		wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
-		exit;
-	}
 
 	/* Make sure the current user can create forum replies. */
 	if ( !current_user_can( 'create_forum_replies' ) ) {
@@ -471,15 +461,9 @@ function mb_handler_new_reply() {
 
 function mb_handler_edit_reply() {
 
-	/* Check if this is a new reply. */
-	if ( !isset( $_GET['message-board'] ) || !in_array( $_GET['message-board'], array( 'edit-reply' ) ) )
+	if ( !mb_check_post_nonce( 'mb_edit_reply_nonce', 'mb_edit_reply_action' ) )
 		return;
 
-	/* Check if the new reply nonce was posted. */
-	if ( !isset( $_POST['mb_edit_reply_nonce'] ) || !wp_verify_nonce( $_POST['mb_edit_reply_nonce'], 'mb_edit_reply_action' ) ) {
-		wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
-		exit;
-	}
 	/* Make sure we have a reply ID. */
 	if ( !isset( $_POST['mb_reply_id'] ) ) {
 		wp_die( __( 'What are you editing?', 'message-board' ) );
@@ -562,99 +546,6 @@ function mb_handler_edit_access() {
 			wp_die( 'Whoah, partner!', 'message-board' );
 	}
 }
-
-function mb_handler_edit_post() {
-
-	if ( !isset( $_GET['message-board'] ) || !in_array( $_GET['message-board'], array( 'edit' ) ) )
-		return;
-
-	if ( isset( $_POST['mb_edit_post_nonce'] ) ) {
- 
-		if ( !wp_verify_nonce( $_POST['mb_edit_post_nonce'], 'mb_edit_post_action' ) ) {
-			wp_die( __( 'Ooops! Something went wrong!', 'message-board' ) );
-			exit;
-		} else {
-
-			if ( empty( $_POST['mb_post_id'] ) ) {
-				wp_die( __( 'No post ID found!', 'message-board' ) );
-			}
-
-			$post = get_post( absint( $_POST['mb_post_id'] ) );
-
-			if ( is_wp_error( $post ) || empty( $post ) ) {
-				wp_die( __( 'Post not found!', 'message-board' ) );
-			}
-
-			if ( mb_get_topic_post_type() === $post->post_type ) {
-
-				if ( isset( $_POST['mb_post_title'] ) ) {
-
-					$new_title = $_POST['mb_post_title'];
-
-					if ( !empty( $new_title ) && $new_title !== $post->post_title ) {
-						$post_title = esc_html( strip_tags( $new_title ) );
-					}
-
-				}
-
-				if ( isset( $_POST['mb_post_forum'] ) ) {
-					$new_forum = $_POST['mb_post_forum'];
-
-					if ( !empty( $new_forum ) && $new_forum !== $post->post_parent ) {
-
-						$post_forum = absint( $new_forum );
-					}
-				}
-			} // end check for forum topic
-
-			if ( empty( $_POST['mb_post_content'] ) ) {
-
-				wp_die( __( 'You did not enter any content!', 'message-board' ) );
-				exit;
-			} else {
-
-				/* Post content. */
-				if ( !current_user_can( 'unfiltered_html' ) ) {
-					$post_content = $_POST['mb_post_content'];
-					$post_content = mb_encode_bad( $post_content );
-					$post_content = mb_code_trick( $post_content );
-					$post_content = force_balance_tags( $post_content );
-					$post_content = wp_filter_post_kses( $post_content );
-				} else {
-					$post_content = $_POST['mb_post_content'];
-				}
-			}
-
-			$user_id = get_current_user_id();
-
-			if ( empty( $user_id ) ) {
-				wp_die( 'Did not recognize user ID.', 'message-board' );
-				exit;
-			}
-
-			$post_date = current_time( 'mysql' );
-
-			/* Update. */
-			$post_arr = array( 'ID' => $post->ID, 'post_content' => $post_content );
-
-			if ( !empty( $post_title ) ) {
-				$post_arr['post_title'] = $post_title;
-			}
-
-			if ( !empty( $post_forum ) ) {
-				$post_arr['post_parent'] = absint( $post_forum );
-			}
-
-			$updated = wp_update_post( $post_arr );
-
-			if ( $updated ) {
-
-				wp_safe_redirect( get_permalink( $updated ) );
-			}
-		}
-	}
-}
-
 
 function mb_handler_topic_subscribe() {
 

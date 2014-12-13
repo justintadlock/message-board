@@ -9,7 +9,7 @@ if ( mb_is_single_forum() && !mb_forum_type_allows_topics( mb_get_forum_type() )
 	return;
 ?>
 
-<form id="topic-form" method="post" action="<?php mb_topic_form_action_url(); ?>">
+<form id="topic-form" method="post" action="<?php mb_board_home_url(); ?>">
 
 	<fieldset>
 		<legend><?php _e( 'Add New Topic', 'message-board' ); ?></legend>

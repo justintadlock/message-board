@@ -107,6 +107,7 @@ function mb_get_edit_slug() {
 function mb_query_vars( $vars ) {
 
 	$vars[] = 'mb_custom';
+	$vars[] = 'mb_action';
 	$vars[] = 'forum_id';
 	$vars[] = 'topic_id';
 	$vars[] = 'reply_id';
@@ -156,7 +157,7 @@ function mb_rewrite_rules() {
 	add_rewrite_rule( $login_slug . '/?$', 'index.php?mb_custom=login', 'top' );
 
 	/* Edit page. */
-	add_rewrite_rule( $edit_slug . '/?$', 'index.php?mb_custom=edit', 'top' );
+	//add_rewrite_rule( $edit_slug . '/?$', 'index.php?mb_custom=edit', 'top' );
 }
 
 /**

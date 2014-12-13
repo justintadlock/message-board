@@ -308,6 +308,7 @@ function mb_reply_url( $reply_id = 0 ) {
 }
 
 function mb_get_reply_url( $reply_id = 0 ) {
+	$reply_id = mb_get_reply_id( $reply_id );
 	return apply_filters( 'mb_get_reply_url', mb_get_post_url( $reply_id ), $reply_id );
 }
 
@@ -349,14 +350,6 @@ function mb_get_reply_author_profile_link( $reply_id = 0 ) {
 }
 
 /* ====== Reply Form ====== */
-
-function mb_reply_form_action_url() {
-	echo mb_get_reply_form_action_url();
-}
-
-function mb_get_reply_form_action_url() {
-	return esc_url( add_query_arg( 'message-board', 'new-reply', trailingslashit( home_url() ) ) );
-}
 
 function mb_reply_form() {
 	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-reply.php' );

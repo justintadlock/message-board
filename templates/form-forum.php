@@ -3,7 +3,7 @@ if ( !current_user_can( 'create_forums' ) )
 	return;
 ?>
 
-<form id="forum-form" method="post" action="<?php echo esc_url( add_query_arg( 'mb_action', 'new-forum', home_url( mb_get_root_slug() ) ) ); ?>">
+<form id="forum-form" method="post" action="<?php mb_board_home_url(); ?>">
 
 	<fieldset>
 		<legend><?php _e( 'Add New Forum', 'message-board' ); ?></legend>

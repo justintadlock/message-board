@@ -508,6 +508,7 @@ function mb_topic_url( $topic_id = 0 ) {
  * @return string
  */
 function mb_get_topic_url( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id( $topic_id );
 	return apply_filters( 'mb_get_topic_url', mb_get_post_url( $topic_id ), $topic_id );
 }
 
@@ -1014,28 +1015,6 @@ function mb_topic_form() {
  */
 function mb_topic_edit_form() {
 	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-edit-topic.php' );
-}
-
-/**
- * Displays the topic form action URL
- *
- * @since  1.0.0
- * @access public
- * @return void
- */
-function mb_topic_form_action_url() {
-	echo mb_get_topic_form_action_url();
-}
-
-/**
- * Returns the topic form action URL.
- *
- * @since  1.0.0
- * @access public
- * @return string
- */
-function mb_get_topic_form_action_url() {
-	return esc_url( add_query_arg( 'message-board', 'new-topic', trailingslashit( home_url() ) ) );
 }
 
 /* ====== Topic Subscriptions ====== */

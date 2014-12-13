@@ -3,7 +3,7 @@ if ( !current_user_can( 'edit_topic', mb_get_topic_id() ) )
 	return;
 ?>
 
-<form id="topic-form" method="post" action="<?php echo esc_url( add_query_arg( 'message-board', 'edit-topic', user_trailingslashit( home_url() ) ) ); ?>">
+<form id="topic-form" method="post" action="<?php mb_topic_url(); ?>">
 
 	<fieldset>
 		<legend><?php _e( 'Edit Topic', 'message-board' ); ?></legend>

@@ -2,7 +2,7 @@
 	return; 
 ?>
 
-<form id="reply-form" method="post" action="<?php mb_reply_form_action_url(); ?>">
+<form id="reply-form" method="post" action="<?php mb_topic_url(); ?>">
 
 	<fieldset>
 		<legend><?php _e( 'Leave A Reply', 'message-board' ); ?></legend>
