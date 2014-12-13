@@ -81,12 +81,6 @@ function mb_handler_new_forum() {
 		exit();
 	}
 
-	/* Make sure we have a user ID. */
-	if ( ! $user_id = get_current_user_id() ) {
-		wp_die( 'Did not recognize user.', 'message-board' );
-		exit();
-	}
-
 	/* Make sure we have a forum title. */
 	if ( empty( $_POST['mb_forum_title'] ) ) {
 		wp_die( __( 'You did not enter a forum title!', 'message-board' ) );
@@ -94,18 +88,10 @@ function mb_handler_new_forum() {
 	}
 
 	/* Post title. */
-	$post_title = esc_html( strip_tags( $_POST['mb_forum_title'] ) );
+	apply_filters( 'mb_pre_insert_forum_title', $_POST['mb_forum_title'] );
 
 	/* Post content. */
-	if ( !empty( $_POST['mb_forum_content'] ) ) {
-		$post_content = $_POST['mb_forum_content'];
-		$post_content = mb_encode_bad( $post_content );
-		$post_content = mb_code_trick( $post_content );
-		$post_content = force_balance_tags( $post_content );
-		$post_content = mb_filter_post_kses( $post_content );
-	} else {
-		$post_content = '';
-	}
+	apply_filters( 'mb_pre_insert_forum_content', $_POST['mb_forum_content'] );
 
 	/* Forum ID. */
 	$post_parent = 0 >= $_POST['mb_post_parent'] ? 0 : mb_get_forum_id( $_POST['mb_post_parent'] );
@@ -171,18 +157,10 @@ function mb_handler_edit_forum() {
 	}
 
 	/* Post title. */
-	$post_title = esc_html( strip_tags( $_POST['mb_forum_title'] ) );
+	apply_filters( 'mb_pre_insert_forum_title', $_POST['mb_forum_title'] );
 
 	/* Post content. */
-	if ( !empty( $_POST['mb_forum_content'] ) ) {
-		$post_content = $_POST['mb_forum_content'];
-		$post_content = mb_encode_bad( $post_content );
-		$post_content = mb_code_trick( $post_content );
-		$post_content = force_balance_tags( $post_content );
-		$post_content = mb_filter_post_kses( $post_content );
-	} else {
-		$post_content = '';
-	}
+	apply_filters( 'mb_pre_insert_forum_content', $_POST['mb_forum_content'] );
 
 	/* Forum ID. */
 	$post_parent = isset( $_POST['mb_post_parent'] ) ? absint( $_POST['mb_post_parent'] ) : mb_get_forum_parent_id( $forum_id );
@@ -239,14 +217,8 @@ function mb_handler_new_topic() {
 		return;
 
 	/* Make sure the current user can create forum topics. */
-	if ( !current_user_can( 'create_forum_topics' ) ) {
+	if ( !current_user_can( 'create_topics' ) ) {
 		wp_die( 'Sorry, you cannot create new forum topics.', 'message-board' );
-		exit;
-	}
-
-	/* Make sure we have a user ID. */
-	if ( ! $user_id = get_current_user_id() ) {
-		wp_die( 'Did not recognize user.', 'message-board' );
 		exit;
 	}
 
@@ -269,14 +241,10 @@ function mb_handler_new_topic() {
 	}
 
 	/* Post title. */
-	$post_title = esc_html( strip_tags( $_POST['mb_topic_title'] ) );
+	apply_filters( 'mb_pre_insert_topic_title', $_POST['mb_topic_title'] );
 
 	/* Post content. */
-	$post_content = $_POST['mb_topic_content'];
-	$post_content = mb_encode_bad( $post_content );
-	$post_content = mb_code_trick( $post_content );
-	$post_content = force_balance_tags( $post_content );
-	$post_content = mb_filter_post_kses( $post_content );
+	apply_filters( 'mb_pre_insert_topic_content', $_POST['mb_topic_content'] );
 
 	/* Forum ID. */
 	$forum_id = absint( $_POST['mb_topic_forum'] );
@@ -299,7 +267,7 @@ function mb_handler_new_topic() {
 		/* If the user chose to subscribe to the topic. */
 		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] ) {
 
-			mb_add_user_subscription( absint( $user_id ), $published );
+			mb_add_user_subscription( get_current_user_id(), $published );
 		}
 
 		/* Redirect to the published topic page. */
@@ -345,14 +313,10 @@ function mb_handler_edit_topic() {
 	}
 
 	/* Post title. */
-	$post_title = esc_html( strip_tags( $_POST['mb_topic_title'] ) );
+	apply_filters( 'mb_pre_insert_topic_title', $_POST['mb_topic_title'] );
 
 	/* Post content. */
-	$post_content = $_POST['mb_topic_content'];
-	$post_content = mb_encode_bad( $post_content );
-	$post_content = mb_code_trick( $post_content );
-	$post_content = force_balance_tags( $post_content );
-	$post_content = mb_filter_post_kses( $post_content );
+	apply_filters( 'mb_pre_insert_topic_content', $_POST['mb_topic_content'] );
 
 	/* Forum ID. */
 	$forum_id = absint( $_POST['mb_topic_forum'] );
@@ -404,12 +368,6 @@ function mb_handler_new_reply() {
 		exit;
 	}
 
-	/* Make sure we have a user ID. */
-	if ( ! $user_id = get_current_user_id() ) {
-		wp_die( 'Did not recognize user.', 'message-board' );
-		exit;
-	}
-
 	/* Make sure we have a topic ID. */
 	if ( empty( $_POST['mb_reply_topic_id'] ) ) {
 		wp_die( __( 'Forum topic not specified.', 'message-board' ) );
@@ -426,11 +384,7 @@ function mb_handler_new_reply() {
 	$topic_id = absint( $_POST['mb_reply_topic_id'] );
 
 	/* Post content. */
-	$post_content = $_POST['mb_reply_content'];
-	$post_content = mb_encode_bad( $post_content );
-	$post_content = mb_code_trick( $post_content );
-	$post_content = force_balance_tags( $post_content );
-	$post_content = mb_filter_post_kses( $post_content );
+	apply_filters( 'mb_pre_insert_reply_content', $_POST['mb_reply_content'] );
 
 	/* Publish a new reply. */
 	$published = mb_insert_reply(
@@ -494,11 +448,7 @@ function mb_handler_edit_reply() {
 	$topic_id = absint( $_POST['mb_reply_topic_id'] );
 
 	/* Post content. */
-	$post_content = $_POST['mb_reply_content'];
-	$post_content = mb_encode_bad( $post_content );
-	$post_content = mb_code_trick( $post_content );
-	$post_content = force_balance_tags( $post_content );
-	$post_content = mb_filter_post_kses( $post_content );
+	apply_filters( 'mb_pre_insert_reply_content', $_POST['mb_reply_content'] );
 
 	/* Publish a new reply. */
 	$published = wp_update_post(

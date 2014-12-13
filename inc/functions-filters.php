@@ -29,6 +29,25 @@ foreach ( $hooks as $hook ) {
 	add_filter( $hook,                   'make_clickable',       40 );
 }
 
+// @todo Use a core hook instead.
+$pre_content_hooks = array( 'mb_pre_insert_forum_content', 'mb_pre_insert_topic_content', 'mb_pre_insert_reply_content' );
+
+foreach ( $pre_content_hooks as $hook ) {
+	add_filter( $hook, 'mb_encode_bad'       );
+	add_filter( $hook, 'mb_code_trick'       );
+	add_filter( $hook, 'force_balance_tags'  );
+	add_filter( $hook, 'mb_filter_post_kses' );
+}
+
+// @todo Use a core hook intead.
+$pre_title_hooks = array( 'mb_pre_insert_forum_title', 'mb_pre_insert_topic_title', 'mb_pre_insert_reply_title' );
+
+foreach ( $pre_title_hooks as $hook ) {
+	add_filter( $hook, 'strip_tags' );
+	add_filter( $hook, 'esc_html'   );
+}
+
+
 /* Reply title filters. */
 add_filter( 'the_title', 'mb_forum_reply_title_filter', 5, 2 );
 add_filter( 'post_title', 'mb_forum_reply_title_filter', 5, 2 );
