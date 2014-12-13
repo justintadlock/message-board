@@ -58,6 +58,24 @@ function mb_get_thread_position( $post_id = 0 ) {
 	return apply_filters( 'mb_get_thread_position', $position );
 }
 
+/* ====== Forum Front Page ====== */
+
+function mb_board_home_url() {
+	echo mb_get_board_home_url();
+}
+
+function mb_get_board_home_url() {
+
+	if ( 'forums' === mb_get_show_on_front() )
+		$url = get_post_type_archive_link( mb_get_forum_post_type() );
+	elseif ( 'topics' === mb_get_show_on_front() )
+		$url = get_post_type_archive_link( mb_get_topic_post_type() );
+	else
+		$url = home_url( mb_get_root_slug() );
+
+	return apply_filters( 'mb_get_board_home_url', $url );
+}
+
 /* ====== Post ID ====== */
 
 function mb_get_post_id( $post_id = 0 ) {
