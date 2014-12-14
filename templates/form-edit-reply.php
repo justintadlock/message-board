@@ -24,7 +24,6 @@
 		</p>
 
 		<input type="hidden" name="mb_reply_id" value="<?php mb_reply_id(); ?>" />
-		<input type="hidden" name="mb_reply_topic_id" value="<?php mb_reply_topic_id(); ?>" />
 
 		<?php wp_nonce_field( 'mb_edit_reply_action', 'mb_edit_reply_nonce', false ); ?>
 
