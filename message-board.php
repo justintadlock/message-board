@@ -154,11 +154,11 @@ final class Message_Board {
 	private function setup() {
 
 		/* Set up the forum queries. */
-		$this->forum_query     = new WP_Query();
+		$this->forum_query    = new WP_Query();
 		$this->subforum_query = new WP_Query();
-		$this->topic_query     = new WP_Query();
-		$this->reply_query     = new WP_Query();
-		$this->search_query    = new WP_Query();
+		$this->topic_query    = new WP_Query();
+		$this->reply_query    = new WP_Query();
+		$this->search_query   = new WP_Query();
 
 		/* Set up the directory path and URI. */
 		$this->dir_path = trailingslashit( plugin_dir_path( __FILE__ ) );

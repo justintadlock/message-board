@@ -36,6 +36,14 @@ add_action( 'mb_template_redirect', 'mb_handler_topic_toggle_trash' );
 add_action( 'mb_template_redirect', 'mb_handler_reply_toggle_spam'  );
 add_action( 'mb_template_redirect', 'mb_handler_reply_toggle_trash' );
 
+/**
+ * Checks if we're currently viewing a board action page. Actions mean we want to perform some action, 
+ * typically interacting with the database on the front end of the site.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
 function mb_is_board_action() {
 	$allowed = array( 'edit' );
 	$action  = get_query_var( 'mb_action' );
@@ -43,23 +51,46 @@ function mb_is_board_action() {
 	return !empty( $action ) && in_array( $action, $allowed ) ? true : false;
 }
 
+/**
+ * Gets the current board action. If not viewing an action page, returns an empty string.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
 function mb_get_board_action() {
 	return mb_is_board_action() ? sanitize_key( get_query_var( 'mb_action' ) ) : '';
 }
 
+/**
+ * Checks a `$_POST` nonce by name and action.  If the nonce wasn't posted, returns `FALSE`.  If the 
+ * nonce was posted, verify it using `wp_verify_nonce()`.  Returns `TRUE` if things check.  Dies if 
+ * it fails.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $name
+ * @param  string  $action
+ * @return bool
+ */
 function mb_check_post_nonce( $name, $action ) {
 
 	if ( !isset( $_POST[ $name ] ) )
 		return false;
 
-	if ( !wp_verify_nonce( $_POST[ $name ], $action ) ) {
-		wp_die( __( 'Whoah, partner!', 'message-board' ) );
-		exit();
-	}
+	if ( !wp_verify_nonce( $_POST[ $name ], $action ) )
+		mb_bring_the_doom( 'nonce-failed' );
 
 	return true;
 }
 
+/**
+ * Returns an array of messages when something fails.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return array
+ */
 function mb_get_messages_of_doom() {
 
 	$doom = array(
@@ -68,27 +99,69 @@ function mb_get_messages_of_doom() {
 		'no-permission' => __( "Whoah, partner! I'm not buying your story. What's your name? Who sent you?",     'message-board' ),
 		'what-edit'     => __( "I didn't credit you with an overabundance of education, but this? This?",        'message-board' ),
 		'no-topic-id'   => __( "Do you think we can just stay on topic for once? Just this once? Please?",       'message-board' ),
+		'nonce-failed'  => __( "Whoah there, partner! What do you think you're doing?",                          'message-board' ),
 	);
 
 	return apply_filters( 'mb_get_messages_of_doom', $doom );
 }
 
+/**
+ * Gets one of the failed messages based on context.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $handle
+ * @return string
+ */
 function mb_get_message_of_doom( $handle ) {
 	$doom = mb_get_messages_of_doom();
 
 	return isset( $doom[ $handle ] ) ? $doom[ $handle ] : '';
 }
 
+/**
+ * Kills the page and prints an error message using `wp_die()`.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $handle
+ * @return void
+ */
 function mb_bring_the_doom( $handle ) {
 	wp_die( mb_get_message_of_doom( $handle ) );
 	exit();
 }
 
 /**
- * New forum handler. This function executes when a new topic is posted on the front end.
+ * Figures out whether we're on an edit page and whether the current user has permission to be here.
  *
- * @todo Separate some of the functionality into its own functions.
- * @todo Use filter hooks for sanitizing rather than doing it directly in the function.
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_handler_edit_access() {
+
+	if ( mb_is_edit() ) {
+
+		if ( mb_is_forum_edit() && !current_user_can( 'edit_forum', mb_get_forum_id() ) )
+			mb_bring_the_doom( 'no-permission' );
+
+		elseif ( mb_is_topic_edit() && !current_user_can( 'edit_topic', mb_get_topic_id() ) )
+			mb_bring_the_doom( 'no-permission' );
+
+		elseif ( mb_is_reply_edit() && !current_user_can( 'edit_reply', mb_get_reply_id() ) )
+			mb_bring_the_doom( 'no-permission' );
+
+		elseif ( mb_is_user_edit() && !current_user_can( 'edit_user', mb_get_user_id() ) )
+			mb_bring_the_doom( 'no-permission' );
+
+		elseif ( !mb_is_forum_edit() && !mb_is_topic_edit() && !mb_is_reply_edit() && !mb_is_user_edit() )
+			mb_bring_the_doom( 'no-permission' );
+	}
+}
+
+/**
+ * Front end new forum handler.
  *
  * @since  1.0.0
  * @access public
@@ -147,6 +220,13 @@ function mb_handler_new_forum() {
 	}
 }
 
+/**
+ * Front end edit forum handler.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_handler_edit_forum() {
 
 	/* Verify the nonce. */
@@ -213,7 +293,7 @@ function mb_handler_edit_forum() {
 }
 
 /**
- * New topic handler. This function executes when a new topic is posted on the front end.
+ * Front end new topic handler.
  *
  * @since  1.0.0
  * @access public
@@ -268,6 +348,13 @@ function mb_handler_new_topic() {
 	}
 }
 
+/**
+ * Front end edit topic handler.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_handler_edit_topic() {
 
 	/* Verify the nonce. */
@@ -328,10 +415,7 @@ function mb_handler_edit_topic() {
 }
 
 /**
- * New reply handler. This function executes when a new reply is posted on the front end.
- *
- * @todo Separate some of the functionality into its own functions.
- * @todo Use filter hooks for sanitizing rather than doing it directly in the function.
+ * Front end new reply handler.
  *
  * @since  1.0.0
  * @access public
@@ -381,6 +465,13 @@ function mb_handler_new_reply() {
 	}
 }
 
+/**
+ * Front end edit reply handler.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_handler_edit_reply() {
 
 	/* Verify the nonce. */
@@ -426,27 +517,6 @@ function mb_handler_edit_reply() {
 
 		/* Redirect to the published topic page. */
 		wp_safe_redirect( get_permalink( $published ) );
-	}
-}
-
-function mb_handler_edit_access() {
-
-	if ( mb_is_edit() ) {
-
-		if ( mb_is_forum_edit() && !current_user_can( 'edit_forum', mb_get_forum_id() ) )
-			mb_bring_the_doom( 'no-permission' );
-
-		elseif ( mb_is_topic_edit() && !current_user_can( 'edit_topic', mb_get_topic_id() ) )
-			mb_bring_the_doom( 'no-permission' );
-
-		elseif ( mb_is_reply_edit() && !current_user_can( 'edit_reply', mb_get_reply_id() ) )
-			mb_bring_the_doom( 'no-permission' );
-
-		elseif ( mb_is_user_edit() && !current_user_can( 'edit_user', mb_get_user_id() ) )
-			mb_bring_the_doom( 'no-permission' );
-
-		elseif ( !mb_is_forum_edit() && !mb_is_topic_edit() && !mb_is_reply_edit() && !mb_is_user_edit() )
-			mb_bring_the_doom( 'no-permission' );
 	}
 }
 
