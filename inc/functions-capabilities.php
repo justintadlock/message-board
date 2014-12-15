@@ -45,6 +45,8 @@ function mb_get_forum_capabilities() {
 		'read_post'              => 'read_forum',
 		'delete_post'            => 'delete_forum',
 		'moderate_post'          => 'moderate_forum', // custom
+		'close_post'             => 'close_forum',
+		'open_post'              => 'open_forum',
 
 		// primitive/meta caps
 		'create_posts'           => 'create_forums',
@@ -81,6 +83,9 @@ function mb_get_topic_capabilities() {
 		'read_post'              => 'read_topic',
 		'delete_post'            => 'delete_topic',
 		'moderate_post'          => 'moderate_topic', // custom
+		'close_post'             => 'close_topic',    // custom
+		'open_post'              => 'open_topic',     // custom
+		'spam_post'              => 'spam_topic',     // custom
 
 		// primitive/meta caps
 		'create_posts'           => 'create_topics',
@@ -117,6 +122,7 @@ function mb_get_reply_capabilities() {
 		'read_post'              => 'read_reply',
 		'delete_post'            => 'delete_reply',
 		'moderate_post'          => 'moderate_reply', // custom
+		'spam_post'              => 'spam_reply',     // custom
 
 		// primitive/meta caps
 		'create_posts'           => 'create_replies',
