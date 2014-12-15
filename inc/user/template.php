@@ -52,10 +52,16 @@ function mb_get_user_id( $user_id = 0 ) {
 
 	if ( is_numeric( $user_id ) && 0 < $user_id )
 		$user_id = $user_id;
+
 	elseif ( !empty( $mb_user ) && is_object( $mb_user ) )
 		$user_id = $mb_user->ID;
+
 	elseif ( get_query_var( 'author' ) )
 		$user_id = get_query_var( 'author' );
+
+	elseif ( get_query_var( 'user_id' ) )
+		$user_id = get_query_var( 'user_id' );
+
 	else
 		$user_id  = get_current_user_id();
 
@@ -70,6 +76,36 @@ function mb_single_user_title( $prefix = '', $echo = true ) {
 
 	echo $title;
 }
+
+function mb_user_edit_url( $user_id = 0 ) {
+	echo mb_get_user_edit_url( $user_id );
+}
+
+function mb_get_user_edit_url( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+
+	return apply_filters( 'mb_get_user_edit_url', get_edit_user_link( $user_id ), $user_id );
+}
+
+function mb_user_edit_link( $user_id = 0 ) {
+	echo mb_get_user_edit_link( $user_id );
+}
+
+function mb_get_user_edit_link( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+
+	$link = '';
+
+	if ( current_user_can( 'edit_user', $user_id ) ) {
+		$url  = mb_get_user_edit_url( $user_id );
+
+		if ( !empty( $url ) )
+			$link = sprintf( '<a href="%s" class="user-edit-link edit-link">%s</a>', $url, __( 'Edit', 'message-board' ) );
+	}
+
+	return apply_filters( 'mb_get_topic_edit_link', $link, $user_id );
+}
+
 
 function mb_get_users() {
 
@@ -173,6 +209,7 @@ function mb_user_profile_url( $user_id = 0 ) {
 }
 
 function mb_get_user_profile_url( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
 
 	$nicename = get_the_author_meta( 'user_nicename', $user_id );
 
@@ -265,4 +302,30 @@ function mb_get_user_subscriptions_url( $user_id = 0 ) {
 	$url = trailingslashit( mb_get_user_profile_url( $user_id ) ) . 'subscriptions';
 
 	return apply_filters( 'mb_get_user_subscriptions_url', esc_url( $url ), $user_id );
+}
+
+/**
+ * Displays the edit user form.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_user_edit_form() {
+	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-edit-user.php' );
+}
+
+function mb_is_user_profile_edit() {
+
+	$user_id = mb_get_user_id();
+	$your_id = get_current_user_id();
+
+	return mb_is_user_edit() && $user_id === $your_id ? true : false;
+}
+
+function mb_get_user_contact_methods() {
+
+	$methods = array();
+
+	return apply_filters( 'mb_get_user_contact_methods', $methods );
 }

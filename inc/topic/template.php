@@ -1007,8 +1007,6 @@ function mb_topic_form() {
 /**
  * Displays the edit topic form.
  *
- * @todo Set up system of hooks.
- *
  * @since  1.0.0
  * @access public
  * @return void

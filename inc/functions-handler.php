@@ -24,6 +24,7 @@ add_action( 'mb_template_redirect', 'mb_handler_edit_access'     );
 add_action( 'mb_template_redirect', 'mb_handler_edit_forum'      );
 add_action( 'mb_template_redirect', 'mb_handler_edit_topic'      );
 add_action( 'mb_template_redirect', 'mb_handler_edit_reply'      );
+add_action( 'mb_template_redirect', 'mb_handler_edit_user'       );
 
 add_action( 'mb_template_redirect', 'mb_handler_topic_subscribe' );
 add_action( 'mb_template_redirect', 'mb_handler_topic_bookmark'  );
@@ -517,6 +518,38 @@ function mb_handler_edit_reply() {
 
 		/* Redirect to the published topic page. */
 		wp_safe_redirect( get_permalink( $published ) );
+	}
+}
+
+function mb_handler_edit_user() {
+
+	/* Verify the nonce. */
+	if ( !mb_check_post_nonce( 'mb_edit_user_nonce', 'mb_edit_user_action' ) )
+		return;
+
+	/* Get the user ID. */
+	$user_id = mb_get_user_id( $_POST['mb_user_id'] );
+
+	/* Make sure the current user can edit the user. */
+	if ( !current_user_can( 'edit_user', $user_id ) )
+		mb_bring_the_doom( 'no-permission' );
+
+	/* Get the user object. */
+	$user = new WP_User( $user_id );
+
+	$first_name = !empty( $_POST['mb_first_name'] ) ? esc_html( strip_tags( $_POST['mb_first_name'] ) ) : '';
+	$last_name  = !empty( $_POST['mb_last_name']  ) ? esc_html( strip_tags( $_POST['mb_last_name']  ) ) : '';
+	//$nickname   = !empty( $_POST['mb_nickname']   ) ? esc_html( strip_tags( $_POST['mb_nickname']   ) ) : $user->nickname;
+
+	/*$updated = wp_update_user(
+		array(
+		)
+	);*/
+
+	if ( $updated && !is_wp_error( $updated ) ) {
+
+		/* Redirect to user profile. */
+		wp_safe_redirect( mb_get_user_profile_url( $user_id ) );
 	}
 }
 

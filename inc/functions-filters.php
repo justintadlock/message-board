@@ -55,6 +55,9 @@ add_filter( 'post_title', 'mb_forum_reply_title_filter', 5, 2 );
 /* Edit post link filters. */
 add_filter( 'get_edit_post_link', 'mb_get_edit_post_link', 5, 2 );
 
+/* Edit user link filter. */
+add_filter( 'get_edit_user_link', 'mb_get_edit_user_link_filter', 5, 2 );
+
 /* Filter the front-end page title. */
 add_filter( 'wp_title',   'mb_wp_title'   );
 
@@ -150,4 +153,20 @@ function mb_get_edit_post_link( $url, $post_id ) {
 		$url = add_query_arg( array( 'mb_action' => 'edit', 'reply_id' => $post_id ), mb_get_board_home_url() );
 
 	return $url;
+}
+
+/**
+ * Filters the edit user link for front-end editing.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $url
+ * @param  int     $post_id
+ */
+function mb_get_edit_user_link_filter( $url, $user_id ) {
+
+	if ( is_admin() || !mb_is_message_board() )
+		return $url;
+
+	return add_query_arg( array( 'mb_action' => 'edit', 'user_id' => $user_id ), mb_get_board_home_url() );
 }

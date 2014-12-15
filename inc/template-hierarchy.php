@@ -101,15 +101,18 @@ function mb_template_include( $template ) {
 		$_templates[] = "{$dir}/login.php";
 	}
 
-	/* If viewing single topic edit page. */
+	/* If viewing an edit page. */
 	elseif ( mb_is_edit() ) {
 
 		if ( mb_is_forum_edit() )
 			$_templates[] = "{$dir}/edit-forum.php";
+
 		elseif ( mb_is_topic_edit() )
 			$_templates[] = "{$dir}/edit-topic.php";
+
 		elseif ( mb_is_reply_edit() )
 			$_templates[] = "{$dir}/edit-reply.php";
+
 		elseif ( mb_is_user_edit() )
 			$_templates[] = "{$dir}/edit-user.php";
 
