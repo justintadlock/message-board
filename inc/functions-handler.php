@@ -537,16 +537,41 @@ function mb_handler_edit_user() {
 	/* Get the user object. */
 	$user = new WP_User( $user_id );
 
-	$first_name = !empty( $_POST['mb_first_name'] ) ? esc_html( strip_tags( $_POST['mb_first_name'] ) ) : '';
-	$last_name  = !empty( $_POST['mb_last_name']  ) ? esc_html( strip_tags( $_POST['mb_last_name']  ) ) : '';
-	//$nickname   = !empty( $_POST['mb_nickname']   ) ? esc_html( strip_tags( $_POST['mb_nickname']   ) ) : $user->nickname;
+	$first_name  = !empty( $_POST['mb_first_name']  ) ? esc_html( strip_tags( $_POST['mb_first_name']  ) ) : '';
+	$last_name   = !empty( $_POST['mb_last_name']   ) ? esc_html( strip_tags( $_POST['mb_last_name']   ) ) : '';
+	$nickname    = !empty( $_POST['mb_nickname']    ) ? esc_html( strip_tags( $_POST['mb_nickname']    ) ) : $user->user_login;
+	$url         = !empty( $_POST['mb_url']         ) ? esc_url_raw( $_POST['mb_url'] )                     : '';
 
-	/*$updated = wp_update_user(
+	$email = isset( $_POST['mb_email'] ) ? strip_tags( $_POST['mb_email'] ) : '';
+
+	if ( empty( $email ) || !is_email( $email ) || email_exists( $email ) )
+		$email = $user->user_email;
+
+	$updated = wp_update_user(
 		array(
+			'ID'           => $user->ID,
+			'first_name'   => $first_name,
+			'last_name'    => $last_name,
+			'nickname'     => $nickname,
+		//	'display_name' => $display_name,
+			'user_email'   => $email,
+			'user_url'     => $url,
+		//	'user_pass'    => $password,
 		)
-	);*/
+	);
 
 	if ( $updated && !is_wp_error( $updated ) ) {
+
+		// @todo User contact methods...
+
+		/* Currently-saved meta. */
+		$desc_meta  = get_user_meta( $user_id, 'description', true );
+
+		/* Posted meta. */
+		$description = !empty( $_POST['mb_description'] ) ? mb_filter_post_kses( $_POST['mb_description'] ) : '';
+
+		if ( $desc_meta !== $description )
+			update_user_meta( $user_id, 'description', $description );
 
 		/* Redirect to user profile. */
 		wp_safe_redirect( mb_get_user_profile_url( $user_id ) );
