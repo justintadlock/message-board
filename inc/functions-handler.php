@@ -325,7 +325,7 @@ function mb_handler_new_topic() {
 	$post_content = apply_filters( 'mb_pre_insert_topic_content', $_POST['mb_topic_content'] );
 
 	/* Forum ID. */
-	$forum_id = isset( $_POST['mb_topic_forum'] ) ? mb_get_forum_id( $_POST['mb_topic_forum'] ) : 0;
+	$forum_id = isset( $_POST['mb_forum_id'] ) ? mb_get_forum_id( $_POST['mb_forum_id'] ) : 0;
 	$forum_id = 0 < $forum_id ? $forum_id : mb_get_default_forum_id();
 
 	/* Publish a new forum topic. */

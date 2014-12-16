@@ -13,6 +13,9 @@
 /* Filter to make sure we get a topic post parent. */
 add_filter( 'wp_insert_post_parent', 'mb_insert_topic_post_parent', 10, 3 );
 
+/* Topic form fields. */
+add_action( 'mb_topic_form_fields', 'mb_topic_form_fields' );
+
 /**
  * Inserts a new topic.  This is a wrapper for the `wp_insert_post()` function and should be used in 
  * its place where possible.
@@ -462,4 +465,23 @@ function mb_set_topic_reply_count( $topic_id, $count ) {
  */
 function mb_set_topic_last_reply_id( $topic_id, $reply_id ) {
 	return update_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key(), $reply_id );
+}
+
+/**
+ * Adds hidden topic form fields.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_topic_form_fields() {
+
+	if ( mb_is_topic_edit() )
+		return;
+	
+	if ( mb_is_single_forum() ) : ?>
+		<input type="hidden" name="mb_forum_id" value="<?php echo absint( get_queried_object_id() ); ?>" />
+	<?php endif;
+
+	wp_nonce_field( 'mb_new_topic_action', 'mb_new_topic_nonce', false );
 }

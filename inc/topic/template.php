@@ -939,7 +939,7 @@ function mb_get_topic_form_url() {
 	if ( mb_is_single_forum() && !mb_is_forum_open( get_queried_object_id() ) )
 		$url = '';
 	else
-		$url = esc_url( '#topic-form' );
+		$url = esc_url( '#mb-topic-form' );
 
 	return apply_filters( 'mb_topic_form_url', $url );
 }
@@ -966,7 +966,7 @@ function mb_topic_form_link( $args = array() ) {
  */
 function mb_get_topic_form_link( $args = array() ) {
 
-	if ( !current_user_can( 'create_forum_topics' ) )
+	if ( !current_user_can( 'create_topics' ) )
 		return '';
 
 	$url  = mb_get_topic_form_url();
