@@ -312,7 +312,7 @@ function mb_get_user_subscriptions_url( $user_id = 0 ) {
  * @return void
  */
 function mb_user_edit_form() {
-	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-edit-user.php' );
+	mb_get_template_part( 'form-user', 'edit' );
 }
 
 function mb_is_user_profile_edit() {

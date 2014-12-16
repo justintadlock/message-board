@@ -25,6 +25,46 @@ function mb_get_theme_template_folder() {
 }
 
 /**
+ * Function for loading template parts.  This is similar to the WordPress `get_template_part()` function 
+ * with the exception that it will fall back to templates in the plugin's `/templates` folder.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $slug
+ * @param  string  $name
+ * @return void
+ */
+function mb_get_template_part( $slug, $name = '' ) {
+
+	/* Get theme and plugin templates paths. */
+	$theme_dir  = mb_get_theme_template_folder();
+	$plugin_dir = trailingslashit( message_board()->dir_path ) . 'templates';
+
+	/* Build the templates array for the theme. */
+	$templates = array();
+
+	if ( !empty( $name ) )
+		$templates[] = "{$theme_dir}/{$slug}-{$name}.php";
+
+	$templates[] = "{$theme_dir}/{$slug}.php";
+
+	/* Attempt to find the template in the theme. */
+	$has_template = locate_template( $templates, false, false );
+
+	/* If no theme template found, check for name + slug template in plugin. */
+	if ( !$has_template && !empty( $name ) && file_exists( "{$plugin_dir}/{$slug}-{$name}.php" ) )
+		$has_template = "{$plugin_dir}/{$slug}-{$name}.php";
+
+	/* Else, if no theme template found, check for it in the plugin. */
+	elseif ( !$has_template && file_exists( "{$plugin_dir}/{$slug}.php" ) )
+		$has_template = "{$plugin_dir}/{$slug}.php";
+
+	/* If we found a template, load it. */
+	if ( $has_template )
+		require( $has_template );
+}
+
+/**
  * Custom template hierarchy.
  *
  * @since  1.0.0

@@ -1001,7 +1001,7 @@ function mb_get_topic_form_link( $args = array() ) {
  * @return void
  */
 function mb_topic_form() {
-	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-new-topic.php' );
+	mb_get_template_part( 'form-topic', 'new' );
 }
 
 /**
@@ -1012,7 +1012,7 @@ function mb_topic_form() {
  * @return void
  */
 function mb_topic_edit_form() {
-	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-edit-topic.php' );
+	mb_get_template_part( 'form-topic', 'edit' );
 }
 
 /* ====== Topic Subscriptions ====== */

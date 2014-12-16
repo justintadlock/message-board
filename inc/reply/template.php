@@ -352,11 +352,11 @@ function mb_get_reply_author_profile_link( $reply_id = 0 ) {
 /* ====== Reply Form ====== */
 
 function mb_reply_form() {
-	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-new-reply.php' );
+	mb_get_template_part( 'form-reply', 'new' );
 }
 
 function mb_reply_edit_form() {
-	require_once( trailingslashit( message_board()->dir_path ) . 'templates/form-edit-reply.php' );
+	mb_get_template_part( 'form-reply', 'edit' );
 }
 
 /* ====== Reply Forum ====== */
