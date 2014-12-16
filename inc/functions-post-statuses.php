@@ -536,11 +536,12 @@ function mb_unorphan_reply( $reply_id ) {
 function mb_get_prev_post_status( $post_id ) {
 	$status = get_post_meta( $post_id, mb_get_prev_status_meta_key(), true );
 
-	if ( empty( $status ) )
+	if ( empty( $status ) ) {
 		$status = mb_get_publish_post_status();
 
-	if ( in_array( get_post_type( $post_id ), array( mb_get_forum_post_type(), mb_get_topic_post_type() ) ) )
-		$status = mb_get_open_post_status();
+		if ( in_array( get_post_type( $post_id ), array( mb_get_forum_post_type(), mb_get_topic_post_type() ) ) )
+			$status = mb_get_open_post_status();
+	}
 
 	return $status;
 }
