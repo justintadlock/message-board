@@ -37,10 +37,6 @@ if ( !current_user_can( 'edit_user', mb_get_user_id() ) )
 		<legend><?php _e( 'Contact Info', 'message-board' ); ?></legend>
 
 		<p>
-			<label for="mb_email"><?php _e( 'Email', 'message-board' ); ?> <span class="required">*</span></label>
-			<input type="email" id="mb_email" name="mb_email" value="<?php echo esc_attr( get_the_author_meta( 'email', mb_get_user_id() ) ); ?>" />
-		</p>
-		<p>
 			<label for="mb_url"><?php _e( 'Web Site', 'message-board' ); ?></label>
 			<input type="url" id="mb_url" name="mb_url" value="<?php echo esc_url( get_the_author_meta( 'url', mb_get_user_id() ) ); ?>" />
 		</p>
@@ -60,6 +56,33 @@ if ( !current_user_can( 'edit_user', mb_get_user_id() ) )
 			<label for="mb_description"><?php _e( 'Biographical Info', 'message-board' ); ?></label>
 			<textarea id="mb_description" name="mb_description"><?php echo esc_textarea( get_the_author_meta( 'description', mb_get_user_id() ) ); ?></textarea>
 		</p>
+	</fieldset>
+
+	<fieldset>
+		<legend><?php _e( 'Account', 'message-board' ); ?></legend>
+
+		<p>
+			<label for="mb_user_login"><?php _e( 'Username', 'message-board' ); ?></label>
+			<input type="text" id="mb_user_login" name="mb_user_login" disabled="disabled" value="<?php echo esc_attr( get_the_author_meta( 'login', mb_get_user_id() ) ); ?>" />
+		</p>
+
+		<p>
+			<label for="mb_email"><?php _e( 'Email', 'message-board' ); ?> <span class="required">*</span></label>
+			<input type="email" id="mb_email" name="mb_email" value="<?php echo esc_attr( get_the_author_meta( 'email', mb_get_user_id() ) ); ?>" />
+		</p>
+
+		<p>
+			<label for="pass1"><?php _e( 'New Password', 'message-board' ); ?></label>
+			<input type="password" id="pass1" name="pass1" value="" autocomplete="off" />
+			<span class="description"><?php _e( 'If you would like to change the password type a new one. Otherwise leave this blank.', 'message-board' ); ?></span>
+		</p>
+
+		<p>
+			<label for="pass2"><?php _e( 'Repeat Password', 'message-board' ); ?></label>
+			<input type="password" id="pass2" name="pass2" value="" autocomplete="off" />
+			<span class="description"><?php _e( 'Type your new password again.', 'message-board' ); ?></span><br />
+		</p>
+
 	</fieldset>
 
 	<p>

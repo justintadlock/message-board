@@ -542,23 +542,25 @@ function mb_handler_edit_user() {
 	$nickname    = !empty( $_POST['mb_nickname']    ) ? esc_html( strip_tags( $_POST['mb_nickname']    ) ) : $user->user_login;
 	$url         = !empty( $_POST['mb_url']         ) ? esc_url_raw( $_POST['mb_url'] )                     : '';
 
-	$email = isset( $_POST['mb_email'] ) ? strip_tags( $_POST['mb_email'] ) : '';
+	$email = isset( $_POST['mb_email'] ) ? sanitize_email( $_POST['mb_email'] ) : '';
 
 	if ( empty( $email ) || !is_email( $email ) || email_exists( $email ) )
 		$email = $user->user_email;
 
-	$updated = wp_update_user(
-		array(
-			'ID'           => $user->ID,
-			'first_name'   => $first_name,
-			'last_name'    => $last_name,
-			'nickname'     => $nickname,
-		//	'display_name' => $display_name,
-			'user_email'   => $email,
-			'user_url'     => $url,
-		//	'user_pass'    => $password,
-		)
+	$args = array(
+		'ID'           => $user->ID,
+		'first_name'   => $first_name,
+		'last_name'    => $last_name,
+		'nickname'     => $nickname,
+	//	'display_name' => $display_name,
+		'user_email'   => $email,
+		'user_url'     => $url,
 	);
+
+	if ( !empty( $_POST['pass1'] ) && !empty( $_POST['pass2'] ) && $_POST['pass1'] === $_POST['pass2'] )
+		$args['user_pass'] = $_POST['pass1'];
+
+	$updated = wp_update_user( $args );
 
 	if ( $updated && !is_wp_error( $updated ) ) {
 
