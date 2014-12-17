@@ -645,7 +645,8 @@ function mb_get_topic_author_profile_link( $topic_id = 0 ) {
 function mb_get_topic_forum_id( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	$forum_id = get_post( $topic_id )->post_parent;
+	$topic_obj = get_post( $topic_id );
+	$forum_id  = is_object( $topic_obj ) ? $post->post_parent : 0;
 
 	return apply_filters( 'mb_get_topic_forum_id', $forum_id, $topic_id );
 }

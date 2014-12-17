@@ -119,7 +119,7 @@ function mb_forum_reply_title_filter( $title, $post_id ) {
 
 	if ( mb_get_reply_post_type() === get_post_type( $post_id ) ) {
 		$post = get_post( $post_id );
-		if ( 0 >= $post->post_parent )
+		if ( 0 >= $post->post_parent || mb_is_reply_orphan( $post_id ) )
 			$title = get_the_ID();
 		else
 			$title = sprintf( __( 'Reply to: %s', 'message-board' ), get_post_field( 'post_title', $post->post_parent ) );

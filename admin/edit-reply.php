@@ -208,22 +208,34 @@ final class Message_Board_Admin_Edit_Replies {
 
 			$forum_id = mb_get_reply_forum_id( $post_id );
 
-			$post_type = get_post_type( $post_id );
+			if ( 0 === $forum_id || mb_is_reply_orphan( $post_id ) ) {
 
-			$url = add_query_arg( array( 'post_type' => $post_type, 'mb_forum' => $forum_id ), admin_url( 'edit.php' ) );
+				echo '&mdash;';
+			} else {
 
-			printf( '<a href="%s">%s</a>', $url, mb_get_forum_title( $forum_id ) );
+				$post_type = get_post_type( $post_id );
+
+				$url = add_query_arg( array( 'post_type' => $post_type, 'mb_forum' => $forum_id ), admin_url( 'edit.php' ) );
+
+				printf( '<a href="%s">%s</a>', $url, mb_get_forum_title( $forum_id ) );
+			}
 
 		/* Topic column. */
 		} elseif ( 'topic' === $column ) {
 
 			$topic_id = mb_get_reply_topic_id( $post_id );
 
-			$post_type = get_post_type( $post_id );
+			if ( 0 === $topic_id || mb_is_reply_orphan( $post_id ) ) {
 
-			$url = add_query_arg( array( 'post_type' => $post_type, 'post_parent' => $topic_id ), admin_url( 'edit.php' ) );
+				echo '&mdash;';
+			} else {
 
-			printf( '<a href="%s">%s</a>', $url, mb_get_topic_title( $topic_id ) );
+				$post_type = get_post_type( $post_id );
+
+				$url = add_query_arg( array( 'post_type' => $post_type, 'post_parent' => $topic_id ), admin_url( 'edit.php' ) );
+
+				printf( '<a href="%s">%s</a>', $url, mb_get_topic_title( $topic_id ) );
+			}
 
 		/* Datetime column. */
 		} elseif ( 'datetime' === $column ) {

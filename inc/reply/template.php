@@ -168,6 +168,20 @@ function mb_is_reply_trash( $reply_id = 0 ) {
 	return apply_filters( 'mb_is_reply_trash', mb_get_trash_post_status() === $status ? true : false, $reply_id );
 }
 
+/**
+ * Conditional check to see whether a reply has the "orphan" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_reply_orphan( $reply_id = 0 ) {
+	$reply_id = mb_get_reply_id( $reply_id );
+	$status   = get_post_status( $reply_id );
+
+	return apply_filters( 'mb_is_reply_orphan', mb_get_orphan_post_status() === $status ? true : false, $reply_id );
+}
+
 function mb_reply_toggle_spam_url( $reply_id = 0 ) {
 	echo mb_get_reply_toggle_spam_spam_url( $reply_id = 0 );
 }

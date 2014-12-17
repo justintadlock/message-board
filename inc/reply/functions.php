@@ -255,3 +255,13 @@ function mb_set_reply_statuses( $topic_id, $status ) {
 
 	$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET post_status = %s WHERE ID IN (" . implode( ',', $post_ids ) . ")", $status ) );
 }
+
+function mb_orphanize_replies( $topic_id ) {
+	$reply_ids = mb_get_topic_reply_ids( $topic_id );
+
+	if ( !empty( $reply_ids ) ) {
+
+		foreach ( $reply_ids as $reply_id )
+			mb_orphan_reply( $reply_id );
+	}
+}
