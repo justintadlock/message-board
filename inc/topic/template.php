@@ -82,7 +82,7 @@ function mb_is_single_topic( $topic = '' ) {
 }
 
 function mb_is_topic_archive() {
-	return mb_is_forum_search() ? false : is_post_type_archive( mb_get_topic_post_type() );
+	return get_query_var( 'mb_custom' ) ? false : is_post_type_archive( mb_get_topic_post_type() );
 }
 
 /* ====== Lead Topic ====== */

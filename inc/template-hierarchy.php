@@ -128,11 +128,16 @@ function mb_template_include( $template ) {
 		$_templates[] = "{$dir}/archive-user.php";
 	}
 
-	/* If viewing a search results page. */
-	elseif ( mb_is_forum_search() ) {
+	/* If viewing the advanced search page. */
+	elseif ( mb_is_search() ) {
 
 		$_templates[] = "{$dir}/search.php";
-		$_templates[] = "{$dir}/archive-topic.php"; // temp
+	}
+
+	/* If viewing a search results page. */
+	elseif ( mb_is_search_results() ) {
+
+		$_templates[] = "{$dir}/search-results.php";
 	}
 
 	/* If viewing the forum login page. */

@@ -119,7 +119,8 @@ function mb_is_message_board() {
 	$is_message_board = false;
 
 	if ( 
-		   mb_is_forum_search() 
+		   mb_is_search() 
+		|| mb_is_search_results()
 		|| mb_is_forum_login()
 		|| mb_is_edit()
 		|| mb_is_forum_archive()
@@ -248,9 +249,13 @@ function mb_pre_get_posts( $query ) {
 		}
 	}
 
-	elseif ( !is_admin() && $query->is_main_query() && mb_is_forum_search() ) {
+	elseif ( !is_admin() && $query->is_main_query() && mb_is_search_results() ) {
 
-		$query->set( 'post_type',      array( mb_get_forum_post_type(), mb_get_topic_post_type(), mb_get_reply_post_type() ) );
+		$post_type = $query->get( 'post_type' );
+
+		if ( empty( $post_type ) || 'any' === $post_type )
+			$query->set( 'post_type',      array( mb_get_forum_post_type(), mb_get_topic_post_type(), mb_get_reply_post_type() ) );
+
 		$query->set( 'post_status',    array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status() ) );
 		$query->set( 'posts_per_page', mb_get_topics_per_page()    );
 	}
@@ -439,7 +444,7 @@ function mb_add_stickies( $posts, $sticky_posts, $forum_id = 0 ) {
  */
 function mb_parse_query( $query ) {
 
-	if ( mb_is_forum_search() ) {
+	if ( mb_is_search_results() ) {
 		$query->is_404        = false;
 		$query->is_front_page = false;
 		$query->is_home       = false;
@@ -460,7 +465,7 @@ function mb_parse_query( $query ) {
 function mb_404_override() {
 	global $wp_query;
 
-	if ( mb_is_forum_login() || mb_is_user_archive() || mb_is_edit() ) {
+	if ( mb_is_user_archive() || mb_is_edit() || get_query_var( 'mb_custom' ) ) {
 		status_header( 200 );
 		$wp_query->is_404        = false;
 		$wp_query->is_front_page = false;

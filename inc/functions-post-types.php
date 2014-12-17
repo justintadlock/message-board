@@ -25,6 +25,17 @@ add_filter( 'post_updated_messages', 'mb_post_updated_messages' );
 add_filter( 'enter_title_here', 'mb_enter_title_here', 10, 2 );
 
 /**
+ * Displays the forum post type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_forum_post_type() {
+	echo mb_get_forum_post_type();
+}
+
+/**
  * Returns the name of the "forum" post type.
  *
  * @since  1.0.0
@@ -36,6 +47,17 @@ function mb_get_forum_post_type() {
 }
 
 /**
+ * Displays the topic post type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_topic_post_type() {
+	echo mb_get_topic_post_type();
+}
+
+/**
  * Returns the name of the "topic" post type.
  *
  * @since  1.0.0
@@ -44,6 +66,17 @@ function mb_get_forum_post_type() {
  */
 function mb_get_topic_post_type() {
 	return apply_filters( 'mb_get_topic_post_type', 'forum_topic' );
+}
+
+/**
+ * Displays the reply post type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_reply_post_type() {
+	echo mb_get_reply_post_type();
 }
 
 /**

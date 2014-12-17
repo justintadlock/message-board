@@ -156,6 +156,10 @@ function mb_rewrite_rules() {
 	/* Login page. */
 	add_rewrite_rule( $login_slug . '/?$', 'index.php?mb_custom=login', 'top' );
 
+	$search_slug = trailingslashit( mb_get_root_slug() ) . 'search';
+
+	add_rewrite_rule( $search_slug . '/?$', 'index.php?mb_custom=search', 'top' );
+
 	/* Edit page. */
 	//add_rewrite_rule( $edit_slug . '/?$', 'index.php?mb_custom=edit', 'top' );
 }

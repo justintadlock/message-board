@@ -1,13 +1,24 @@
 <?php
 
 /**
+ * Checks if viewing the search (advanced) page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_search() {
+	return get_query_var( 'mb_custom' ) && 'search' === get_query_var( 'mb_custom' ) ? true : false;
+}
+
+/**
  * Checks if viewing the forum search page.
  *
  * @since  1.0.0
  * @access public
  * @return bool
  */
-function mb_is_forum_search() {
+function mb_is_search_results() {
 	global $wp;
 
 	return is_search() && mb_get_root_slug() === $wp->request ? true : false;
@@ -34,7 +45,7 @@ function mb_search_query() {
 	}
 
 	/* Use the main WP query when viewing a single topic or topic archive. */
-	if ( mb_is_forum_search() ) {
+	if ( mb_is_search_results() ) {
 		global $wp_the_query;
 		
 		$mb->search_query = $wp_the_query;
