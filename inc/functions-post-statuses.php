@@ -23,6 +23,9 @@ add_action( 'init', 'mb_register_post_statuses' );
 /* Transition post status. */
 add_action( 'transition_post_status', 'mb_transition_post_status', 10, 3 );
 
+/* Permanently-deleted post. */
+add_action( 'before_delete_post', 'mb_before_delete_post' );
+
 /**
  * Returns the slug for the "publish" post status.  Used by replies by default.  Note that this status 
  * is not registered by default because it's a default WordPress post status.
@@ -569,4 +572,89 @@ function mb_restore_post_status( $post_id ) {
  */
 function mb_update_post_status( $post_id, $status ) {
 	return wp_update_post( array( 'ID' => $post_id, 'post_status' => $status ) );
+}
+
+/**
+ * Callback function on the `before_delete_post` hook for when a post is deleted. This sets up some 
+ * specific actions based on our post types. It also saves the deleted post object for later use in 
+ * those actions.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $post_id
+ * @return void
+ */
+function mb_before_delete_post( $post_id ) {
+
+	$forum_type = mb_get_forum_post_type();
+	$topic_type = mb_get_topic_post_type();
+	$reply_type = mb_get_reply_post_type();
+	$post_type  = get_post_type( $post_id );
+
+	/* WP doesn't pass the post object after a post has been deleted, so we need to save it temporarily. */
+	if ( in_array( $post_type, array( $forum_type, $topic_type, $reply_type ) ) )
+		message_board()->deleted_post = get_post( $post_id );
+
+	/* If a forum is being deleted. */
+	if ( $forum_type === $post_type )
+		add_action( 'after_delete_post', 'mb_after_delete_forum' );
+
+	/* If a topic is being deleted. */
+	elseif ( $topic_type === $post_type )
+		add_action( 'after_delete_post', 'mb_after_delete_topic' );
+
+	/* If a reply is being deleted. */
+	elseif ( $reply_type === $post_type )
+		add_action( 'after_delete_post', 'mb_after_delete_reply' );
+}
+
+/**
+ * Callback function on the `after_delete_post` hook for when a forum is deleted.
+ *
+ * @todo All forum topics need to become orphans at this point. Attempt to move topics into parent if avail.
+ * @todo Reset counts for parent forums.
+ * @todo `wp_die()` if this is the default forum.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $post_id
+ * @return void
+ */
+function mb_after_delete_forum( $post_id ) {}
+
+/**
+ * Callback function on the `after_delete_post` hook for when a topic is deleted.
+ *
+ * @todo All topic replies need to become orphans at this point.
+ * @todo Remove from sticky arrays.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $post_id
+ * @return void
+ */
+function mb_after_delete_topic( $post_id ) {
+	$mb = message_board();
+
+	if ( is_object( $mb->deleted_post ) && $mb->deleted_post->ID === $post_id ) {
+		mb_reset_topic_data( $mb->deleted_post );
+		$mb->deleted_post = null;
+	}
+}
+
+/**
+ * Callback function on the `after_delete_post` hook for when a reply is deleted.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $post_id
+ * @return void
+ */
+function mb_after_delete_reply( $post_id ) {
+	$mb = message_board();
+
+	if ( is_object( $mb->deleted_post ) && $mb->deleted_post->ID === $post_id ) {
+		mb_reset_reply_data( $mb->deleted_post );
+		$mb->deleted_post = null;
+	}
 }

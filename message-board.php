@@ -115,6 +115,15 @@ final class Message_Board {
 	public $search_query;
 
 	/**
+	 * Used for temporarily saving a deleted post object.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @var    object|null
+	 */
+	public $deleted_post = null;
+
+	/**
 	 * Returns the instance.
 	 *
 	 * @since  1.0.0
