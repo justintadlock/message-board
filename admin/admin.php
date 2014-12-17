@@ -71,8 +71,8 @@ final class Message_Board_Admin {
 		/* Admin notices. */
 		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 
-		/* Register styles. */
-		add_action( 'admin_enqueue_scripts', array( $this, 'register_styles' ) );
+		/* Register scripts and styles. */
+		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
 
 		/* Add custom body class. */
 		add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
@@ -130,14 +130,15 @@ final class Message_Board_Admin {
 	}
 
 	/**
-	 * Registers the admin stylesheet.
+	 * Registers the admin scripts and styles.
 	 *
 	 * @since  1.0.0
 	 * @access public
 	 * @return object
 	 */
-	public function register_styles() {
-		wp_register_style( 'message-board-admin', message_board()->dir_uri . 'css/admin.css' );
+	public function register_scripts() {
+		wp_register_script( 'message-board-admin', message_board()->dir_uri . 'js/admin.js', array( 'jquery' ), false, true );
+		wp_register_style(  'message-board-admin', message_board()->dir_uri . 'css/admin.css' );
 	}
 
 	/**

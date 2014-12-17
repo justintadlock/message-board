@@ -36,7 +36,7 @@ final class Message_Board_Admin_Post_Topic {
 		if ( empty( $screen->post_type ) || $screen->post_type !== mb_get_topic_post_type() )
 			return;
 
-		add_action( 'admin_enqueue_scripts', array( $this, 'print_styles' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
 		add_action( "add_meta_boxes_{$screen->post_type}", array( $this, 'add_meta_boxes' ) );
 
@@ -44,15 +44,15 @@ final class Message_Board_Admin_Post_Topic {
 	}
 
 	/**
-	 * Style adjustments for the manage menu items screen, particularly for adjusting the thumbnail 
-	 * column in the table to make sure it doesn't take up too much space.
+	 * Loads scripts and styles.
 	 *
 	 * @since  1.0.0
 	 * @access public
 	 * @return void
 	 */
-	public function print_styles() {
-		wp_enqueue_style( 'message-board-admin' );
+	public function enqueue_scripts() {
+		wp_enqueue_script( 'message-board-admin' );
+		wp_enqueue_style(  'message-board-admin' );
 	}
 
 	/**

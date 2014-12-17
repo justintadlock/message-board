@@ -33,16 +33,15 @@ function mb_submit_meta_box( $post, $args = array() ) {
 
 				<div class="misc-pub-section misc-pub-post-status">
 <?php $st_object = !empty( $post->post_status ) && in_array( $post->post_status, $avail_statuses ) ? get_post_status_object( $post->post_status ) : get_post_status_object( mb_get_open_post_status() ); ?>
-						<p><label for="post_status"><?php printf( __( 'Status: %s', 'message-board' ), "<strong>{$st_object->label}</strong>" ); ?></label>
-<?php /*
-<a href="#post_status" class="edit-post-status hide-if-no-js">
+
+<label for="post_status"><?php printf( __( 'Status: %s', 'message-board' ), "<strong class='mb-current-status'>{$st_object->label}</strong>" ); ?></label>
+
+<a href="#post-status-select" class="edit-post-status hide-if-no-js">
 	<span aria-hidden="true"><?php _e( 'Edit' ); ?></span> 
 	<span class="screen-reader-text"><?php _e( 'Edit status' ); ?></span>
 </a>
-*/ ?>
-</p>
 
-					<div id="post-status-select" <?php /*class="hide-if-js"*/ ?>>
+					<div id="post-status-select" class="hide-if-js">
 						<input type="hidden" name="hidden_post_status" id="hidden_post_status" value="<?php echo esc_attr( ('auto-draft' == $post->post_status ) ? 'draft' : $post->post_status); ?>" />
 							<div id="post_status">
 							<?php foreach ( $avail_statuses as $status ) : ?>
@@ -53,11 +52,15 @@ function mb_submit_meta_box( $post, $args = array() ) {
 										<?php $post_status = in_array( $post->post_status, $avail_statuses ) ? $post->post_status : mb_get_open_post_status(); ?>
 									<?php endif; ?>
 									<?php $status_object = get_post_status_object( $status ); ?>
-									<label class="<?php echo esc_attr( $status ); ?>">
-									<input type="radio" name="post_status" value="<?php echo esc_attr( $status ); ?>"<?php checked( $post_status, $status ); ?> /> <?php echo $status_object->label; ?>
+									<input type="radio" name="post_status" id="post-status-<?php echo esc_attr( $status ); ?>" value="<?php echo esc_attr( $status ); ?>"<?php checked( $post_status, $status ); ?> /> 
+									<label for="post-status-<?php echo esc_attr( $status ); ?>" class="<?php echo esc_attr( $status ); ?>">
+										<?php echo $status_object->label; ?>
+									</label>
 									<br />
 								<?php endif; ?>
 							<?php endforeach; ?>
+ <a href="#post_status" class="save-post-status hide-if-no-js button"><?php _e('OK'); ?></a>
+ <a href="#post_status" class="cancel-post-status hide-if-no-js button-cancel"><?php _e('Cancel'); ?></a>
 							</div><!-- #post_status -->
 					</div><!-- #post-status-select -->
 
