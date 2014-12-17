@@ -193,9 +193,10 @@ final class Message_Board_Admin_Edit_Forums {
 			$columns['type']      = __( 'Type', 'message-board' );
 
 		/* Topics, replies, and datetime columns. */
-		$columns['topics']    = __( 'Topics',     'message-board' );
-		$columns['replies']   = __( 'Replies',    'message-board' );
-		$columns['datetime']  = __( 'Created',    'message-board' );
+		$columns['topics']    = __( 'Topics',  'message-board' );
+		$columns['replies']   = __( 'Replies', 'message-board' );
+		$columns['author']    = __( 'Author',  'message-board' );
+		$columns['datetime']  = __( 'Created', 'message-board' );
 
 		/* Return the columns. */
 		return $columns;
@@ -214,6 +215,7 @@ final class Message_Board_Admin_Edit_Forums {
 		$columns['type']    = array( 'forum_type',  true );
 		$columns['topics']  = array( 'topic_count', true );
 		$columns['replies'] = array( 'reply_count', true );
+		$columns['author']  = array( 'post_author', true );
 
 		return $columns;
 	}
