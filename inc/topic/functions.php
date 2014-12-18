@@ -349,7 +349,7 @@ function mb_reset_topic_voices( $topic_id ) {
  *
  * @since  1.0.0
  * @access public
- * @param  int     $topic_id
+ * @param  object|int  $post
  * @return array
  */
 function mb_reset_topic_data( $post, $reset_latest = false ) {

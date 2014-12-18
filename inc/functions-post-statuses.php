@@ -177,7 +177,7 @@ function mb_register_post_statuses() {
 		'label'                     => __( 'Orphan', 'message-board' ),
 		'label_verb'                => __( 'Orphan', 'message-board' ), // custom
 		'label_count'               => _n_noop( 'Orphan <span class="count">(%s)</span>', 'Orphan <span class="count">(%s)</span>', 'message-board' ),
-		'public'                    => true,
+		'public'                    => false,
 		'exclude_from_search'       => true,
 		'show_in_admin_status_list' => true,
 		'show_in_admin_all_list'    => false,
@@ -596,16 +596,22 @@ function mb_before_delete_post( $post_id ) {
 		message_board()->deleted_post = get_post( $post_id );
 
 	/* If a forum is being deleted. */
-	if ( $forum_type === $post_type )
+	if ( $forum_type === $post_type ) {
+
+		/* If this is the default forum, stop everything. */
+		if ( mb_get_default_forum_id() === $post_id )
+			wp_die( 'Whoah there! This is the default forum and cannot be deleted. Visit the settings page to change the default forum.', 'message-board' );
+
 		add_action( 'after_delete_post', 'mb_after_delete_forum' );
 
 	/* If a topic is being deleted. */
-	elseif ( $topic_type === $post_type )
+	} elseif ( $topic_type === $post_type ) {
 		add_action( 'after_delete_post', 'mb_after_delete_topic' );
 
 	/* If a reply is being deleted. */
-	elseif ( $reply_type === $post_type )
+	} elseif ( $reply_type === $post_type ) {
 		add_action( 'after_delete_post', 'mb_after_delete_reply' );
+	}
 }
 
 /**
@@ -625,9 +631,6 @@ function mb_after_delete_forum( $post_id ) {}
 /**
  * Callback function on the `after_delete_post` hook for when a topic is deleted.
  *
- * @todo All topic replies need to become orphans at this point.
- * @todo Remove from sticky arrays.
- *
  * @since  1.0.0
  * @access public
  * @param  int     $post_id
@@ -637,8 +640,18 @@ function mb_after_delete_topic( $post_id ) {
 	$mb = message_board();
 
 	if ( is_object( $mb->deleted_post ) && $mb->deleted_post->ID === $post_id ) {
+
+		/* Reset data based on topic. */
 		mb_reset_topic_data( $mb->deleted_post );
+
+		/* Make all of the topic's replies orphans. */
 		mb_orphanize_replies( $post_id );
+
+		/* Remove the topic from sticky arrays. */
+		mb_remove_super_topic(  $post_id );
+		mb_remove_sticky_topic( $post_id );
+
+		/* Reset the deleted post object. */
 		$mb->deleted_post = null;
 	}
 }
