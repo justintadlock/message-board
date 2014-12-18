@@ -183,6 +183,20 @@ function mb_is_topic_trash( $topic_id = 0 ) {
 	return apply_filters( 'mb_is_topic_trash', mb_get_trash_post_status() === $status ? true : false, $topic_id );
 }
 
+/**
+ * Conditional check to see whether a topic has the "orphan" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_topic_orphan( $topic_id = 0 ) {
+	$reply_id = mb_get_topic_id( $topic_id );
+	$status   = get_post_status( $topic_id );
+
+	return apply_filters( 'mb_is_topic_orphan', mb_get_orphan_post_status() === $status ? true : false, $topic_id );
+}
+
 function mb_topic_toggle_open_url( $topic_id = 0 ) {
 	echo mb_get_topic_toggle_open_close_url( $topic_id = 0 );
 }

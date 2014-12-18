@@ -315,6 +315,12 @@ final class Message_Board_Admin_Edit_Topics {
 			unset( $actions['inline hide-if-no-js'] );
 		}
 
+		/* Add delete link for spam and orphan replies. */
+		if ( ( mb_is_topic_spam( $topic_id ) || mb_is_topic_orphan( $topic_id ) ) && current_user_can( 'delete_post', $topic_id ) && EMPTY_TRASH_DAYS ) {
+
+			$actions['delete'] = sprintf( '<a class="submitdelete" href="%s">%s</a>', get_delete_post_link( $topic_id, '', true ), __( 'Delete Permanently', 'message-board' ) );
+		}
+
 		/* Add spam toggle link if user has permission. */
 		if ( current_user_can( 'moderate_topic', $topic_id ) ) {
 
