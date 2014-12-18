@@ -166,7 +166,7 @@ function mb_register_post_statuses() {
 		'label'                     => __( 'Spam', 'message-board' ),
 		'label_verb'                => __( 'Spam', 'message-board' ), // custom
 		'label_count'               => _n_noop( 'Spam <span class="count">(%s)</span>', 'Spam <span class="count">(%s)</span>', 'message-board' ),
-		'public'                    => current_user_can( 'manage_forums' ) && !is_admin() ? true : false,
+		'public'                    => false,
 		'exclude_from_search'       => true,
 		'show_in_admin_status_list' => true,
 		'show_in_admin_all_list'    => false,
