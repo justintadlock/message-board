@@ -218,5 +218,14 @@ function mb_map_meta_cap( $caps, $cap, $user_id, $args ) {
 		}
 	}
 
+	/* Meta cap for deleting a specific forum. */
+	elseif ( 'delete_post' === $cap && mb_get_forum_post_type() === get_post_type( $args[0] ) ) {
+
+		$forum_id = mb_get_forum_id( $args[0] );
+
+		if ( mb_get_default_forum_id() === $forum_id )
+			$caps = array( 'do_not_allow' );
+	}
+
 	return $caps;
 }

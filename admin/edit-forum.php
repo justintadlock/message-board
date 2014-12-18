@@ -79,6 +79,9 @@ final class Message_Board_Admin_Edit_Forums {
 		/* Filter the row actions. */
 		add_filter( 'page_row_actions', array( $this, 'row_actions' ), 10, 2 );
 		add_filter( 'post_row_actions', array( $this, 'row_actions' ), 10, 2 ); // In case forum post type is made non-hierarchial.
+
+		/* Filter post states (shown next to post title). */
+		add_filter( 'display_post_states', array( $this, 'display_post_states' ), 0, 2 );
 	}
 
 	/**
@@ -348,6 +351,25 @@ final class Message_Board_Admin_Edit_Forums {
 		}
 
 		return $actions;
+	}
+
+	/**
+	 * Filter for the `post_states` hook.  We're going to replace any defaults and roll our own.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array   $post_states
+	 * @param  object  $post
+	 */
+	public function display_post_states( $post_states, $post ) {
+
+		$states   = array();
+		$forum_id = mb_get_forum_id( $post->ID );
+
+		if ( mb_get_default_forum_id() === $forum_id )
+			$states['default-forum'] = __( 'Default Forum', 'message-board' );
+
+		return $states;
 	}
 
 	/**

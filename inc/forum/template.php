@@ -237,7 +237,7 @@ function mb_get_forum_toggle_trash_link( $forum_id = 0 ) {
 
 	$forum_id = mb_get_topic_id( $forum_id );
 
-	if ( !current_user_can( 'moderate_forum', $forum_id ) )
+	if ( !current_user_can( 'delete_post', $forum_id ) )
 		return '';
 
 	$text = mb_is_forum_trash( $forum_id ) ? __( 'Restore', 'message-board' ) : get_post_status_object( mb_get_trash_post_status() )->label;
