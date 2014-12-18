@@ -49,8 +49,8 @@ foreach ( $pre_title_hooks as $hook ) {
 
 
 /* Reply title filters. */
-add_filter( 'the_title', 'mb_forum_reply_title_filter', 5, 2 );
-add_filter( 'post_title', 'mb_forum_reply_title_filter', 5, 2 );
+add_filter( 'the_title',  'mb_post_title_filter', 5, 2 );
+add_filter( 'post_title', 'mb_post_title_filter', 5, 2 );
 
 /* Edit post link filters. */
 add_filter( 'get_edit_post_link', 'mb_get_edit_post_link', 5, 2 );
@@ -106,8 +106,8 @@ function mb_body_class( $classes ) {
 }
 
 /**
- * Because replies don't get titles by default, we're going to filter the titles to read 
- * "Reply to: $topic_title".
+ * Handles forums, topics, and replies without titles. The titles will use the post ID. By default, 
+ * replies do not have titles and will be replaced with "Reply to: Topic Title".
  *
  * @since  1.0.0
  * @access public
@@ -115,16 +115,41 @@ function mb_body_class( $classes ) {
  * @param  int     $post_title
  * @return string
  */
-function mb_forum_reply_title_filter( $title, $post_id ) {
+function mb_post_title_filter( $title, $post_id ) {
 
-	if ( mb_get_reply_post_type() === get_post_type( $post_id ) ) {
+	$post_type = get_post_type( $post_id );
+
+	/* Forum post type. */
+	if ( empty( $title ) && mb_get_forum_post_type() === $post_type ) {
+
+		/* Translators: Empty forum title "%s" is the forum ID. */
+		$title = sprintf( __( 'Forum #%s', 'message-board' ), $post_id );
+
+	/* Topic post type. */
+	} elseif ( empty( $title ) && mb_get_topic_post_type() === $post_type ) {
+
+		/* Translators: Empty topic title "%s" is the topic ID. */
+		$title = sprintf( __( 'Topic #%s', 'message-board' ), $post_id );
+
+	/* Reply post type. */
+	} elseif ( empty( $title ) && mb_get_reply_post_type() === $post_type ) {
 		$post = get_post( $post_id );
-		if ( 0 >= $post->post_parent || mb_is_reply_orphan( $post_id ) )
-			$title = get_the_ID();
-		else
-			$title = sprintf( __( 'Reply to: %s', 'message-board' ), get_post_field( 'post_title', $post->post_parent ) );
+
+		/* If the reply doesn't have a parent topic. */
+		if ( 0 >= $post->post_parent || mb_is_reply_orphan( $post_id ) ) {
+
+			/* Translators: Empty reply title with no topic (orphan). "%s" is the reply ID. */
+			$title = sprintf( __( 'Reply #%s', 'message-board' ), $post_id );
+
+		/* If the reply does belong to a topic. */
+		} else {
+
+			/* Translators: Empty reply title. "%s" is the topic title. */
+			$title = sprintf( __( 'Reply to: %s', 'message-board' ), mb_get_topic_title( $post->post_parent ) );
+		}
 	}
 
+	/* Return the filtered title. */
 	return $title;
 }
 
