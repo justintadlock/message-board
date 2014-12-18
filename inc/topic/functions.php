@@ -90,7 +90,7 @@ function mb_insert_topic_data( $post ) {
 	/* If we have a forum ID. */
 	if ( 0 < $forum_id ) {
 
-		$topic_count = mb_get_forum_topic_count( $forum_id = 0 );
+		$topic_count = mb_get_forum_topic_count( $forum_id );
 
 		/* Update forum meta. */
 		mb_set_forum_activity_datetime( $forum_id, $post_date                 );

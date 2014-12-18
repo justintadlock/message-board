@@ -71,6 +71,31 @@ function mb_insert_forum_data( $post ) {
 }
 
 /**
+ * Resets a specific forum's data.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  object|int  $post
+ * @return void
+ */
+function mb_reset_forum_data( $post ) {
+
+	$post = is_object( $post ) ? $post : get_post( $post );
+
+	$forum_id         = mb_get_forum_id( $post->ID );
+	$forum_last_topic = mb_get_forum_last_topic_id( $forum_id );
+
+	/* Reset forum topic count. */
+	mb_reset_forum_topic_count( $forum_id );
+
+	/* Reset forum reply count. */
+	mb_reset_forum_reply_count( $forum_id );
+
+	/* Reset forum latest. */
+	mb_reset_forum_latest( $forum_id );
+}
+
+/**
  * Gets a forum's level in the hierarchy.
  *
  * @since  1.0.0

@@ -626,7 +626,58 @@ function mb_before_delete_post( $post_id ) {
  * @param  int     $post_id
  * @return void
  */
-function mb_after_delete_forum( $post_id ) {}
+function mb_after_delete_forum( $post_id ) {
+	global $wpdb;
+
+	$mb = message_board();
+
+	if ( is_object( $mb->deleted_post ) && $mb->deleted_post->ID === $post_id ) {
+
+		$forum_id = mb_get_forum_id( $post_id );
+		$user_id  = mb_get_user_id( $post->deleted_post->post_author );
+
+		$parent_forum_id = $mb->deleted_post->post_parent;
+
+		/* Get the current forum's topic IDs. */
+		$topic_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_parent = %s ORDER BY menu_order DESC", mb_get_topic_post_type(), absint( $forum_id ) ) );
+
+		if ( !empty( $topic_ids ) ) {
+
+			$moved_topics = false;
+
+			while ( 0 < $parent_forum_id ) {
+
+				$forum_type = mb_get_forum_type( $parent_forum_id );
+
+				if ( mb_forum_type_allows_topics( $forum_type ) ) {
+
+					/* Change all of the topics' parents to the new forum ID. */
+					$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET post_parent = %d WHERE ID IN (" . implode( ',', $topic_ids ) . ")", absint( $parent_forum_id ) ) );
+
+					/* Reset data based on new forum. */
+					mb_reset_forum_data( $parent_forum_id );
+
+					$parent_forum_id = 0;
+					$moved_topics    = true;
+
+					/* Break out of the while loop at this point. */
+					break;
+				} else {
+					$post = get_post( $parent_forum_id );
+					$parent_forum_id = $post->post_parent;
+				}
+			}
+
+			/* If topics didn't get moved to a new forum, set their status to "orphan". */
+			if ( false === $moved_topics ) {
+				$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET post_status = %s WHERE ID IN (" . implode( ',', $topic_ids ) . ")", mb_get_orphan_post_status() ) );
+			}
+		}
+
+		/* Reset user forum count. */
+		mb_set_user_forum_count( $user_id );
+	}
+}
 
 /**
  * Callback function on the `after_delete_post` hook for when a topic is deleted.
