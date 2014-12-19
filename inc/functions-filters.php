@@ -149,6 +149,17 @@ function mb_post_title_filter( $title, $post_id ) {
 		}
 	}
 
+	if ( !is_admin() && mb_get_hidden_post_status() === get_post_status( $post_id ) ) {
+
+		/* Translators: Hidden title. */
+		$title = sprintf( __( 'Hidden: %s', 'message-board' ), $title );
+
+	} elseif ( !is_admin() && mb_get_private_post_status() === get_post_status( $post_id ) ) {
+
+		/* Translators: Private title. */
+		$title = sprintf( __( 'Private: %s', 'message-board' ), $title );
+	}
+
 	/* Return the filtered title. */
 	return $title;
 }

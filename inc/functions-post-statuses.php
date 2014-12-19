@@ -28,7 +28,7 @@ add_action( 'before_delete_post', 'mb_before_delete_post' );
 
 /**
  * Returns the slug for the "publish" post status.  Used by replies by default.  Note that this status 
- * is not registered by default because it's a default WordPress post status.
+ * is not registered because it's a default WordPress post status.
  *
  * @since  1.0.0
  * @access public
@@ -40,7 +40,7 @@ function mb_get_publish_post_status() {
 
 /**
  * Returns the slug for the "trash" post status.  Used by forums, topics, and replies by default.  Note 
- * that this status is not registered by default because it's a default WordPress post status.
+ * that this status is not registered because it's a default WordPress post status.
  *
  * @since  1.0.0
  * @access public
@@ -48,6 +48,18 @@ function mb_get_publish_post_status() {
  */
 function mb_get_trash_post_status() {
 	return apply_filters( 'mb_get_trash_post_status', 'trash' );
+}
+
+/**
+ * Returns the slug for the "private" post status.  Used by forums, and topics by default.  Note 
+ * that this status is not registered because it's a default WordPress post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_private_post_status() {
+	return apply_filters( 'mb_get_private_post_status', 'private' );
 }
 
 /**
@@ -70,6 +82,17 @@ function mb_get_open_post_status() {
  */
 function mb_get_close_post_status() {
 	return apply_filters( 'mb_get_close_post_status', 'close' );
+}
+
+/**
+ * Returns the slug for the "hidden" post status.  Used by forums by default.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_hidden_post_status() {
+	return apply_filters( 'mb_get_hidden_post_status', 'hidden' );
 }
 
 /**
@@ -104,7 +127,7 @@ function mb_get_orphan_post_status() {
  * @return array
  */
 function mb_get_forum_post_statuses() {
-	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_trash_post_status() );
+	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_hidden_post_status(), mb_get_private_post_status(), mb_get_trash_post_status() );
 	return apply_filters( 'mb_get_forum_post_statuses', $statuses );
 }
 
@@ -188,8 +211,22 @@ function mb_register_post_statuses() {
 		'label_count'               => _n_noop( 'Orphan <span class="count">(%s)</span>', 'Orphan <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => false,
 		'private'                   => false,
-		'protected'                 => false,
+		'protected'                 => true,
 		'publicly_queryable'        => false,
+		'exclude_from_search'       => true,
+		'show_in_admin_status_list' => true,
+		'show_in_admin_all_list'    => false,
+	);
+
+	/* Hidden status args. */
+	$hidden_args = array(
+		'label'                     => __( 'Hidden', 'message-board' ),
+		'label_verb'                => __( 'Hide',   'message-board' ), // custom
+		'label_count'               => _n_noop( 'Orphan <span class="count">(%s)</span>', 'Orphan <span class="count">(%s)</span>', 'message-board' ),
+		'public'                    => false,
+		'private'                   => false,
+		'protected'                 => true,
+		'publicly_queryable'        => true,
 		'exclude_from_search'       => true,
 		'show_in_admin_status_list' => true,
 		'show_in_admin_all_list'    => false,
@@ -198,6 +235,7 @@ function mb_register_post_statuses() {
 	/* Register post statuses. */
 	register_post_status( mb_get_open_post_status(),   apply_filters( 'mb_open_post_status_args',   $open_args   ) );
 	register_post_status( mb_get_close_post_status(),  apply_filters( 'mb_close_post_status_args',  $close_args  ) );
+	register_post_status( mb_get_hidden_post_status(), apply_filters( 'mb_hidden_post_status_args', $hidden_args ) );
 	register_post_status( mb_get_spam_post_status(),   apply_filters( 'mb_spam_post_status_args',   $spam_args   ) );
 	register_post_status( mb_get_orphan_post_status(), apply_filters( 'mb_orphan_post_status_args', $orphan_args ) );
 }

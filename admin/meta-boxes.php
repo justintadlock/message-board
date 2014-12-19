@@ -53,7 +53,7 @@ function mb_submit_meta_box( $post, $args = array() ) {
 									<?php endif; ?>
 									<?php $status_object = get_post_status_object( $status ); ?>
 									<input type="radio" name="post_status" id="post-status-<?php echo esc_attr( $status ); ?>" value="<?php echo esc_attr( $status ); ?>"<?php checked( $post_status, $status ); ?> /> 
-									<label for="post-status-<?php echo esc_attr( $status ); ?>" class="<?php echo esc_attr( $status ); ?>">
+									<label for="post-status-<?php echo esc_attr( $status ); ?>">
 										<?php echo $status_object->label; ?>
 									</label>
 									<br />

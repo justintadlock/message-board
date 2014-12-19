@@ -55,6 +55,7 @@ function mb_get_forum_capabilities() {
 		'edit_posts'             => 'edit_forums',
 		'edit_others_posts'      => 'edit_others_forums',
 		'publish_posts'          => 'create_forums',
+		'read_hidden_forums'     => 'read_hidden_forums', // custom
 
 		// primitive caps used inside of map_meta_cap()
 		'read'                   => 'read_forums',
@@ -157,8 +158,24 @@ function mb_get_reply_capabilities() {
  */
 function mb_map_meta_cap( $caps, $cap, $user_id, $args ) {
 
+	if ( 'read_post' === $cap && mb_get_forum_post_type() === get_post_type( $args[0] ) ) {
+		$post       = get_post( $args[0] );
+
+		if ( $user_id != $post->post_author ) {
+			$post_type  = get_post_type_object( $post->post_type );
+			$status_obj = get_post_status_object( $post->post_status );
+
+			if ( mb_get_hidden_post_status() === $status_obj->name )
+				$caps[] = $post_type->cap->read_hidden_forums;
+			elseif ( mb_get_private_post_status() === $status_obj->name )
+				$caps[] = $post_type->cap->read_private_posts;
+			else
+				$caps = array();
+				//$caps[] = $post_type->cap->read;
+		}
+
 	/* Meta cap for moderating a single forum. */
-	if ( 'moderate_forum' === $cap ) {
+	} elseif ( 'moderate_forum' === $cap ) {
 
 		$caps = array();
 
