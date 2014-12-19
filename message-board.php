@@ -293,16 +293,19 @@ final class Message_Board {
 			$role->add_cap( 'edit_forums'        );
 			$role->add_cap( 'edit_others_forums' );
 			$role->add_cap( 'moderate_forums'    );
+			$role->add_cap( 'read_forums'        );
 
 			$role->add_cap( 'create_topics'      );
 			$role->add_cap( 'edit_topics'        );
 			$role->add_cap( 'edit_others_topics' );
 			$role->add_cap( 'moderate_topics'    );
+			$role->add_cap( 'read_topics'        );
 
 			$role->add_cap( 'create_replies'      );
 			$role->add_cap( 'edit_replies'        );
 			$role->add_cap( 'edit_others_replies' );
 			$role->add_cap( 'moderate_replies'    );
+			$role->add_cap( 'read_replies'        );
 		}
 	}
 }
