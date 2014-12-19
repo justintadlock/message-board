@@ -322,7 +322,7 @@ final class Message_Board_Admin_Edit_Topics {
 		}
 
 		/* Add spam toggle link if user has permission. */
-		if ( current_user_can( 'moderate_topic', $topic_id ) ) {
+		if ( current_user_can( 'moderate_topic', $topic_id ) && !mb_is_topic_orphan( $topic_id ) ) {
 
 			/* Get post status objects. */
 			$spam_object  = get_post_status_object( mb_get_spam_post_status() );
@@ -340,7 +340,7 @@ final class Message_Board_Admin_Edit_Topics {
 		}
 
 		/* Add open/close toggle link if user has permission and topic is not spam. */
-		if ( current_user_can( 'moderate_topic', $topic_id ) && !mb_is_topic_spam( $topic_id ) ) {
+		if ( current_user_can( 'moderate_topic', $topic_id ) && !mb_is_topic_spam( $topic_id ) && !mb_is_topic_orphan( $topic_id ) ) {
 
 			/* Get post status objects. */
 			$open_object  = get_post_status_object( mb_get_open_post_status()  );
@@ -358,8 +358,8 @@ final class Message_Board_Admin_Edit_Topics {
 			$actions['mb_toggle_open'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $open_url ), mb_is_topic_open() ? 'close' : 'open', $open_text );
 		}
 
-		/* Add sticky toggle link if user has permission and topic is not spam. */
-		if ( current_user_can( 'moderate_topic', $topic_id ) && !mb_is_topic_spam( $topic_id ) ) {
+		/* Add sticky toggle link if user has permission and topic has a public status. */
+		if ( current_user_can( 'moderate_topic', $topic_id ) && mb_is_topic_public( $topic_id ) ) {
 
 			$current_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
 
