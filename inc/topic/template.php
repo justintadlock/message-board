@@ -128,6 +128,21 @@ function mb_get_topic_edit_link( $topic_id = 0 ) {
 /* ====== Topic Status ====== */
 
 /**
+ * Whether the topic's post status is a "public" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return bool
+ */
+function mb_is_topic_public( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id();
+	$status   = get_post_status_object( get_post_status( $topic_id ) );
+
+	return apply_filters( 'mb_is_topic_public', (bool) $status->public, $topic_id );
+}
+
+/**
  * Conditional check to see whether a topic has the "open" post status.
  *
  * @since  1.0.0

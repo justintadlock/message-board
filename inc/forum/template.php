@@ -140,6 +140,21 @@ function mb_is_forum_archive() {
 /* ====== Forum Status ====== */
 
 /**
+ * Whether the forum's post status is a "public" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return bool
+ */
+function mb_is_forum_public( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id();
+	$status   = get_post_status_object( get_post_status( $forum_id ) );
+
+	return apply_filters( 'mb_is_forum_public', (bool) $status->public, $forum_id );
+}
+
+/**
  * Conditional check to see whether a forum has the "open" post status.
  *
  * @since  1.0.0

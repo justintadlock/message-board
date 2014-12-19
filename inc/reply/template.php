@@ -127,6 +127,21 @@ function mb_get_reply_edit_link( $reply_id = 0 ) {
 /* ====== Reply Status ====== */
 
 /**
+ * Whether the reply's post status is a "public" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return bool
+ */
+function mb_is_reply_public( $reply_id = 0 ) {
+	$reply_id = mb_get_reply_id();
+	$status   = get_post_status_object( get_post_status( $reply_id ) );
+
+	return apply_filters( 'mb_is_reply_public', (bool) $status->public, $reply_id );
+}
+
+/**
  * Conditional check to see whether a reply has the "publish" post status.
  *
  * @since  1.0.0
