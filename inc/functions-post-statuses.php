@@ -147,6 +147,9 @@ function mb_register_post_statuses() {
 		'label_verb'                => __( 'Open', 'message-board' ), // custom
 		'label_count'               => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => true,
+		'private'                   => false,
+		'protected'                 => false,
+		'publicly_queryable'        => true,
 		'show_in_admin_status_list' => true,
 		'show_in_admin_all_list'    => true,
 	);
@@ -157,6 +160,9 @@ function mb_register_post_statuses() {
 		'label_verb'                => __( 'Close',  'message-board' ), // custom
 		'label_count'               => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => true,
+		'private'                   => false,
+		'protected'                 => false,
+		'publicly_queryable'        => true,
 		'show_in_admin_status_list' => true,
 		'show_in_admin_all_list'    => true,
 	);
@@ -167,6 +173,9 @@ function mb_register_post_statuses() {
 		'label_verb'                => __( 'Spam', 'message-board' ), // custom
 		'label_count'               => _n_noop( 'Spam <span class="count">(%s)</span>', 'Spam <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => false,
+		'private'                   => false,
+		'protected'                 => false,
+		'publicly_queryable'        => false,
 		'exclude_from_search'       => true,
 		'show_in_admin_status_list' => true,
 		'show_in_admin_all_list'    => false,
@@ -178,6 +187,9 @@ function mb_register_post_statuses() {
 		'label_verb'                => __( 'Orphan', 'message-board' ), // custom
 		'label_count'               => _n_noop( 'Orphan <span class="count">(%s)</span>', 'Orphan <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => false,
+		'private'                   => false,
+		'protected'                 => false,
+		'publicly_queryable'        => false,
 		'exclude_from_search'       => true,
 		'show_in_admin_status_list' => true,
 		'show_in_admin_all_list'    => false,
