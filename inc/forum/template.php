@@ -31,7 +31,7 @@ function mb_forum_query() {
 
 		$defaults = array(
 			'post_type'           => mb_get_forum_post_type(),
-			'post_status'         => array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_hidden_post_status(), mb_get_private_post_status() ),
+			'post_status'         => array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_hidden_post_status(), mb_get_private_post_status(), mb_get_archive_post_status() ),
 			'posts_per_page'      => $per_page,
 			'paged'               => get_query_var( 'paged' ),
 			'orderby'             => array( 'menu_order' => 'ASC', 'title' => 'ASC' ),
@@ -181,6 +181,20 @@ function mb_is_forum_closed( $forum_id = 0 ) {
 	$status   = get_post_status( $forum_id );
 
 	return apply_filters( 'mb_is_forum_closed', mb_get_close_post_status() === $status ? true : false, $forum_id );
+}
+
+/**
+ * Conditional check to see whether a forum has the "archive" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_forum_archived( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+	$status   = get_post_status( $forum_id );
+
+	return apply_filters( 'mb_is_forum_archived', mb_get_archive_post_status() === $status ? true : false, $forum_id );
 }
 
 /**

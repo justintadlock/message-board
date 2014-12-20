@@ -85,6 +85,17 @@ function mb_get_close_post_status() {
 }
 
 /**
+ * Returns the slug for the "archive" post status.  Used by forums by default.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_archive_post_status() {
+	return apply_filters( 'mb_get_archive_post_status', 'archive' );
+}
+
+/**
  * Returns the slug for the "hidden" post status.  Used by forums by default.
  *
  * @since  1.0.0
@@ -127,7 +138,7 @@ function mb_get_orphan_post_status() {
  * @return array
  */
 function mb_get_forum_post_statuses() {
-	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_hidden_post_status(), mb_get_private_post_status(), mb_get_trash_post_status() );
+	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_hidden_post_status(), mb_get_private_post_status(), mb_get_trash_post_status(), mb_get_archive_post_status() );
 	return apply_filters( 'mb_get_forum_post_statuses', $statuses );
 }
 
@@ -190,6 +201,19 @@ function mb_register_post_statuses() {
 		'show_in_admin_all_list'    => true,
 	);
 
+	/* Archive status args. */
+	$archive_args = array(
+		'label'                     => __( 'Archived', 'message-board' ),
+		'label_verb'                => __( 'Archive',  'message-board' ), // custom
+		'label_count'               => _n_noop( 'Archived <span class="count">(%s)</span>', 'Archived <span class="count">(%s)</span>', 'message-board' ),
+		'public'                    => true,
+		'private'                   => false,
+		'protected'                 => false,
+		'publicly_queryable'        => true,
+		'show_in_admin_status_list' => true,
+		'show_in_admin_all_list'    => true,
+	);
+
 	/* Spam status args. */
 	$spam_args = array(
 		'label'                     => __( 'Spam', 'message-board' ),
@@ -233,11 +257,12 @@ function mb_register_post_statuses() {
 	);
 
 	/* Register post statuses. */
-	register_post_status( mb_get_open_post_status(),   apply_filters( 'mb_open_post_status_args',   $open_args   ) );
-	register_post_status( mb_get_close_post_status(),  apply_filters( 'mb_close_post_status_args',  $close_args  ) );
-	register_post_status( mb_get_hidden_post_status(), apply_filters( 'mb_hidden_post_status_args', $hidden_args ) );
-	register_post_status( mb_get_spam_post_status(),   apply_filters( 'mb_spam_post_status_args',   $spam_args   ) );
-	register_post_status( mb_get_orphan_post_status(), apply_filters( 'mb_orphan_post_status_args', $orphan_args ) );
+	register_post_status( mb_get_open_post_status(),    apply_filters( 'mb_open_post_status_args',    $open_args    ) );
+	register_post_status( mb_get_close_post_status(),   apply_filters( 'mb_close_post_status_args',   $close_args   ) );
+	register_post_status( mb_get_archive_post_status(), apply_filters( 'mb_archive_post_status_args', $archive_args ) );
+	register_post_status( mb_get_hidden_post_status(),  apply_filters( 'mb_hidden_post_status_args',  $hidden_args  ) );
+	register_post_status( mb_get_spam_post_status(),    apply_filters( 'mb_spam_post_status_args',    $spam_args    ) );
+	register_post_status( mb_get_orphan_post_status(),  apply_filters( 'mb_orphan_post_status_args',  $orphan_args  ) );
 }
 
 /**
@@ -456,6 +481,18 @@ function mb_open_forum( $forum_id ) {
  */
 function mb_close_forum( $forum_id ) {
 	return mb_update_post_status( $forum_id, mb_get_close_post_status() );
+}
+
+/**
+ * Changes a forum's post status to "archive" if it has a different status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return int|WP_Error
+ */
+function mb_archive_forum( $forum_id ) {
+	return mb_update_post_status( $forum_id, mb_get_archive_post_status() );
 }
 
 /**
