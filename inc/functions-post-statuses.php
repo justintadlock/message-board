@@ -203,8 +203,8 @@ function mb_register_post_statuses() {
 
 	/* Archive status args. */
 	$archive_args = array(
-		'label'                     => __( 'Archived', 'message-board' ),
-		'label_verb'                => __( 'Archive',  'message-board' ), // custom
+		'label'                     => __( 'Archive', 'message-board' ),
+		'label_verb'                => __( 'Archive', 'message-board' ), // custom
 		'label_count'               => _n_noop( 'Archived <span class="count">(%s)</span>', 'Archived <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => true,
 		'private'                   => false,
