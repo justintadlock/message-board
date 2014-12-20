@@ -60,7 +60,7 @@ final class Message_Board {
 	 *
 	 * @since  1.0.0
 	 * @access public
-	 * @var    string
+	 * @var    array
 	 */
 	public $forum_types = array();
 

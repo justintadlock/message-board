@@ -204,22 +204,22 @@ function mb_topic_attributes_meta_box( $post ) {
 	$not_sticky = $is_super || $is_sticky ? false : true; ?>
 
 	<p>
-		<strong><?php _e( 'Sticky Status:', 'message-board' ); ?></strong>
+		<strong><?php _e( 'Topic Type:', 'message-board' ); ?></strong>
 	</p>
 	<p>
 		<label>
 			<input type="radio" name="mb-topic-sticky" value="" <?php checked( $not_sticky, true ); ?> /> 
-			<?php _e( 'Not Sticky', 'message-board' ); ?>
-		</label>
-		<br />
-		<label>
-			<input type="radio" name="mb-topic-sticky" value="sticky" <?php checked( $is_sticky, true ); ?> /> 
-			<?php _e( 'Sticky', 'message-board' ); ?>
+			<?php _e( 'Normal', 'message-board' ); ?>
 		</label>
 		<br />
 		<label>
 			<input type="radio" name="mb-topic-sticky" value="super" <?php checked( $is_super, true ); ?> /> 
 			<?php _e( 'Super Sticky', 'message-board' ); ?>
+		</label>
+		<br />
+		<label>
+			<input type="radio" name="mb-topic-sticky" value="sticky" <?php checked( $is_sticky, true ); ?> /> 
+			<?php _e( 'Sticky', 'message-board' ); ?>
 		</label>
 	</p>
 
