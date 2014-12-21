@@ -215,6 +215,31 @@ function mb_map_meta_cap( $caps, $cap, $user_id, $args ) {
 			}
 		}
 
+	/* Checks if a user can read a specific reply. */
+	} elseif ( 'read_post' === $cap && mb_get_reply_post_type() === get_post_type( $args[0] ) ) {
+
+		$post = get_post( $args[0] );
+
+		/* Only run our code if the user isnt the post author. */
+		if ( $user_id != $post->post_author ) {
+
+			$topic_id = $post->post_parent;
+
+			/* If we have a topic and the user can't read it, don't allow reading the reply. */
+			if ( 0 < $topic_id && !user_can( $user_id, 'read_post', $topic_id ) ) {
+
+				$caps = array( 'do_not_allow' );
+
+			/* If the user can read the topic, check if they can read the reply. */
+			} else {
+
+				$post_type  = get_post_type_object( $post->post_type );
+
+				$caps = array();
+				//$caps[] = $post_type->cap->read;
+			}
+		}
+
 	/* Meta cap for moderating a single forum. */
 	} elseif ( 'moderate_forum' === $cap ) {
 
