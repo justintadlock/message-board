@@ -13,6 +13,9 @@
 /* Override the template hierarchy when viewing the forums. */
 add_filter( 'template_include', 'mb_template_include' );
 
+/* Adds the theme compatibility layer. */
+add_action( 'mb_theme_compat', 'mb_theme_compat' );
+
 /**
  * Returns the theme folder that houses the templates for the plugin.
  *
@@ -170,9 +173,84 @@ function mb_template_include( $template ) {
 	/* Check to see if we can find one of our templates. */
 	$has_template = locate_template( apply_filters( 'mb_template_hierarchy', $_templates, $dir ) );
 
-	/* If we have a template, use it.  Otherwise, fall back to WP. */
-	$template = !empty( $has_template ) ? $has_template : $template;
+	/* Allow devs to overwrite template. */
+	$has_template = apply_filters( 'mb_template_include', $has_template, $dir );
 
-	/* Return the template and allow devs to overwrite. */
-	return apply_filters( 'mb_template_include', $template, $dir );
+	/* If we have a template return it. */
+	if ( $has_template )
+		return $has_template;
+
+	/* Load our fallback if nothing is found at this point. */
+	require_once( trailingslashit( message_board()->dir_path ) . 'templates/board.php' );
+	return '';
+}
+
+function mb_theme_compat() {
+
+
+	/* If viewing a single forum page. */
+	if ( mb_is_single_forum() ) {
+
+		mb_get_template_part( 'content', 'single-forum' );
+	}
+
+	/* If viewing the forum archive (default forum front). */
+	elseif ( mb_is_forum_archive() ) {
+
+		mb_get_template_part( 'content', 'archive-forum' );
+	}
+
+	/* If viewing a single topic. */
+	elseif ( mb_is_single_topic() ) {
+
+		mb_get_template_part( 'content', 'single-topic' );
+	}
+
+	/* If viewing the topic archive (possible forum front page). */
+	elseif ( mb_is_topic_archive() ) {
+
+		mb_get_template_part( 'content', 'archive-topic' );
+	}
+
+	/* If viewing a user sub-page. */
+	elseif ( mb_is_user_page() ) {
+
+		mb_get_template_part( 'content', 'single-user' );
+	}
+
+	/* If viewing a user profile page. */
+	elseif ( mb_is_single_user() ) {
+
+		mb_get_template_part( 'content', 'single-user' );
+	}
+
+	/* If viewing the user archive. */
+	elseif ( mb_is_user_archive() ) {
+
+		mb_get_template_part( 'content', 'archive-user' );
+	}
+
+	/* If viewing the advanced search page. */
+	elseif ( mb_is_search() ) {
+
+		mb_get_template_part( 'content', 'search' );
+	}
+
+	/* If viewing a search results page. */
+	elseif ( mb_is_search_results() ) {
+
+		mb_get_template_part( 'content', 'search-results' );
+	}
+
+	/* If viewing the forum login page. */
+	elseif ( mb_is_forum_login() ) {
+
+		mb_get_template_part( 'content', 'login' );
+	}
+
+	/* If viewing an edit page. */
+	elseif ( mb_is_edit() ) {
+
+		mb_get_template_part( 'content', 'edit' );
+	}
 }
