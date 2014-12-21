@@ -76,6 +76,49 @@ function mb_get_board_home_url() {
 	return apply_filters( 'mb_get_board_home_url', $url );
 }
 
+/* ====== Post Status ====== */
+
+function mb_dropdown_post_status( $args = array() ) {
+
+	$defaults = array(
+		'post_type' => mb_get_forum_post_type(),
+		'exclude'   => '',
+		'name'      => 'post_status',
+		'id'        => 'post_status',
+		'selected'  => '',
+		'echo'      => true
+	);
+
+	$args = wp_parse_args( $args, $defaults );
+
+	if ( mb_get_forum_post_type() === $args['post_type'] )
+		$stati = mb_get_forum_post_statuses();
+
+	elseif ( mb_get_topic_post_type() === $args['post_type'] )
+		$stati = mb_get_topic_post_statuses();
+
+	elseif ( mb_get_reply_post_type() === $args['post_type'] )
+		$stati = mb_get_reply_post_statuses();
+
+	if ( is_array( $args['exclude'] ) )
+		$stati = array_diff( $stati, $args['exclude'] );
+
+	$out = sprintf( '<select name="%s" id="%s">', sanitize_html_class( $args['name'] ), sanitize_html_class( $args['id'] ) );
+
+	foreach ( $stati as $status ) {
+		$status_obj = get_post_status_object( $status );
+
+		$out .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $status_obj->name ), selected( $status_obj->name, $args['selected'], false ), $status_obj->label );
+	}
+
+	$out .= '</select>';
+
+	if ( !$args['echo'] )
+		return $out;
+
+	echo $out;
+}
+
 /* ====== Post ID ====== */
 
 function mb_get_post_id( $post_id = 0 ) {

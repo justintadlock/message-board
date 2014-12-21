@@ -44,21 +44,7 @@ function mb_submit_meta_box( $post, $args = array() ) {
 					<div id="post-status-select" class="hide-if-js">
 						<input type="hidden" name="hidden_post_status" id="hidden_post_status" value="<?php echo esc_attr( ('auto-draft' == $post->post_status ) ? 'draft' : $post->post_status); ?>" />
 							<div id="post_status">
-							<?php foreach ( $avail_statuses as $status ) : ?>
-								<?php if ( mb_get_trash_post_status() !== $status ) : // @todo - Better handling of next line. ?>
-									<?php if ( mb_get_reply_post_type() === $post->post_type ) : ?>
-										<?php $post_status = in_array( $post->post_status, $avail_statuses ) ? $post->post_status : mb_get_publish_post_status(); ?>
-									<?php else : ?>
-										<?php $post_status = in_array( $post->post_status, $avail_statuses ) ? $post->post_status : mb_get_open_post_status(); ?>
-									<?php endif; ?>
-									<?php $status_object = get_post_status_object( $status ); ?>
-									<input type="radio" name="post_status" id="post-status-<?php echo esc_attr( $status ); ?>" value="<?php echo esc_attr( $status ); ?>"<?php checked( $post_status, $status ); ?> /> 
-									<label for="post-status-<?php echo esc_attr( $status ); ?>">
-										<?php echo $status_object->label; ?>
-									</label>
-									<br />
-								<?php endif; ?>
-							<?php endforeach; ?>
+						<?php mb_dropdown_post_status( array( 'post_type' => $post_type, 'selected' => $post->post_status, 'exclude' => array( mb_get_trash_post_status(), mb_get_orphan_post_status() ) ) ); ?>
  <a href="#post_status" class="save-post-status hide-if-no-js button"><?php _e('OK'); ?></a>
  <a href="#post_status" class="cancel-post-status hide-if-no-js button-cancel"><?php _e('Cancel'); ?></a>
 							</div><!-- #post_status -->

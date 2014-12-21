@@ -3,7 +3,7 @@ jQuery( document ).ready( function() {
 	/* ====== Post Screen (post.php, post-new.php) ====== */
 
 	/* Get the original post status in the case the user clicks "Cancel". */
-	var orig_status = jQuery( 'input[name=post_status]:checked' ).attr( 'id' );
+	var orig_status = jQuery( 'select[name=post_status] option:selected' ).val();
 
 	/* When user clicks the "Edit" post status link. */
 	jQuery( 'a.edit-post-status' ).click(
@@ -11,7 +11,7 @@ jQuery( document ).ready( function() {
 			j.preventDefault();
 
 			/* Grab the original status again in case user clicks "OK" or "Cancel" more than once. */
-			orig_status = jQuery( 'input[name=post_status]:checked' ).attr( 'id' );
+			orig_status = jQuery( 'select[name=post_status] option:selected' ).val();
 
 			/* Hide this link. */
 			jQuery( this ).hide();
@@ -46,20 +46,20 @@ jQuery( document ).ready( function() {
 			jQuery( 'a.edit-post-status' ).show();
 
 			/* Check the original status radio since we're canceling. */
-			jQuery( '#' + orig_status ).attr( 'checked', true );
+			jQuery( 'option[value="' + orig_status + '"]' ).attr( 'selected', true );
 
 			/* Change the post status text. */
 			jQuery( 'strong.mb-current-status' ).text( 
-				jQuery( "label[for='" + orig_status + "'" ).text()
+				jQuery( 'option[value="' + orig_status + '"]' ).text()
 			);
 		}
 	);
 
 	/* When a new status is selected, change the post status text to match the selected status. */
-	jQuery( 'input:radio[name=post_status]' ).change(
+	jQuery( 'select[name=post_status]' ).change(
 		function() {
 			jQuery( 'strong.mb-current-status' ).text( 
-				jQuery( "label[for='" + jQuery( this ).attr( 'id' ) + "'" ).text()
+				jQuery( 'option:selected', this ).text()
 			);
 		}
 	);
