@@ -150,7 +150,7 @@ function mb_get_forum_post_statuses() {
  * @return array
  */
 function mb_get_topic_post_statuses() {
-	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_orphan_post_status(), mb_get_spam_post_status(), mb_get_trash_post_status() );
+	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_hidden_post_status(), mb_get_private_post_status(), mb_get_orphan_post_status(), mb_get_spam_post_status(), mb_get_trash_post_status() );
 	return apply_filters( 'mb_get_topic_post_statuses', $statuses );
 }
 
@@ -248,8 +248,8 @@ function mb_register_post_statuses() {
 		'label_verb'                => __( 'Hide',   'message-board' ), // custom
 		'label_count'               => _n_noop( 'Orphan <span class="count">(%s)</span>', 'Orphan <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => false,
-		'private'                   => false,
-		'protected'                 => true,
+		'private'                   => true,
+		'protected'                 => false,
 		'publicly_queryable'        => true,
 		'exclude_from_search'       => true,
 		'show_in_admin_status_list' => true,

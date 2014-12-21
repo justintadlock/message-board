@@ -490,8 +490,9 @@ function mb_forum_link( $forum_id = 0 ) {
  * @return string
  */
 function mb_get_forum_link( $forum_id = 0 ) {
-	$url   = mb_get_forum_url(   $forum_id );
-	$title = mb_get_forum_title( $forum_id );
+	$forum_id = mb_get_forum_id(    $forum_id );
+	$url      = mb_get_forum_url(   $forum_id );
+	$title    = mb_get_forum_title( $forum_id );
 
 	return apply_filters( 'mb_get_forum_link', sprintf( '<a class="forum-link" href="%s">%s</a>', $url, $title ), $forum_id );
 }

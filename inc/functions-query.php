@@ -163,7 +163,7 @@ function mb_pre_get_posts( $query ) {
 	elseif ( !is_admin() && $query->is_main_query() && mb_is_topic_archive() ) {
 
 		$query->set( 'post_type',      mb_get_topic_post_type()    );
-		$query->set( 'post_status',    array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status() ) );
+		$query->set( 'post_status',    array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_hidden_post_status(), mb_get_private_post_status() ) );
 		$query->set( 'posts_per_page', mb_get_topics_per_page()    );
 		$query->set( 'order',          'DESC'                      );
 		$query->set( 'orderby',        'menu_order'                );
