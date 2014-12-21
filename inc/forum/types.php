@@ -28,7 +28,7 @@ function mb_register_forum_types() {
 		'topics_allowed' => true,
 		'_builtin'       => true,
 		'_internal'      => true,
-		'label'          => __( 'Forum', 'message-board' ),
+		'label'          => __( 'Normal', 'message-board' ),
 	);
 
 	/* Category type args. */
