@@ -1,0 +1,35 @@
+/**
+ * Front End CSS Rules. These are only used in the event that the theme does not add support for 
+ * `message-board`.  Otherwise, we leave it up to the theme.
+ */
+
+/* === Forum Meta === */
+
+.ltr .forum .mb-topic-count,
+.ltr .forum .mb-reply-count,
+.ltr .forum .toggle-open-link,
+.ltr .forum .toggle-trash-link { margin-right: 8px; }
+
+/* === Loops === */
+
+.mb-loop-forum,
+.mb-loop-topic { font-size: 17px; }
+
+/* === Title column. === */
+
+.mb-col-title { width: 65%; }
+
+	.ltr .mb-col-title .new-forum-link,
+	.ltr .mb-col-title .new-topic-link { margin-left: 8px; }
+
+	.mb-col-title .forum-link,
+	.mb-col-title .mb-topic-link { font-size: 19px; font-weight: bold; }
+
+	.mb-col-title .mb-forum-content,
+	.mb-col-title .mb-topic-meta { margin-top: 5px; }
+
+		.mb-col-title .mb-forum-content p:last-of-type { margin-bottom: 0; }
+
+/* === Count column. === */
+
+.mb-col-count { width: 15%; }

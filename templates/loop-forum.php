@@ -1,32 +1,48 @@
-<?php if ( mb_forum_query() ) : ?>
-	<table>
+<?php if ( mb_forum_query() ) : // If there are forums to show. ?>
+
+	<table class="mb-loop-forum">
+
 		<thead>
 			<tr>
-				<th>Forum
-					<?php if ( current_user_can( 'create_forums' ) ) : ?>
-					<a href="<?php mb_forum_form_url(); ?>" class="genericon-edit new-topic">New Forum &rarr;</a>
-					<?php endif; ?>
+				<th class="mb-col-title">
+					<?php mb_is_single_forum() ? _e( 'Sub-forums', 'message-board' ) : _e( 'Forums', 'message-board' ); ?> 
+					<?php if ( mb_is_forum_archive() ) mb_forum_form_link(); ?>
 				</th>
-				<th class="num">Topics</th>
-				<th class="num">Posts</th>
+				<th class="mb-col-count">
+					<?php _e( 'Topics / Replies', 'message-board' ); ?>
+				</th>
+				<th class="mb-col-latest">
+					<?php _e( 'Last Post', 'message-board' ); ?>
+				</th>
 			</tr>
 		</thead>
+
 		<tfoot>
 			<tr>
-				<th>Forums</th>
-				<th class="num">Topics</th>
-				<th class="num">Posts</th>
+				<th class="mb-col-title">
+					<?php mb_is_single_forum() ? _e( 'Sub-forums', 'message-board' ) : _e( 'Forums', 'message-board' ); ?>
+				</th>
+				<th class="mb-col-count">
+					<?php _e( 'Topics / Replies', 'message-board' ); ?>
+				</th>
+				<th class="mb-col-latest">
+					<?php _e( 'Last Post', 'message-board' ); ?>
+				</th>
 			</tr>
 		</tfoot>
+
 		<tbody>
+			<?php while ( mb_forum_query() ) : // Loop through the forums. ?>
 
-			<?php while ( mb_forum_query() ) : ?>
+				<?php mb_the_forum(); // Set up forum data. ?>
 
-				<?php mb_the_forum(); ?>
-
-				<tr class="forum">
-					<td>
+				<tr <?php post_class(); ?>>
+					<td class="mb-col-title">
 						<?php mb_forum_link(); ?>
+
+						<div class="mb-forum-content">
+							<?php mb_forum_content(); ?>
+						</div><!-- .mb-forum-content -->
 
 						<?php if ( mb_is_forum_archive() && mb_subforum_query() ) : ?>
 
@@ -38,11 +54,24 @@
 							</div>
 
 						<?php endif; ?>
-					</td>
-					<td class="num"><?php mb_forum_topic_count(); ?></td>
-					<td class="num"><?php mb_forum_post_count(); ?></td>
+					</td><!-- .mb-col-title -->
+
+					<td class="mb-col-count">
+						<?php printf( __( 'Topics: %s', 'message-board' ), mb_get_forum_topic_count() ); ?><br />
+						<?php printf( __( 'Replies: %s', 'message-board' ), mb_get_forum_reply_count() ); ?>
+					</td><!-- .mb-col-count -->
+
+					<td class="mb-col-latest">
+						<?php mb_forum_last_topic_link(); ?><br />
+						<?php printf( __( 'By %s', 'message-board' ), mb_get_forum_last_poster() ); ?><br />
+						<a href="<?php mb_forum_last_post_url(); ?>"><?php mb_forum_last_active_time(); ?> ago</a> 
+					</td><!-- .mb-col-latest -->
 				</tr>
-			<?php endwhile; ?>
+
+			<?php endwhile; // End forum loop. ?>
+
 		</tbody>
-	</table>
-<?php endif; ?>
+
+	</table><!-- .mb-loop-forum -->
+
+<?php endif; // End check for forums. ?>

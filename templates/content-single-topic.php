@@ -28,7 +28,7 @@
 
 	<?php if ( current_user_can( 'read_topic', mb_get_topic_id() ) ) : ?>
 
-		<ol id="thread" class="comment-list">
+		<ol id="mb-thread" class="comment-list mb-thread">
 
 			<?php if ( mb_show_lead_topic() && mb_topic_query() ) : ?>
 

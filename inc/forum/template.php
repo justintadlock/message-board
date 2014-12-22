@@ -676,8 +676,9 @@ function mb_forum_last_poster( $forum_id = 0 ) {
 function mb_get_forum_last_poster( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 	$reply_id = mb_get_forum_last_reply_id( $forum_id );
+	$topic_id = mb_get_forum_last_reply_id( $forum_id );
 
-	$author = !empty( $reply_id ) ? mb_get_reply_author( $reply_id ) : mb_get_forum_author( $forum_id );
+	$author = $reply_id > $topic_id ? mb_get_reply_author( $reply_id ) : mb_get_topic_author( $topic_id );
 
 	return apply_filters( 'mb_get_forum_last_poster', $author, $reply_id, $forum_id );
 }
@@ -723,8 +724,9 @@ function mb_forum_last_post_url( $forum_id = 0 ) {
 function mb_get_forum_last_post_url( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 	$reply_id = mb_get_forum_last_reply_id( $forum_id );
+	$topic_id = mb_get_forum_last_topic_id( $forum_id );
 
-	$url = !empty( $reply_id ) ? mb_get_reply_url( $reply_id ) : mb_get_post_jump_url( $forum_id );
+	$url = $reply_id > $topic_id ? mb_get_reply_url( $reply_id ) : mb_get_topic_url( $topic_id );
 
 	return apply_filters( 'mb_get_forum_last_post_url', $url, $reply_id, $forum_id );
 }
@@ -739,6 +741,43 @@ function mb_get_forum_last_topic_id( $forum_id ) {
 	$topic_id = get_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(), true );
 
 	return !empty( $topic_id ) ? absint( $topic_id ) : 0;
+}
+
+/* ====== Last Topic URL ====== */
+
+function mb_forum_last_topic_url( $forum_id = 0 ) {
+	echo mb_get_forum_last_topic_url( $forum_id );
+}
+
+function mb_get_forum_last_topic_url( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+	$topic_id = mb_get_forum_last_topic_id( $forum_id );
+
+	return mb_get_topic_url( $topic_id );
+}
+
+function mb_forum_last_topic_link( $forum_id = 0 ) {
+	echo mb_get_forum_last_topic_link( $forum_id );
+}
+
+function mb_get_forum_last_topic_link( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	$url   = mb_get_forum_last_topic_url(   $forum_id );
+	$title = mb_get_forum_last_topic_title( $forum_id );
+
+	return sprintf( '<a href="%s">%s</a>', $url, $title );
+}
+
+function mb_forum_last_topic_title( $forum_id = 0 ) {
+	echo mb_get_forum_last_topic_title( $forum_id );
+}
+
+function mb_get_forum_last_topic_title( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+	$topic_id = mb_get_forum_last_topic_id( $forum_id );
+
+	return mb_get_topic_title( $topic_id );
 }
 
 /* ====== Subforums ====== */

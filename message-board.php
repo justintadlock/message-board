@@ -257,6 +257,9 @@ final class Message_Board {
 		/* Internationalize the text strings used. */
 		add_action( 'plugins_loaded', array( $this, 'i18n' ), 2 );
 
+		/* Add front end styles. */
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
 		/* Register activation hook. */
 		register_activation_hook( __FILE__, array( $this, 'activation' ) );
 	}
@@ -270,6 +273,19 @@ final class Message_Board {
 	 */
 	public function i18n() {
 		load_plugin_textdomain( 'message-board', false, 'message-board/languages' );
+	}
+
+	/**
+	 * Loads the front end stylesheet in case the theme doesn't support the plugin.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function enqueue_scripts() {
+
+		if ( !current_theme_supports( 'message-board' ) )
+			wp_enqueue_style( 'message-board', trailingslashit( $this->dir_uri ) . 'css/style.css' );
 	}
 
 	/**

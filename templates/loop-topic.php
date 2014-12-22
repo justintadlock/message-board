@@ -1,43 +1,58 @@
+<?php if ( mb_topic_query() ) : // If there are any topics to show. ?>
 
-	<?php if ( mb_topic_query() ) : // Checks if any posts were found. ?>
-<table>
-	<thead>
-		<tr>
-			<th>Topics <?php mb_topic_form_link(); ?></th>
-			<th class="num">Posts</th>
-		</tr>
-	</thead>
-	<tfoot>
-		<tr>
-			<th>Topics</th>
-			<th class="num">Posts</th>
-		</tr>
-	</tfoot>
-	<tbody>
+	<table class="mb-loop-topic">
 
-		<?php while ( mb_topic_query() ) : // Begins the loop through found posts. ?>
+		<thead>
+			<tr>
+				<th class="mb-col-title"><?php _e( 'Topics', 'message-board' ); ?> <?php mb_topic_form_link(); ?></th>
+				<th class="mb-col-count"><?php _e( 'Replies / Views', 'message-board' ); ?></th>
+				<th class="m-col-latest"><?php _e( 'Last Post', 'message-board' ); ?></th>
+			</tr>
+		</thead>
 
-			<?php mb_the_topic(); // Loads the post data. ?>
+		<tfoot>
+			<tr>
+				<th class="mb-col-title"><?php _e( 'Topics', 'message-board' ); ?></th>
+				<th class="mb-col-count"><?php _e( 'Replies / Views', 'message-board' ); ?></th>
+				<th class="m-col-latest"><?php _e( 'Last Post', 'message-board' ); ?></th>
+			</tr>
+		</tfoot>
 
-	<tr class="<?php echo mb_is_topic_super() ? 'sticky' : ''; ?>">
-		<td>
-			<a class="topic-link" href="<?php mb_topic_url(); ?>"><?php mb_topic_title(); ?></a>
-			<div class="entry-meta">
-				<?php mb_topic_labels(); ?>
-				Last post 
-				<a href="<?php mb_topic_last_post_url(); ?>"><?php mb_topic_last_active_time(); ?> ago</a> 
-				by <?php mb_topic_last_poster(); ?>
-			</div><!-- .entry-meta -->
-		</td>
-		<td class="num">
-			<a href="<?php mb_topic_last_post_url(); ?>"><?php mb_topic_post_count(); ?></a>
-		</td>
-	</tr>
-		<?php endwhile; // End found posts loop. ?>
+		<tbody>
 
+			<?php while ( mb_topic_query() ) : // Loop through the topics. ?>
 
-	</tbody>
-</table>
-		<?php locate_template( array( 'misc/loop-nav.php' ), true ); // Loads the misc/loop-nav.php template. ?>
+				<?php mb_the_topic(); // Sets up the topic data. ?>
 
-	<?php endif; // End check for posts. ?>
+				<tr <?php post_class(); ?>>
+
+					<td class="mb-col-title">
+						<?php mb_topic_link(); ?>
+						<div class="mb-topic-meta">
+							<?php mb_topic_labels(); ?>
+							<?php printf( __( 'Started by %s', 'message-board' ), mb_get_topic_author_profile_link() ); ?> 
+							<?php mb_topic_date(); ?> 
+							<?php mb_topic_time(); ?>
+						</div><!-- .mb-topic-meta -->
+					</td><!-- .mb-col-title -->
+
+					<td class="mb-col-count">
+						<?php printf( __( 'Replies: %s', 'message-board' ), mb_get_topic_reply_count() ); ?><br />
+						<?php printf( __( 'Views: %s', 'message-board' ), 0 /*mb_get_topic_view_count()*/ ); ?>
+					</td><!-- .mb-col-count -->
+
+					<td class="mb-col-latest">
+						<?php mb_topic_last_poster(); ?><br />
+						<a href="<?php mb_topic_last_post_url(); ?>"><?php mb_topic_last_active_time(); ?> ago</a> 
+					</td><!-- .mb-col-latest -->
+				</tr>
+
+			<?php endwhile; // End topics loop. ?>
+
+		</tbody>
+
+	</table><!-- .mb-loop-topic -->
+
+	<?php locate_template( array( 'misc/loop-nav.php' ), true ); // Loads the misc/loop-nav.php template. ?>
+
+<?php endif; // End check for topics. ?>

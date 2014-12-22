@@ -565,7 +565,65 @@ function mb_get_topic_link( $topic_id = 0 ) {
 	$url   = mb_get_topic_url(   $topic_id );
 	$title = mb_get_topic_title( $topic_id );
 
-	return apply_filters( 'mb_get_topic_link', sprintf( '<a href="%s">%s</a>', $url, $title ), $topic_id );
+	return apply_filters( 'mb_get_topic_link', sprintf( '<a class="mb-topic-link" href="%s">%s</a>', $url, $title ), $topic_id );
+}
+
+/**
+ * Displays the topic date.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id,
+ * @param  string  $format
+ * @return void
+ */
+function mb_topic_date( $topic_id = 0, $format = '' ) {
+	echo mb_get_topic_date( $topic_id, $format );
+}
+
+/**
+ * Returns the topic date.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id,
+ * @param  string  $format
+ * @return void
+ */
+function mb_get_topic_date( $topic_id = 0, $format = '' ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$format   = !empty( $format ) ? $format : get_option( 'date_format' );
+
+	return get_post_time( $format, false, $topic_id, true );
+}
+
+/**
+ * Displays the topic time.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id,
+ * @param  string  $format
+ * @return void
+ */
+function mb_topic_time( $topic_id = 0, $format = '' ) {
+	echo mb_get_topic_time( $topic_id, $format );
+}
+
+/**
+ * Returns the topic time.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id,
+ * @param  string  $format
+ * @return void
+ */
+function mb_get_topic_time( $topic_id = 0, $format = '' ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$format   = !empty( $format ) ? $format : get_option( 'time_format' );
+
+	return get_post_time( $format, false, $topic_id, true );
 }
 
 /* ====== Topic Author ====== */
