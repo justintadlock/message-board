@@ -9,7 +9,7 @@ if ( mb_is_single_forum() && !mb_forum_type_allows_topics( mb_get_forum_type() )
 	return;
 ?>
 
-<form id="mb-topic-form" method="post" action="<?php mb_board_home_url(); ?>">
+<form id="mb-topic-form" class="mb-form-topic" method="post" action="<?php mb_board_home_url(); ?>">
 
 	<fieldset>
 		<legend><?php _e( 'Add New Topic', 'message-board' ); ?></legend>
@@ -21,8 +21,8 @@ if ( mb_is_single_forum() && !mb_forum_type_allows_topics( mb_get_forum_type() )
 
 		<?php if ( !mb_is_single_forum() ) : ?>
 
-			<p class="mb-form-forum-id">
-				<label for="mb_forum_id"><?php _e( 'Select A Forum', 'message-board' ); ?></label>
+			<p class="mb-form-parent">
+				<label for="mb_forum_id"><?php _e( 'Forum', 'message-board' ); ?></label>
 				<?php mb_dropdown_forums(
 					array(
 						'child_type' => mb_get_topic_post_type(),
@@ -33,6 +33,26 @@ if ( mb_is_single_forum() && !mb_forum_type_allows_topics( mb_get_forum_type() )
 			</p>
 
 		<?php endif; ?>
+
+		<p class="mb-form-type">
+			<label for="mb_topic_type"><?php _e( 'Topic Type:', 'message-board' ); ?></label>
+			<select id="mb_topic_type" name="mb_topic_type">
+				<option value="normal"><?php _e( 'Normal', 'message-board' ); ?></option>
+				<option value="super"><?php _e( 'Super', 'message-board' ); ?></option>
+				<option value="sticky"><?php _e( 'Sticky', 'message-board' ); ?></option>
+			</select>
+		</p>
+
+		<p class="mb-form-status">
+			<label for="mb_post_status"><?php _e( 'Status:', 'message-board' ); ?></label>
+			<?php mb_dropdown_post_status(
+				array(
+					'post_type' => mb_get_topic_post_type(),
+					'name'      => 'mb_post_status',
+					'id'        => 'mb_post_status'
+				)
+			); ?>
+		</p>
 
 		<p class="mb-form-content">
 			<label for="mb_topic_content"><?php _e( 'Please put code in between <code>`backtick`</code> characters.', 'message-board' ); ?></label>

@@ -62,7 +62,7 @@ add_filter( 'get_edit_user_link', 'mb_get_edit_user_link_filter', 5, 2 );
 add_filter( 'wp_title',   'mb_wp_title'   );
 
 /* Filter the front-end `<body>` classes. */
-add_filter( 'body_class', 'mb_body_class' );
+add_filter( 'body_class', 'mb_body_class', 15 );
 
 /**
  * Filters `wp_title` to handle the title on the forum front page since this is a non-standard WP page.
@@ -94,11 +94,52 @@ function mb_body_class( $classes ) {
 	global $wp;
 
 	if ( mb_is_message_board() ) {
-		$classes[] = 'forum';
+		$classes[] = 'mb';
 		$classes[] = 'bbpress'; // temporary class for compat
+
+		$forum_type = mb_get_forum_post_type();
+		$topic_type = mb_get_topic_post_type();
+		$reply_type = mb_get_reply_post_type();
+
+		$_classes = $classes;
+		$remove   = array(
+			"single-{$forum_type}",
+			"single-{$topic_type}",
+			"single-{$reply_type}",
+			"singular-{$forum_type}",
+			"singular-{$topic_type}",
+			"singular-{$reply_type}",
+			"archive-{$forum_type}",
+			"archive-{$topic_type}",
+			"archive-{$reply_type}"
+		);
+
+		foreach ( $_classes as $class_key => $class_value ) {
+
+			if ( in_array( $class_value, $remove ) )
+				unset( $classes[ $class_key ] );
+		}
 
 		if ( mb_is_forum_front() ) {
 			$classes[] = 'forum-front';
+
+		} elseif ( mb_is_single_forum() ) {
+			$classes[] = 'single-forum';
+
+		} elseif ( mb_is_single_topic() ) {
+			$classes[] = 'single-topic';
+
+		} elseif ( mb_is_single_reply() ) {
+			$classes[] = 'single-reply';
+
+		} elseif ( mb_is_forum_archive() ) {
+			$classes[] = 'archive-forum';
+
+		} elseif ( mb_is_topic_archive() ) {
+			$classes[] = 'archive-topic';
+
+		} elseif ( mb_is_reply_archive() ) {
+			$classes[] = 'archive-reply';
 		}
 	}
 

@@ -30,6 +30,69 @@
 
 		.mb-col-title .mb-forum-content p:last-of-type { margin-bottom: 0; }
 
+	.mb-col-title .mb-subforum-list {
+		list-style: none;
+		margin:     5px 0 0 0;
+		padding:    0;
+	}
+
+		.mb-col-title .mb-subforum-list li { display: inline-block; }
+
+			.ltr .mb-col-title .mb-subforum-list li { margin-right: 8px; }
+
+			.mb-col-title .mb-subforum-list .forum-link { font-size: 17px; font-weight: normal; }
+
 /* === Count column. === */
 
 .mb-col-count { width: 15%; }
+
+
+/* ====== Forms ====== */
+
+/* === Form: Forum === */
+
+.mb-form-forum .mb-form-parent,
+.mb-form-forum .mb-form-type,
+.mb-form-forum .mb-form-status,
+.mb-form-forum .mb-form-order {
+	float:        left;
+	width:        22%;
+	margin-right: 4%;
+}
+
+.mb-form-forum .mb-form-order {
+	float:        right;
+	margin-right: 0;
+}
+
+.mb-form-forum .mb-form-content { clear: both; }
+
+/* === Form: Topic === */
+
+.mb-form-topic .mb-form-parent,
+.mb-form-topic .mb-form-type,
+.mb-form-topic .mb-form-status {
+	float:        left;
+	width:        30%;
+	margin-right: 5%;
+}
+
+.mb-form-parent + .mb-form-type + .mb-form-status {
+	float:        right;
+	margin-right: 0;
+}
+
+.mb-form-topic .mb-form-content { clear: both; }
+
+
+
+
+
+
+
+
+
+
+
+
+

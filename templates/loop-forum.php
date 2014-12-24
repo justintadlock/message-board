@@ -46,12 +46,12 @@
 
 						<?php if ( mb_is_forum_archive() && mb_subforum_query() ) : ?>
 
-							<div class="entry-meta">
+							<ul class="mb-subforum-list">
 								<?php while ( mb_subforum_query() ) : ?>
 									<?php mb_the_subforum(); ?>
-									<?php mb_forum_link(); ?> (<?php mb_forum_topic_count(); ?>)
+									<li><?php mb_forum_link(); ?> (<?php mb_forum_topic_count(); ?>)</li>
 								<?php endwhile; ?>
-							</div>
+							</ul><!-- .mb-subforum-list -->
 
 						<?php endif; ?>
 					</td><!-- .mb-col-title -->
