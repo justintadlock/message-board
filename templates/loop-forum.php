@@ -8,12 +8,8 @@
 					<?php mb_is_single_forum() ? _e( 'Sub-forums', 'message-board' ) : _e( 'Forums', 'message-board' ); ?> 
 					<?php if ( mb_is_forum_archive() ) mb_forum_form_link(); ?>
 				</th>
-				<th class="mb-col-count">
-					<?php _e( 'Topics / Replies', 'message-board' ); ?>
-				</th>
-				<th class="mb-col-latest">
-					<?php _e( 'Last Post', 'message-board' ); ?>
-				</th>
+				<th class="mb-col-count"><?php _e( 'Topics / Replies', 'message-board' ); ?></th>
+				<th class="mb-col-latest"><?php _e( 'Last Post', 'message-board' ); ?></th>
 			</tr>
 		</thead>
 
@@ -22,12 +18,8 @@
 				<th class="mb-col-title">
 					<?php mb_is_single_forum() ? _e( 'Sub-forums', 'message-board' ) : _e( 'Forums', 'message-board' ); ?>
 				</th>
-				<th class="mb-col-count">
-					<?php _e( 'Topics / Replies', 'message-board' ); ?>
-				</th>
-				<th class="mb-col-latest">
-					<?php _e( 'Last Post', 'message-board' ); ?>
-				</th>
+				<th class="mb-col-count"><?php _e( 'Topics / Replies', 'message-board' ); ?></th>
+				<th class="mb-col-latest"><?php _e( 'Last Post', 'message-board' ); ?></th>
 			</tr>
 		</tfoot>
 
@@ -37,6 +29,7 @@
 				<?php mb_the_forum(); // Set up forum data. ?>
 
 				<tr <?php post_class(); ?>>
+
 					<td class="mb-col-title">
 						<?php mb_forum_link(); ?>
 

@@ -26,13 +26,17 @@
 
 	.mb-col-title .forum-link,
 	.mb-col-title .mb-topic-link,
+	.mb-col-title .mb-reply-link,
 	.archive-user .mb-col-title .user-profile-link { font-size: 19px; font-weight: bold; }
 
 	.mb-col-title .mb-forum-content,
 	.mb-col-title .mb-topic-meta,
+	.mb-col-title .mb-reply-meta,
+	.mb-col-title .mb-reply-summary,
 	.mb-col-title .mb-user-description { margin-top: 5px; }
 
-		.mb-col-title .mb-forum-content p:last-of-type { margin-bottom: 0; }
+		.mb-col-title .mb-forum-content p:last-of-type,
+		.mb-col-title .mb-reply-summary p:last-of-type { margin-bottom: 0; }
 
 	.mb-col-title .mb-subforum-list {
 		list-style: none;
@@ -52,6 +56,8 @@
 
 
 /* ====== Forms ====== */
+
+.mb form .description { font-size: 17px; font-style: italic; font-weight: 400; }
 
 /* === Form: Forum === */
 

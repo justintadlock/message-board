@@ -1,37 +1,53 @@
+<?php if ( mb_reply_query() ) : // Checks if any posts were found. ?>
 
-	<?php if ( mb_reply_query() ) : // Checks if any posts were found. ?>
-<table>
-	<thead>
-		<tr>
-			<th>Replies</th>
-			<th>Created</th>
-		</tr>
-	</thead>
-	<tfoot>
-		<tr>
-			<th>Replies</th>
-			<th>Created</th>
-		</tr>
-	</tfoot>
-	<tbody>
+	<table class="mb-loop-reply">
 
-		<?php while ( mb_reply_query() ) : // Begins the loop through found posts. ?>
+		<thead>
+			<tr>
+				<th class="mb-col-title"><?php _e( 'Replies', 'message-board' ); ?></th>
+				<th class="mb-col-datetime"><?php _e( 'Created', 'message-board' ); ?></th>
+				<th class="mb-col-author"><?php _e( 'Author', 'message-board' ); ?></th>
+			</tr>
+		</thead>
 
-			<?php mb_the_reply(); // Loads the post data. ?>
+		<tfoot>
+			<tr>
+				<th class="mb-col-title"><?php _e( 'Replies', 'message-board' ); ?></th>
+				<th class="mb-col-datetime"><?php _e( 'Created', 'message-board' ); ?></th>
+				<th class="mb-col-author"><?php _e( 'Author', 'message-board' ); ?></th>
+			</tr>
+		</tfoot>
 
-	<tr>
-		<td>
-			<a class="reply-link" href="<?php mb_reply_url(); ?>"><?php mb_reply_title(); ?></a>
-		</td>
-		<td class="num">
-			<?php echo get_the_date(); ?>
-		</td>
-	</tr>
-		<?php endwhile; // End found posts loop. ?>
+		<tbody>
 
+			<?php while ( mb_reply_query() ) : // Begins the loop through found posts. ?>
 
-	</tbody>
-</table>
-		<?php locate_template( array( 'misc/loop-nav.php' ), true ); // Loads the misc/loop-nav.php template. ?>
+				<?php mb_the_reply(); // Loads the post data. ?>
 
-	<?php endif; // End check for posts. ?>
+				<tr>
+					<td class="mb-col-title">
+						<?php mb_reply_link(); ?>
+						<div class="mb-reply-summary">
+							<?php the_excerpt(); ?>
+						</div><!-- .mb-reply-summary -->
+					</td><!-- .mb-col-title -->
+
+					<td class="mb-col-datetime">
+						<?php mb_reply_date(); ?><br />
+						<?php mb_reply_time(); ?>
+					</td><!-- .mb-col-datetime -->
+
+					<td class="mb-col-author">
+						<?php mb_reply_author_profile_link(); ?>
+					</td><!-- .mb-col-author -->
+				</tr>
+
+			<?php endwhile; // End found posts loop. ?>
+
+		</tbody>
+
+	</table><!-- .mb-loop-reply -->
+
+	<?php locate_template( array( 'misc/loop-nav.php' ), true ); // Loads the misc/loop-nav.php template. ?>
+
+<?php endif; // End check for posts. ?>

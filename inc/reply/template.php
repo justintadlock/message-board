@@ -341,6 +341,91 @@ function mb_get_reply_url( $reply_id = 0 ) {
 	return apply_filters( 'mb_get_reply_url', mb_get_post_url( $reply_id ), $reply_id );
 }
 
+/**
+ * Displays the reply link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
+function mb_reply_link( $reply_id = 0 ) {
+	echo mb_get_reply_link( $reply_id );
+}
+
+/**
+ * Returns the reply link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return string
+ */
+function mb_get_reply_link( $reply_id = 0 ) {
+	$url   = mb_get_reply_url(   $reply_id );
+	$title = mb_get_reply_title( $reply_id );
+
+	return apply_filters( 'mb_get_reply_link', sprintf( '<a class="mb-reply-link" href="%s">%s</a>', $url, $title ), $reply_id );
+}
+
+/**
+ * Displays the reply date.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id,
+ * @param  string  $format
+ * @return void
+ */
+function mb_reply_date( $reply_id = 0, $format = '' ) {
+	echo mb_get_reply_date( $reply_id, $format );
+}
+
+/**
+ * Returns the reply date.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id,
+ * @param  string  $format
+ * @return void
+ */
+function mb_get_reply_date( $reply_id = 0, $format = '' ) {
+	$reply_id = mb_get_reply_id( $reply_id );
+	$format   = !empty( $format ) ? $format : get_option( 'date_format' );
+
+	return get_post_time( $format, false, $reply_id, true );
+}
+
+/**
+ * Displays the reply time.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id,
+ * @param  string  $format
+ * @return void
+ */
+function mb_reply_time( $reply_id = 0, $format = '' ) {
+	echo mb_get_reply_time( $reply_id, $format );
+}
+
+/**
+ * Returns the reply time.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id,
+ * @param  string  $format
+ * @return void
+ */
+function mb_get_reply_time( $reply_id = 0, $format = '' ) {
+	$reply_id = mb_get_reply_id( $reply_id );
+	$format   = !empty( $format ) ? $format : get_option( 'time_format' );
+
+	return get_post_time( $format, false, $reply_id, true );
+}
+
 /* ====== Reply Author ====== */
 
 function mb_reply_author_id( $reply_id = 0 ) {
