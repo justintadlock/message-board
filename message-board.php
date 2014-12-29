@@ -115,6 +115,16 @@ final class Message_Board {
 	public $search_query;
 
 	/**
+	 * User query. This holds the results of `get_users()` and is particularly useful for the user 
+	 * archive page.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @var    object|null
+	 */
+	public $user_query = null;
+
+	/**
 	 * Used for temporarily saving a deleted post object.
 	 *
 	 * @since  1.0.0

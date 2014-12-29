@@ -148,6 +148,20 @@ function mb_get_reply_capabilities() {
 	return apply_filters( 'mb_get_reply_capabilities', $caps );
 }
 
+function mb_user_can( $user_id, $cap, $post_id ) {
+
+	// @todo Check hierarchy.
+	if ( 0 >= $user_id && in_array( $cap, array( 'read_forum', 'read_topic', 'read_reply' ) ) ) {
+
+		$status_obj = get_post_status_object( get_post_status( $post_id ) );
+
+		if ( false === $status_obj->private && false === $status_obj->protected )
+			return true;
+	}
+
+	return user_can( $user_id, $cap, $post_id );
+}
+
 /**
  * Overwrites capabilities in certain scenarios.
  *
@@ -161,12 +175,8 @@ function mb_get_reply_capabilities() {
  */
 function mb_map_meta_cap( $caps, $cap, $user_id, $args ) {
 
-	if ( in_array( $cap, array( 'read_forum', 'read_topic', 'read_reply' ) ) ) {
-
-		map_meta_cap( 'read_post', $user_id, $args[0] );
-
 	/* Checks if a user can read a specific forum. */
-	} elseif ( 'read_post' === $cap && mb_get_forum_post_type() === get_post_type( $args[0] ) ) {
+	if ( 'read_post' === $cap && mb_get_forum_post_type() === get_post_type( $args[0] ) ) {
 		$post       = get_post( $args[0] );
 
 		if ( $user_id != $post->post_author ) {
@@ -187,13 +197,13 @@ function mb_map_meta_cap( $caps, $cap, $user_id, $args ) {
 
 		$post = get_post( $args[0] );
 
-		/* Only run our code if the user isnt the post author. */
+		/* Only run our code if the user isn't the post author. */
 		if ( $user_id != $post->post_author ) {
 
 			$forum_id = $post->post_parent;
 
 			/* If we have a forum and the user can't read it, don't allow reading the topic. */
-			if ( 0 < $forum_id && !user_can( $user_id, 'read_post', $forum_id ) ) {
+			if ( 0 < $forum_id && !mb_user_can( $user_id, 'read_forum', $forum_id ) ) {
 
 				$caps = array( 'do_not_allow' );
 
@@ -220,7 +230,7 @@ function mb_map_meta_cap( $caps, $cap, $user_id, $args ) {
 
 		$post = get_post( $args[0] );
 
-		/* Only run our code if the user isnt the post author. */
+		/* Only run our code if the user isn't the post author. */
 		if ( $user_id != $post->post_author ) {
 
 			$topic_id = $post->post_parent;

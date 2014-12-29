@@ -140,6 +140,9 @@ function mb_body_class( $classes ) {
 
 		} elseif ( mb_is_reply_archive() ) {
 			$classes[] = 'archive-reply';
+
+		} elseif ( mb_is_user_archive() ) {
+			$classes[] = 'archive-user';
 		}
 	}
 

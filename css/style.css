@@ -13,7 +13,9 @@
 /* === Loops === */
 
 .mb-loop-forum,
-.mb-loop-topic { font-size: 17px; }
+.mb-loop-topic,
+.mb-loop-reply,
+.mb-loop-user { font-size: 17px; }
 
 /* === Title column. === */
 
@@ -23,10 +25,12 @@
 	.ltr .mb-col-title .new-topic-link { margin-left: 8px; }
 
 	.mb-col-title .forum-link,
-	.mb-col-title .mb-topic-link { font-size: 19px; font-weight: bold; }
+	.mb-col-title .mb-topic-link,
+	.archive-user .mb-col-title .user-profile-link { font-size: 19px; font-weight: bold; }
 
 	.mb-col-title .mb-forum-content,
-	.mb-col-title .mb-topic-meta { margin-top: 5px; }
+	.mb-col-title .mb-topic-meta,
+	.mb-col-title .mb-user-description { margin-top: 5px; }
 
 		.mb-col-title .mb-forum-content p:last-of-type { margin-bottom: 0; }
 
@@ -84,10 +88,39 @@
 
 .mb-form-topic .mb-form-content { clear: both; }
 
+/* ====== Topic Thread ====== */
+
+.mb-thread { list-style: none; }
+
+	.ltr .mb-thread,
+	.ltr .mb-thread li { margin-left: 0; padding-left: 0; }
+
+	.mb-thread .mb-topic-header,
+	.mb-thread .mb-reply-header { margin-bottom: 1.5rem; }
+
+		.ltr .mb-thread .mb-topic-permalink,
+		.ltr .mb-thread .mb-reply-permalink { float: right; text-align: right; }
+
+	.mb-thread .mb-author-box { width: 25%; }
+
+		.ltr .mb-thread .mb-author-box { float: left; margin-right: 5%; }
+
+		.mb-author-box .avatar { width: 80px; height: 80px; }
+
+		.mb-author-box .mb-author-info { clear: both; }
 
 
+/* ====== User Profile ====== */
 
+.mb-user-page-links { list-style: none; }
 
+	.ltr .mb-user-page-links { margin-left: 0; padding-left: 0; }
+
+	.mb-user-page-links li { display: inline-block; }
+
+		.ltr .mb-user-page-links li { margin-right: 8px; }
+
+.mb-user-info { float: left; }
 
 
 

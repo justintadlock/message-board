@@ -1,5 +1,48 @@
 <?php
 
+function mb_user_query() {
+	$mb = message_board();
+
+	/* If a query has already been created, let's roll. */
+	if ( !is_null( $mb->user_query ) ) {
+
+		if ( $mb->user_query->current_user + 1 <= $mb->user_query->found_users )
+			return true;
+
+		return false;
+	}
+
+	$page = is_paged() ? absint( get_query_var( 'paged' ) ) : 1;
+
+	$offset = 1 === $page ? '' : ( $page - 1 ) * mb_get_users_per_page();
+
+	$mb->user_query = new WP_User_Query(
+		array(
+			'orderby'      => 'login',
+			'order'        => 'ASC',
+			'offset'       => $offset,
+			'search'       => '',
+			'number'       => mb_get_users_per_page(),
+			'count_total'  => true,
+			'fields'       => 'all',
+			'who'          => ''
+		)
+	);
+
+	$mb->user_query->found_users = count( $mb->user_query->results );
+	$mb->user_query->current_user = 0;
+
+	return !empty( $mb->user_query->results ) ? true : false;
+}
+
+function mb_the_user() {
+	$mb = message_board();
+
+	$current = $mb->user_query->current_user++;
+
+	$mb->user_query->loop_user_id = $mb->user_query->results[ $current ]->ID;
+}
+
 /**
  * Checks if viewing the user archive page.
  *
@@ -48,13 +91,12 @@ function mb_user_id( $user_id = 0 ) {
 }
 
 function mb_get_user_id( $user_id = 0 ) {
-	global $mb_user;
 
 	if ( is_numeric( $user_id ) && 0 < $user_id )
 		$user_id = $user_id;
 
-	elseif ( !empty( $mb_user ) && is_object( $mb_user ) )
-		$user_id = $mb_user->ID;
+	elseif ( !is_null( message_board()->user_query ) )
+		$user_id = message_board()->user_query->loop_user_id;
 
 	elseif ( get_query_var( 'author' ) )
 		$user_id = get_query_var( 'author' );
@@ -198,7 +240,7 @@ function mb_get_user_post_count( $user_id = 0 ) {
 }
 
 function mb_users_pagination( $args = array() ) {
-	$total_users = message_board()->users_query->total_users;
+	$total_users = message_board()->user_query->total_users;
 	$max_pages   = ceil( $total_users / mb_get_users_per_page() );
 	$query = array( 'max_num_pages' => $max_pages );
 	return mb_pagination( $args, (object) $query );

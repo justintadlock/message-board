@@ -2,7 +2,7 @@
 
 	<article>
 		<header class="mb-topic-header">
-			<time><?php printf( __( '%s ago', 'message-board' ), human_time_diff( get_post_time( 'U' ), current_time( 'timestamp' ) ) ); ?></time> 
+			<time class="mb-topic-date"><?php printf( __( '%s ago', 'message-board' ), human_time_diff( get_post_time( 'U' ), current_time( 'timestamp' ) ) ); ?></time> 
 			<?php mb_topic_edit_link(); ?>
 			<?php mb_topic_toggle_spam_link(); ?>
 			<?php mb_topic_toggle_trash_link(); ?>

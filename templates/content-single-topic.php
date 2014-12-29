@@ -5,22 +5,10 @@
 			<div class="loop-description">
 				<p>
 					<?php mb_topic_forum_link( get_queried_object_id() ); ?>
-					<span class="entry-terms topic-posts genericon-status">
-						<?php $count = mb_get_topic_post_count( mb_get_topic_id() ); ?>
-						<?php echo ( 1 == $count ) ? "{$count} post" : "{$count} posts"; ?>
-					</span>
-					<span class="entry-terms topic-voices genericon-user">
-						<?php $voices = mb_get_topic_voice_count( mb_get_topic_id() ); ?>
-						<?php echo ( 1 == $voices ) ? "{$voices} voice" : "{$voices} voices"; ?>
-					</span> 
-					<?php if ( is_user_logged_in() ) : ?>
-					<span class="entry-terms topic-subscribe genericon-mail">
-						<?php mb_topic_subscribe_link( mb_get_topic_id() ); ?>
-					</span>
-					<span class="entry-terms topic-favorite genericon-heart">
-						<?php mb_topic_bookmark_link( mb_get_topic_id() ); ?>
-					</span>
-					<?php endif; ?>
+					<span class="mb-topic-post-count"><?php printf( __( 'Posts: %s', 'message-board' ), mb_get_topic_post_count() ); ?></span>
+					<span class="mb-topic-voice-count"><?php printf( __( 'Participating: %s', 'message-board' ), mb_get_topic_voice_count() ); ?></span>
+					<?php mb_topic_subscribe_link(); ?>
+					<?php mb_topic_bookmark_link(); ?>
 				</p>
 			</div><!-- .loop-description -->
 
@@ -28,7 +16,7 @@
 
 	<?php if ( current_user_can( 'read_topic', mb_get_topic_id() ) ) : ?>
 
-		<ol id="mb-thread" class="comment-list mb-thread">
+		<ol id="mb-thread" class="mb-thread">
 
 			<?php if ( mb_show_lead_topic() && mb_topic_query() ) : ?>
 
@@ -56,9 +44,7 @@
 
 		</ol><!-- #thread -->
 
-		<?php if ( current_user_can( 'view_club_content' ) ) : ?>
-			<div class="loop-nav"><?php echo mb_topic_pagination(); ?></div><!-- .comments-nav -->
-		<?php endif; ?>
+		<div class="loop-nav"><?php echo mb_topic_pagination(); ?></div>
 
 		<?php if ( mb_is_topic_open() ) : ?>
 			<?php mb_get_template_part( 'form-reply', 'new' ); // Loads the topic reply form. ?>

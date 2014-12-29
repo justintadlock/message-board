@@ -1,37 +1,44 @@
-	<?php $mb_users = mb_get_users(); ?>
+<?php if ( mb_user_query() ) : // Checks if we have users. ?>
 
-	<?php if ( $mb_users ) : // Checks if any posts were found. ?>
+	<table class="mb-loop-user">
+		<thead>
+			<tr>
+				<th class="mb-col-title"><?php _e( 'Users', 'message-board' ); ?></th>
+				<th class="mb-col-count"><?php _e( 'Topics', 'message-board' ); ?></th>
+				<th class="mb-col-count"><?php _e( 'Replies', 'message-board' ); ?></th>
+			</tr>
+		</thead>
+		<tfoot>
+			<tr>
+				<th class="mb-col-title"><?php _e( 'Users', 'message-board' ); ?></th>
+				<th class="mb-col-count"><?php _e( 'Topics', 'message-board' ); ?></th>
+				<th class="mb-col-count"><?php _e( 'Replies', 'message-board' ); ?></th>
+			</tr>
+		</tfoot>
+		<tbody>
 
-		<table>
-			<thead>
-				<tr>
-					<th>User</th>
-					<th class="num">Topics</th>
-					<th class="num">Replies</th>
-				</tr>
-			</thead>
-			<tfoot>
-				<tr>
-					<th>User</th>
-					<th class="num">Topics</th>
-					<th class="num">Replies</th>
-				</tr>
-			</tfoot>
-			<tbody>
+		<?php while ( mb_user_query() ) : // Begins the loop through found users. ?>
 
-		<?php foreach ( $mb_users as $mb_user ) : // Begins the loop through found posts. ?>
+			<?php mb_the_user(); // Set up user data. ?>
 
-<tr>
-	<td><?php echo get_avatar( mb_get_user_id() ); ?> <?php mb_user_profile_link(); ?> <?php mb_user_edit_link(); ?></td>
-	<td><?php mb_user_topic_count(); ?></td>
-	<td><?php mb_user_reply_count(); ?></td>
-</tr>
+			<tr>
+				<td class="mb-col-title">
+					<?php echo get_avatar( mb_get_user_id() ); ?>
+					<?php mb_user_profile_link(); ?>
+					<div class="mb-user-description">
+						<?php the_author_meta( 'description', mb_get_user_id() ); ?>
+					</div><!-- .mb-user-description -->
+				</td>
+				<td class="mb-col-count"><a href="<?php mb_user_page_url( 'topics' ); ?>"><?php mb_user_topic_count(); ?></a></td>
+				<td class="mb-col-count"><a href="<?php mb_user_page_url( 'replies' ); ?>"><?php mb_user_reply_count(); ?></a></td>
+			</tr>
 
-		<?php endforeach; // End found posts loop. ?>
+		<?php endwhile; // End found users loop. ?>
 
-			</tbody>
-		</table>
+		</tbody>
 
-		<?php mb_users_pagination(); // Loads the misc/loop-nav.php template. ?>
+	</table><!-- .mb-loop-user -->
 
-	<?php endif; // End check for posts. ?>
+	<?php mb_users_pagination(); // Loads the misc/loop-nav.php template. ?>
+
+<?php endif; // End check for posts. ?>

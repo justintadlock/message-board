@@ -2,7 +2,7 @@
 
 	<article>
 		<header class="mb-reply-header">
-			<time><?php printf( __( '%s ago', 'message-board' ), human_time_diff( get_post_time( 'U' ), current_time( 'timestamp' ) ) ); ?></time> 
+			<time class="mb-repy-date"><?php printf( __( '%s ago', 'message-board' ), human_time_diff( get_post_time( 'U' ), current_time( 'timestamp' ) ) ); ?></time> 
 			<?php mb_reply_edit_link(); ?>
 			<?php mb_reply_toggle_spam_link(); ?>
 			<a class="mb-reply-permalink" href="<?php mb_post_jump_url(); ?>" rel="bookmark" itemprop="url">#<?php mb_thread_position(); ?></a>
@@ -15,6 +15,7 @@
 			<div class="mb-author-info">
 				<?php mb_reply_author_profile_link(); ?>
 				<?php if ( get_the_author_meta( 'forum_nickname' ) ) : ?>
+					<br />
 					<span class="user-forum-nickname"><?php the_author_meta( 'forum_nickname' ); ?></span>
 				<?php endif; ?>
 				<?php if ( get_the_author_meta('url') ) : ?>
@@ -22,7 +23,7 @@
 					<a href="<?php echo esc_url( get_the_author_meta( 'url' ), mb_get_reply_author_id() ); ?>"><?php _e( 'Web Site', 'message-board' ); ?></a>
 				<?php endif; ?>
 				<br />
-				<span class="mb-user-reply-count"><?php printf( __( 'Topics: %s', 'message-board' ), mb_get_user_reply_count( mb_get_reply_author_id() ) ); ?></span>
+				<span class="mb-user-topic-count"><?php printf( __( 'Topics: %s', 'message-board' ), mb_get_user_reply_count( mb_get_reply_author_id() ) ); ?></span>
 				<br />
 				<span class="mb-user-reply-count"><?php printf( __( 'Replies: %s', 'message-board' ), mb_get_user_reply_count( mb_get_reply_author_id() ) ); ?></span>
 			</div><!-- .mb-author-info -->
