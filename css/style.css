@@ -57,42 +57,60 @@
 
 /* ====== Forms ====== */
 
+.mb-form-forum input,
+.mb-form-topic input,
+.mb-form-reply input,
+.mb-form-forum select,
+.mb-form-topic select,
+.mb-form-reply select,
+.mb-form-forum textarea,
+.mb-form-topic textarea,
+.mb-form-reply textarea { max-width: 100%; }
+
 .mb form .description { font-size: 17px; font-style: italic; font-weight: 400; }
 
 /* === Form: Forum === */
 
-.mb-form-forum .mb-form-parent,
-.mb-form-forum .mb-form-type,
-.mb-form-forum .mb-form-status,
-.mb-form-forum .mb-form-order {
-	float:        left;
-	width:        22%;
-	margin-right: 4%;
+@media only screen and ( min-width: 768px ) {
+
+	.mb-form-forum .mb-form-parent,
+	.mb-form-forum .mb-form-type,
+	.mb-form-forum .mb-form-status,
+	.mb-form-forum .mb-form-order {
+		float:        left;
+		width:        22%;
+		margin-right: 4%;
+	}
+
+	.mb-form-forum .mb-form-status {
+		float:        right;
+		margin-right: 0;
+	}
+
+	.mb-form-forum .mb-form-content { clear: both; }
 }
 
-.mb-form-forum .mb-form-order {
-	float:        right;
-	margin-right: 0;
-}
-
-.mb-form-forum .mb-form-content { clear: both; }
+	textarea[name="mb_forum_content"] { min-height: 150px; }
 
 /* === Form: Topic === */
 
-.mb-form-topic .mb-form-parent,
-.mb-form-topic .mb-form-type,
-.mb-form-topic .mb-form-status {
-	float:        left;
-	width:        30%;
-	margin-right: 5%;
-}
+@media only screen and ( min-width: 768px ) {
 
-.mb-form-parent + .mb-form-type + .mb-form-status {
-	float:        right;
-	margin-right: 0;
-}
+	.mb-form-topic .mb-form-parent,
+	.mb-form-topic .mb-form-type,
+	.mb-form-topic .mb-form-status {
+		float:        left;
+		width:        30%;
+		margin-right: 5%;
+	}
 
-.mb-form-topic .mb-form-content { clear: both; }
+	.mb-form-parent + .mb-form-type + .mb-form-status {
+		float:        right;
+		margin-right: 0;
+	}
+
+	.mb-form-topic .mb-form-content { clear: both; }
+}
 
 /* ====== Topic Thread ====== */
 
