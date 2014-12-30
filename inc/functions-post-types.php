@@ -210,6 +210,7 @@ function mb_register_post_types() {
 			'search_items'       => __( 'Search Topics',            'message-board' ),
 			'not_found'          => __( 'No topics found',          'message-board' ),
 			'not_found_in_trash' => __( 'No topics found in trash', 'message-board' ),
+			'parent_item_colon'  => __( 'Forum:',                   'message-board' ),
 
 			/* Custom archive label.  Must filter 'post_type_archive_title' to use. */
 			'archive_title'      => __( 'Topics',                   'message-board' ),
@@ -256,6 +257,7 @@ function mb_register_post_types() {
 			'search_items'       => __( 'Search Replies',            'message-board' ),
 			'not_found'          => __( 'No replies found',          'message-board' ),
 			'not_found_in_trash' => __( 'No replies found in trash', 'message-board' ),
+			'parent_item_colon'  => __( 'Topic:',                    'message-board' ),
 
 			/* Custom archive label.  Must filter 'post_type_archive_title' to use. */
 			'archive_title'      => __( 'Replies',                   'message-board' ),

@@ -56,13 +56,22 @@ final class Message_Board {
 	public $dir_uri = '';
 
 	/**
-	 * Forum types (e.g., forum, category).
+	 * Forum types (e.g., normal, category).
 	 *
 	 * @since  1.0.0
 	 * @access public
 	 * @var    array
 	 */
 	public $forum_types = array();
+
+	/**
+	 * Topic types (e.g., normal, super, sticky).
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @var    array
+	 */
+	public $topic_types = array();
 
 	/**
 	 * Forum query.  Is assigned a WP_Query object.  On forum archive/single views, this is the 
@@ -217,6 +226,7 @@ final class Message_Board {
 		/* Load topic files. */
 		require_once( $this->dir_path . 'inc/topic/functions.php' );
 		require_once( $this->dir_path . 'inc/topic/template.php'  );
+		require_once( $this->dir_path . 'inc/topic/types.php'     );
 
 		/* Load reply files. */
 		require_once( $this->dir_path . 'inc/reply/functions.php' );

@@ -49,6 +49,7 @@ function mb_topic_query() {
 		if ( mb_is_single_forum() ) {
 			$defaults['post_parent'] = get_queried_object_id();
 			add_filter( 'the_posts', 'mb_posts_sticky_filter', 10, 2 );
+		add_filter( 'the_posts', 'mb_posts_super_filter', 10, 2 );
 		}
 
 		$mb->topic_query = new WP_Query( $defaults );
@@ -358,39 +359,6 @@ function mb_get_topic_labels( $topic_id = 0 ) {
 	}
 
 	return '';
-}
-
-/* ====== Topic Sticky ====== */
-
-/**
- * Checks if a topic is sticky.  Sticky topics are only sticky for their specific forum.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $topic_id
- * @return bool
- */
-function mb_is_topic_sticky( $topic_id = 0 ) {
-	$topic_id = mb_get_topic_id( $topic_id );
-	$stickies = mb_get_sticky_topics();
-
-	return in_array( $topic_id, $stickies ) ? true : false;
-}
-
-/**
- * Checks if a topic is super sticky.  Super sticky topics are sticky on all forums as well as 
- * the topic archive page.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $topic_id
- * @return bool
- */
-function mb_is_topic_super( $topic_id = 0 ) {
-	$topic_id       = mb_get_topic_id( $topic_id );
-	$super_stickies = mb_get_super_topics();
-
-	return in_array( $topic_id, $super_stickies ) ? true : false;
 }
 
 /* ====== Topic ID ====== */

@@ -405,7 +405,7 @@ final class Message_Board_Admin_Edit_Topics {
 		$topic_id = mb_get_topic_id( $post->ID );
 
 		if ( mb_is_topic_super( $topic_id ) )
-			$states['super'] = __( 'Super Sticky', 'message-board' );
+			$states['super'] = __( 'Super', 'message-board' );
 		elseif ( mb_is_topic_sticky( $topic_id ) )
 			$states['sticky'] = __( 'Sticky', 'message-board' );
 
@@ -495,8 +495,14 @@ final class Message_Board_Admin_Edit_Topics {
 			/* Check if the topic is sticky. */
 			$is_sticky = mb_is_topic_sticky( $topic_id );
 
-			/* Update the post status. */
-			$updated = $is_sticky ? mb_remove_sticky_topic( $topic_id ) : mb_add_sticky_topic( $topic_id );
+			/* Update the topic type. */
+			if ( $is_sticky ) {
+				$updated = mb_remove_sticky_topic( $topic_id );
+				mb_set_topic_type( $topic_id, 'normal' );
+			} else {
+				$updated = mb_add_sticky_topic( $topic_id );
+				mb_set_topic_type( $topic_id, 'sticky' );
+			}
 
 			/* If the status was updated, add notice slug. */
 			if ( $updated && !is_wp_error( $updated ) ) {
@@ -525,8 +531,14 @@ final class Message_Board_Admin_Edit_Topics {
 			/* Check if the topic is sticky. */
 			$is_super = mb_is_topic_super( $topic_id );
 
-			/* Update the post status. */
-			$updated = $is_super ? mb_remove_super_topic( $topic_id ) : mb_add_super_topic( $topic_id );
+			/* Update the topic type. */
+			if ( $is_super ) {
+				$updated = mb_remove_super_topic( $topic_id );
+				mb_set_topic_type( $topic_id, 'normal' );
+			} else {
+				$updated = mb_add_super_topic( $topic_id );
+				mb_set_topic_type( $topic_id, 'super' );
+			}
 
 			/* If the status was updated, add notice slug. */
 			if ( $updated && !is_wp_error( $updated ) ) {

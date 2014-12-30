@@ -183,35 +183,25 @@ function mb_topic_attributes_meta_box( $post ) {
 
 	wp_nonce_field( '_mb_topic_attr_nonce', 'mb_topic_attr_nonce' );
 
-	$forum_type_object = get_post_type_object( mb_get_forum_post_type() );
+	$topic_type_object = get_post_type_object( mb_get_topic_post_type() );
 
-	$is_super   = mb_is_topic_super( $post->ID );
-	$is_sticky  = mb_is_topic_sticky( $post->ID );
-	$not_sticky = $is_super || $is_sticky ? false : true; ?>
+	$topic_types = mb_get_topic_type_objects(); ?>
 
 	<p>
 		<strong><?php _e( 'Topic Type:', 'message-board' ); ?></strong>
 	</p>
 	<p>
-		<label>
-			<input type="radio" name="mb-topic-sticky" value="" <?php checked( $not_sticky, true ); ?> /> 
-			<?php _e( 'Normal', 'message-board' ); ?>
-		</label>
-		<br />
-		<label>
-			<input type="radio" name="mb-topic-sticky" value="super" <?php checked( $is_super, true ); ?> /> 
-			<?php _e( 'Super Sticky', 'message-board' ); ?>
-		</label>
-		<br />
-		<label>
-			<input type="radio" name="mb-topic-sticky" value="sticky" <?php checked( $is_sticky, true ); ?> /> 
-			<?php _e( 'Sticky', 'message-board' ); ?>
-		</label>
+		<?php foreach ( $topic_types as $type ) : ?>
+			<label>
+				<input type="radio" name="mb_topic_type" value="<?php echo esc_attr( $type->name ); ?>"<?php checked( $type->name, mb_get_topic_type( $post->ID ) ); ?> /> <?php echo esc_html( $type->label ); ?>
+			</label>
+			<br />
+		<?php endforeach; ?>
 	</p>
 
 	<p>
 		<label id="mb_parent_forum">
-			<strong><?php echo $forum_type_object->labels->singular_name; ?></strong>
+			<strong><?php echo $topic_type_object->labels->parent_item_colon; ?></strong>
 		</label>
 	</p>
 	<p>
