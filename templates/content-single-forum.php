@@ -34,8 +34,4 @@
 
 <?php endif; ?>
 
-<div class="loop-nav">
-	<?php echo mb_forum_pagination(); ?>
-</div><!-- .loop-nav -->
-
 <?php mb_get_template_part( 'form-topic', 'new' ); ?>

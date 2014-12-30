@@ -39,6 +39,6 @@
 
 	</table><!-- .mb-loop-user -->
 
-	<?php mb_users_pagination(); // Loads the misc/loop-nav.php template. ?>
+	<?php mb_loop_user_pagination(); ?>
 
 <?php endif; // End check for posts. ?>

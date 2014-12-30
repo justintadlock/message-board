@@ -64,3 +64,15 @@ function mb_search_query() {
 function mb_the_search_post() {
 	return message_board()->search_query->the_post();
 }
+
+/**
+ * Outputs pagination links for search results.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $args
+ * @return string
+ */
+function mb_loop_search_pagination( $args = array() ) {
+	return mb_pagination( $args, message_board()->search_query );
+}

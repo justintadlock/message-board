@@ -239,7 +239,7 @@ function mb_get_user_post_count( $user_id = 0 ) {
 	return apply_filters( 'mb_get_user_post_count', $count, $user_id );
 }
 
-function mb_users_pagination( $args = array() ) {
+function mb_loop_user_pagination( $args = array() ) {
 	$total_users = message_board()->user_query->total_users;
 	$max_pages   = ceil( $total_users / mb_get_users_per_page() );
 	$query = array( 'max_num_pages' => $max_pages );

@@ -870,8 +870,8 @@ function mb_is_forum_paged() {
  * @param  array  $args
  * @return string
  */
-function mb_forum_pagination( $args = array() ) {
-	return mb_pagination( $args, message_board()->topic_query );
+function mb_loop_forum_pagination( $args = array() ) {
+	return mb_pagination( $args, message_board()->forum_query );
 }
 
 function mb_dropdown_forums( $args = array() ) {

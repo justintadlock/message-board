@@ -44,7 +44,7 @@
 
 		</ol><!-- #thread -->
 
-		<div class="loop-nav"><?php echo mb_topic_pagination(); ?></div>
+		<?php mb_single_topic_pagination(); ?>
 
 		<?php if ( mb_is_topic_open() ) : ?>
 			<?php mb_get_template_part( 'form-reply', 'new' ); // Loads the topic reply form. ?>

@@ -53,6 +53,6 @@
 
 	</table><!-- .mb-loop-topic -->
 
-	<?php locate_template( array( 'misc/loop-nav.php' ), true ); // Loads the misc/loop-nav.php template. ?>
+	<?php mb_loop_topic_pagination(); ?>
 
 <?php endif; // End check for topics. ?>

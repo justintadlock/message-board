@@ -67,4 +67,6 @@
 
 	</table><!-- .mb-loop-forum -->
 
+	<?php mb_loop_forum_pagination(); ?>
+
 <?php endif; // End check for forums. ?>

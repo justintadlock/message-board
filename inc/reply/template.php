@@ -492,3 +492,15 @@ function mb_get_reply_topic_id( $reply_id = 0 ) {
 	$reply_id = mb_get_reply_id( $reply_id );
 	return get_post_field( 'post_parent', $reply_id );
 }
+
+/**
+ * Outputs pagination links for single topic pages (the replies are paginated).
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $args
+ * @return string
+ */
+function mb_loop_reply_pagination( $args = array() ) {
+	return mb_pagination( $args, message_board()->reply_query );
+}

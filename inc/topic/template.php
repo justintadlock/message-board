@@ -998,7 +998,19 @@ function mb_is_topic_paged() {
  * @param  array  $args
  * @return string
  */
-function mb_topic_pagination( $args = array() ) {
+function mb_loop_topic_pagination( $args = array() ) {
+	return mb_pagination( $args, message_board()->topic_query );
+}
+
+/**
+ * Outputs pagination links for single topic pages (the replies are paginated).
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $args
+ * @return string
+ */
+function mb_single_topic_pagination( $args = array() ) {
 	return mb_pagination( $args, message_board()->reply_query );
 }
 

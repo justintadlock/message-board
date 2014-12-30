@@ -48,6 +48,6 @@
 
 	</table><!-- .mb-loop-reply -->
 
-	<?php locate_template( array( 'misc/loop-nav.php' ), true ); // Loads the misc/loop-nav.php template. ?>
+	<?php mb_loop_reply_pagination(); ?>
 
 <?php endif; // End check for posts. ?>
