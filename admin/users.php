@@ -95,7 +95,7 @@ final class Message_Board_Admin_Users {
 	public function columns( $columns ) {
 
 		/* Add custom columns. */
-		$columns['topics']  = __( 'Topics', 'message-board' );
+		$columns['topics']  = __( 'Topics',  'message-board' );
 		$columns['replies'] = __( 'Replies', 'message-board' );
 
 		/* Return the columns. */
@@ -132,12 +132,16 @@ final class Message_Board_Admin_Users {
 		/* Post status column. */
 		if ( 'topics' === $column_name ) {
 
-			$user_id    = mb_get_user_id( $user_id );
+			$user_id     = mb_get_user_id( $user_id );
 			$topic_count = mb_get_user_topic_count( $user_id );
 
+			/* If the current user can create topics, link the topic count back to the edit topics screen. */
 			if ( !empty( $topic_count ) && current_user_can( 'create_topics' ) ) {
-				$url = add_query_arg( array( 'post_type' => mb_get_topic_post_type(), 'author' => $user_id ), admin_url( 'edit.php' ) );
+
+				$url    = add_query_arg( array( 'post_type' => mb_get_topic_post_type(), 'author' => $user_id ), admin_url( 'edit.php' ) );
 				$column = sprintf( '<a href="%s" title="%s">%s</a>', esc_url( $url ), __( 'View topics by this user', 'message-board' ), $topic_count );
+
+			/* Else, display the count. */
 			} else {
 				$column = !empty( $topic_count ) ? $topic_count : number_format_i18n( 0 );
 			}
@@ -145,17 +149,22 @@ final class Message_Board_Admin_Users {
 		/* Replies column. */
 		} elseif ( 'replies' === $column_name ) {
 
-			$user_id    = mb_get_user_id( $user_id );
+			$user_id     = mb_get_user_id( $user_id );
 			$reply_count = mb_get_user_reply_count( $user_id );
 
+			/* If the current user can create replies, link the topic count back to the edit replies screen. */
 			if ( !empty( $reply_count ) && current_user_can( 'create_replies' ) ) {
+
 				$url = add_query_arg( array( 'post_type' => mb_get_reply_post_type(), 'author' => $user_id ), admin_url( 'edit.php' ) );
 				$column = sprintf( '<a href="%s" title="%s">%s</a>', esc_url( $url ), __( 'View replies by this user', 'message-board' ), $reply_count );
+
+			/* Else, display the count. */
 			} else {
 				$column = !empty( $reply_count ) ? $reply_count : number_format_i18n( 0 );
 			}
 		}
 
+		/* Return the filtered column. */
 		return $column;
 	}
 
