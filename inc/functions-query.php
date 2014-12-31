@@ -129,6 +129,7 @@ function mb_is_message_board() {
 		|| mb_is_user_archive()
 		|| mb_is_single_forum()
 		|| mb_is_single_topic()
+		|| mb_is_single_reply()
 		|| mb_is_single_user()
 	) {
 		$is_message_board = true;

@@ -73,10 +73,44 @@ add_filter( 'body_class', 'mb_body_class', 15 );
  * @return string
  */
 function mb_wp_title( $title ) {
+
+	if ( !mb_is_message_board() )
+		return $title;
+
 	if ( mb_is_forum_front() )
 		$title = esc_attr__( 'Forums', 'message-board' );
 
-	return $title;
+	elseif ( mb_is_single_forum() )
+		$title = mb_get_single_forum_title();
+
+	elseif ( mb_is_forum_archive() )
+		$title = mb_get_forum_archive_title();
+
+	elseif ( mb_is_single_topic() )
+		$title = mb_get_single_topic_title();
+
+	elseif ( mb_is_topic_archive() )
+		$title = mb_get_topic_archive_title();
+
+	elseif ( mb_is_single_reply() )
+		$title = mb_get_single_reply_title();
+
+	elseif ( mb_is_reply_archive() )
+		$title = mb_get_reply_archive_title();
+
+	elseif ( mb_is_user_page() )
+		$title = mb_get_user_page_title();
+
+	elseif ( mb_is_single_user() )
+		$title = mb_get_single_user_title();
+
+	elseif ( mb_is_user_archive() )
+		$title = mb_get_user_archive_title();
+
+	else
+		$title = __( 'Board', 'message-board' );
+
+	return apply_filters( 'mb_wp_title', $title );
 }
 
 /**

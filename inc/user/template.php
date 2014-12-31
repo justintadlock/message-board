@@ -110,13 +110,46 @@ function mb_get_user_id( $user_id = 0 ) {
 	return absint( $user_id );
 }
 
-function mb_single_user_title( $prefix = '', $echo = true ) {
-	$title = apply_filters( 'mb_single_user_title', $prefix . get_the_author_meta( 'display_name', get_query_var( 'author' ) ) );
+function mb_single_user_title() {
+	echo mb_get_single_user_title();
+}
 
-	if ( false === $echo )
-		return $title;
+function mb_get_single_user_title() {
+	return apply_filters( 'mb_get_single_user_title', get_the_author_meta( 'display_name', mb_get_user_id() ) );
+}
 
-	echo $title;
+function mb_user_page_title() {
+	echo mb_get_user_page_title();
+}
+
+function mb_get_user_page_title() {
+
+	$name = get_the_author_meta( 'display_name', mb_get_user_id() );
+
+	if ( mb_is_user_page( 'forums' ) )
+		$title = __( '%s: Forums Created', 'message-board' );
+	elseif ( mb_is_user_page( 'topics' ) )
+		$title = __( '%s: Topics Created', 'message-board' );
+	elseif ( mb_is_user_page( 'replies' ) )
+		$title = __( '%s: Replies Created', 'message-board' );
+	elseif ( mb_is_user_page( 'forum-subscriptions' ) )
+		$title = __( '%s: Forum Subscriptions', 'message-board' );
+	elseif ( mb_is_user_page( 'topic-subscriptions' ) )
+		$title = __( '%s: Topic Subscriptions', 'message-board' );
+	elseif ( mb_is_user_page( 'bookmarks' ) )
+		$title = __( '%s: Topic Bookmarks', 'message-board' );
+	else
+		$title = mb_get_single_user_title();
+
+	return apply_filters( 'mb_get_user_page_title', sprintf( $title, get_the_author_meta( 'display_name', mb_get_user_id() ) ) );
+}
+
+function mb_user_archive_title() {
+	echo mb_get_user_archive_title();
+}
+
+function mb_get_user_archive_title() {
+	return apply_filters( 'mb_get_user_archive_title', __( 'Users', 'message-board' ) );
 }
 
 function mb_user_edit_url( $user_id = 0 ) {

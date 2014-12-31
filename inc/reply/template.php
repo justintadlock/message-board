@@ -78,6 +78,31 @@ function mb_is_reply_archive() {
 	return is_post_type_archive( mb_get_reply_post_type() );
 }
 
+/* ====== Reply Title ====== */
+
+/**
+ * Displays the single reply title.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_single_reply_title() {
+	echo mb_get_single_reply_title();
+}
+
+function mb_get_single_reply_title() {
+	return apply_filters( 'mb_get_single_reply_title', single_post_title( '', false ) );
+}
+
+function mb_reply_archive_title() {
+	echo mb_get_reply_archive_title();
+}
+
+function mb_get_reply_archive_title() {
+	return apply_filters( 'mb_get_reply_archive_title', post_type_archive_title( '', false ) );
+}
+
 /* ====== Reply Position ====== */
 
 function mb_reply_position( $reply_id = 0 ) {

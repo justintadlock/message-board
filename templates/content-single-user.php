@@ -1,5 +1,5 @@
 <div class="loop-meta">
-	<h1 class="loop-title"><?php mb_single_user_title(); ?></h1>
+	<h1 class="loop-title"><?php mb_user_page_title(); ?></h1>
 </div><!-- .loop-meta -->
 
 <ul class="mb-user-page-links">

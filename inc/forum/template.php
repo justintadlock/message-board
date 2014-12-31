@@ -404,17 +404,22 @@ function mb_get_forum_content( $forum_id = 0, $mode = 'display' ) {
  *
  * @since  1.0.0
  * @access public
- * @param  string  $prefix
- * @param  bool    $echo
- * @return string
+ * @return void
  */
-function mb_single_forum_title( $prefix = '', $echo = true ) {
-	$title = apply_filters( 'mb_single_forum_title', single_post_title( $prefix, false ) );
+function mb_single_forum_title() {
+	echo mb_get_single_forum_title();
+}
 
-	if ( false === $echo )
-		return $title;
+function mb_get_single_forum_title() {
+	return apply_filters( 'mb_get_single_forum_title', single_post_title( '', false ) );
+}
 
-	echo $title;
+function mb_forum_archive_title() {
+	echo mb_get_forum_archive_title();
+}
+
+function mb_get_forum_archive_title() {
+	return apply_filters( 'mb_get_forum_archive_title', post_type_archive_title( '', false ) );
 }
 
 /**
