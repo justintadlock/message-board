@@ -879,9 +879,14 @@ function mb_dropdown_forums( $args = array() ) {
 	$defaults = array(
 		'child_type'  => mb_get_forum_post_type(),
 		'post_type'   => mb_get_forum_post_type(),
-		'post_status' => array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status() ),
+		'post_status' => mb_get_forum_post_statuses(),
 		'walker'      => new MB_Walker_Forum_Dropdown,
 	);
+
+	$trash = array_search( mb_get_trash_post_status(), $defaults['post_status'] );
+
+	if ( $trash )
+		unset( $defaults['post_status'][ $trash ] );
 
 	return wp_dropdown_pages( wp_parse_args( $args, $defaults ) );
 }
