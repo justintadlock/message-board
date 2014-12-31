@@ -30,11 +30,7 @@ if ( !current_user_can( 'create_forums' ) )
 
 		<p class="mb-form-type">
 			<label for="mb_forum_type"><?php _e( 'Forum Type:', 'message-board' ); ?></label>
-			<select id="mb_forum_type" name="mb_forum_type">
-			<?php foreach ( mb_get_forum_type_objects() as $forum_type ) : ?>
-				<option value="<?php echo esc_attr( $forum_type->name ); ?>"><?php echo esc_html( $forum_type->label ); ?></option>
-			<?php endforeach; ?>
-			</select>
+			<?php mb_dropdown_forum_type(); ?>
 		</p>
 
 		<p class="mb-form-status">

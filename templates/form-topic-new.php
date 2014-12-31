@@ -36,11 +36,7 @@ if ( mb_is_single_forum() && !mb_forum_type_allows_topics( mb_get_forum_type() )
 
 		<p class="mb-form-type">
 			<label for="mb_topic_type"><?php _e( 'Topic Type:', 'message-board' ); ?></label>
-			<select id="mb_topic_type" name="mb_topic_type">
-				<option value="normal"><?php _e( 'Normal', 'message-board' ); ?></option>
-				<option value="super"><?php _e( 'Super', 'message-board' ); ?></option>
-				<option value="sticky"><?php _e( 'Sticky', 'message-board' ); ?></option>
-			</select>
+			<?php mb_dropdown_topic_type(); ?>
 		</p>
 
 		<p class="mb-form-status">

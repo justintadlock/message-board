@@ -135,19 +135,16 @@ function mb_forum_attributes_meta_box( $post ) {
 	$forum_types = mb_get_forum_type_objects(); ?>
 
 	<p>
-		<strong><?php _e( 'Forum Type:', 'message-board' ); ?></strong>
+		<label for="mb_forum_type">
+			<strong><?php _e( 'Forum Type:', 'message-board' ); ?></strong>
+		</label>
 	</p>
 	<p>
-		<?php foreach ( $forum_types as $type ) : ?>
-			<label>
-				<input type="radio" name="mb_forum_type" value="<?php echo esc_attr( $type->name ); ?>"<?php checked( $type->name, mb_get_forum_type( $post->ID ) ); ?> /> <?php echo esc_html( $type->label ); ?>
-			</label>
-			<br />
-		<?php endforeach; ?>
+		<?php mb_dropdown_forum_type( array( 'selected' => mb_get_forum_type( $post->ID ) ) ); ?>
 	</p>
 
 	<p>
-		<label id="mb_parent_forum">
+		<label for="mb_parent_forum">
 			<strong><?php _e( 'Parent Forum:', 'message-board' ); ?></strong>
 		</label>
 	</p>
@@ -188,19 +185,16 @@ function mb_topic_attributes_meta_box( $post ) {
 	$topic_types = mb_get_topic_type_objects(); ?>
 
 	<p>
-		<strong><?php _e( 'Topic Type:', 'message-board' ); ?></strong>
+		<label for="mb_topic_type">
+			<strong><?php _e( 'Topic Type:', 'message-board' ); ?></strong>
+		</label>
 	</p>
 	<p>
-		<?php foreach ( $topic_types as $type ) : ?>
-			<label>
-				<input type="radio" name="mb_topic_type" value="<?php echo esc_attr( $type->name ); ?>"<?php checked( $type->name, mb_get_topic_type( $post->ID ) ); ?> /> <?php echo esc_html( $type->label ); ?>
-			</label>
-			<br />
-		<?php endforeach; ?>
+		<?php mb_dropdown_topic_type( array( 'selected' => mb_get_topic_type( $post->ID ) ) ); ?>
 	</p>
 
 	<p>
-		<label id="mb_parent_forum">
+		<label for="mb_parent_forum">
 			<strong><?php echo $topic_type_object->labels->parent_item_colon; ?></strong>
 		</label>
 	</p>

@@ -193,3 +193,38 @@ function mb_set_forum_type( $forum_id, $type ) {
 function mb_forum_type_allows_topics( $type ) {
 	return mb_get_forum_type_object( $type )->topics_allowed;
 }
+
+/**
+ * Creates a dropdown `<select>` for selecting the forum type in forms.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $args
+ * @return string
+ */
+function mb_dropdown_forum_type( $args = array() ) {
+
+	$defaults = array(
+		'name'      => 'mb_forum_type',
+		'id'        => 'mb_forum_type',
+		'selected'  => '',
+		'echo'      => true
+	);
+
+	$args = wp_parse_args( $args, $defaults );
+
+	$types = mb_get_forum_type_objects();
+
+	$out = sprintf( '<select name="%s" id="%s">', sanitize_html_class( $args['name'] ), sanitize_html_class( $args['id'] ) );
+
+	foreach ( $types as $type ) {
+		$out .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $type->name ), selected( $type->name, $args['selected'], false ), $type->label );
+	}
+
+	$out .= '</select>';
+
+	if ( !$args['echo'] )
+		return $out;
+
+	echo $out;
+}

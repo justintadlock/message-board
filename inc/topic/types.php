@@ -322,3 +322,38 @@ function mb_remove_sticky_topic( $topic_id ) {
 
 	return false;
 }
+
+/**
+ * Creates a dropdown `<select>` for selecting the topic type in forms.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $args
+ * @return string
+ */
+function mb_dropdown_topic_type( $args = array() ) {
+
+	$defaults = array(
+		'name'      => 'mb_topic_type',
+		'id'        => 'mb_topic_type',
+		'selected'  => '',
+		'echo'      => true
+	);
+
+	$args = wp_parse_args( $args, $defaults );
+
+	$types = mb_get_topic_type_objects();
+
+	$out = sprintf( '<select name="%s" id="%s">', sanitize_html_class( $args['name'] ), sanitize_html_class( $args['id'] ) );
+
+	foreach ( $types as $type ) {
+		$out .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $type->name ), selected( $type->name, $args['selected'], false ), $type->label );
+	}
+
+	$out .= '</select>';
+
+	if ( !$args['echo'] )
+		return $out;
+
+	echo $out;
+}
