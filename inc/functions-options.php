@@ -20,7 +20,7 @@
  * @return string forums|topics
  */
 function mb_get_show_on_front() {
-	return apply_filters( 'mb_get_show_on_front', 'forums' );
+	return apply_filters( 'mb_get_show_on_front', get_option( 'mb_show_on_front', 'forums' ) );
 }
 
 /**
@@ -33,7 +33,7 @@ function mb_get_show_on_front() {
  * @return int
  */
 function mb_get_forums_per_page() {
-	return intval( apply_filters( 'mb_get_forums_per_page', 50 ) );
+	return intval( apply_filters( 'mb_get_forums_per_page', get_option( 'mb_forums_per_page', 50 ) ) );
 }
 
 /**
@@ -46,7 +46,7 @@ function mb_get_forums_per_page() {
  * @return int
  */
 function mb_get_topics_per_page() {
-	return intval( apply_filters( 'mb_get_topics_per_page', 15 ) );
+	return intval( apply_filters( 'mb_get_topics_per_page', get_option( 'mb_topics_per_page', 15 ) ) );
 }
 
 /**
@@ -59,7 +59,7 @@ function mb_get_topics_per_page() {
  * @return int
  */
 function mb_get_replies_per_page() {
-	return intval( apply_filters( 'mb_get_replies_per_page', 15 ) );
+	return intval( apply_filters( 'mb_get_replies_per_page', get_option( 'mb_replies_per_page', 15 ) ) );
 }
 
 /**
@@ -72,7 +72,7 @@ function mb_get_replies_per_page() {
  * @return int
  */
 function mb_get_users_per_page() {
-	return intval( apply_filters( 'mb_get_users_per_page', 15 ) );
+	return intval( apply_filters( 'mb_get_users_per_page', get_option( 'mb_users_per_page', 15 ) ) );
 }
 
 /**
@@ -85,7 +85,29 @@ function mb_get_users_per_page() {
  * @return int
  */
 function mb_get_default_forum_id() {
-	return absint( apply_filters( 'mb_get_default_forum_id', 0 ) );
+	return absint( apply_filters( 'mb_get_default_forum_id', get_option( 'mb_default_forum_id', 0 ) ) );
+}
+
+/**
+ * Returns TRUE if the bookmarks feature is enabled.  Returns FALSE if disabled.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_bookmarks_active() {
+	return apply_filters( 'mb_is_bookmarks_active', get_option( 'mb_enable_bookmarks', true ) );
+}
+
+/**
+ * Returns TRUE if the subscriptions feature is enabled.  Returns FALSE if disabled.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_subscriptions_active() {
+	return apply_filters( 'mb_is_subscriptions_active', get_option( 'mb_enable_subscriptions', true ) );
 }
 
 /**
