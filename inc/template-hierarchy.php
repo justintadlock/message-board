@@ -212,6 +212,18 @@ function mb_theme_compat() {
 		mb_get_template_part( 'content', 'archive-topic' );
 	}
 
+	/* If viewing a single reply. */
+	elseif ( mb_is_single_reply() ) {
+
+		mb_get_template_part( 'content', 'single-reply' );
+	}
+
+	/* If viewing the reply archive. */
+	elseif ( mb_is_reply_archive() ) {
+
+		mb_get_template_part( 'content', 'archive-reply' );
+	}
+
 	/* If viewing a user sub-page. */
 	elseif ( mb_is_user_page() ) {
 

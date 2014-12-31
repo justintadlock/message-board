@@ -232,12 +232,19 @@ function mb_register_post_types() {
 		'can_export'          => true,
 		'delete_with_user'    => false,
 		'hierarchical'        => false,
-		'has_archive'         =>  false,
+		'has_archive'         => mb_get_reply_slug(),
 		'query_var'           => $reply_type,
 		'capability_type'     => 'forum_reply',
 		'map_meta_cap'        => true,
 		'capabilities'        => mb_get_reply_capabilities(),
-		'rewrite'             => false,
+
+		'rewrite' => array(
+			'slug'       => mb_get_reply_slug(),
+			'with_front' => false,
+			'pages'      => false,
+			'feeds'      => false,
+			'ep_mask'    => EP_PERMALINK,
+		),
 
 		'supports' => array(
 			'editor'

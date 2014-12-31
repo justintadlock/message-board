@@ -51,6 +51,7 @@ foreach ( $pre_title_hooks as $hook ) {
 /* Reply title filters. */
 add_filter( 'the_title',  'mb_post_title_filter', 5, 2 );
 add_filter( 'post_title', 'mb_post_title_filter', 5, 2 );
+add_filter( 'single_post_title', 'mb_post_title_filter', 5, 2 );
 
 /* Edit post link filters. */
 add_filter( 'get_edit_post_link', 'mb_get_edit_post_link', 5, 2 );
@@ -190,11 +191,12 @@ function mb_body_class( $classes ) {
  * @since  1.0.0
  * @access public
  * @param  string  $title
- * @param  int     $post_title
+ * @param  int     $post
  * @return string
  */
-function mb_post_title_filter( $title, $post_id ) {
+function mb_post_title_filter( $title, $post ) {
 
+	$post_id   = is_object( $post ) ? $post->ID : $post;
 	$post_type = get_post_type( $post_id );
 
 	/* Forum post type. */

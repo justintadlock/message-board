@@ -43,6 +43,17 @@ function mb_maybe_get_root_slug() {
 }
 
 /**
+ * Returns the forums slug.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_forum_slug() {
+	return apply_filters( 'mb_forum_slug', mb_maybe_get_root_slug() . 'forums' );
+}
+
+/**
  * Returns the topics slug.
  *
  * @since  1.0.0
@@ -54,14 +65,14 @@ function mb_get_topic_slug() {
 }
 
 /**
- * Returns the forums slug.
+ * Returns the reply slug.
  *
  * @since  1.0.0
  * @access public
  * @return string
  */
-function mb_get_forum_slug() {
-	return apply_filters( 'mb_forum_slug', mb_maybe_get_root_slug() . 'forums' );
+function mb_get_reply_slug() {
+	return apply_filters( 'mb_get_reply_slug', mb_maybe_get_root_slug() . 'replies' );
 }
 
 /**

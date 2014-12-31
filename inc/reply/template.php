@@ -20,7 +20,7 @@ function mb_reply_query() {
 		return $have_posts;
 	}
 
-	if ( mb_is_reply_archive() || mb_is_user_page( 'replies' ) ) {
+	if ( mb_is_reply_archive() || mb_is_single_reply() || mb_is_user_page( 'replies' ) ) {
 		global $wp_query;
 
 		$mb->reply_query = $wp_query;
@@ -88,7 +88,7 @@ function mb_is_reply_archive() {
  * @return void
  */
 function mb_single_reply_title() {
-	echo mb_get_single_reply_title();
+	echo single_post_title();
 }
 
 function mb_get_single_reply_title() {
