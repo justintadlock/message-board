@@ -1,4 +1,14 @@
 <?php
+/**
+ * Handles all the functionality for the `post.php` and `post-new.php` screen for the forum post type. 
+ *
+ * @package    MessageBoard
+ * @subpackage Admin
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 final class Message_Board_Admin_Post_Forum {
 

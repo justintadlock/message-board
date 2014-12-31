@@ -1,4 +1,15 @@
 <?php
+/**
+ * Callback functions for the various meta boxes used on the post screen in the admin for all 
+ * the plugin's post types.
+ *
+ * @package    MessageBoard
+ * @subpackage Admin
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 /**
  * Custom `submitdiv` meta box.  This replaces the WordPress default because it has too many things 
