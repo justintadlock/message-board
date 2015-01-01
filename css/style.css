@@ -85,7 +85,7 @@
 		margin-right: 4%;
 	}
 
-	.mb-form-forum .mb-form-status {
+	.mb-form-forum .mb-form-order {
 		float:        right;
 		margin-right: 0;
 	}
@@ -107,7 +107,7 @@
 		margin-right: 5%;
 	}
 
-	.mb-form-parent + .mb-form-type + .mb-form-status {
+	.mb-form-topic .mb-form-parent + .mb-form-type + .mb-form-status {
 		float:        right;
 		margin-right: 0;
 	}

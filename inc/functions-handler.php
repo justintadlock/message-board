@@ -194,12 +194,16 @@ function mb_handler_new_forum() {
 	/* Menu order. */
 	$menu_order = isset( $_POST['mb_menu_order'] ) ? absint( $_POST['mb_menu_order'] ) : 0;
 
-	/* Publish a new forum topic. */
+	/* Post status. */
+	$post_status = isset( $_POST['mb_post_status'] ) && in_array( $_POST['mb_post_status'], mb_get_forum_post_statuses() ) ? $_POST['mb_post_status'] : mb_get_open_post_status();
+
+	/* Publish a new forum. */
 	$published = mb_insert_forum(
 		array(
 			'post_title'   => $post_title,
 			'post_content' => $post_content,
 			'post_parent'  => $post_parent,
+			'post_status'  => $post_status,
 			'menu_order'   => $menu_order
 		)
 	);
@@ -208,8 +212,8 @@ function mb_handler_new_forum() {
 	if ( $published && !is_wp_error( $published ) ) {
 
 		/* Forum type. */
-		if ( isset( $_POST['mb_forum_type'] ) )
-			mb_set_forum_type( $published, sanitize_key( $_POST['mb_forum_type'] ) );
+		$forum_type = isset( $_POST['mb_forum_type'] ) && mb_forum_type_exists( $_POST['mb_forum_type'] ) ? sanitize_key( $_POST['mb_forum_type'] ) : 'forum';
+		mb_set_forum_type( $published, $forum_type );
 
 		/* Forum subscription. */
 		if ( isset( $_POST['mb_forum_subscribe'] ) && 1 === absint( $_POST['mb_forum_subscribe'] ) )
