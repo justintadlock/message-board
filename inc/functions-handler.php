@@ -328,17 +328,25 @@ function mb_handler_new_topic() {
 	$forum_id = isset( $_POST['mb_forum_id'] ) ? mb_get_forum_id( $_POST['mb_forum_id'] ) : 0;
 	$forum_id = 0 < $forum_id ? $forum_id : mb_get_default_forum_id();
 
+	/* Post Status. */
+	$post_status = isset( $_POST['mb_post_status'] ) && in_array( $_POST['mb_post_status'], mb_get_topic_post_statuses() ) ? $_POST['mb_post_status'] : mb_get_open_post_status();
+
 	/* Publish a new forum topic. */
 	$published = mb_insert_topic(
 		array(
 			'post_title'   => $post_title,
 			'post_content' => $post_content,
 			'post_parent'  => $forum_id,
+			'post_status'  => $post_status,
 		)
 	);
 
 	/* If the post was published. */
 	if ( $published && !is_wp_error( $published ) ) {
+
+		/* Topic Type. */
+		$topic_type = isset( $_POST['mb_topic_type'] ) && mb_topic_type_exists( $_POST['mb_topic_type'] ) ? $_POST['mb_topic_type'] : 'normal';
+		mb_set_topic_type( $published, $topic_type );
 
 		/* If the user chose to subscribe to the topic. */
 		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] )
