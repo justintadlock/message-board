@@ -214,6 +214,7 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/functions-shortcodes.php'     );
 		require_once( $this->dir_path . 'inc/functions-options.php'        );
 		require_once( $this->dir_path . 'inc/functions-admin-bar.php'      );
+		require_once( $this->dir_path . 'inc/template-hierarchy.php'       );
 
 		/* Load common files. */
 		require_once( $this->dir_path . 'inc/common/template.php' );
@@ -238,10 +239,6 @@ final class Message_Board {
 
 		/* Load search files. */
 		require_once( $this->dir_path . '/inc/search/template.php' );
-
-		/* Templates. */
-		require_once( $this->dir_path . 'inc/template-hierarchy.php' );
-		require_once( $this->dir_path . 'inc/template.php'           );
 
 		/* Load admin files. */
 		if ( is_admin() ) {

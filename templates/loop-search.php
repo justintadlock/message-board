@@ -1,43 +1,96 @@
+<?php if ( mb_search_query() ) : // If there are any posts found in the search results. ?>
 
-	<?php if ( mb_search_query() ) : // Checks if any posts were found. ?>
+	<table class="mb-loop-search">
 
-		<table>
-			<thead>
-				<tr>
-					<th>Results</th>
-					<th class="num">Posted</th>
-				</tr>
-			</thead>
-			<tfoot>
-				<tr>
-					<th>Results</th>
-					<th class="num">Posted</th>
-				</tr>
-			</tfoot>
-			<tbody>
+		<thead>
+			<tr>
+				<th class="mb-col-title"><?php _e( 'Results', 'message-board' ); ?></th>
+				<th class="mb-col-datetime"><?php _e( 'Created', 'message-board' ); ?></th>
+				<th class="mb-col-author"><?php _e( 'Author', 'message-board' ); ?></th>
+			</tr>
+		</thead>
 
-		<?php while ( mb_search_query() ) : // Begins the loop through found posts. ?>
+		<tfoot>
+			<tr>
+				<th class="mb-col-title"><?php _e( 'Results', 'message-board' ); ?></th>
+				<th class="mb-col-datetime"><?php _e( 'Created', 'message-board' ); ?></th>
+				<th class="mb-col-author"><?php _e( 'Author', 'message-board' ); ?></th>
+			</tr>
+		</tfoot>
 
-			<?php mb_the_search_post(); // Loads the post data. ?>
+		<tbody>
+			<?php while ( mb_search_query() ) : // Begins the loop through found posts. ?>
 
-				<tr>
-					<td>
-						<a class="topic-link" href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-						<div class="entry-meta">
+				<?php mb_the_search_result(); // Loads the post data. ?>
 
-<?php the_excerpt(); ?>
+				<?php if ( 'forum' === mb_get_content_type() ) : ?>
 
-						</div><!-- .entry-meta -->
-					</td>
-					<td class="num">
-						<a style="font-size: 14px;" href="<?php the_permalink(); ?>"><?php echo human_time_diff( get_the_date( 'U' ), current_time( 'timestamp' ) ); ?> ago</a>
-					</td>
-				</tr>
-		<?php endwhile; // End found posts loop. ?>
+					<tr <?php post_class(); ?>>
+						<td class="mb-col-title">
+							<?php mb_forum_link(); ?>
+							<div class="mb-forum-summary">
+								<?php the_excerpt(); ?>
+							</div><!-- .entry-meta -->
+						</td><!-- .mb-col-title -->
 
-			</tbody>
-		</table>
+						<td class="mb-col-datetime">
+							<?php mb_forum_date(); ?><br />
+							<?php mb_forum_time(); ?>
+						</td><!-- .mb-col-datetime -->
 
-		<?php mb_loop_search_pagination(); ?>
+						<td class="mb-col-author">
+							<?php mb_forum_author_profile_link(); ?>
+						</td><!-- .mb-col-author -->
+					</tr>
 
-	<?php endif; // End check for posts. ?>
+				<?php elseif ( 'topic' === mb_get_content_type() ) : ?>
+
+					<tr <?php post_class(); ?>>
+						<td class="mb-col-title">
+							<?php mb_topic_link(); ?>
+							<div class="mb-topic-summary">
+								<?php the_excerpt(); ?>
+							</div><!-- .entry-meta -->
+						</td><!-- .mb-col-title -->
+
+						<td class="mb-col-datetime">
+							<?php mb_topic_date(); ?><br />
+							<?php mb_topic_time(); ?>
+						</td><!-- .mb-col-datetime -->
+
+						<td class="mb-col-author">
+							<?php mb_topic_author_profile_link(); ?>
+						</td><!-- .mb-col-author -->
+					</tr>
+
+				<?php elseif ( 'reply' === mb_get_content_type() ) : ?>
+
+					<tr <?php post_class(); ?>>
+						<td class="mb-col-title">
+							<?php mb_reply_link(); ?>
+							<div class="mb-reply-summary">
+								<?php the_excerpt(); ?>
+							</div><!-- .entry-meta -->
+						</td><!-- .mb-col-title -->
+
+						<td class="mb-col-datetime">
+							<?php mb_reply_date(); ?><br />
+							<?php mb_reply_time(); ?>
+						</td><!-- .mb-col-datetime -->
+
+						<td class="mb-col-author">
+							<?php mb_reply_author_profile_link(); ?>
+						</td><!-- .mb-col-author -->
+					</tr>
+
+				<?php endif; // End content type check. ?>
+
+			<?php endwhile; // End found posts loop. ?>
+
+		</tbody>
+
+	</table><!-- .mb-loop-reply -->
+
+	<?php mb_loop_search_pagination(); ?>
+
+<?php endif; // End check for search results. ?>

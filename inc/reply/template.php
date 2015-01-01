@@ -317,6 +317,9 @@ function mb_get_reply_id( $reply_id = 0 ) {
 	elseif ( !empty( $mb->reply_query->in_the_loop ) && isset( $mb->reply_query->post->ID ) )
 		$_reply_id = $mb->reply_query->post->ID;
 
+	elseif ( !empty( $mb->search_query->in_the_loop ) && isset( $mb->serch_query->post->ID ) )
+		$_reply_id = $mb->search_query->post->ID;
+
 	elseif ( mb_is_single_reply() )
 		$_reply_id = get_queried_object_id();
 

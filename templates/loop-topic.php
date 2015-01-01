@@ -6,7 +6,7 @@
 			<tr>
 				<th class="mb-col-title"><?php _e( 'Topics', 'message-board' ); ?> <?php mb_topic_form_link(); ?></th>
 				<th class="mb-col-count"><?php _e( 'Replies / Views', 'message-board' ); ?></th>
-				<th class="m-col-latest"><?php _e( 'Last Post', 'message-board' ); ?></th>
+				<th class="mb-col-latest"><?php _e( 'Last Post', 'message-board' ); ?></th>
 			</tr>
 		</thead>
 
@@ -14,7 +14,7 @@
 			<tr>
 				<th class="mb-col-title"><?php _e( 'Topics', 'message-board' ); ?></th>
 				<th class="mb-col-count"><?php _e( 'Replies / Views', 'message-board' ); ?></th>
-				<th class="m-col-latest"><?php _e( 'Last Post', 'message-board' ); ?></th>
+				<th class="mb-col-latest"><?php _e( 'Last Post', 'message-board' ); ?></th>
 			</tr>
 		</tfoot>
 

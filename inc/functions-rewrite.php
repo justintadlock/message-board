@@ -109,6 +109,17 @@ function mb_get_edit_slug() {
 }
 
 /**
+ * Returns the search slug.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_search_slug() {
+	return apply_filters( 'mb_get_search_slug', mb_maybe_get_root_slug() . 'search' );
+}
+
+/**
  * Adds custom query vars.
  *
  * @since  1.0.0

@@ -254,7 +254,7 @@ function mb_pre_get_posts( $query ) {
 
 		$post_type = $query->get( 'post_type' );
 
-		if ( empty( $post_type ) || 'any' === $post_type )
+		if ( empty( $post_type ) || 'any' === $post_type || !isset( $_GET['mb_search_mode'] ) )
 			$query->set( 'post_type',      array( mb_get_forum_post_type(), mb_get_topic_post_type(), mb_get_reply_post_type() ) );
 
 		$query->set( 'post_status',    array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status() ) );
@@ -466,7 +466,7 @@ function mb_parse_query( $query ) {
 function mb_404_override() {
 	global $wp_query;
 
-	if ( mb_is_user_archive() || mb_is_edit() || get_query_var( 'mb_custom' ) ) {
+	if ( mb_is_user_archive() || mb_is_edit() || get_query_var( 'mb_custom' ) || mb_is_search_results() ) {
 		status_header( 200 );
 		$wp_query->is_404        = false;
 		$wp_query->is_front_page = false;

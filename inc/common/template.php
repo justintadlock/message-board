@@ -60,6 +60,14 @@ function mb_get_thread_position( $post_id = 0 ) {
 
 /* ====== Forum Front Page ====== */
 
+function mb_board_url() {
+	echo mb_get_board_url();
+}
+
+function mb_get_board_url() {
+	echo mb_get_board_home_url();
+}
+
 function mb_board_home_url() {
 	echo mb_get_board_home_url();
 }

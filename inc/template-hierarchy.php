@@ -131,16 +131,16 @@ function mb_template_include( $template ) {
 		$_templates[] = "{$dir}/archive-user.php";
 	}
 
-	/* If viewing the advanced search page. */
-	elseif ( mb_is_search() ) {
-
-		$_templates[] = "{$dir}/search.php";
-	}
-
 	/* If viewing a search results page. */
 	elseif ( mb_is_search_results() ) {
 
 		$_templates[] = "{$dir}/search-results.php";
+	}
+
+	/* If viewing the advanced search page. */
+	elseif ( mb_is_search() ) {
+
+		$_templates[] = "{$dir}/search.php";
 	}
 
 	/* If viewing the forum login page. */
@@ -242,16 +242,16 @@ function mb_theme_compat() {
 		mb_get_template_part( 'content', 'archive-user' );
 	}
 
-	/* If viewing the advanced search page. */
-	elseif ( mb_is_search() ) {
-
-		mb_get_template_part( 'content', 'search' );
-	}
-
 	/* If viewing a search results page. */
 	elseif ( mb_is_search_results() ) {
 
 		mb_get_template_part( 'content', 'search-results' );
+	}
+
+	/* If viewing the advanced search page. */
+	elseif ( mb_is_search() ) {
+
+		mb_get_template_part( 'content', 'search' );
 	}
 
 	/* If viewing the forum login page. */

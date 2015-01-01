@@ -352,6 +352,9 @@ function mb_get_forum_id( $forum_id = 0 ) {
 	elseif ( !empty( $mb->forum_query->in_the_loop ) && isset( $mb->forum_query->post->ID ) )
 		$_forum_id = $mb->forum_query->post->ID;
 
+	elseif ( !empty( $mb->search_query->in_the_loop ) && isset( $mb->serch_query->post->ID ) )
+		$_forum_id = $mb->search_query->post->ID;
+
 	elseif ( mb_is_single_forum() )
 		$_forum_id = get_queried_object_id();
 
@@ -500,6 +503,64 @@ function mb_get_forum_link( $forum_id = 0 ) {
 	$title    = mb_get_forum_title( $forum_id );
 
 	return apply_filters( 'mb_get_forum_link', sprintf( '<a class="forum-link" href="%s">%s</a>', $url, $title ), $forum_id );
+}
+
+/**
+ * Displays the forum date.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id,
+ * @param  string  $format
+ * @return void
+ */
+function mb_forum_date( $forum_id = 0, $format = '' ) {
+	echo mb_get_forum_date( $forum_id, $format );
+}
+
+/**
+ * Returns the forum date.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id,
+ * @param  string  $format
+ * @return void
+ */
+function mb_get_forum_date( $forum_id = 0, $format = '' ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+	$format   = !empty( $format ) ? $format : get_option( 'date_format' );
+
+	return get_post_time( $format, false, $forum_id, true );
+}
+
+/**
+ * Displays the forum time.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id,
+ * @param  string  $format
+ * @return void
+ */
+function mb_forum_time( $forum_id = 0, $format = '' ) {
+	echo mb_get_forum_time( $forum_id, $format );
+}
+
+/**
+ * Returns the forum time.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id,
+ * @param  string  $format
+ * @return void
+ */
+function mb_get_forum_time( $forum_id = 0, $format = '' ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+	$format   = !empty( $format ) ? $format : get_option( 'time_format' );
+
+	return get_post_time( $format, false, $forum_id, true );
 }
 
 /* ====== Forum Author ====== */

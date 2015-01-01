@@ -15,7 +15,8 @@
 .mb-loop-forum,
 .mb-loop-topic,
 .mb-loop-reply,
-.mb-loop-user { font-size: 17px; }
+.mb-loop-user,
+.mb-loop-search { font-size: 17px; }
 
 /* === Title column. === */
 
@@ -36,6 +37,8 @@
 	.mb-col-title .mb-user-description { margin-top: 5px; }
 
 		.mb-col-title .mb-forum-content p:last-of-type,
+		.mb-col-title .mb-forum-summary p:last-of-type,
+		.mb-col-title .mb-topic-summary p:last-of-type,
 		.mb-col-title .mb-reply-summary p:last-of-type { margin-bottom: 0; }
 
 	.mb-col-title .mb-subforum-list {

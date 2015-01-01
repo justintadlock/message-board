@@ -392,6 +392,9 @@ function mb_get_topic_id( $topic_id = 0 ) {
 	elseif ( !empty( $mb->topic_query->in_the_loop ) && isset( $mb->topic_query->post->ID ) )
 		$_topic_id = $mb->topic_query->post->ID;
 
+	elseif ( !empty( $mb->search_query->in_the_loop ) && isset( $mb->serch_query->post->ID ) )
+		$_topic_id = $mb->search_query->post->ID;
+
 	elseif ( mb_is_single_topic() )
 		$_topic_id = get_queried_object_id();
 
