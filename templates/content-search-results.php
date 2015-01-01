@@ -5,8 +5,8 @@
 ?>
 
 <?php 
-	/* Loads the `form-search.php` template part. */
-	mb_get_template_part( 'form-search' ); 
+	/* Loads the `form-search-basic.php` template part. */
+	mb_get_template_part( 'form-search', 'basic' ); 
 ?>
 
 <?php 
