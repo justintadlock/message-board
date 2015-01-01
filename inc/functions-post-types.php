@@ -65,7 +65,7 @@ function mb_topic_post_type() {
  * @return string
  */
 function mb_get_topic_post_type() {
-	return apply_filters( 'mb_get_topic_post_type', 'forum_topic' );
+	return apply_filters( 'mb_get_topic_post_type', 'topic' );
 }
 
 /**
@@ -87,7 +87,7 @@ function mb_reply_post_type() {
  * @return string
  */
 function mb_get_reply_post_type() {
-	return apply_filters( 'mb_get_reply_post_type', 'forum_reply' );
+	return apply_filters( 'mb_get_reply_post_type', 'reply' );
 }
 
 /**

@@ -176,8 +176,8 @@ function mb_rewrite_rules() {
 }
 
 /**
- * Overwrites the rewrite rules for the `forum_topic` post type.  In particular, we need to handle the 
- * pagination on singular topics because the `forum_reply` post type is paginated on this page.
+ * Overwrites the rewrite rules for the `topic` post type.  In particular, we need to handle the 
+ * pagination on singular topics because the `reply` post type is paginated on this page.
  *
  * @todo See if this can be simplified where we're only taking care of the things we need.
  *
@@ -189,6 +189,7 @@ function mb_rewrite_rules() {
 function mb_forum_topic_rewrite_rules( $rules ) {
 
 	$topic_slug = mb_get_topic_slug();
+	$topic_type = mb_get_topic_post_type();
 
 	$rules = array(
 		$topic_slug . '/[^/]+/attachment/([^/]+)/?$'                               => 'index.php?attachment=$matches[1]',
@@ -196,13 +197,13 @@ function mb_forum_topic_rewrite_rules( $rules ) {
 		$topic_slug . '/[^/]+/attachment/([^/]+)/feed/(feed|rdf|rss|rss2|atom)/?$' => 'index.php?attachment=$matches[1]&feed=$matches[2]',
 		$topic_slug . '/[^/]+/attachment/([^/]+)/(feed|rdf|rss|rss2|atom)/?$'      => 'index.php?attachment=$matches[1]&feed=$matches[2]',
 		$topic_slug . '/[^/]+/attachment/([^/]+)/comment-page-([0-9]{1,})/?$'      => 'index.php?attachment=$matches[1]&cpage=$matches[2]',
-		$topic_slug . '/([^/]+)/trackback/?$'                                      => 'index.php?forum_topic=$matches[1]&tb=1',
-		$topic_slug . '/([^/]+)/feed/(feed|rdf|rss|rss2|atom)/?$'                  => 'index.php?forum_topic=$matches[1]&feed=$matches[2]',
-		$topic_slug . '/([^/]+)/(feed|rdf|rss|rss2|atom)/?$'                       => 'index.php?forum_topic=$matches[1]&feed=$matches[2]',
-		$topic_slug . '/page/?([0-9]{1,})/?$'                                      => 'index.php?post_type=forum_topic&paged=$matches[1]',
-		$topic_slug . '/([^/]+)/page/([0-9]{1,})/?$'                               => 'index.php?forum_topic=$matches[1]&paged=$matches[2]',
-		$topic_slug . '/([^/]+)(/[0-9]+)?/?$'                                      => 'index.php?forum_topic=$matches[1]&page=$matches[2]',
-		$topic_slug . '/([^/]+)/edit/([0-9]+)?/?$'                                 => 'index.php?forum_topic=$matches[1]&edit=$matches[2]',
+		$topic_slug . '/([^/]+)/trackback/?$'                                      => 'index.php?' . $topic_type . '=$matches[1]&tb=1',
+		$topic_slug . '/([^/]+)/feed/(feed|rdf|rss|rss2|atom)/?$'                  => 'index.php?' . $topic_type . '=$matches[1]&feed=$matches[2]',
+		$topic_slug . '/([^/]+)/(feed|rdf|rss|rss2|atom)/?$'                       => 'index.php?' . $topic_type . '=$matches[1]&feed=$matches[2]',
+		$topic_slug . '/page/?([0-9]{1,})/?$'                                      => 'index.php?post_type=' . $topic_type . '&paged=$matches[1]',
+		$topic_slug . '/([^/]+)/page/([0-9]{1,})/?$'                               => 'index.php?' . $topic_type . '=$matches[1]&paged=$matches[2]',
+		$topic_slug . '/([^/]+)(/[0-9]+)?/?$'                                      => 'index.php?' . $topic_type . '=$matches[1]&page=$matches[2]',
+		$topic_slug . '/([^/]+)/edit/([0-9]+)?/?$'                                 => 'index.php?' . $topic_type . '=$matches[1]&edit=$matches[2]',
 		$topic_slug . '/[^/]+/([^/]+)/?$'                                          => 'index.php?attachment=$matches[1]',
 		$topic_slug . '/[^/]+/([^/]+)/trackback/?$'                                => 'index.php?attachment=$matches[1]&tb=1',
 		$topic_slug . '/[^/]+/([^/]+)/feed/(feed|rdf|rss|rss2|atom)/?$'            => 'index.php?attachment=$matches[1]&feed=$matches[2]',

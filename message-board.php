@@ -317,6 +317,15 @@ final class Message_Board {
 	 */
 	public function activation() {
 
+		/*
+		 * Temporary code to simplify post type names and to match bbPress.
+		 *
+		global $wpdb;
+
+		$wpdb->query( "UPDATE  {$wpdb->posts} SET  post_type = 'topic' WHERE  post_type = 'forum_topic'" );
+		$wpdb->query( "UPDATE  {$wpdb->posts} SET  post_type = 'reply' WHERE  post_type = 'forum_reply'" );
+		*/
+
 		/* Get the administrator role. */
 		$role = get_role( 'administrator' );
 
