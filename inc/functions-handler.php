@@ -441,7 +441,7 @@ function mb_handler_new_reply() {
 		return;
 
 	/* Make sure the current user can create forum replies. */
-	if ( !current_user_can( 'create_forum_replies' ) )
+	if ( !current_user_can( 'create_replies' ) )
 		mb_bring_the_doom( 'no-permission' );
 
 	/* Make sure we have a topic ID. */
