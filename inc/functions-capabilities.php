@@ -322,6 +322,55 @@ function mb_map_meta_cap( $caps, $cap, $user_id, $args ) {
 		if ( mb_get_default_forum_id() === $forum_id )
 			$caps = array( 'do_not_allow' );
 
+	/* Meta cap check for accessing the forum form. */
+	} elseif ( 'access_forum_form' === $cap ) {
+
+		$caps = array( 'create_forums' );
+
+		/* If this is a single forum page, check if user can create sub-forums. */
+		if ( mb_is_single_forum() ) {
+
+			$forum_id     = mb_get_forum_id();
+			$forum_status = get_post_status( $forum_id );
+			$forum_type   = mb_get_forum_type( $forum_id );
+
+			if ( !current_user_can( 'read_forum', $forum_id ) )
+				$caps[] = 'do_not_allow';
+
+			elseif ( in_array( $forum_status, array( mb_get_close_post_status(), mb_get_trash_post_status(), mb_get_archive_post_status() ) ) )
+				$caps[] = 'do_not_allow';
+
+			elseif ( !mb_forum_type_allows_subforums( $forum_type ) )
+				$caps[] = 'do_not_allow';
+
+		} elseif ( mb_is_forum_edit() && !user_can( $user_id, 'edit_post', mb_get_forum_id() ) ) {
+			$caps[] = 'do_not_allow';
+		}
+
+	/* Meta cap check for accessing the topic form. */
+	} elseif ( 'access_topic_form' === $cap ) {
+
+		$caps = array( 'create_topics' );
+
+		if ( mb_is_single_forum() ) {
+
+			$forum_id     = mb_get_forum_id();
+			$forum_status = get_post_status( $forum_id );
+			$forum_type   = mb_get_forum_type( $forum_id );
+
+			if ( !current_user_can( 'read_forum', $forum_id ) )
+				$caps[] = 'do_not_allow';
+
+			elseif ( in_array( $forum_status, array( mb_get_close_post_status(), mb_get_trash_post_status(), mb_get_archive_post_status() ) ) )
+				$caps[] = 'do_not_allow';
+
+			elseif ( !mb_forum_type_allows_topics( $forum_type ) )
+				$caps[] = 'do_not_allow';
+
+		} elseif ( mb_is_topic_edit() && !user_can( $user_id, 'edit_post', mb_get_topic_id() ) ) {
+			$caps[] = 'do_not_allow';
+		}
+
 	/* Meta cap check for accessing the reply form. */
 	} elseif ( 'access_reply_form' === $cap ) {
 

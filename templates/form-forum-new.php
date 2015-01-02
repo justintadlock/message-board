@@ -1,5 +1,5 @@
 <?php
-if ( !current_user_can( 'create_forums' ) )
+if ( !current_user_can( 'access_forum_form' ) )
 	return;
 ?>
 

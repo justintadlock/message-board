@@ -1,11 +1,4 @@
-<?php
-if ( !current_user_can( 'create_topics' ) )
-	return; 
-
-if ( mb_is_single_forum() && !mb_is_forum_open() )
-	return;
-
-if ( mb_is_single_forum() && !mb_forum_type_allows_topics( mb_get_forum_type() ) )
+<?php if ( !current_user_can( 'access_topic_form' ) )
 	return;
 ?>
 
