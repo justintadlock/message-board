@@ -34,7 +34,7 @@ function mb_register_topic_types() {
 
 	/* Super type args. */
 	$super_args = array(
-		'replies_allowed' => false,
+		'replies_allowed' => true,
 		'_builtin'        => true,
 		'_internal'       => false,
 		'label'           => __( 'Super', 'message-board' ),
@@ -43,7 +43,7 @@ function mb_register_topic_types() {
 
 	/* Sticky type args. */
 	$sticky_args = array(
-		'replies_allowed' => false,
+		'replies_allowed' => true,
 		'_builtin'        => true,
 		'_internal'       => false,
 		'label'           => __( 'Sticky', 'message-board' ),

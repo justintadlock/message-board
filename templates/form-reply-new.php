@@ -1,5 +1,5 @@
-<?php if ( !current_user_can( 'create_replies' ) || !mb_is_topic_open( get_queried_object_id() ) )
-	return; 
+<?php if ( !current_user_can( 'access_reply_form' ) )
+	return;
 ?>
 
 <form id="reply-form" method="post" action="<?php mb_topic_url(); ?>">

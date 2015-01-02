@@ -44,9 +44,10 @@ function mb_get_forum_capabilities() {
 		'edit_post'              => 'edit_forum',
 		'read_post'              => 'read_forum',
 		'delete_post'            => 'delete_forum',
-		'moderate_post'          => 'moderate_forum', // custom
-		'close_post'             => 'close_forum',
-		'open_post'              => 'open_forum',
+		'moderate_forum'         => 'moderate_forum',    // custom
+		'close_forum'            => 'close_forum',       // custom
+		'open_forum'             => 'open_forum',        // custom
+		'access_forum_form'      => 'access_forum_form', // custom
 
 		// primitive/meta caps
 		'create_posts'           => 'create_forums',
@@ -84,10 +85,11 @@ function mb_get_topic_capabilities() {
 		'edit_post'              => 'edit_topic',
 		'read_post'              => 'read_topic',
 		'delete_post'            => 'delete_topic',
-		'moderate_post'          => 'moderate_topic', // custom
-		'close_post'             => 'close_topic',    // custom
-		'open_post'              => 'open_topic',     // custom
-		'spam_post'              => 'spam_topic',     // custom
+		'moderate_topic'         => 'moderate_topic',    // custom
+		'close_topic'            => 'close_topic',       // custom
+		'open_topic'             => 'open_topic',        // custom
+		'spam_topic'             => 'spam_topic',        // custom
+		'access_topic_form'      => 'access_topic_form', // custom
 
 		// primitive/meta caps
 		'create_posts'           => 'create_topics',
@@ -125,8 +127,9 @@ function mb_get_reply_capabilities() {
 		'edit_post'              => 'edit_reply',
 		'read_post'              => 'read_reply',
 		'delete_post'            => 'delete_reply',
-		'moderate_post'          => 'moderate_reply', // custom
-		'spam_post'              => 'spam_reply',     // custom
+		'moderate_reply'         => 'moderate_reply',    // custom
+		'spam_reply'             => 'spam_reply',        // custom
+		'access_reply_form'      => 'access_reply_form', // custom
 
 		// primitive/meta caps
 		'create_posts'           => 'create_replies',
@@ -318,6 +321,30 @@ function mb_map_meta_cap( $caps, $cap, $user_id, $args ) {
 
 		if ( mb_get_default_forum_id() === $forum_id )
 			$caps = array( 'do_not_allow' );
+
+	/* Meta cap check for accessing the reply form. */
+	} elseif ( 'access_reply_form' === $cap ) {
+
+		$caps = array( 'create_replies' );
+
+		if ( mb_is_single_topic() ) {
+
+			$topic_id     = mb_get_topic_id();
+			$topic_status = get_post_status( $topic_id );
+			$topic_type   = mb_get_topic_type( $topic_id );
+
+			if ( !current_user_can( 'read_topic', $topic_id ) )
+				$caps[] = 'do_not_allow';
+
+			elseif ( in_array( $topic_status, array( mb_get_close_post_status(), mb_get_trash_post_status() ) ) )
+				$caps[] = 'do_not_allow';
+
+			elseif ( !mb_topic_type_allows_replies( $topic_type ) )
+				$caps[] = 'do_not_allow';
+
+		} elseif ( mb_is_reply_edit() && !user_can( $user_id, 'edit_post', mb_get_reply_id() ) ) {
+			$caps[] = 'do_not_allow';
+		}
 	}
 
 	return $caps;
