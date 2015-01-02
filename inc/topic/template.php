@@ -337,10 +337,10 @@ function mb_get_topic_labels( $topic_id = 0 ) {
 	$topic_id       = mb_get_topic_id( $topic_id );
 	$labels = array();
 
-	if ( mb_is_topic_super( $topic_id ) )
-		$labels['super'] = __( '[Super Sticky]', 'message-board' );
+	if ( mb_is_topic_super( $topic_id ) && ( mb_is_topic_archive() || mb_is_single_forum() ) )
+		$labels['super'] = __( '[Sticky]', 'message-board' );
 
-	elseif ( mb_is_topic_sticky( $topic_id ) )
+	elseif ( mb_is_topic_sticky( $topic_id ) && mb_is_single_forum() )
 		$labels['sticky'] = __( '[Sticky]', 'message-board' );
 
 	if ( mb_is_topic_closed( $topic_id ) )
