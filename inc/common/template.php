@@ -457,8 +457,10 @@ function mb_pagination( $args = array(), $query = null ) {
 	);
 
 	/* Add the $base argument to the array if the user is using permalinks. */
-	if ( $wp_rewrite->using_permalinks() )
-		$defaults['base'] = user_trailingslashit( get_pagenum_link() . "{$pagination_base}/%#%" );
+	if ( $wp_rewrite->using_permalinks() && !is_search() ) {
+		$big = 999999999;
+		$defaults['base'] = str_replace( $big, '%#%', get_pagenum_link( $big ) );
+	}
 
 	/* Merge the arguments input with the defaults. */
 	$args = wp_parse_args( $args, $defaults );
