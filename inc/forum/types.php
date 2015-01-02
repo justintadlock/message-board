@@ -25,18 +25,20 @@ function mb_register_forum_types() {
 
 	/* Forum type args. */
 	$forum_args = array(
-		'topics_allowed' => true,
-		'_builtin'       => true,
-		'_internal'      => true,
-		'label'          => __( 'Normal', 'message-board' ),
+		'topics_allowed'    => true,
+		'subforums_allowed' => true,
+		'_builtin'          => true,
+		'_internal'         => true,
+		'label'             => __( 'Normal', 'message-board' ),
 	);
 
 	/* Category type args. */
 	$category_args = array(
-		'topics_allowed' => false,
-		'_builtin'       => true,
-		'_internal'      => false,
-		'label'          => __( 'Category', 'message-board' ),
+		'topics_allowed'    => false,
+		'subforums_allowed' => true,
+		'_builtin'          => true,
+		'_internal'         => false,
+		'label'             => __( 'Category', 'message-board' ),
 	);
 
 	/* Register forum types. */
@@ -60,10 +62,11 @@ function mb_register_forum_type( $name, $args = array() ) {
 	if ( !mb_forum_type_exists( $name ) ) {
 
 		$defaults = array(
-			'topics_allowed' => true,  // Whether new topics can be posted.
-			'_builtin'       => false, // Internal use only! Whether the type is built in.
-			'_internal'      => false, // Internal use only! Whether the type is internal (cannot be unregistered).
-			'label'          => '',
+			'topics_allowed'    => true,  // Whether new topics can be posted.
+			'subforums_allowed' => true,  // Whether new subforums can be created.
+			'_builtin'          => false, // Internal use only! Whether the type is built in.
+			'_internal'         => false, // Internal use only! Whether the type is internal (cannot be unregistered).
+			'label'             => '',
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -192,6 +195,18 @@ function mb_set_forum_type( $forum_id, $type ) {
  */
 function mb_forum_type_allows_topics( $type ) {
 	return mb_get_forum_type_object( $type )->topics_allowed;
+}
+
+/**
+ * Conditional check to see if a forum type allows new subforums to be created.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $type
+ * @return bool
+ */
+function mb_forum_type_allows_subforums( $type ) {
+	return mb_get_forum_type_object( $type )->subforums_allowed;
 }
 
 /**
