@@ -200,7 +200,7 @@ function mb_topic_type( $topic_id = 0 ) {
 function mb_get_topic_type( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	$topic_type = get_post_meta( $topic_id, mb_get_topic_type_meta_key(), true );
+	$topic_type = $topic_id ? get_post_meta( $topic_id, mb_get_topic_type_meta_key(), true ) : '';
 
 	$topic_type = !empty( $topic_type ) && mb_topic_type_exists( $topic_type ) ? $topic_type : 'normal';
 
@@ -336,7 +336,7 @@ function mb_dropdown_topic_type( $args = array() ) {
 	$defaults = array(
 		'name'      => 'mb_topic_type',
 		'id'        => 'mb_topic_type',
-		'selected'  => '',
+		'selected'  => mb_get_topic_type(),
 		'echo'      => true
 	);
 

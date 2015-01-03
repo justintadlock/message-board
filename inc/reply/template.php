@@ -286,6 +286,18 @@ function mb_get_reply_toggle_trash_link( $reply_id = 0 ) {
 	return $link;
 }
 
+/* ====== Reply Labels ====== */
+
+function mb_reply_label( $label ) {
+	echo mb_get_reply_label( $label );
+}
+
+function mb_get_reply_label( $label ) {
+	$labels = get_post_type_object( mb_get_reply_post_type() )->labels;
+
+	return $labels->$label;
+}
+
 /* ====== Reply ID ====== */
 
 /**
@@ -340,7 +352,8 @@ function mb_reply_content( $reply_id = 0 ) {
 
 function mb_get_reply_content( $reply_id = 0, $mode = 'display' ) {
 	$reply_id = mb_get_reply_id( $reply_id );
-	$content  = get_post_field( 'post_content', $reply_id, 'raw' );
+
+	$content  = $reply_id ? get_post_field( 'post_content', $reply_id, 'raw' ) : '';
 
 	if ( 'raw' === $mode )
 		return $content;

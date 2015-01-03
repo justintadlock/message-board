@@ -162,7 +162,7 @@ function mb_forum_type( $forum_id = 0 ) {
 function mb_get_forum_type( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 
-	$forum_type = get_post_meta( $forum_id, mb_get_forum_type_meta_key(), true );
+	$forum_type = $forum_id ? get_post_meta( $forum_id, mb_get_forum_type_meta_key(), true ) : '';
 
 	$forum_type = !empty( $forum_type ) && mb_forum_type_exists( $forum_type ) ? $forum_type : 'forum';
 
@@ -222,7 +222,7 @@ function mb_dropdown_forum_type( $args = array() ) {
 	$defaults = array(
 		'name'      => 'mb_forum_type',
 		'id'        => 'mb_forum_type',
-		'selected'  => '',
+		'selected'  => mb_get_forum_type(),
 		'echo'      => true
 	);
 

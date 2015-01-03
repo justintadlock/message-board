@@ -128,6 +128,17 @@ function mb_get_topic_edit_link( $topic_id = 0 ) {
 
 /* ====== Topic Status ====== */
 
+function mb_topic_status( $topic_id = 0 ) {
+	echo mb_get_topic_status();
+}
+
+function mb_get_topic_status( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$status   = $topic_id ? get_post_status( $topic_id ) : mb_get_open_post_status();
+
+	return apply_filters( 'mb_get_topic_status', $status, $topic_id );
+}
+
 /**
  * Whether the topic's post status is a "public" post status.
  *
@@ -315,6 +326,16 @@ function mb_get_topic_toggle_trash_link( $topic_id = 0 ) {
 
 /* ====== Topic Labels ====== */
 
+function mb_topic_label( $label ) {
+	echo mb_get_topic_label( $label );
+}
+
+function mb_get_topic_label( $label ) {
+	$labels = get_post_type_object( mb_get_topic_post_type() )->labels;
+
+	return $labels->$label;
+}
+
 /**
  * Outputs a topics labels.
  *
@@ -322,8 +343,8 @@ function mb_get_topic_toggle_trash_link( $topic_id = 0 ) {
  * @access public
  * @return void
  */
-function mb_topic_labels( $topic_id = 0 ) {
-	echo mb_get_topic_labels( $topic_id );
+function mb_topic_states( $topic_id = 0 ) {
+	echo mb_get_topic_states( $topic_id );
 }
 
 /**
@@ -333,7 +354,7 @@ function mb_topic_labels( $topic_id = 0 ) {
  * @access public
  * @return string
  */
-function mb_get_topic_labels( $topic_id = 0 ) {
+function mb_get_topic_states( $topic_id = 0 ) {
 	$topic_id       = mb_get_topic_id( $topic_id );
 	$labels = array();
 
@@ -487,7 +508,9 @@ function mb_topic_title( $topic_id = 0 ) {
  */
 function mb_get_topic_title( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-	return apply_filters( 'mb_get_topic_title', mb_get_post_title( $topic_id ), $topic_id );
+	$title    = $topic_id ? get_post_field( 'post_title', $topic_id ) : '';
+
+	return apply_filters( 'mb_get_topic_title', $title, $topic_id );
 }
 
 /* ====== Topic URL ====== */
@@ -707,9 +730,7 @@ function mb_get_topic_author_profile_link( $topic_id = 0 ) {
 
 function mb_get_topic_forum_id( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-
-	$topic_obj = get_post( $topic_id );
-	$forum_id  = is_object( $topic_obj ) ? $topic_obj->post_parent : 0;
+	$forum_id = $topic_id ? get_post( $topic_id )->post_parent : 0;
 
 	return apply_filters( 'mb_get_topic_forum_id', $forum_id, $topic_id );
 }

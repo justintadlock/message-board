@@ -5,11 +5,11 @@
 <form id="reply-form" method="post" action="<?php mb_topic_url(); ?>">
 
 	<fieldset>
-		<legend><?php _e( 'Leave A Reply', 'message-board' ); ?></legend>
+		<legend><?php mb_reply_label( 'add_new_item' ); ?></legend>
 
 		<p>
-			<label for="mb_reply_content" name="mb_reply_content"><?php _e( 'Please put code in between <code>`backtick`</code> characters.', 'message-board' ); ?></label>
-			<textarea id="mb_reply_content" name="mb_reply_content"></textarea>
+			<label for="mb_reply_content" name="mb_reply_content"><?php mb_reply_label( 'mb_form_content' ); ?></label>
+			<textarea id="mb_reply_content" name="mb_reply_content"><?php echo format_to_edit( mb_code_trick_reverse( mb_get_reply_content( mb_get_reply_id(), 'raw' ) ) ); ?></textarea>
 		</p>
 
 		<p>

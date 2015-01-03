@@ -159,6 +159,12 @@ function mb_register_post_types() {
 
 			/* Custom archive label.  Must filter 'post_type_archive_title' to use. */
 			'archive_title'      => __( 'Forums',                   'message-board' ),
+			'mb_form_title'      => __( 'Forum Title:',             'message-board' ),
+			'mb_form_type'       => __( 'Forum Type:',              'message-board' ),
+			'mb_form_status'     => __( 'Status:',                  'message-board' ),
+			'mb_form_order'      => __( 'Order:',                   'message-board' ),
+			'mb_form_content'    => __( 'Description:',             'message-board' ),
+			'mb_form_subscribe'  => __( 'Notify me of topics and posts via email', 'message-board' ),
 		)
 	);
 
@@ -214,6 +220,11 @@ function mb_register_post_types() {
 
 			/* Custom archive label.  Must filter 'post_type_archive_title' to use. */
 			'archive_title'      => __( 'Topics',                   'message-board' ),
+			'mb_form_title'      => __( 'Topic Title:',             'message-board' ),
+			'mb_form_type'       => __( 'Topic Type:',              'message-board' ),
+			'mb_form_status'     => __( 'Status:',                  'message-board' ),
+			'mb_form_content'    => __( 'Content:',                 'message-board' ),
+			'mb_form_subscribe'  => __( 'Notify me of follow-up posts via email', 'message-board' ),
 		)
 	);
 
@@ -257,7 +268,7 @@ function mb_register_post_types() {
 			'name_admin_bar'     => __( 'Reply',                     'message-board' ),
 			'all_items'          => __( 'Replies',                   'message-board' ),
 			'add_new'            => __( 'Add Reply',                 'message-board' ),
-			'add_new_item'       => __( 'Add New Reply',             'message-board' ),
+			'add_new_item'       => __( 'Leave A Reply',             'message-board' ),
 			'edit_item'          => __( 'Edit Reply',                'message-board' ),
 			'new_item'           => __( 'New Reply',                 'message-board' ),
 			'view_item'          => __( 'View Reply',                'message-board' ),
@@ -268,6 +279,8 @@ function mb_register_post_types() {
 
 			/* Custom archive label.  Must filter 'post_type_archive_title' to use. */
 			'archive_title'      => __( 'Replies',                   'message-board' ),
+			'mb_form_content'    => __( 'Message:',                  'message-board' ),
+			'mb_form_subscribe'  => __( 'Notify me of follow-up posts via email', 'message-board' ),
 		)
 	);
 

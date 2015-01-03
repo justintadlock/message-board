@@ -246,7 +246,7 @@ function mb_register_post_statuses() {
 	$hidden_args = array(
 		'label'                     => __( 'Hidden', 'message-board' ),
 		'label_verb'                => __( 'Hide',   'message-board' ), // custom
-		'label_count'               => _n_noop( 'Orphan <span class="count">(%s)</span>', 'Orphan <span class="count">(%s)</span>', 'message-board' ),
+		'label_count'               => _n_noop( 'Hidden <span class="count">(%s)</span>', 'Hidden <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => false,
 		'private'                   => true,
 		'protected'                 => false,

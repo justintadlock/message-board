@@ -29,7 +29,7 @@
 					<td class="mb-col-title">
 						<?php mb_topic_link(); ?>
 						<div class="mb-topic-meta">
-							<?php mb_topic_labels(); ?>
+							<?php mb_topic_states(); ?>
 							<?php printf( __( 'Started by %s', 'message-board' ), mb_get_topic_author_profile_link() ); ?> 
 							<?php mb_topic_date(); ?> 
 							<?php mb_topic_time(); ?>

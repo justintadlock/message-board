@@ -140,6 +140,17 @@ function mb_is_forum_archive() {
 
 /* ====== Forum Status ====== */
 
+function mb_forum_status( $forum_id = 0 ) {
+	echo mb_get_forum_status();
+}
+
+function mb_get_forum_status( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+	$status   = $forum_id ? get_post_status( $forum_id ) : mb_get_open_post_status();
+
+	return apply_filters( 'mb_get_forum_status', $status, $forum_id );
+}
+
 /**
  * Whether the forum's post status is a "public" post status.
  *
@@ -279,6 +290,16 @@ function mb_get_forum_toggle_trash_link( $forum_id = 0 ) {
 
 /* ====== Forum Labels ====== */
 
+function mb_forum_label( $label ) {
+	echo mb_get_forum_label( $label );
+}
+
+function mb_get_forum_label( $label ) {
+	$labels = get_post_type_object( mb_get_forum_post_type() )->labels;
+
+	return $labels->$label;
+}
+
 /**
  * Outputs a forums labels.
  *
@@ -286,8 +307,8 @@ function mb_get_forum_toggle_trash_link( $forum_id = 0 ) {
  * @access public
  * @return void
  */
-function mb_forum_labels( $forum_id = 0 ) {
-	echo mb_get_forum_labels( $forum_id );
+function mb_forum_states( $forum_id = 0 ) {
+	echo mb_get_forum_states( $forum_id );
 }
 
 /**
@@ -297,13 +318,13 @@ function mb_forum_labels( $forum_id = 0 ) {
  * @access public
  * @return string
  */
-function mb_get_forum_labels( $forum_id = 0 ) {
+function mb_get_forum_states( $forum_id = 0 ) {
 	$forum_id       = mb_get_forum_id( $forum_id );
 	$labels = array();
 
 	/* @todo Default labels - closed, private, etc. */
 
-	$labels = apply_filters( 'mb_forum_labels', $labels, $forum_id );
+	$labels = apply_filters( 'mb_get_forum_states', $labels, $forum_id );
 
 	if ( !empty( $labels ) ) {
 
@@ -392,7 +413,7 @@ function mb_forum_content( $forum_id = 0 ) {
 function mb_get_forum_content( $forum_id = 0, $mode = 'display' ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 
-	$content = mb_get_post_content( $forum_id );
+	$content = $forum_id ? mb_get_post_content( $forum_id ) : '';
 
 	if ( 'raw' === $mode )
 		return $content;
@@ -447,7 +468,9 @@ function mb_forum_title( $forum_id = 0 ) {
  */
 function mb_get_forum_title( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
-	return apply_filters( 'mb_get_forum_title', mb_get_post_title( $forum_id ), $forum_id );
+	$title    = $forum_id ? get_post_field( 'post_title', $forum_id ) : '';
+
+	return apply_filters( 'mb_get_forum_title', $title, $forum_id );
 }
 
 /* ====== Forum URL ====== */
@@ -851,7 +874,7 @@ function mb_get_forum_last_topic_title( $forum_id = 0 ) {
 function mb_get_forum_order( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 
-	$order = get_post( $forum_id )->menu_order;
+	$order = $forum_id ? get_post( $forum_id )->menu_order : 0;
 
 	return apply_filters( 'mb_get_forum_order', $order, $forum_id );
 }
@@ -859,7 +882,7 @@ function mb_get_forum_order( $forum_id = 0 ) {
 function mb_get_forum_parent_id( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 
-	$parent_id = get_post( $forum_id )->post_parent;
+	$parent_id = $forum_id ? get_post( $forum_id )->post_parent : 0;
 
 	return apply_filters( 'mb_get_forum_parent_id', $parent_id, $forum_id );
 }
