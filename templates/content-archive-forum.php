@@ -6,8 +6,8 @@
 ?>
 
 <?php 
-	/* Loads the `loop-forum.php` template part.  Falls back to the `loop.php` template part. */
-	mb_get_template_part( 'loop', 'forum' );
+	/* Loads the `loop-forum-hierarchical.php` template part.  Falls back to the `loop.php` template part. */
+	mb_get_template_part( 'loop', 'forum-hierarchical' );
 ?>
 
 <?php 

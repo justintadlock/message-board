@@ -453,12 +453,12 @@ function mb_topic_content( $topic_id = 0 ) {
 function mb_get_topic_content( $topic_id = 0, $mode = 'display' ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	$content = mb_get_post_content( $topic_id );
+	$content = $topic_id ? get_post_field( 'post_content', $topic_id, 'raw' ) : '';
 
 	if ( 'raw' === $mode )
 		return $content;
 	else
-		return apply_filters( 'mb_get_topic_content', mb_get_post_content( $topic_id ), $topic_id );
+		return apply_filters( 'mb_get_topic_content', $content, $topic_id );
 }
 
 /* ====== Topic Title ====== */

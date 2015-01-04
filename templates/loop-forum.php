@@ -4,10 +4,7 @@
 
 		<thead>
 			<tr>
-				<th class="mb-col-title">
-					<?php mb_is_single_forum() ? _e( 'Sub-forums', 'message-board' ) : _e( 'Forums', 'message-board' ); ?> 
-					<?php if ( mb_is_forum_archive() ) mb_forum_form_link(); ?>
-				</th>
+				<th class="mb-col-title"><?php mb_is_single_forum() ? _e( 'Sub-forums', 'message-board' ) : _e( 'Forums', 'message-board' ); ?></th>
 				<th class="mb-col-count"><?php _e( 'Topics / Replies', 'message-board' ); ?></th>
 				<th class="mb-col-latest"><?php _e( 'Last Post', 'message-board' ); ?></th>
 			</tr>
@@ -15,9 +12,7 @@
 
 		<tfoot>
 			<tr>
-				<th class="mb-col-title">
-					<?php mb_is_single_forum() ? _e( 'Sub-forums', 'message-board' ) : _e( 'Forums', 'message-board' ); ?>
-				</th>
+				<th class="mb-col-title"><?php mb_is_single_forum() ? _e( 'Sub-forums', 'message-board' ) : _e( 'Forums', 'message-board' ); ?></th>
 				<th class="mb-col-count"><?php _e( 'Topics / Replies', 'message-board' ); ?></th>
 				<th class="mb-col-latest"><?php _e( 'Last Post', 'message-board' ); ?></th>
 			</tr>

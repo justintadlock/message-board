@@ -413,7 +413,7 @@ function mb_forum_content( $forum_id = 0 ) {
 function mb_get_forum_content( $forum_id = 0, $mode = 'display' ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 
-	$content = $forum_id ? mb_get_post_content( $forum_id ) : '';
+	$content = $forum_id ? get_post_field( 'post_content', $forum_id, 'raw' ) : '';
 
 	if ( 'raw' === $mode )
 		return $content;
