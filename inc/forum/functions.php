@@ -57,6 +57,9 @@ function mb_insert_forum( $args = array() ) {
  */
 function mb_insert_forum_data( $post ) {
 
+	/* Hook for before inserting forum data. */
+	do_action( 'mb_before_insert_forum_data', $post );
+
 	/* Get the forum ID. */
 	$forum_id = mb_get_forum_id( $post->ID );
 
@@ -68,6 +71,12 @@ function mb_insert_forum_data( $post ) {
 
 	/* Add forum meta. */
 	mb_reset_forum_level( $forum_id );
+
+	/* Notify subscribers that there's a new forum. */
+	mb_notify_subscribers( $post );
+
+	/* Hook for after inserting forum data. */
+	do_action( 'mb_after_insert_forum_data', $post );
 }
 
 /**

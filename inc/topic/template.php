@@ -1136,9 +1136,8 @@ function mb_topic_subscribe_url( $topic_id = 0 ) {
  */
 function mb_get_topic_subscribe_url( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
-	$url = esc_url( add_query_arg( array( 'action' => 'subscribe', 'topic_id' => $topic_id, 'redirect' => $redirect ), trailingslashit( home_url( 'board' ) ) ) );
+	$url = esc_url( add_query_arg( array( 'action' => 'subscribe', 'topic_id' => $topic_id ) ) );
 
 	return apply_filters( 'mb_get_topic_subscribe_url', $url, $topic_id );
 }
@@ -1165,9 +1164,8 @@ function mb_topic_unsubscribe_url( $topic_id = 0 ) {
  */
 function mb_get_topic_unsubscribe_url( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
-	$url = esc_url( add_query_arg( array( 'action' => 'unsubscribe', 'topic_id' => $topic_id, 'redirect' => $redirect ), trailingslashit( home_url( 'board' ) ) ) );
+	$url = esc_url( add_query_arg( array( 'action' => 'unsubscribe', 'topic_id' => $topic_id ) ) );
 
 	return apply_filters( 'mb_get_topic_unsubscribe_url', $url, $topic_id );
 }
@@ -1213,25 +1211,6 @@ function mb_get_topic_subscribe_link( $topic_id = 0 ) {
 	}
 
 	return $link;
-}
-
-/**
- * Checks if the user is subscribed to the topic.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $user_id
- * @param  int     $topic_id
- * @return bool
- */
-function mb_is_user_subscribed_topic( $user_id = 0, $topic_id = 0 ) {
-
-	$user_id  = 0 < $user_id ? $user_id : get_current_user_id();
-	$topic_id = mb_get_topic_id( $topic_id );
-
-	$subs = mb_get_user_subscriptions( $user_id );
-
-	return in_array( $topic_id, $subs ) ? true : false;
 }
 
 /* ====== Topic Bookmarks ====== */

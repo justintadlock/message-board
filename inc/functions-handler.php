@@ -354,7 +354,7 @@ function mb_handler_new_topic() {
 
 		/* If the user chose to subscribe to the topic. */
 		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 == $_POST['mb_topic_subscribe'] )
-			mb_add_user_subscription( get_current_user_id(), $published );
+			mb_add_user_topic_subscription( get_current_user_id(), $published );
 
 		/* Redirect to the published topic page. */
 		wp_safe_redirect( get_permalink( $published ) );
@@ -418,9 +418,9 @@ function mb_handler_edit_topic() {
 
 		/* If the user chose to subscribe to the topic. */
 		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 === absint( $_POST['mb_topic_subscribe'] ) )
-			mb_add_user_subscription( absint( $user_id ), $published );
+			mb_add_user_topic_subscription( absint( $user_id ), $published );
 		else
-			mb_remove_user_subscription( absint( $user_id ), $published );
+			mb_remove_user_topic_subscription( absint( $user_id ), $published );
 
 		/* Redirect to the published topic page. */
 		wp_safe_redirect( get_permalink( $published ) );
@@ -471,7 +471,7 @@ function mb_handler_new_reply() {
 
 		/* If the user chose to subscribe to the topic. */
 		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 === absint( $_POST['mb_topic_subscribe'] ) )
-			mb_add_user_subscription( absint( $user_id ), $topic_id );
+			mb_add_user_topic_subscription( absint( $user_id ), $topic_id );
 
 		/* Redirect to the published topic page. */
 		wp_safe_redirect( get_permalink( $published ) );
@@ -524,9 +524,9 @@ function mb_handler_edit_reply() {
 
 		/* If the user chose to subscribe to the topic. */
 		if ( isset( $_POST['mb_topic_subscribe'] ) && 1 === absint( $_POST['mb_topic_subscribe'] ) )
-			mb_add_user_subscription( $user_id, $topic_id );
+			mb_add_user_topic_subscription( $user_id, $topic_id );
 		else
-			mb_remove_user_subscription( $user_id, $topic_id );
+			mb_remove_topic_user_subscription( $user_id, $topic_id );
 
 		/* Redirect to the published topic page. */
 		wp_safe_redirect( get_permalink( $published ) );
@@ -611,25 +611,17 @@ function mb_handler_topic_subscribe() {
 
 	if ( 0 < $user_id && 0 < $topic_id && 'subscribe' === $_GET['action'] ) {
 
-		$added = mb_add_user_subscription( absint( $user_id ), $topic_id );
-
-		if ( $added ) {
-			mb_set_topic_subscribers( $topic_id );
-		}
+		$added = mb_add_user_topic_subscription( absint( $user_id ), $topic_id );
 
 	} elseif ( 0 < $user_id && 0 < $topic_id && 'unsubscribe' === $_GET['action'] ) {
 
-		$removed = mb_remove_user_subscription( $user_id, $topic_id );
+		$removed = mb_remove_user_topic_subscription( $user_id, $topic_id );
 
-		if ( $removed ) {
-			mb_set_topic_subscribers( $topic_id );
-		}
 	}
 
-		if ( isset( $_GET['redirect'] ) ) {
+	$redirect_url = remove_query_arg( array( 'action', 'topic_id' ) );
 
-			wp_safe_redirect( esc_url( strip_tags( $_GET['redirect'] ) ) );
-		}
+	wp_safe_redirect( esc_url( $redirect_url ) );
 }
 
 

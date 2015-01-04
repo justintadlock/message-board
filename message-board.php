@@ -234,8 +234,9 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/reply/template.php'  );
 
 		/* Load user files. */
-		require_once( $this->dir_path . 'inc/user/functions.php' );
-		require_once( $this->dir_path . 'inc/user/template.php'  );
+		require_once( $this->dir_path . 'inc/user/functions.php'     );
+		require_once( $this->dir_path . 'inc/user/template.php'      );
+		require_once( $this->dir_path . 'inc/user/subscriptions.php' );
 
 		/* Load search files. */
 		require_once( $this->dir_path . '/inc/search/template.php' );

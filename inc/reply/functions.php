@@ -54,6 +54,9 @@ function mb_insert_reply( $args = array() ) {
  */
 function mb_insert_reply_data( $post ) {
 
+	/* Hook for before inserting reply data. */
+	do_action( 'mb_before_insert_reply_data', $post );
+
 	/* Get the reply ID. */
 	$reply_id = mb_get_reply_id( $post->ID );
 
@@ -102,9 +105,11 @@ function mb_insert_reply_data( $post ) {
 	mb_set_forum_last_topic_id(     $forum_id, $topic_id          );
 	mb_set_forum_reply_count(       $forum_id, $forum_reply_count );
 
-	/* Notify subscribers. */
-	mb_notify_topic_subscribers( $topic_id, $reply_id );
-	//mb_notify_forum_subscribers();
+	/* Notify subscribers that there's a new reply. */
+	mb_notify_subscribers( $post );
+
+	/* Hook for after inserting reply data. */
+	do_action( 'mb_after_insert_reply_data', $post );
 }
 
 function mb_reply_post_type_link( $link, $post ) {

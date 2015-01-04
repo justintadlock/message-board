@@ -63,6 +63,9 @@ function mb_insert_topic( $args = array() ) {
  */
 function mb_insert_topic_data( $post ) {
 
+	/* Hook for before inserting topic data. */
+	do_action( 'mb_before_insert_topic_data', $post );
+
 	/* Get the topic ID. */
 	$topic_id = mb_get_topic_id( $post->ID );
 
@@ -98,6 +101,12 @@ function mb_insert_topic_data( $post ) {
 		mb_set_forum_last_topic_id(     $forum_id, $topic_id                  );
 		mb_set_forum_topic_count(       $forum_id, absint( $topic_count ) + 1 );
 	}
+
+	/* Notify subscribers that there's a new topic. */
+	mb_notify_subscribers( $post );
+
+	/* Hook for after inserting topic data. */
+	do_action( 'mb_after_insert_topic_data', $post );
 }
 
 /**
@@ -130,29 +139,6 @@ function mb_get_multi_topic_reply_ids( $topic_ids ) {
 	global $wpdb;
 
 	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s AND post_parent IN ( " . implode( ',', $topic_ids ) . " ) ORDER BY post_date DESC", mb_get_reply_post_type(), mb_get_publish_post_status() ) );
-}
-
-/**
- * Get an array of user IDs for users who are subscribed to the topic.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $topic_id
- * @return array
- */
-function mb_get_topic_subscribers( $topic_id = 0 ) {
-	$topic_id = mb_get_topic_id( $topic_id );
-
-	$users = wp_cache_get( 'mb_get_topic_subscribers_' . $topic_id, 'message-board-users' );
-
-	if ( false === $users ) {
-		global $wpdb;
-
-		$users = $wpdb->get_col( $wpdb->prepare( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s AND FIND_IN_SET( '{$topic_id}', meta_value ) > 0", mb_get_user_topic_subscriptions_meta_key() ) );
-		wp_cache_set( 'mb_get_topic_subscribers_' . $topic_id, $users, 'message-board-users' );
-	}
-
-	return apply_filters( 'mb_get_topic_subscribers', $users );
 }
 
 /**
