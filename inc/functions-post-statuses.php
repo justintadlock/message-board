@@ -174,11 +174,26 @@ function mb_get_reply_post_statuses() {
  * @return void
  */
 function mb_register_post_statuses() {
+	global $wp_post_statuses;
+
+	/* Add custom arguments to the "publish" status. */
+	if ( isset( $wp_post_statuses['publish'] ) && 'publish' === mb_get_publish_post_status() ) {
+		$wp_post_statuses['publish']->mb_show_in_status_select = true;
+	}
+
+	/* Add custom arguments to the "trash" status. */
+	if ( isset( $wp_post_statuses['trash'] ) && 'trash' === mb_get_trash_post_status() ) {
+		$wp_post_statuses['trash']->mb_show_in_status_select = false;
+	}
+
+	/* Add custom arguments to the "private" status. */
+	if ( isset( $wp_post_statuses['private'] ) && 'private' === mb_get_private_post_status() ) {
+		$wp_post_statuses['private']->mb_show_in_status_select = true;
+	}
 
 	/* Open status args. */
 	$open_args = array(
 		'label'                     => __( 'Open', 'message-board' ),
-		'label_verb'                => __( 'Open', 'message-board' ), // custom
 		'label_count'               => _n_noop( 'Open <span class="count">(%s)</span>', 'Open <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => true,
 		'private'                   => false,
@@ -186,12 +201,15 @@ function mb_register_post_statuses() {
 		'publicly_queryable'        => true,
 		'show_in_admin_status_list' => true,
 		'show_in_admin_all_list'    => true,
+
+		/* Custom arguments. */
+		'mb_label_verb'             => __( 'Open', 'message-board' ),
+		'mb_show_in_status_select'  => true,
 	);
 
 	/* Close status args. */
 	$close_args = array(
 		'label'                     => __( 'Closed', 'message-board' ),
-		'label_verb'                => __( 'Close',  'message-board' ), // custom
 		'label_count'               => _n_noop( 'Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => true,
 		'private'                   => false,
@@ -199,12 +217,15 @@ function mb_register_post_statuses() {
 		'publicly_queryable'        => true,
 		'show_in_admin_status_list' => true,
 		'show_in_admin_all_list'    => true,
+
+		/* Custom arguments. */
+		'mb_label_verb'             => __( 'Close', 'message-board' ),
+		'mb_show_in_status_select'  => true,
 	);
 
 	/* Archive status args. */
 	$archive_args = array(
 		'label'                     => __( 'Archive', 'message-board' ),
-		'label_verb'                => __( 'Archive', 'message-board' ), // custom
 		'label_count'               => _n_noop( 'Archived <span class="count">(%s)</span>', 'Archived <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => true,
 		'private'                   => false,
@@ -212,12 +233,15 @@ function mb_register_post_statuses() {
 		'publicly_queryable'        => true,
 		'show_in_admin_status_list' => true,
 		'show_in_admin_all_list'    => true,
+
+		/* Custom arguments. */
+		'mb_label_verb'             => __( 'Archive', 'message-board' ),
+		'mb_show_in_status_select'  => true,
 	);
 
 	/* Spam status args. */
 	$spam_args = array(
 		'label'                     => __( 'Spam', 'message-board' ),
-		'label_verb'                => __( 'Spam', 'message-board' ), // custom
 		'label_count'               => _n_noop( 'Spam <span class="count">(%s)</span>', 'Spam <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => false,
 		'private'                   => false,
@@ -226,12 +250,15 @@ function mb_register_post_statuses() {
 		'exclude_from_search'       => true,
 		'show_in_admin_status_list' => true,
 		'show_in_admin_all_list'    => false,
+
+		/* Custom arguments. */
+		'mb_label_verb'             => __( 'Spam', 'message-board' ),
+		'mb_show_in_status_select'  => true,
 	);
 
 	/* Orphan status args. */
 	$orphan_args = array(
 		'label'                     => __( 'Orphan', 'message-board' ),
-		'label_verb'                => __( 'Orphan', 'message-board' ), // custom
 		'label_count'               => _n_noop( 'Orphan <span class="count">(%s)</span>', 'Orphan <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => false,
 		'private'                   => false,
@@ -240,12 +267,15 @@ function mb_register_post_statuses() {
 		'exclude_from_search'       => true,
 		'show_in_admin_status_list' => true,
 		'show_in_admin_all_list'    => false,
+
+		/* Custom arguments. */
+		'mb_label_verb'             => __( 'Orphan', 'message-board' ),
+		'mb_show_in_status_select'  => false,
 	);
 
 	/* Hidden status args. */
 	$hidden_args = array(
 		'label'                     => __( 'Hidden', 'message-board' ),
-		'label_verb'                => __( 'Hide',   'message-board' ), // custom
 		'label_count'               => _n_noop( 'Hidden <span class="count">(%s)</span>', 'Hidden <span class="count">(%s)</span>', 'message-board' ),
 		'public'                    => false,
 		'private'                   => true,
@@ -254,6 +284,10 @@ function mb_register_post_statuses() {
 		'exclude_from_search'       => true,
 		'show_in_admin_status_list' => true,
 		'show_in_admin_all_list'    => false,
+
+		/* Custom arguments. */
+		'mb_label_verb'             => __( 'Hide', 'message-board' ),
+		'mb_show_in_status_select'  => true,
 	);
 
 	/* Register post statuses. */

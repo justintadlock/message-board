@@ -130,6 +130,9 @@ function mb_dropdown_post_status( $args = array() ) {
 	foreach ( $stati as $status ) {
 		$status_obj = get_post_status_object( $status );
 
+		if ( false === $status_obj->mb_show_in_status_select )
+			continue;
+
 		$out .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $status_obj->name ), selected( $status_obj->name, $args['selected'], false ), $status_obj->label );
 	}
 

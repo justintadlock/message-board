@@ -330,7 +330,7 @@ final class Message_Board_Admin_Edit_Forums {
 			$close_object = get_post_status_object( mb_get_close_post_status() );
 
 			/* Get open/close link text. */
-			$open_text = mb_is_forum_open( $forum_id ) ? $close_object->label_verb : $open_object->label_verb;
+			$open_text = mb_is_forum_open( $forum_id ) ? $close_object->mb_label_verb : $open_object->mb_label_verb;
 
 			/* Build open/close toggle URL. */
 			$open_url = remove_query_arg( array( 'forum_id', 'mb_forum_notice' ) );

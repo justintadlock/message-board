@@ -251,7 +251,7 @@ function mb_get_forum_toggle_open_link( $forum_id = 0 ) {
 
 	$status = mb_is_forum_open( $forum_id ) ? get_post_status_object( mb_get_close_post_status() ) : get_post_status_object( mb_get_open_post_status() );
 
-	$link = sprintf( '<a class="toggle-open-link" href="%s">%s</a>', mb_get_forum_toggle_open_url( $forum_id ), $status->label_verb );
+	$link = sprintf( '<a class="toggle-open-link" href="%s">%s</a>', mb_get_forum_toggle_open_url( $forum_id ), $status->mb_label_verb );
 
 	return $link;
 }
