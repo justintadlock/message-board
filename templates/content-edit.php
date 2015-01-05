@@ -1,5 +1,5 @@
 <div class="loop-meta">
-	<h1 class="topic-title loop-title">Edit</h1>
+	<h1 class="topic-title loop-title"><?php _e( 'Edit', 'message-board' ); ?></h1>
 </div>
 
 <?php if ( mb_is_forum_edit() ) : ?>

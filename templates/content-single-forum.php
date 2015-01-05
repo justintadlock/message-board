@@ -30,7 +30,7 @@
 
 <?php else: ?>
 
-	<p class="mb-error">Sorry, but you do not have permission to view this forum.</p>
+	<p class="mb-error"><?php _e( 'Sorry, but you do not have permission to view this forum.', 'message-board' ); ?></p>
 
 <?php endif; ?>
 
