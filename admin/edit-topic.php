@@ -104,13 +104,11 @@ final class Message_Board_Admin_Edit_Topics {
 			$new_vars['post_parent'] = mb_get_forum_id( $_GET['post_parent'] );
 		}
 
-		elseif ( isset( $_GET['show_super'] ) && 1 === absint( $_GET['show_super'] ) ) {
+		/* Get topics by a specific topic type. */
+		elseif ( isset( $_GET['topic_type'] ) && mb_topic_type_exists( $_GET['topic_type'] ) ) {
 
-			$new_vars['post__in'] = mb_get_super_topics();
-		}
-
-		elseif ( isset( $_GET['show_sticky'] ) && 1 === absint( $_GET['show_sticky'] ) ) {
-			$new_vars['post__in'] = mb_get_sticky_topics();
+			$new_vars['meta_key']   = mb_get_topic_type_meta_key();
+			$new_vars['meta_value'] = sanitize_key( $_GET['topic_type'] );
 		}
 
 		/* Order topics by their forums. */
@@ -163,12 +161,12 @@ final class Message_Board_Admin_Edit_Topics {
 
 		if ( 0 < $super_count ) {
 			$super_text = sprintf( _n( 'Super <span class="count">(%s)</span>', 'Super <span class="count">(%s)</span>', $super_count, 'message-board' ), number_format_i18n( $super_count ) );
-			$views['super'] = sprintf( '<a href="%s">%s</a>', add_query_arg( array( 'post_type' => $post_type, 'show_super' => 1 ), admin_url( 'edit.php' ) ), $super_text );
+			$views['super'] = sprintf( '<a href="%s">%s</a>', add_query_arg( array( 'post_type' => $post_type, 'topic_type' => 'super' ), admin_url( 'edit.php' ) ), $super_text );
 		}
 
 		if ( 0 < $sticky_count ) {
 			$sticky_text = sprintf( _n( 'Sticky <span class="count">(%s)</span>', 'Sticky <span class="count">(%s)</span>', $sticky_count, 'message-board' ), number_format_i18n( $sticky_count ) );
-			$views['sticky'] = sprintf( '<a href="%s">%s</a>', add_query_arg( array( 'post_type' => $post_type, 'show_sticky' => 1 ), admin_url( 'edit.php' ) ), $sticky_text );
+			$views['sticky'] = sprintf( '<a href="%s">%s</a>', add_query_arg( array( 'post_type' => $post_type, 'topic_type' => 'sticky' ), admin_url( 'edit.php' ) ), $sticky_text );
 		}
 
 		return $views;
