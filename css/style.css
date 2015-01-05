@@ -3,12 +3,20 @@
  * `message-board`.  Otherwise, we leave it up to the theme.
  */
 
-/* === Forum Meta === */
+/* === Single Forum Meta === */
 
-.ltr .forum .mb-topic-count,
-.ltr .forum .mb-reply-count,
-.ltr .forum .toggle-open-link,
-.ltr .forum .toggle-trash-link { margin-right: 8px; }
+.ltr .mb-page-header .mb-topic-count,
+.ltr .mb-page-header .mb-reply-count,
+.ltr .mb-page-header .toggle-open-link,
+.ltr .mb-page-header .toggle-trash-link { margin-right: 8px; }
+
+/* === Single Topic Meta === */
+
+.ltr .mb-page-header .forum-link,
+.ltr .mb-page-header .mb-topic-post-count,
+.ltr .mb-page-header .mb-topic-voice-count,
+.ltr .mb-page-header .subscribe-link,
+.ltr .mb-page-header .bookmark-link { margin-right: 8px; }
 
 /* === Loops === */
 

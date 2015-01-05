@@ -1,9 +1,9 @@
-<div class="loop-meta forum">
-	<h1 class="topic-title loop-title"><?php mb_single_forum_title(); ?></h1>
+<header class="mb-page-header">
+	<h1 class="mb-page-title"><?php mb_single_forum_title(); ?></h1>
 
-	<div class="loop-description">
+	<div class="mb-forum-content">
 		<?php mb_forum_content(); ?>
-	</div><!-- .loop-description -->
+	</div><!-- .mb-forum-content -->
 
 	<p>
 		<span class="mb-topic-count"><?php printf( __( 'Topics: %s', 'message-board' ), mb_get_forum_topic_count() ); ?></span> 
@@ -12,26 +12,22 @@
 		<?php mb_forum_toggle_trash_link(); ?>
 	</p>
 
-</div><!-- .loop-meta -->
+</header><!-- .mb-page-header -->
 
-<?php if ( current_user_can( 'read_forum', mb_get_forum_id() ) ) : ?>
+<?php if ( current_user_can( 'read_forum', mb_get_forum_id() ) ) : // Check if the current user can read the forum. ?>
 
-	<?php if ( !mb_is_forum_paged() ) : ?>
+	<?php if ( !mb_is_forum_paged() ) : // Only show subforums if on page 1. ?>
 
 		<?php mb_get_template_part( 'loop', 'forum' ); ?>
 
-	<?php endif; ?>
+	<?php endif; // End paged check. ?>
 
-	<?php if ( mb_forum_type_allows_topics( mb_get_forum_type() ) ) : ?>
+	<?php if ( mb_forum_type_allows_topics( mb_get_forum_type() ) ) : // Only show topics if they're allowed. ?>
 
 		<?php mb_get_template_part( 'loop', 'topic' ); ?>
 
-	<?php endif; ?>
+	<?php endif; // End show topics check. ?>
 
-<?php else: ?>
-
-	<p class="mb-error">Sorry, but you do not have permission to view this forum.</p>
-
-<?php endif; ?>
+<?php endif; // End check to see if user can read forum. ?>
 
 <?php mb_get_template_part( 'form-topic', 'new' ); ?>

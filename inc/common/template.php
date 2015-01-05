@@ -25,6 +25,20 @@ function mb_get_content_type( $post_id = 0 ) {
 	return $type;
 }
 
+function mb_format_template_tag( $args ) {
+
+	$defaults = array(
+		'text'   => '',
+		'before' => '',
+		'after'  => '',
+		'wrap'   => '<span %s>%s</span>',
+	);
+
+	$args = wp_parse_args( $args, $defaults );
+
+	return $args['before'] . sprintf( $args['wrap'], $args['text'] ) . $args['after'];
+}
+
 /* ====== Login ====== */
 
 function mb_login_url() {

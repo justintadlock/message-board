@@ -78,10 +78,7 @@ function mb_wp_title( $title ) {
 	if ( !mb_is_message_board() )
 		return $title;
 
-	if ( mb_is_forum_front() )
-		$title = esc_attr__( 'Forums', 'message-board' );
-
-	elseif ( mb_is_single_forum() )
+	if ( mb_is_single_forum() )
 		$title = mb_get_single_forum_title();
 
 	elseif ( mb_is_forum_archive() )
@@ -107,6 +104,9 @@ function mb_wp_title( $title ) {
 
 	elseif ( mb_is_user_archive() )
 		$title = mb_get_user_archive_title();
+
+	elseif ( mb_is_search() )
+		$title = mb_get_search_page_title();
 
 	else
 		$title = __( 'Board', 'message-board' );

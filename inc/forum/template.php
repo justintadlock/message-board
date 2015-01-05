@@ -367,14 +367,8 @@ function mb_get_forum_id( $forum_id = 0 ) {
 	if ( is_numeric( $forum_id ) && 0 < $forum_id )
 		$_forum_id = $forum_id;
 
-	elseif ( !empty( $mb->subforum_query->in_the_loop ) && isset( $mb->subforum_query->post->ID ) )
-		$_forum_id = $mb->subforum_query->post->ID;
-
-	elseif ( !empty( $mb->forum_query->in_the_loop ) && isset( $mb->forum_query->post->ID ) )
-		$_forum_id = $mb->forum_query->post->ID;
-
-	elseif ( !empty( $mb->search_query->in_the_loop ) && isset( $mb->serch_query->post->ID ) )
-		$_forum_id = $mb->search_query->post->ID;
+	elseif ( mb_get_forum_post_type() === get_post_type( get_the_ID() ) )
+		$_forum_id = get_the_ID();
 
 	elseif ( mb_is_single_forum() )
 		$_forum_id = get_queried_object_id();

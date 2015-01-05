@@ -4,9 +4,9 @@
  */
 ?>
 
-<div class="loop-meta">
-	<h1 class="loop-title"><?php mb_user_archive_title(); ?></h1>
-</div><!-- .loop-meta -->
+<header class="mb-page-header">
+	<h1 class="mb-page-title"><?php mb_user_archive_title(); ?></h1>
+</header><!-- .mb-page-header -->
 
 <?php 
 	/* Loads the `loop-user.php` template part.  Falls back to the `loop.php` template part. */

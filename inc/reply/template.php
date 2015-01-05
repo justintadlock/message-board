@@ -326,11 +326,8 @@ function mb_get_reply_id( $reply_id = 0 ) {
 	if ( is_numeric( $reply_id ) && 0 < $reply_id )
 		$_reply_id = $reply_id;
 
-	elseif ( !empty( $mb->reply_query->in_the_loop ) && isset( $mb->reply_query->post->ID ) )
-		$_reply_id = $mb->reply_query->post->ID;
-
-	elseif ( !empty( $mb->search_query->in_the_loop ) && isset( $mb->serch_query->post->ID ) )
-		$_reply_id = $mb->search_query->post->ID;
+	elseif ( mb_get_reply_post_type() === get_post_type( get_the_ID() ) )
+		$_reply_id = get_the_ID();
 
 	elseif ( mb_is_single_reply() )
 		$_reply_id = get_queried_object_id();

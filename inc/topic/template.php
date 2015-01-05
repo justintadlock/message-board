@@ -410,11 +410,8 @@ function mb_get_topic_id( $topic_id = 0 ) {
 	if ( is_numeric( $topic_id ) && 0 < $topic_id )
 		$_topic_id = $topic_id;
 
-	elseif ( !empty( $mb->topic_query->in_the_loop ) && isset( $mb->topic_query->post->ID ) )
-		$_topic_id = $mb->topic_query->post->ID;
-
-	elseif ( !empty( $mb->search_query->in_the_loop ) && isset( $mb->serch_query->post->ID ) )
-		$_topic_id = $mb->search_query->post->ID;
+	elseif ( mb_get_topic_post_type() === get_post_type( get_the_ID() ) )
+		$_topic_id = get_the_ID();
 
 	elseif ( mb_is_single_topic() )
 		$_topic_id = get_queried_object_id();
@@ -561,8 +558,9 @@ function mb_topic_link( $topic_id = 0 ) {
  * @return string
  */
 function mb_get_topic_link( $topic_id = 0 ) {
-	$url   = mb_get_topic_url(   $topic_id );
-	$title = mb_get_topic_title( $topic_id );
+	$topic_id = mb_get_topic_id( $topic_id );
+	$url      = mb_get_topic_url( $topic_id );
+	$title    = mb_get_topic_title( $topic_id );
 
 	return apply_filters( 'mb_get_topic_link', sprintf( '<a class="mb-topic-link" href="%s">%s</a>', $url, $title ), $topic_id );
 }

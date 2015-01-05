@@ -93,6 +93,28 @@ function mb_the_search_result() {
 }
 
 /**
+ * Outputs the search page title.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_search_page_title() {
+	echo mb_get_search_page_title();
+}
+
+/**
+ * Returns the search page title.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_search_page_title() {
+	return apply_filters( 'mb_get_search_page_title', __( 'Advanced Search', 'message-board' ) );
+}
+
+/**
  * Outputs pagination links for search results.
  *
  * @since  1.0.0

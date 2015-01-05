@@ -1,6 +1,12 @@
-<div class="loop-meta">
-	<h1 class="topic-title loop-title">Edit</h1>
-</div>
+<?php
+/**
+ * This template part outputs the edit page content.
+ */
+?>
+
+<header class="mb-page-header">
+	<h1 class="mb-page-title"><?php _e( 'Edit', 'message-board' ); ?></h1>
+</header><!-- .mb-page-header -->
 
 <?php if ( mb_is_forum_edit() ) : ?>
 

@@ -9,13 +9,14 @@
 		<legend><?php _e( 'Search For', 'message-board' ); ?></legend>
 
 		<p>
-			<label for="mb_search_s"><?php _e( 'Keyword(s)', 'message-board' ); ?></label>
+			<label for="mb_search_s"><?php _e( 'Keyword(s):', 'message-board' ); ?></label>
 			<input type="search" id="mb_search_s" name="s" value="<?php the_search_query(); ?>" />
 		</p>
 
 		<p>
-			<label for="mb_username"><?php _e( 'Username', 'message-board' ); ?></label>
+			<label for="mb_username"><?php _e( 'Username:', 'message-board' ); ?></label>
 			<input type="text" id="mb_username" name="author_name" value="" /> 
+			<span class="description"><?php _e( 'Limit search results to a specific author. Must match exact username.', 'message-board' ); ?></span>
 		</p>
 
 	</fieldset>
@@ -26,17 +27,17 @@
 		<p>
 			<label>
 				<input type="checkbox" name="post_type[]" value="<?php mb_forum_post_type(); ?>" /> 
-				<?php _e( 'Forums', 'message-board' ); ?>
+				<?php mb_forum_label( 'name' ); ?>
 			</label>
 			<br />
 			<label>
 				<input type="checkbox" name="post_type[]" value="<?php mb_topic_post_type(); ?>" checked="checked" /> 
-				<?php _e( 'Topics', 'message-board' ); ?>
+				<?php mb_topic_label( 'name' ); ?>
 			</label>
 			<br />
 			<label>
 				<input type="checkbox" name="post_type[]" value="<?php mb_reply_post_type(); ?>" checked="checked" /> 
-				<?php _e( 'Replies', 'message-board' ); ?>
+				<?php mb_reply_label( 'name' ); ?>
 			</label>
 		</p>
 

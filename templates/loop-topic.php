@@ -5,7 +5,7 @@
 		<thead>
 			<tr>
 				<th class="mb-col-title"><?php _e( 'Topics', 'message-board' ); ?> <?php mb_topic_form_link(); ?></th>
-				<th class="mb-col-count"><?php _e( 'Replies / Views', 'message-board' ); ?></th>
+				<th class="mb-col-count"><?php _e( 'Replies / Voices', 'message-board' ); ?></th>
 				<th class="mb-col-latest"><?php _e( 'Last Post', 'message-board' ); ?></th>
 			</tr>
 		</thead>
@@ -13,7 +13,7 @@
 		<tfoot>
 			<tr>
 				<th class="mb-col-title"><?php _e( 'Topics', 'message-board' ); ?></th>
-				<th class="mb-col-count"><?php _e( 'Replies / Views', 'message-board' ); ?></th>
+				<th class="mb-col-count"><?php _e( 'Replies / Voices', 'message-board' ); ?></th>
 				<th class="mb-col-latest"><?php _e( 'Last Post', 'message-board' ); ?></th>
 			</tr>
 		</tfoot>
@@ -38,7 +38,7 @@
 
 					<td class="mb-col-count">
 						<?php printf( __( 'Replies: %s', 'message-board' ), mb_get_topic_reply_count() ); ?><br />
-						<?php printf( __( 'Views: %s', 'message-board' ), 0 /*mb_get_topic_view_count()*/ ); ?>
+						<?php printf( __( 'Voices: %s', 'message-board' ), mb_get_topic_voice_count() ); ?>
 					</td><!-- .mb-col-count -->
 
 					<td class="mb-col-latest">
