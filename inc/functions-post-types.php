@@ -164,6 +164,7 @@ function mb_register_post_types() {
 			'mb_form_status'     => __( 'Status:',                  'message-board' ),
 			'mb_form_order'      => __( 'Order:',                   'message-board' ),
 			'mb_form_content'    => __( 'Description:',             'message-board' ),
+			'mb_form_edit_item'  => __( 'Edit Forum: %s',           'message-board' ),
 			'mb_form_subscribe'  => __( 'Notify me of topics and posts via email', 'message-board' ),
 		)
 	);
@@ -224,6 +225,7 @@ function mb_register_post_types() {
 			'mb_form_type'       => __( 'Topic Type:',              'message-board' ),
 			'mb_form_status'     => __( 'Status:',                  'message-board' ),
 			'mb_form_content'    => __( 'Content:',                 'message-board' ),
+			'mb_form_edit_item'  => __( 'Edit Topic: %s',           'message-board' ),
 			'mb_form_subscribe'  => __( 'Notify me of follow-up posts via email', 'message-board' ),
 		)
 	);
@@ -280,6 +282,7 @@ function mb_register_post_types() {
 			/* Custom archive label.  Must filter 'post_type_archive_title' to use. */
 			'archive_title'      => __( 'Replies',                   'message-board' ),
 			'mb_form_content'    => __( 'Message:',                  'message-board' ),
+			'mb_form_edit_item'  => __( 'Edit Reply: %s',           'message-board' ),
 			'mb_form_subscribe'  => __( 'Notify me of follow-up posts via email', 'message-board' ),
 		)
 	);

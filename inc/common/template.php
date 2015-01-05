@@ -144,6 +144,31 @@ function mb_dropdown_post_status( $args = array() ) {
 	echo $out;
 }
 
+/* Edit page title. */
+
+function mb_edit_page_title() {
+	echo mb_get_edit_page_title();
+}
+
+function mb_get_edit_page_title() {
+
+	$title = '';
+
+	if ( mb_is_forum_edit() )
+		$title = sprintf( mb_get_forum_label( 'mb_form_edit_item' ), mb_get_forum_title() );
+
+	elseif ( mb_is_topic_edit() )
+		$title = sprintf( mb_get_topic_label( 'mb_form_edit_item' ), mb_get_topic_title() );
+
+	elseif ( mb_is_reply_edit() )
+		$title = sprintf( mb_get_reply_label( 'mb_form_edit_item' ), mb_get_reply_title() );
+
+	elseif ( mb_is_user_edit() )
+		$title = __( 'Edit User', 'message-board' );
+
+	return apply_filters( 'mb_get_edit_title', $title );
+}
+
 /* ====== Post ID ====== */
 
 function mb_get_post_id( $post_id = 0 ) {

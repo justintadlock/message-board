@@ -10,7 +10,7 @@
 
 <?php if ( is_user_logged_in() ) : // Checks if the user is already logged into the site. ?>
 
-	<?php echo wpautop( 'You are currently logged in. Feel free to participate in the forums.', 'message-board' ); ?>
+	<?php echo wpautop( 'You are currently logged in. Feel free to browse or participate in the forums.', 'message-board' ); ?>
 
 <?php else : // If the user is not logged in. ?>
 

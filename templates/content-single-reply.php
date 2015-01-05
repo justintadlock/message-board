@@ -1,6 +1,6 @@
-<div class="loop-meta">
-	<h1 class="loop-title"><?php mb_single_reply_title(); ?></h1>
-</div><!-- .loop-meta -->
+<header class="mb-page-header">
+	<h1 class="mb-page-title"><?php mb_single_reply_title(); ?></h1>
+</header><!-- .mb-page-header -->
 
 <?php if ( current_user_can( 'read_reply', mb_get_reply_id() ) ) : ?>
 
