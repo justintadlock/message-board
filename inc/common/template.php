@@ -114,16 +114,20 @@ function mb_dropdown_post_status( $args = array() ) {
 	$args = wp_parse_args( $args, $defaults );
 
 	if ( mb_get_forum_post_type() === $args['post_type'] )
-		$stati = mb_get_forum_post_statuses();
+		$stati = apply_filters( 'mb_select_forum_post_statuses', mb_get_forum_post_statuses() );
 
 	elseif ( mb_get_topic_post_type() === $args['post_type'] )
-		$stati = mb_get_topic_post_statuses();
+		$stati = apply_filters( 'mb_select_topic_post_statuses', mb_get_topic_post_statuses() );
 
 	elseif ( mb_get_reply_post_type() === $args['post_type'] )
-		$stati = mb_get_reply_post_statuses();
+		$stati = apply_filters( 'mb_select_reply_post_statuses', mb_get_reply_post_statuses() );
 
 	if ( is_array( $args['exclude'] ) )
 		$stati = array_diff( $stati, $args['exclude'] );
+
+	/* Don't show spam status if the post isn't yet published. */
+	if ( empty( $args['selected'] ) && in_array( mb_get_spam_post_status(), $stati ) )
+		$stati = array_diff( $stati, array( mb_get_spam_post_status() ) );
 
 	$out = sprintf( '<select name="%s" id="%s">', sanitize_html_class( $args['name'] ), sanitize_html_class( $args['id'] ) );
 

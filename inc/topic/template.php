@@ -134,7 +134,7 @@ function mb_topic_status( $topic_id = 0 ) {
 
 function mb_get_topic_status( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-	$status   = $topic_id ? get_post_status( $topic_id ) : mb_get_open_post_status();
+	$status   = $topic_id ? get_post_status( $topic_id ) : '';
 
 	return apply_filters( 'mb_get_topic_status', $status, $topic_id );
 }
