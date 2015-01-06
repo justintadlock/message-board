@@ -220,18 +220,21 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/common/template.php' );
 
 		/* Load forum files. */
-		require_once( $this->dir_path . 'inc/forum/functions.php' );
-		require_once( $this->dir_path . 'inc/forum/template.php'  );
-		require_once( $this->dir_path . 'inc/forum/types.php'     );
+		require_once( $this->dir_path . 'inc/forum/capabilities.php' );
+		require_once( $this->dir_path . 'inc/forum/functions.php'    );
+		require_once( $this->dir_path . 'inc/forum/template.php'     );
+		require_once( $this->dir_path . 'inc/forum/types.php'        );
 
 		/* Load topic files. */
-		require_once( $this->dir_path . 'inc/topic/functions.php' );
-		require_once( $this->dir_path . 'inc/topic/template.php'  );
-		require_once( $this->dir_path . 'inc/topic/types.php'     );
+		require_once( $this->dir_path . 'inc/topic/capabilities.php' );
+		require_once( $this->dir_path . 'inc/topic/functions.php'    );
+		require_once( $this->dir_path . 'inc/topic/template.php'     );
+		require_once( $this->dir_path . 'inc/topic/types.php'        );
 
 		/* Load reply files. */
-		require_once( $this->dir_path . 'inc/reply/functions.php' );
-		require_once( $this->dir_path . 'inc/reply/template.php'  );
+		require_once( $this->dir_path . 'inc/reply/capabilities.php' );
+		require_once( $this->dir_path . 'inc/reply/functions.php'    );
+		require_once( $this->dir_path . 'inc/reply/template.php'     );
 
 		/* Load user files. */
 		require_once( $this->dir_path . 'inc/user/functions.php'     );
