@@ -129,7 +129,7 @@ function mb_get_topic_edit_link( $topic_id = 0 ) {
 /* ====== Topic Status ====== */
 
 function mb_topic_status( $topic_id = 0 ) {
-	echo mb_get_topic_status();
+	echo mb_get_topic_status( $topic_id );
 }
 
 function mb_get_topic_status( $topic_id = 0 ) {
@@ -149,7 +149,7 @@ function mb_get_topic_status( $topic_id = 0 ) {
  */
 function mb_is_topic_public( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id();
-	$status   = get_post_status_object( get_post_status( $topic_id ) );
+	$status   = get_post_status_object( mb_get_topic_status( $topic_id ) );
 
 	return apply_filters( 'mb_is_topic_public', (bool) $status->public, $topic_id );
 }
@@ -163,7 +163,7 @@ function mb_is_topic_public( $topic_id = 0 ) {
  */
 function mb_is_topic_open( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-	$status   = get_post_status( $topic_id );
+	$status   = mb_get_topic_status( $topic_id );
 
 	return apply_filters( 'mb_is_topic_open', mb_get_open_post_status() === $status ? true : false, $topic_id );
 }
@@ -177,9 +177,37 @@ function mb_is_topic_open( $topic_id = 0 ) {
  */
 function mb_is_topic_closed( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-	$status   = get_post_status( $topic_id );
+	$status   = mb_get_topic_status( $topic_id );
 
 	return apply_filters( 'mb_is_topic_closed', mb_get_close_post_status() === $status ? true : false, $topic_id );
+}
+
+/**
+ * Conditional check to see whether a topic has the "private" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_topic_private( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$status   = mb_get_topic_status( $topic_id );
+
+	return apply_filters( 'mb_is_topic_private', mb_get_private_post_status() === $status ? true : false, $topic_id );
+}
+
+/**
+ * Conditional check to see whether a topic has the "hidden" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_topic_hidden( $topic_id = 0 ) {
+	$topic_id = mb_get_topic_id( $topic_id );
+	$status   = mb_get_topic_status( $topic_id );
+
+	return apply_filters( 'mb_is_topic_hidden', mb_get_hidden_post_status() === $status ? true : false, $topic_id );
 }
 
 /**
@@ -191,7 +219,7 @@ function mb_is_topic_closed( $topic_id = 0 ) {
  */
 function mb_is_topic_spam( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-	$status   = get_post_status( $topic_id );
+	$status   = mb_get_topic_status( $topic_id );
 
 	return apply_filters( 'mb_is_topic_spam', mb_get_spam_post_status() === $status ? true : false, $topic_id );
 }
@@ -205,7 +233,7 @@ function mb_is_topic_spam( $topic_id = 0 ) {
  */
 function mb_is_topic_trash( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
-	$status   = get_post_status( $topic_id );
+	$status   = mb_get_topic_status( $topic_id );
 
 	return apply_filters( 'mb_is_topic_trash', mb_get_trash_post_status() === $status ? true : false, $topic_id );
 }
@@ -219,7 +247,7 @@ function mb_is_topic_trash( $topic_id = 0 ) {
  */
 function mb_is_topic_orphan( $topic_id = 0 ) {
 	$reply_id = mb_get_topic_id( $topic_id );
-	$status   = get_post_status( $topic_id );
+	$status   = mb_get_topic_status( $topic_id );
 
 	return apply_filters( 'mb_is_topic_orphan', mb_get_orphan_post_status() === $status ? true : false, $topic_id );
 }

@@ -151,6 +151,17 @@ function mb_get_reply_edit_link( $reply_id = 0 ) {
 
 /* ====== Reply Status ====== */
 
+function mb_reply_status( $reply_id = 0 ) {
+	echo mb_get_reply_status( $reply_id );
+}
+
+function mb_get_reply_status( $reply_id = 0 ) {
+	$reply_id = mb_get_reply_id( $reply_id );
+	$status   = $reply_id ? get_post_status( $reply_id ) : '';
+
+	return apply_filters( 'mb_get_reply_status', $status, $reply_id );
+}
+
 /**
  * Whether the reply's post status is a "public" post status.
  *
@@ -161,7 +172,7 @@ function mb_get_reply_edit_link( $reply_id = 0 ) {
  */
 function mb_is_reply_public( $reply_id = 0 ) {
 	$reply_id = mb_get_reply_id();
-	$status   = get_post_status_object( get_post_status( $reply_id ) );
+	$status   = get_post_status_object( mb_get_reply_status( $reply_id ) );
 
 	return apply_filters( 'mb_is_reply_public', (bool) $status->public, $reply_id );
 }
@@ -175,7 +186,7 @@ function mb_is_reply_public( $reply_id = 0 ) {
  */
 function mb_is_reply_published( $reply_id = 0 ) {
 	$reply_id = mb_get_reply_id( $reply_id );
-	$status   = get_post_status( $reply_id );
+	$status   = mb_get_reply_status( $reply_id );
 
 	return apply_filters( 'mb_is_reply_published', mb_get_publish_post_status() === $status ? true : false, $reply_id );
 }
@@ -189,7 +200,7 @@ function mb_is_reply_published( $reply_id = 0 ) {
  */
 function mb_is_reply_spam( $reply_id = 0 ) {
 	$reply_id = mb_get_reply_id( $reply_id );
-	$status   = get_post_status( $reply_id );
+	$status   = mb_get_reply_status( $reply_id );
 
 	return apply_filters( 'mb_is_reply_spam', mb_get_spam_post_status() === $status ? true : false, $reply_id );
 }
@@ -203,7 +214,7 @@ function mb_is_reply_spam( $reply_id = 0 ) {
  */
 function mb_is_reply_trash( $reply_id = 0 ) {
 	$reply_id = mb_get_reply_id( $reply_id );
-	$status   = get_post_status( $reply_id );
+	$status   = mb_get_reply_status( $reply_id );
 
 	return apply_filters( 'mb_is_reply_trash', mb_get_trash_post_status() === $status ? true : false, $reply_id );
 }
@@ -217,7 +228,7 @@ function mb_is_reply_trash( $reply_id = 0 ) {
  */
 function mb_is_reply_orphan( $reply_id = 0 ) {
 	$reply_id = mb_get_reply_id( $reply_id );
-	$status   = get_post_status( $reply_id );
+	$status   = mb_get_reply_status( $reply_id );
 
 	return apply_filters( 'mb_is_reply_orphan', mb_get_orphan_post_status() === $status ? true : false, $reply_id );
 }

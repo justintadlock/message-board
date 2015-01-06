@@ -141,12 +141,12 @@ function mb_is_forum_archive() {
 /* ====== Forum Status ====== */
 
 function mb_forum_status( $forum_id = 0 ) {
-	echo mb_get_forum_status();
+	echo mb_get_forum_status( $forum_id );
 }
 
 function mb_get_forum_status( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
-	$status   = $forum_id ? get_post_status( $forum_id ) : mb_get_open_post_status();
+	$status   = $forum_id ? get_post_status( $forum_id ) : '';
 
 	return apply_filters( 'mb_get_forum_status', $status, $forum_id );
 }
@@ -161,7 +161,7 @@ function mb_get_forum_status( $forum_id = 0 ) {
  */
 function mb_is_forum_public( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id();
-	$status   = get_post_status_object( get_post_status( $forum_id ) );
+	$status   = get_post_status_object( mb_get_forum_status( $forum_id ) );
 
 	return apply_filters( 'mb_is_forum_public', (bool) $status->public, $forum_id );
 }
@@ -175,7 +175,7 @@ function mb_is_forum_public( $forum_id = 0 ) {
  */
 function mb_is_forum_open( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
-	$status   = get_post_status( $forum_id );
+	$status   = mb_get_forum_status( $forum_id );
 
 	return apply_filters( 'mb_is_forum_open', mb_get_open_post_status() === $status ? true : false, $forum_id );
 }
@@ -189,7 +189,7 @@ function mb_is_forum_open( $forum_id = 0 ) {
  */
 function mb_is_forum_closed( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
-	$status   = get_post_status( $forum_id );
+	$status   = mb_get_forum_status( $forum_id );
 
 	return apply_filters( 'mb_is_forum_closed', mb_get_close_post_status() === $status ? true : false, $forum_id );
 }
@@ -203,9 +203,37 @@ function mb_is_forum_closed( $forum_id = 0 ) {
  */
 function mb_is_forum_archived( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
-	$status   = get_post_status( $forum_id );
+	$status   = mb_get_forum_status( $forum_id );
 
 	return apply_filters( 'mb_is_forum_archived', mb_get_archive_post_status() === $status ? true : false, $forum_id );
+}
+
+/**
+ * Conditional check to see whether a forum has the "private" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_forum_private( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+	$status   = mb_get_forum_status( $forum_id );
+
+	return apply_filters( 'mb_is_forum_private', mb_get_private_post_status() === $status ? true : false, $forum_id );
+}
+
+/**
+ * Conditional check to see whether a forum has the "hidden" post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_is_forum_hidden( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+	$status   = mb_get_forum_status( $forum_id );
+
+	return apply_filters( 'mb_is_forum_hidden', mb_get_hidden_post_status() === $status ? true : false, $forum_id );
 }
 
 /**
@@ -217,7 +245,7 @@ function mb_is_forum_archived( $forum_id = 0 ) {
  */
 function mb_is_forum_trash( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
-	$status   = get_post_status( $forum_id );
+	$status   = mb_get_forum_status( $forum_id );
 
 	return apply_filters( 'mb_is_forum_trash', mb_get_trash_post_status() === $status ? true : false, $forum_id );
 }
