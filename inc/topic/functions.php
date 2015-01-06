@@ -13,6 +13,9 @@
 /* Filter to make sure we get a topic post parent. */
 add_filter( 'wp_insert_post_parent', 'mb_insert_topic_post_parent', 10, 3 );
 
+/* Update topic data on the `post_updated` hook. */
+add_action( 'post_updated', 'mb_topic_post_updated', 10, 3 );
+
 /* Topic form fields. */
 add_action( 'mb_topic_form_fields', 'mb_topic_form_fields' );
 
@@ -269,6 +272,29 @@ function mb_reset_topic_data( $post, $reset_latest = false ) {
 
 	/* Reset user topic count. */
 	mb_set_user_topic_count( $post->post_author );
+}
+
+function mb_topic_post_updated( $post_id, $post_after, $post_before ) {
+
+	/* Bail if this is not the topic post type. */
+	if ( mb_get_topic_post_type() !== $post_after->post_type )
+		return;
+
+	/* If the topic parent (forum) has changed. */
+	if ( $post_after->post_parent !== $post_before->post_parent ) {
+
+		/* Reset forum topic count. */
+		mb_reset_forum_topic_count( $post_after->post_parent );
+		mb_reset_forum_topic_count( $post_before->post_parent );
+
+		/* Reset forum reply count. */
+		mb_reset_forum_reply_count( $post_after->post_parent );
+		mb_reset_forum_reply_count( $post_before->post_parent );
+
+		/* Reset forum latest data. */
+		mb_reset_forum_latest( $post_after->post_parent );
+		mb_reset_forum_latest( $post_before->post_parent );
+	}
 }
 
 /**
