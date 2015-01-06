@@ -31,6 +31,7 @@ function mb_register_meta() {
 	register_meta( 'post', mb_get_forum_activity_datetime_epoch_meta_key(), 'esc_html', '__return_true' );
 	register_meta( 'post', mb_get_forum_last_topic_id_meta_key(),           'absint',   '__return_true' );
 	register_meta( 'post', mb_get_forum_last_reply_id_meta_key(),           'absint',   '__return_true' );
+	register_meta( 'post', mb_get_forum_subforum_count_meta_key(),          'absint',   '__return_true' );
 	register_meta( 'post', mb_get_forum_topic_count_meta_key(),             'absint',   '__return_true' );
 	register_meta( 'post', mb_get_forum_reply_count_meta_key(),             'absint',   '__return_true' );
 	register_meta( 'post', mb_get_forum_type_meta_key(),                    'esc_html', '__return_true' );
@@ -107,6 +108,17 @@ function mb_get_forum_last_topic_id_meta_key() {
  */
 function mb_get_forum_last_reply_id_meta_key() {
 	return apply_filters( 'mb_get_forum_last_reply_id_meta_key', '_forum_last_reply_id' );
+}
+
+/**
+ * Returns the meta key used for the "subforum count" for the "forum" post type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_forum_subforum_count_meta_key() {
+	return apply_filters( 'mb_get_forum_subforum_count_meta_key', '_forum_subforum_count' );
 }
 
 /**

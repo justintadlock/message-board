@@ -925,6 +925,18 @@ function mb_is_subforum( $forum_id = 0 ) {
 
 /* ====== Forum Counts ====== */
 
+function mb_forum_subforum_count( $forum_id = 0 ) {
+	echo mb_get_forum_subforum_count( $forum_id );
+}
+
+function mb_get_forum_subforum_count( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	$count = $forum_id ? get_post_meta( $forum_id, mb_get_forum_subforum_count_meta_key(), true ) : 0;
+
+	return apply_filters( 'mb_get_forum_subforum_count', absint( $count ), $forum_id );
+}
+
 function mb_forum_topic_count( $forum_id = 0 ) {
 	echo mb_get_forum_topic_count( $forum_id );
 }

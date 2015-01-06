@@ -10,6 +10,31 @@
  * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
+/* Update forum data on the `post_updated` hook. */
+add_action( 'post_updated', 'mb_forum_post_updated', 10, 3 );
+
+function mb_forum_post_updated( $post_id, $post_after, $post_before ) {
+
+	/* Bail if this is not the forum post type. */
+	if ( mb_get_forum_post_type() !== $post_after->post_type )
+		return;
+
+	/* If the forum parent has changed. */
+	if ( $post_after->post_parent !== $post_before->post_parent ) {
+
+		/* Update the forum's level. */
+		mb_reset_forum_level( $post_id );
+
+		/* Update the new forum parent's subforum count. */
+		if ( 0 < $post_after->post_parent )
+			mb_reset_forum_subforum_count( $post_after->post_parent );
+
+		/* Update the old forum parent's subforum count. */
+		if ( 0 < $post_before->post_parent )
+			mb_reset_forum_subforum_count( $post_before->post_parent );
+	}
+}
+
 /**
  * Inserts a new forum.  This is a wrapper for the `wp_insert_post()` function and should be used in its 
  * place where possible.
@@ -66,6 +91,12 @@ function mb_insert_forum_data( $post ) {
 	/* Get the User ID. */
 	$user_id = mb_get_user_id( $post->post_author );
 
+	/* Update parent's subforum count. */
+	if ( 0 < $post->post_parent ) {
+		$count = mb_get_forum_subforum_count( $post->post_parent );
+		mb_set_forum_subforum_count( $post->post_parent, absint( $count ) + 1 );
+	}
+
 	/* Update user meta. */
 	mb_set_user_forum_count( $user_id );
 
@@ -89,10 +120,11 @@ function mb_insert_forum_data( $post ) {
  */
 function mb_reset_forum_data( $post ) {
 
-	$post = is_object( $post ) ? $post : get_post( $post );
+	/* Get the forum ID. */
+	$forum_id = is_object( $post ) ? mb_get_forum_id( get_post( $post )->ID ) : mb_get_forum_id( $post );
 
-	$forum_id         = mb_get_forum_id( $post->ID );
-	$forum_last_topic = mb_get_forum_last_topic_id( $forum_id );
+	/* Reset subforum count. */
+	mb_reset_forum_subforum_count( $forum_id );
 
 	/* Reset forum topic count. */
 	mb_reset_forum_topic_count( $forum_id );
@@ -147,6 +179,29 @@ function mb_reset_forum_level( $forum_id ) {
 	mb_set_forum_level( $forum_id, absint( $level ) );
 
 	return $level;
+}
+
+function mb_reset_forum_subforum_count( $forum_id ) {
+
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	$open_status    = mb_get_open_post_status();
+	$close_status   = mb_get_close_post_status();
+	$publish_status = mb_get_publish_post_status();
+	$hidden_status  = mb_get_hidden_post_status();
+	$private_status = mb_get_private_post_status();
+
+	$where = $wpdb->prepare( "WHERE post_parent = %d AND post_type = %s", $forum_id, mb_get_forum_post_type() );
+
+	$status_where = "AND (post_status = '{$open_status}' OR post_status = '{$close_status}' OR post_status = '{$publish_status}' OR post_status = '{$private_status}' OR post_status = '{$hidden_status}')";
+
+	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where $status_where" );
+
+	return mb_set_forum_subforum_count( $forum_id, $count );
+}
+
+function mb_set_forum_subforum_count( $forum_id, $count ) {
+	return update_post_meta( $forum_id, mb_get_forum_subforum_count_meta_key(), absint( $count ) );
 }
 
 /**

@@ -6,10 +6,12 @@ function mb_set_user_forum_count( $user_id ) {
 	$open_status    = mb_get_open_post_status();
 	$close_status   = mb_get_close_post_status();
 	$publish_status = mb_get_publish_post_status();
+	$hidden_status  = mb_get_hidden_post_status();
+	$private_status = mb_get_private_post_status();
 
 	$where = $wpdb->prepare( "WHERE post_author = %d AND post_type = %s", $user_id, mb_get_forum_post_type() );
 
-	$status_where = "AND (post_status = '{$open_status}' OR post_status = '{$close_status}' OR post_status = '{$publish_status}')";
+	$status_where = "AND (post_status = '{$open_status}' OR post_status = '{$close_status}' OR post_status = '{$publish_status}' OR post_status = '{$private_status}' OR post_status = '{$hidden_status}')";
 
 	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where $status_where" );
 
@@ -24,10 +26,12 @@ function mb_set_user_topic_count( $user_id ) {
 	$open_status    = mb_get_open_post_status();
 	$close_status   = mb_get_close_post_status();
 	$publish_status = mb_get_publish_post_status();
+	$hidden_status  = mb_get_hidden_post_status();
+	$private_status = mb_get_private_post_status();
 
 	$where = $wpdb->prepare( "WHERE post_author = %d AND post_type = %s", $user_id, mb_get_topic_post_type() );
 
-	$status_where = "AND (post_status = '{$open_status}' OR post_status = '{$close_status}' OR post_status = '{$publish_status}')";
+	$status_where = "AND (post_status = '{$open_status}' OR post_status = '{$close_status}' OR post_status = '{$publish_status}' OR post_status = '{$private_status}' OR post_status = '{$hidden_status}')";
 
 	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where $status_where" );
 
