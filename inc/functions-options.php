@@ -33,7 +33,7 @@ function mb_get_show_on_front() {
  * @return int
  */
 function mb_get_forums_per_page() {
-	return intval( apply_filters( 'mb_get_forums_per_page', get_option( 'mb_forums_per_page', 50 ) ) );
+	return intval( apply_filters( 'mb_get_forums_per_page', get_option( 'mb_forums_per_page', 15 ) ) );
 }
 
 /**

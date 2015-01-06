@@ -76,8 +76,7 @@ function mb_subforum_query() {
 
 	$defaults = array(
 		'post_type'           => mb_get_forum_post_type(),
-		'nopaging'            => true,
-		'posts_per_page'      => -1,
+		'posts_per_page'      => mb_get_forums_per_page(),
 		'orderby'             => array( 'menu_order' => 'ASC', 'title' => 'ASC' ),
 		'ignore_sticky_posts' => true,
 	);
