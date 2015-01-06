@@ -45,11 +45,14 @@ add_action( 'mb_template_redirect', 'mb_handler_reply_toggle_trash' );
  * @access public
  * @return bool
  */
-function mb_is_board_action() {
-	$allowed = array( 'edit' );
-	$action  = get_query_var( 'mb_action' );
+function mb_is_board_action( $action = '' ) {
+	$allowed   = array( 'edit', 'toggle_subscribe', 'toggle_bookmark' );
+	$mb_action = get_query_var( 'mb_action' );
 
-	return !empty( $action ) && in_array( $action, $allowed ) ? true : false;
+	if ( $action )
+		return $mb_action && $action === $mb_action && in_array( $mb_action, $allowed ) ? true : false;
+
+	return $mb_action && in_array( $mb_action, $allowed ) ? true : false;
 }
 
 /**
@@ -594,97 +597,80 @@ function mb_handler_edit_user() {
 
 function mb_handler_topic_subscribe() {
 
-	if ( !is_user_logged_in() )
+	/* Is this a topic subscription request? */
+	if ( !mb_is_board_action( 'toggle_subscribe' ) || !isset( $_GET['topic_id'] ) )
 		return;
 
-	// @todo nonce?
-
-	if ( !isset( $_GET['action'] ) || !in_array( $_GET['action'], array( 'subscribe', 'unsubscribe' ) ) )
+	/* Make sure the user is logged in and subscriptions are active. */
+	if ( !is_user_logged_in() || !mb_is_subscriptions_active() )
 		return;
 
-	if ( !isset( $_GET['topic_id'] ) )
+	/* Get the topic ID. */
+	$topic_id = mb_get_topic_id( $_GET['topic_id'] );
+
+	/* Verify nonce. */
+	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "subscribe_topic_{$topic_id}" ) )
 		return;
 
-	$topic_id = absint( $_GET['topic_id'] );
-
+	/* Get the current user ID. */
 	$user_id = get_current_user_id();
 
-	if ( 0 < $user_id && 0 < $topic_id && 'subscribe' === $_GET['action'] ) {
-
-		$added = mb_add_user_topic_subscription( absint( $user_id ), $topic_id );
-
-	} elseif ( 0 < $user_id && 0 < $topic_id && 'unsubscribe' === $_GET['action'] ) {
-
-		$removed = mb_remove_user_topic_subscription( $user_id, $topic_id );
-
+	/* If the current user can't read the topic, make sure they are not subscribed and bail. */
+	if ( !current_user_can( 'read_topic', $topic_id ) ) {
+		mb_remove_user_topic_subscription( $user_id, $topic_id );
+		return;
 	}
 
-	$redirect_url = remove_query_arg( array( 'action', 'topic_id' ) );
+	/* If the user is already subscribed, unsubscribe them. */
+	if ( mb_is_user_subscribed_topic( $user_id, $topic_id ) ) {
+		mb_remove_user_topic_subscription( $user_id, $topic_id );
 
-	wp_safe_redirect( esc_url( $redirect_url ) );
+	/* Else, subscribe them. */
+	} else {
+		mb_add_user_topic_subscription( $user_id, $topic_id );
+	}
+
+	/* Redirect the user. */
+	wp_safe_redirect( esc_url( remove_query_arg( array( 'mb_action', 'topic_id', 'mb_nonce' ) ) ) );
 }
-
 
 function mb_handler_topic_bookmark() {
 
-	if ( !is_user_logged_in() )
+	/* Is this a topic bookmark request? */
+	if ( !mb_is_board_action( 'toggle_bookmark' ) || !isset( $_GET['topic_id'] ) )
 		return;
 
-	// @todo nonce?
-
-	if ( !isset( $_GET['action'] ) || !in_array( $_GET['action'], array( 'bookmark', 'unbookmark' ) ) )
+	/* Make sure the user is logged in and bookmarks are active. */
+	if ( !is_user_logged_in() || !mb_is_bookmarks_active() )
 		return;
 
-	if ( !isset( $_GET['topic_id'] ) )
+	/* Get the topic ID. */
+	$topic_id = mb_get_topic_id( $_GET['topic_id'] );
+
+	/* Verify nonce. */
+	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "bookmark_topic_{$topic_id}" ) )
 		return;
 
-	$topic_id = absint( $_GET['topic_id'] );
-
+	/* Get the current user ID. */
 	$user_id = get_current_user_id();
 
-	if ( 0 < $user_id && 0 < $topic_id && 'bookmark' === $_GET['action'] ) {
-
-		// mb_get_user_bookmarks( $user_id );
-
-		$bookmarks = get_user_meta( $user_id, mb_get_user_topic_bookmarks_meta_key(), true );
-		$favs = explode( ',', $bookmarks );
-
-
-		if ( !in_array( $topic_id, $favs ) ) {
-			$favs[] = $topic_id;
-
-			$new_bookmarks   = implode( ',', wp_parse_id_list( array_filter( $favs ) ) );
-
-			update_user_meta( $user_id, mb_get_user_topic_bookmarks_meta_key(), $new_bookmarks );
-
-			mb_set_topic_bookmarkers( $topic_id );
-		}
-
-	} elseif ( 0 < $user_id && 0 < $topic_id && 'unbookmark' === $_GET['action'] ) {
-
-		// mb_get_user_bookmarks( $user_id );
-
-		$bookmarks = get_user_meta( $user_id, mb_get_user_topic_bookmarks_meta_key(), true );
-		$favs = explode( ',', $bookmarks );
-
-		if ( in_array( $topic_id, $favs ) ) {
-
-			$_fav = array_search( $topic_id, $favs );
-
-			unset( $favs[ $_fav ] );
-
-			$new_bookmarks   = implode( ',', wp_parse_id_list( array_filter( $favs ) ) );
-
-			update_user_meta( $user_id, mb_get_user_topic_bookmarks_meta_key(), $new_bookmarks );
-
-			mb_set_topic_bookmarkers( $topic_id );
-		}
+	/* If the current user can't read the topic, make sure they are not bookmarked and bail. */
+	if ( !current_user_can( 'read_topic', $topic_id ) ) {
+		mb_remove_user_topic_bookmark( $user_id, $topic_id );
+		return;
 	}
 
-		if ( isset( $_GET['redirect'] ) ) {
+	/* If the user is already bookmarked, unbookmark them. */
+	if ( mb_is_topic_user_bookmark( $user_id, $topic_id ) ) {
+		mb_remove_user_topic_bookmark( $user_id, $topic_id );
 
-			wp_safe_redirect( esc_url( strip_tags( $_GET['redirect'] ) ) );
-		}
+	/* Else, bookmark them. */
+	} else {
+		mb_add_user_topic_bookmark( $user_id, $topic_id );
+	}
+
+	/* Redirect the user. */
+	wp_safe_redirect( esc_url( remove_query_arg( array( 'mb_action', 'topic_id', 'mb_nonce' ) ) ) );
 }
 
 function mb_handler_forum_toggle_open() {

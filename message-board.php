@@ -236,6 +236,7 @@ final class Message_Board {
 		/* Load user files. */
 		require_once( $this->dir_path . 'inc/user/functions.php'     );
 		require_once( $this->dir_path . 'inc/user/template.php'      );
+		require_once( $this->dir_path . 'inc/user/bookmarks.php'     );
 		require_once( $this->dir_path . 'inc/user/subscriptions.php' );
 
 		/* Load search files. */

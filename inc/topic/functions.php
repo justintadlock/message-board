@@ -145,29 +145,6 @@ function mb_get_multi_topic_reply_ids( $topic_ids ) {
 }
 
 /**
- * Get an array of user IDs for users who have bookmarked to the topic.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $topic_id
- * @return array
- */
-function mb_get_topic_bookmarkers( $topic_id = 0 ) {
-	$topic_id = mb_get_topic_id( $topic_id );
-
-	$users = wp_cache_get( 'mb_get_topic_bookmarkers_' . $topic_id, 'message-board-users' );
-
-	if ( false === $users ) {
-		global $wpdb;
-
-		$users = $wpdb->get_col( $wpdb->prepare( "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s and FIND_IN_SET( '{$topic_id}', meta_value ) > 0", mb_get_user_topic_bookmarks_meta_key() ) );
-		wp_cache_set( 'mb_get_topic_bookmarkers_' . $topic_id, $users, 'message-board-users' );
-	}
-
-	return apply_filters( 'mb_get_topic_bookmarkers', $users );
-}
-
-/**
  * Resets the topic's latest data.
  *
  * @since  1.0.0

@@ -1164,39 +1164,18 @@ function mb_topic_subscribe_url( $topic_id = 0 ) {
  * @return string
  */
 function mb_get_topic_subscribe_url( $topic_id = 0 ) {
+
+	if ( !mb_is_subscriptions_active() )
+		return '';
+
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	$url = esc_url( add_query_arg( array( 'action' => 'subscribe', 'topic_id' => $topic_id ) ) );
+	$url = $topic_id && current_user_can( 'read_topic', $topic_id ) ? add_query_arg( array( 'mb_action' => 'toggle_subscribe', 'topic_id' => $topic_id ) ) : '';
 
-	return apply_filters( 'mb_get_topic_subscribe_url', $url, $topic_id );
-}
+	if ( $url )
+		$url = wp_nonce_url( $url, "subscribe_topic_{$topic_id}", 'mb_nonce' );
 
-/**
- * Displays the topic unsubscribe URL.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $topic_id
- * @return void
- */
-function mb_topic_unsubscribe_url( $topic_id = 0 ) {
-	echo mb_get_topic_unsubscribe_url( $topic_id );
-}
-
-/**
- * Returns the topic unsubscribe URL.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $topic_id
- * @return string
- */
-function mb_get_topic_unsubscribe_url( $topic_id = 0 ) {
-	$topic_id = mb_get_topic_id( $topic_id );
-
-	$url = esc_url( add_query_arg( array( 'action' => 'unsubscribe', 'topic_id' => $topic_id ) ) );
-
-	return apply_filters( 'mb_get_topic_unsubscribe_url', $url, $topic_id );
+	return apply_filters( 'mb_get_topic_subscribe_url', esc_url( $url ), $topic_id );
 }
 
 /**
@@ -1221,25 +1200,23 @@ function mb_topic_subscribe_link( $topic_id = 0 ) {
  */
 function mb_get_topic_subscribe_link( $topic_id = 0 ) {
 
+	if ( !mb_is_subscriptions_active() )
+		return '';
+
 	$topic_id = mb_get_topic_id( $topic_id );
+	$link     = '';
 
-	if ( !mb_is_user_subscribed_topic( get_current_user_id(), $topic_id ) ) {
+	if ( is_user_logged_in() ) {
 
-		$link = sprintf( 
-			'<a class="subscribe-link" href="%s">%s</a>', 
-			mb_get_topic_subscribe_url( $topic_id ), 
-			__( 'Subscribe', 'message-board' ) 
-		);
+		$user_id = get_current_user_id();
+		$url     = mb_get_topic_subscribe_url( $topic_id );
+		$text    = mb_is_user_subscribed_topic( $user_id, $topic_id ) ? __( 'Unsubscribe', 'message-board' ) : __( 'Subscribe', 'message-board' );
 
-	} else {
-		$link = sprintf( 
-			'<a class="subscribe-link" href="%s">%s</a>', 
-			mb_get_topic_unsubscribe_url( $topic_id ),
-			__( 'Unsubscribe', 'message-board' ) 
-		);
+		if ( !empty( $url ) )
+			$link = sprintf( '<a class="mb-subscribe-link" href="%s">%s</a>', $url, $text ); 
 	}
 
-	return $link;
+	return apply_filters( 'mb_get_topic_subscribe_link', $link, $topic_id );
 }
 
 /* ====== Topic Bookmarks ====== */
@@ -1266,42 +1243,17 @@ function mb_topic_bookmark_url( $topic_id = 0 ) {
  */
 function mb_get_topic_bookmark_url( $topic_id = 0 ) {
 
-	$topic_id = mb_get_topic_id( $topic_id );
-	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
-	$url = esc_url( add_query_arg( array( 'action' => 'bookmark', 'topic_id' => $topic_id, 'redirect' => $redirect ), trailingslashit( home_url( 'board' ) ) ) );
-
-	return apply_filters( 'mb_get_topic_bookmark_url', $url, $topic_id );
-}
-
-/**
- * Displays the topic unbookmark URL.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $topic_id
- * @return void
- */
-function mb_topic_unbookmark_url( $topic_id = 0 ) {
-	echo mb_get_topic_unbookmark_url( $topic_id );
-}
-
-/**
- * Returns the topic unbookmark URL.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $topic_id
- * @return string
- */
-function mb_get_topic_unbookmark_url( $topic_id = 0 ) {
+	if ( !mb_is_bookmarks_active() )
+		return '';
 
 	$topic_id = mb_get_topic_id( $topic_id );
-	$redirect = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
-	$url = esc_url( add_query_arg( array( 'action' => 'unbookmark', 'topic_id' => $topic_id, 'redirect' => $redirect ), trailingslashit( home_url( 'board' ) ) ) );
+	$url = $topic_id && current_user_can( 'read_topic', $topic_id ) ? add_query_arg( array( 'mb_action' => 'toggle_bookmark', 'topic_id' => $topic_id ) ) : '';
 
-	return apply_filters( 'mb_get_topic_unbookmark_url', $url, $topic_id );
+	if ( $url )
+		$url = wp_nonce_url( $url, "bookmark_topic_{$topic_id}", 'mb_nonce' );
+
+	return apply_filters( 'mb_get_topic_bookmark_url', esc_url( $url ), $topic_id );
 }
 
 /**
@@ -1325,43 +1277,22 @@ function mb_topic_bookmark_link( $topic_id = 0 ) {
  * @return string
  */
 function mb_get_topic_bookmark_link( $topic_id = 0 ) {
+
+	if ( !mb_is_bookmarks_active() )
+		return '';
+
 	$topic_id = mb_get_topic_id( $topic_id );
+	$link     = '';
 
-	if ( !mb_is_topic_user_bookmark( get_current_user_id(), $topic_id ) ) {
-		$link = sprintf( 
-			'<a class="bookmark-link" href="%s">%s</a>', 
-			mb_get_topic_bookmark_url( $topic_id ), 
-			__( 'Bookmark', 'message-board' ) 
-		);
-	}
-	else {
-		$link = sprintf( 
-			'<a class="bookmark-link" href="%s">%s</a>', 
-			mb_get_topic_unbookmark_url( $topic_id ), 
-			__( 'Unbookmark', 'message-board' ) 
-		);
+	if ( is_user_logged_in() ) {
+
+		$user_id = get_current_user_id();
+		$url     = mb_get_topic_bookmark_url( $topic_id );
+		$text    = mb_is_topic_user_bookmark( $user_id, $topic_id ) ? __( 'Unbookmark', 'message-board' ) : __( 'Bookmark', 'message-board' );
+
+		if ( !empty( $url ) )
+			$link = sprintf( '<a class="mb-bookmark-link" href="%s">%s</a>', $url, $text ); 
 	}
 
-	return $link;
-}
-
-/**
- * Checks if the topic is one of the user's bookmarks.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $user_id
- * @param  int     $topic_id
- * @return bool
- */
-function mb_is_topic_user_bookmark( $user_id = 0, $topic_id = 0 ) {
-
-	$user_id  = 0 < $user_id ? $user_id : get_current_user_id();
-	$topic_id = mb_get_topic_id( $topic_id );
-
-	$bookmarks = get_user_meta( $user_id, mb_get_user_topic_bookmarks_meta_key(), true );
-
-	$favs = explode( ',', $bookmarks );
-
-	return in_array( $topic_id, $favs ) ? true : false;
+	return apply_filters( 'mb_get_topic_bookmark_link', $link, $topic_id );
 }
