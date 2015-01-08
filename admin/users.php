@@ -38,7 +38,7 @@ final class Message_Board_Admin_Users {
 		add_action( 'load-users.php', array( $this, 'load_users' ) );
 
 		/* Callback for handling requests. */
-		//add_action( 'load-users.php', array( $this, 'handler' ), 0 );
+		add_action( 'load-users.php', array( $this, 'handler' ), 0 );
 	}
 
 	/**
@@ -62,6 +62,9 @@ final class Message_Board_Admin_Users {
 		/* Add custom admin notices. */
 		//add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 
+		/* Forum role selector. */
+		add_action( 'restrict_manage_users', array( $this, 'roles_dropdown' ) );
+
 		/* Handle custom columns. */
 		add_filter( 'manage_users_columns',          array( $this, 'columns'          )        );
 		//add_filter( 'manage_users_sortable_columns', array( $this, 'sortable_columns' )        );
@@ -84,6 +87,16 @@ final class Message_Board_Admin_Users {
 		return array_merge( $vars, $new_vars );
 	}
 
+	public function roles_dropdown() { ?>
+		<?php if ( current_user_can( 'promote_users' ) ) : ?>
+
+		<label class="screen-reader-text" for="mb_new_forum_role"><?php _e( 'Change forum role to&hellip;', 'message-board' ) ?></label>
+		<?php mb_dropdown_roles( array( 'show_option_none' => __( 'Change forum role&hellip;', 'message-board' ) ) ); ?>
+	<?php
+			submit_button( __( 'Change' ), 'button', 'mb_change_role', false );
+		endif;
+	}
+
 	/**
 	 * Customize the columns on the edit post screen.
 	 *
@@ -95,6 +108,7 @@ final class Message_Board_Admin_Users {
 	public function columns( $columns ) {
 
 		/* Add custom columns. */
+		$columns['forum_role'] = __( 'Forum Role', 'message-board' );
 		$columns['topics']  = __( 'Topics',  'message-board' );
 		$columns['replies'] = __( 'Replies', 'message-board' );
 
@@ -129,8 +143,19 @@ final class Message_Board_Admin_Users {
 	 */
 	public function custom_column( $column, $column_name, $user_id ) {
 
+		if ( 'forum_role' === $column_name ) {
+
+			$role = mb_get_user_role( $user_id );
+
+			if ( $role ) {
+				$dynamic_roles = mb_get_dynamic_roles();
+				$column        = $dynamic_roles[ $role ]['name'];
+			} else {
+				$column = '&mdash;';
+			}
+
 		/* Post status column. */
-		if ( 'topics' === $column_name ) {
+		} elseif ( 'topics' === $column_name ) {
 
 			$user_id     = mb_get_user_id( $user_id );
 			$topic_count = mb_get_user_topic_count( $user_id );
@@ -175,7 +200,43 @@ final class Message_Board_Admin_Users {
 	 * @access public
 	 * @return void
 	 */
-	public function handler() {}
+	public function handler() {
+
+		if ( !current_user_can( 'promote_users' ) )
+			return;
+
+		if ( empty( $_REQUEST['users'] ) )
+			return;
+
+		if ( empty( $_REQUEST['mb_forum_role'] ) || empty( $_REQUEST['mb_change_role'] ) )
+			return;
+
+		$new_role = sanitize_key( $_REQUEST['mb_forum_role'] );
+
+		$dynamic_roles = mb_get_dynamic_roles();
+
+		if ( !isset( $dynamic_roles[ $new_role ] ) )
+			return;
+
+		$current_user_id = get_current_user_id();
+
+		foreach ( (array)$_REQUEST['users'] as $user_id ) {
+
+			$user_id = mb_get_user_id( $user_id );
+
+			if ( $current_user_id === $user_id )
+				continue;
+
+			$forum_role = mb_get_user_role( $user_id );
+
+			if ( $new_role !== $forum_role )
+				mb_set_user_role( $user_id, $new_role );
+		}
+
+		$url = remove_query_arg( array( 's', 'action', 'new_role', 'mb_forum_role', 'mb_change_role', 'action2', 'users' ) );
+
+		wp_safe_redirect( $url );
+	}
 
 	/**
 	 * Displays admin notices for the edit forum screen.

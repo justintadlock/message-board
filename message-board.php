@@ -263,7 +263,8 @@ final class Message_Board {
 			require_once( $this->dir_path . 'admin/post-reply.php' );
 
 			/* User screen files. */
-			require_once( $this->dir_path . 'admin/users.php' );
+			require_once( $this->dir_path . 'admin/users.php'     );
+			require_once( $this->dir_path . 'admin/user-edit.php' );
 		}
 	}
 
@@ -319,6 +320,9 @@ final class Message_Board {
 	 */
 	public function activation() {
 
+		/* Set the current user's forum role so that they can access forum stuff. */
+		mb_set_current_user_role();
+
 		/*
 		 * Temporary code to simplify post type names and to match bbPress.
 		 *
@@ -327,33 +331,6 @@ final class Message_Board {
 		$wpdb->query( "UPDATE  {$wpdb->posts} SET  post_type = 'topic' WHERE  post_type = 'forum_topic'" );
 		$wpdb->query( "UPDATE  {$wpdb->posts} SET  post_type = 'reply' WHERE  post_type = 'forum_reply'" );
 		*/
-
-		/* Get the administrator role. */
-		$role = get_role( 'administrator' );
-
-		/* If the administrator role exists, add required capabilities for the plugin. */
-		if ( !empty( $role ) ) {
-
-			$role->add_cap( 'manage_forums' );
-
-			$role->add_cap( 'create_forums'      );
-			$role->add_cap( 'edit_forums'        );
-			$role->add_cap( 'edit_others_forums' );
-			$role->add_cap( 'moderate_forums'    );
-			$role->add_cap( 'read_forums'        );
-
-			$role->add_cap( 'create_topics'      );
-			$role->add_cap( 'edit_topics'        );
-			$role->add_cap( 'edit_others_topics' );
-			$role->add_cap( 'moderate_topics'    );
-			$role->add_cap( 'read_topics'        );
-
-			$role->add_cap( 'create_replies'      );
-			$role->add_cap( 'edit_replies'        );
-			$role->add_cap( 'edit_others_replies' );
-			$role->add_cap( 'moderate_replies'    );
-			$role->add_cap( 'read_replies'        );
-		}
 	}
 }
 

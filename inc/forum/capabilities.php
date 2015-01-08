@@ -82,6 +82,8 @@ function mb_forum_map_meta_cap( $caps, $cap, $user_id, $args ) {
 			else
 				$caps = array();
 				//$caps[] = $post_type->cap->read;
+		} else {
+			$caps = array();
 		}
 
 	/* Meta cap for moderating a single forum. */

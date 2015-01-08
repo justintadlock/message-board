@@ -87,6 +87,8 @@ function mb_reply_map_meta_cap( $caps, $cap, $user_id, $args ) {
 				$caps = array();
 				//$caps[] = $post_type->cap->read;
 			}
+		} else {
+			$caps = array();
 		}
 
 	/* Meta cap for moderating a single reply. */

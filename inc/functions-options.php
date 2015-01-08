@@ -89,6 +89,17 @@ function mb_get_default_forum_id() {
 }
 
 /**
+ * Returns the ID/slug of the default forum role. By default, this is set to the `mb_participant` role.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_default_role() {
+	return apply_filters( 'mb_get_default_role', get_option( 'mb_default_forum_role', mb_get_participant_role() ) );
+}
+
+/**
  * Returns TRUE if the bookmarks feature is enabled.  Returns FALSE if disabled.
  *
  * @since  1.0.0

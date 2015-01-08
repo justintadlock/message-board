@@ -56,6 +56,11 @@
 
 /* ====== Users Screen (users.php) ====== */
 
+#mb_forum_role {
+	display: inline-block;
+	float:   none;
+}
+
 .users-php .wp-list-table .column-topics,
 .users-php .wp-list-table .column-replies {
 	width:      8%;

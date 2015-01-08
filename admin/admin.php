@@ -90,7 +90,7 @@ final class Message_Board_Admin {
 	function admin_menu() {
 
 		/* Remove `post-new.php` submenu pages for topics and replies. */
-		remove_submenu_page( mb_get_admin_menu_page(), "post-new.php?post_type={$this->topic_type}" );
+		//remove_submenu_page( mb_get_admin_menu_page(), "post-new.php?post_type={$this->topic_type}" );
 		remove_submenu_page( mb_get_admin_menu_page(), "post-new.php?post_type={$this->reply_type}" );
 	}
 
