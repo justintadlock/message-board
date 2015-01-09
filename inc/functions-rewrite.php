@@ -130,6 +130,7 @@ function mb_query_vars( $vars ) {
 
 	$vars[] = 'mb_custom';
 	$vars[] = 'mb_action';
+	$vars[] = 'mb_role';
 	$vars[] = 'forum_id';
 	$vars[] = 'topic_id';
 	$vars[] = 'reply_id';
@@ -167,6 +168,10 @@ function mb_rewrite_rules() {
 	/* User archive rewrite rules. */
 	add_rewrite_rule( $user_slug . '/?$',  'index.php?mb_custom=users', 'top' );
 	add_rewrite_rule( $user_slug . '/page/?([0-9]{1,})/?$', 'index.php?mb_custom=users&paged=$matches[1]', 'top' );
+
+	/* Single user rewrite rules. */
+	add_rewrite_rule( $user_slug . '/roles/([^/]+)/page/?([0-9]{1,})/?$', 'index.php?mb_custom=users&mb_role=$matches[1]&paged=$matches[2]', 'top' );
+	add_rewrite_rule( $user_slug . '/roles/([^/]+)/?$',                   'index.php?mb_custom=users&mb_role=$matches[1]',                   'top' );
 
 	$user_pages = 'forums|topics|replies|bookmarks|topic-subscriptions|forum-subscriptions';
 

@@ -102,6 +102,9 @@ function mb_wp_title( $title ) {
 	elseif ( mb_is_single_user() )
 		$title = mb_get_single_user_title();
 
+	elseif ( mb_is_user_role_archive() )
+		$title = mb_get_user_role_archive_title();
+
 	elseif ( mb_is_user_archive() )
 		$title = mb_get_user_archive_title();
 

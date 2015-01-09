@@ -202,7 +202,7 @@ function mb_get_spectator_role_caps() {
 }
 
 /**
- * Returns the capabilities for the keymaster forum role. Note that we're explicitly denying all 
+ * Returns the capabilities for the banned forum role. Note that we're explicitly denying all 
  * forum-related capabilities for this role.  This means that any user with this role, regardless of 
  * any other roles they have, will be denied forum permissions.
  *
@@ -247,10 +247,11 @@ function mb_get_banned_role_caps() {
  * @since  1.0.0
  * @access public
  * @global array  $wp_roles
+ * @global object $wpdb
  * @return void
  */
 function mb_register_user_roles() {
-	global $wp_roles;
+	global $wp_roles, $wpdb;
 
 	/* Make sure we have roles. */
 	if ( !isset( $wp_roles ) )
@@ -262,24 +263,14 @@ function mb_register_user_roles() {
 	 */
 	foreach ( mb_get_dynamic_roles() as $role => $args ) {
 
-		/*
-		 * Create a role object of our own. Typicaly, creating a `new WP_Role()` would handle 
-		 * this, but that method will add it to the database.
-		 */
-		$role_obj               = new stdClass;
-		$role_obj->name         = $role;
-		$role_obj->capabilities = $args['capabilities'];
-
 		/* Add the custom role. */
 		$wp_roles->roles[ $role ]        = $args;
-		$wp_roles->role_objects[ $role ] = $role_obj;
+		$wp_roles->role_objects[ $role ] = new WP_Role( $role, $args['capabilities'] );
 		$wp_roles->role_names[ $role ]   = $args['name'];
 	}
 
-	global $wpdb;
-	$role_key = $wpdb->prefix . 'user_roles';
-
-	add_filter( 'option_' . $role_key, 'mb_option_user_roles_filter' );
+	/* Filter the user roles option when WP decides to pull roles from the DB. */
+	add_filter( "option_{$wpdb->prefix}user_roles", 'mb_option_user_roles_filter' );
 }
 
 /**
@@ -402,14 +393,92 @@ function mb_remove_user_role( $user_id, $role ) {
  */
 function mb_get_user_role( $user_id = 0 ) {
 	$user_id = mb_get_user_id( $user_id );
+	$user    = new WP_User( $user_id );
 
-	$user = new WP_User( $user_id );
-
+	/* Get the user's forum roles. */
 	$forum_roles = array_intersect( array_keys( mb_get_dynamic_roles() ), $user->roles );
 
+	/* If the user has a forum role, use the first. Else, return an empty string. */
 	$role = !empty( $forum_roles ) ? array_shift( $forum_roles ) : '';
 
+	/* Return the forum role and allow devs to filter. */
 	return apply_filters( 'mb_get_user_forum_role', $role, $user_id );
+}
+
+/**
+ * Displays the translatable forum role name for a specific user.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $user_id
+ * @return void
+ */
+function mb_user_role_name( $user_id = 0 ) {
+	echo mb_get_user_role_name( $user_id );
+}
+
+/**
+ * Returns the translatable forum role name for a specific user.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $user_id
+ * @return string
+ */
+function mb_get_user_role_name( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+	$role    = mb_get_user_role( $user_id );
+
+	$name = !empty( $role ) ? mb_get_role_name( $role ) : '';
+
+	/* Return the role name and allow devs to filter. */
+	return apply_filters( 'mb_get_user_role_name', $name, $role, $user_id );
+}
+
+function mb_role_name( $role ) {
+	echo mb_get_role_name( $role );
+}
+
+function mb_get_role_name( $role ) {
+
+	$dynamic_roles = mb_get_dynamic_roles();
+	$name          = $dynamic_roles[ $role ]['name'];
+
+	return apply_filters( 'mb_get_role_name', $name, $role );
+}
+
+function mb_role_url( $role ) {
+	echo mb_get_role_url( $role );
+}
+
+function mb_get_role_url( $role ) {
+	global $wp_rewrite;
+
+	$role = sanitize_key( $role );
+
+	if ( $wp_rewrite->using_permalinks() )
+		$url = user_trailingslashit( trailingslashit( mb_get_user_archive_url() ) . 'roles/' . str_replace( 'mb_', '', $role ) );
+	else
+		$url = add_query_arg( 'mb_role', $role, mb_get_user_archive_url() );
+
+	return apply_filters( 'mb_get_user_archive_url', $url );
+}
+
+function mb_role_link( $role ) {
+	echo mb_get_role_link( $role );
+}
+
+function mb_get_role_link( $role ) {
+
+	$link = '';
+
+	if ( !empty( $role ) ) {
+		$text = mb_get_role_name( $role );
+		$url  = mb_get_role_url( $role );
+		$link = sprintf( '<a class="mb-role-link" href="%s">%s</a>', $url, $text );
+	}
+
+	return apply_filters( 'mb_get_role_link', $link );
 }
 
 /**

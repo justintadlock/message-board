@@ -16,10 +16,8 @@
 
 			<div class="mb-author-info">
 				<?php mb_topic_author_profile_link(); ?>
-				<?php if ( get_the_author_meta( 'forum_nickname' ) ) : ?>
-					<br />
-					<span class="user-forum-nickname"><?php the_author_meta( 'forum_nickname' ); ?></span>
-				<?php endif; ?>
+				<br />
+				<?php mb_role_link( mb_get_user_role( mb_get_topic_author_id() ) ); ?>
 				<?php if ( get_the_author_meta('url') ) : ?>
 					<br />
 					<a href="<?php echo esc_url( get_the_author_meta( 'url' ), mb_get_topic_author_id() ); ?>"><?php _e( 'Web Site', 'message-board' ); ?></a>

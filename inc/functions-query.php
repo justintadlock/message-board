@@ -260,6 +260,14 @@ function mb_pre_get_posts( $query ) {
 		$query->set( 'post_status',    array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status() ) );
 		$query->set( 'posts_per_page', mb_get_topics_per_page()    );
 	}
+
+	elseif ( mb_is_user_archive() ) {
+
+		$role = get_query_var( 'mb_role' );
+
+		if ( $role && in_array( "mb_{$role}", array_keys( mb_get_dynamic_roles() ) ) )
+			$query->set( 'mb_role', "mb_{$role}" );
+	}
 }
 
 /**

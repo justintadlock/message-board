@@ -67,6 +67,11 @@
 
 .mb-col-count { width: 15%; }
 
+/* === User loop columns. === */
+
+.mb-loop-user .mb-col-count { width: 10%; }
+
+.mb-loop-user .mb-col-role { width: 15%; }
 
 /* ====== Forms ====== */
 
@@ -145,6 +150,12 @@
 		.mb-author-box .avatar { width: 80px; height: 80px; }
 
 		.mb-author-box .mb-author-info { clear: both; }
+
+	.mb-thread .mb-topic-content,
+	.mb-thread .mb-reply-content { width: 70%; }
+
+		.ltr .mb-thread .mb-topic-content,
+		.ltr .mb-thread .mb-reply-content { float: right; }
 
 
 /* ====== User Profile ====== */

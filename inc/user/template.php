@@ -21,6 +21,7 @@ function mb_user_query() {
 			'orderby'      => 'login',
 			'order'        => 'ASC',
 			'offset'       => $offset,
+			'role'         => get_query_var( 'mb_role' ) ? sanitize_key( get_query_var( 'mb_role' ) ) : '',
 			'search'       => '',
 			'number'       => mb_get_users_per_page(),
 			'count_total'  => true,
@@ -54,6 +55,30 @@ function mb_is_user_archive() {
 	$is_user_archive = get_query_var( 'mb_custom' ) && 'users' === get_query_var( 'mb_custom' ) ? true : false;
 
 	return $is_user_archive && !is_author() ? true : false;
+}
+
+/**
+ * Checks if viewing a user role archive page.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $role
+ * @return bool
+ */
+function mb_is_user_role_archive( $role = '' ) {
+
+	if ( !mb_is_user_archive() )
+		return false;
+
+	$q_role = get_query_var( 'mb_role' );
+
+	if ( empty( $role ) && $q_role )
+		return true;
+
+	if ( $q_role === $role || $q_role === "mb_{$role}" )
+		return true;
+
+	return false;
 }
 
 /**
@@ -149,7 +174,47 @@ function mb_user_archive_title() {
 }
 
 function mb_get_user_archive_title() {
-	return apply_filters( 'mb_get_user_archive_title', __( 'Users', 'message-board' ) );
+
+	$title = mb_is_user_role_archive() ? mb_get_user_role_archive_title() : __( 'Users', 'message-board' );
+
+	return apply_filters( 'mb_get_user_archive_title', $title );
+}
+
+function mb_user_role_archive_title() {
+	echo mb_get_user_role_archive_title();
+}
+
+function mb_get_user_role_archive_title() {
+
+	$name = mb_get_role_name( get_query_var( 'mb_role' ) );
+
+	return apply_filters( 'mb_get_user_role_archive_title', sprintf( __( 'Users: %s Role', 'message-board' ), $name ) );
+}
+
+function mb_user_archive_url() {
+	echo mb_get_user_archive_url();
+}
+
+function mb_get_user_archive_url() {
+	global $wp_rewrite;
+
+	if ( $wp_rewrite->using_permalinks() )
+		$url = user_trailingslashit( home_url( mb_get_user_slug() ) );
+	else
+		$url = add_query_arg( 'mb_custom', 'users', home_url() );
+
+	return apply_filters( 'mb_get_user_archive_url', $url );
+}
+
+function mb_user_archive_link() {
+	echo mb_get_user_archive_link();
+}
+
+function mb_get_user_archive_link() {
+
+	$link = sprintf( '<a class="mb-user-archive-link" href="%s">%s</a>', mb_get_user_archive_url(), __( 'Users', 'message-board' ) );
+
+	return apply_filters( 'mb_get_user_archive_link', $link );
 }
 
 function mb_user_edit_url( $user_id = 0 ) {
