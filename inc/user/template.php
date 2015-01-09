@@ -75,6 +75,9 @@ function mb_is_user_role_archive( $role = '' ) {
 	if ( empty( $role ) && $q_role )
 		return true;
 
+	if ( empty( $role ) )
+		return false;
+
 	if ( $q_role === $role || $q_role === "mb_{$role}" )
 		return true;
 
