@@ -293,6 +293,9 @@ function mb_option_user_roles_filter( $roles ) {
  * Returns an array of the plugin's dynamic roles.  These roles are "dynamic" because they are not saved in 
  * the database.  Instead, they're added early in the page load.
  *
+ * Developers can overwrite the default roles with custom ones. If doing so, it is recommended that devs 
+ * also filter the role slugs, unless completely overwriting.
+ *
  * @since  1.0.0
  * @access public
  * @return array
@@ -406,6 +409,20 @@ function mb_get_user_role( $user_id = 0 ) {
 }
 
 /**
+ * Conditional check to see if the user is a keymaster (i.e., forum admin).
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $user_id
+ * @return bool
+ */
+function mb_is_user_keymaster( $user_id ) {
+	$is_keymaster = mb_get_keymaster_role() === mb_get_user_role( $user_id ) ? true : false;
+
+	return apply_filters( 'mb_is_user_keymaster', $is_keymaster, $user_id );
+}
+
+/**
  * Displays the translatable forum role name for a specific user.
  *
  * @since  1.0.0
@@ -435,55 +452,107 @@ function mb_get_user_role_name( $user_id = 0 ) {
 	return apply_filters( 'mb_get_user_role_name', $name, $role, $user_id );
 }
 
+/**
+ * Displays the name/label for a specific role.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $role
+ * @return void
+ */
 function mb_role_name( $role ) {
 	echo mb_get_role_name( $role );
 }
 
+/**
+ * Returns the name/label for a specific role.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $role
+ * @return string
+ */
 function mb_get_role_name( $role ) {
 
 	$dynamic_roles = mb_get_dynamic_roles();
-	$name          = $dynamic_roles[ $role ]['name'];
+	$name          = isset( $dynamic_roles[ $role ] ) ? $dynamic_roles[ $role ]['name'] : '';
 
 	return apply_filters( 'mb_get_role_name', $name, $role );
 }
 
+/**
+ * Displays the URL (/board/users/roles/rolename) for a specific role.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $role
+ * @return void
+ */
 function mb_role_url( $role ) {
 	echo mb_get_role_url( $role );
 }
 
+/**
+ * Returns the URL (/board/users/roles/rolename) for a specific role.  Note that we remove the `mb_` prefix
+ * for prettier URLs.  Only forum-specific roles get archive pages.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $role
+ * @return string
+ */
 function mb_get_role_url( $role ) {
 	global $wp_rewrite;
 
-	$role = sanitize_key( $role );
+	$dynamic_roles = mb_get_dynamic_roles();
+	$url           = '';
 
-	if ( $wp_rewrite->using_permalinks() )
-		$url = user_trailingslashit( trailingslashit( mb_get_user_archive_url() ) . 'roles/' . str_replace( 'mb_', '', $role ) );
-	else
-		$url = add_query_arg( 'mb_role', $role, mb_get_user_archive_url() );
+	if ( isset( $dynamic_roles[ $role ] ) ) {
+
+		if ( $wp_rewrite->using_permalinks() )
+			$url = user_trailingslashit( trailingslashit( mb_get_user_archive_url() ) . 'roles/' . str_replace( 'mb_', '', $role ) );
+		else
+			$url = add_query_arg( 'mb_role', $role, mb_get_user_archive_url() );
+	}
 
 	return apply_filters( 'mb_get_user_archive_url', $url );
 }
 
+/**
+ * Outputs the user role archive link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $role
+ * @return void
+ */
 function mb_role_link( $role ) {
 	echo mb_get_role_link( $role );
 }
 
+/**
+ * Returns the user role archive link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $role
+ * @return void
+ */
 function mb_get_role_link( $role ) {
 
-	$link = '';
+	$url  = mb_get_role_url( $role );
+	$text = mb_get_role_name( $role );
 
-	if ( !empty( $role ) ) {
-		$text = mb_get_role_name( $role );
-		$url  = mb_get_role_url( $role );
-		$link = sprintf( '<a class="mb-role-link" href="%s">%s</a>', $url, $text );
-	}
+	$link = !empty( $role ) && !empty( $url ) ? sprintf( '<a class="mb-role-link" href="%s">%s</a>', $url, $text ) : '';
 
-	return apply_filters( 'mb_get_role_link', $link );
+	return apply_filters( 'mb_get_role_link', $link, $role );
 }
 
 /**
  * Maps default WordPress roles to the plugin's roles.  This is the default used when a user doesn't yet 
- * have a forum role.
+ * have a forum role.  Developers can add custom-created roles to the map using a filter on the 
+ * `mb_get_role_map` hook.  Roles are mapped in key/value pairs.  The key is the WP or custom role.  The 
+ * value is the forum role to map it to.
  *
  * @since  1.0.0
  * @access public
@@ -567,6 +636,18 @@ function mb_get_common_capabilities() {
 	return apply_filters( 'mb_get_common_capabilities', $caps );
 }
 
+/**
+ * Helper function for checking if a user can read forums, topics, or replies. We need this to handle 
+ * users who are not logged in but should have permission to read (e.g, non-private forums).  This 
+ * function is meant to be used in conjunction with a filter on `map_meta_cap`.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $user_id
+ * @param  string  $cap
+ * @param  int     $post_id
+ * @return bool
+ */
 function mb_user_can( $user_id, $cap, $post_id ) {
 
 	// @todo Check hierarchy.
@@ -581,6 +662,14 @@ function mb_user_can( $user_id, $cap, $post_id ) {
 	return user_can( $user_id, $cap, $post_id );
 }
 
+/**
+ * `<select>` dropdown for displaying the forum roles in a form.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $args
+ * @return string|void
+ */
 function mb_dropdown_roles( $args = array() ) {
 
 	$defaults = array(

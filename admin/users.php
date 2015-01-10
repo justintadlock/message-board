@@ -87,14 +87,30 @@ final class Message_Board_Admin_Users {
 		return array_merge( $vars, $new_vars );
 	}
 
-	public function roles_dropdown() { ?>
-		<?php if ( current_user_can( 'promote_users' ) ) : ?>
+	/**
+	 * Adds a forum roles dropdown above the users table.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function roles_dropdown() {
+		if ( current_user_can( 'promote_users' ) ) : ?>
 
-		<label class="screen-reader-text" for="mb_new_forum_role"><?php _e( 'Change forum role to&hellip;', 'message-board' ) ?></label>
-		<?php mb_dropdown_roles( array( 'show_option_none' => __( 'Change forum role&hellip;', 'message-board' ) ) ); ?>
-	<?php
-			submit_button( __( 'Change' ), 'button', 'mb_change_role', false );
-		endif;
+			<label class="screen-reader-text" for="mb_new_forum_role">
+				<?php _e( 'Change forum role to&hellip;', 'message-board' ) ?>
+			</label>
+
+			<?php mb_dropdown_roles(
+				array(
+					'show_option_none' => __( 'Change forum role&hellip;', 'message-board' ),
+					'exclude'          => mb_is_user_keymaster( get_current_user_id() ) ? array() : array( mb_get_keymaster_role() )
+				)
+			); ?>
+
+			<?php submit_button( __( 'Change', 'message-board' ), 'button', 'mb_change_role', false ); ?>
+
+		<?php endif;
 	}
 
 	/**
@@ -197,39 +213,56 @@ final class Message_Board_Admin_Users {
 	 */
 	public function handler() {
 
-		if ( !current_user_can( 'promote_users' ) )
+		/* If the current user can't promote users or there are no users, bail. */
+		if ( !current_user_can( 'promote_users' ) || empty( $_REQUEST['users'] ) )
 			return;
 
-		if ( empty( $_REQUEST['users'] ) )
-			return;
-
+		/* Is this a forum role change request? */
 		if ( empty( $_REQUEST['mb_forum_role'] ) || empty( $_REQUEST['mb_change_role'] ) )
 			return;
 
+		/* Get the new role. */
 		$new_role = sanitize_key( $_REQUEST['mb_forum_role'] );
 
+		/* Get an array of the allowed forum roles. */
 		$dynamic_roles = mb_get_dynamic_roles();
 
+		/* If the new role isn't one of our forum roles, bail. */
 		if ( !isset( $dynamic_roles[ $new_role ] ) )
 			return;
 
+		/* Get some variables we need. */
 		$current_user_id = get_current_user_id();
+		$keymaster_role  = mb_get_keymaster_role();
+		$is_keymaster    = mb_is_user_keymaster( $current_user_id );
 
+		/* Only keymasters can make new keymasters. */
+		if ( $keymaster_role === $new_role && false === $is_keymaster )
+			return;
+
+		/* Loop through each user and change their forum role. */
 		foreach ( (array)$_REQUEST['users'] as $user_id ) {
 
-			$user_id = mb_get_user_id( $user_id );
-
+			/* You can't go changing your own role, silly! */
 			if ( $current_user_id === $user_id )
 				continue;
 
+			/* Get the user's current forum role. */
 			$forum_role = mb_get_user_role( $user_id );
 
+			/* Only keymasters can demote other keymasters. */
+			if ( false === $is_keymaster && $keymaster_role === $forum_role )
+				continue;
+
+			/* If the new role doesn't match the user's current role, let's set it. */
 			if ( $new_role !== $forum_role )
 				mb_set_user_role( $user_id, $new_role );
 		}
 
+		/* Remove some query args and build the redirect URL. */
 		$url = remove_query_arg( array( 's', 'action', 'new_role', 'mb_forum_role', 'mb_change_role', 'action2', 'users' ) );
 
+		/* Redirect back to the users screen. */
 		wp_safe_redirect( $url );
 	}
 

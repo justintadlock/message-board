@@ -261,7 +261,11 @@ function mb_pre_get_posts( $query ) {
 		$query->set( 'posts_per_page', mb_get_topics_per_page()    );
 	}
 
-	elseif ( mb_is_user_archive() ) {
+	/*
+	 * If viewing a user role archive. We're running this early in the page load to change the query 
+	 * var to match the actual role name. It's kind of hacky, but it gets the job done.
+	 */
+	elseif ( mb_is_user_archive() && get_query_var( 'mb_role' ) ) {
 
 		$role = get_query_var( 'mb_role' );
 
