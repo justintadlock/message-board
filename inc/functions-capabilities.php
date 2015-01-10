@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin capabilities (i.e., permissions).
+ * Plugin capabilities and roles.  Includes an API for registering/unregistering forum roles.
  *
  * @todo Figure out why the heck dynamic roles keep getting added to the database. :(
  *
@@ -13,7 +13,10 @@
  */
 
 /* Register dynamic user roles. */
-add_action( 'plugins_loaded', 'mb_register_user_roles', 0 );
+add_action( 'plugins_loaded', 'mb_register_roles', 5 );
+
+/* Merge dynamic roles with WP roles. */
+add_action( 'after_setup_theme', 'mb_merge_roles', 95 );
 
 /* Make sure the current user has a forum role. */
 add_action( 'set_current_user', 'mb_set_current_user_role', 0 );
@@ -240,7 +243,69 @@ function mb_get_banned_role_caps() {
 }
 
 /**
- * Registers user roles with WordPress.  Typically, WordPress roles are saved to the database.  We're going 
+ * Registers the plugin's default user roles.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_register_roles() {
+
+	/* Keymaster role args. */
+	$keymaster_args = array(
+		'labels' => array(
+			'plural_name'   => __( 'Keymasters', 'message-board' ), 
+			'singular_name' => __( 'Keymaster',  'message-board' ),
+		),
+		'capabilities'   => mb_get_keymaster_role_caps()
+	);
+
+	/* Moderator role args. */
+	$moderator_args = array(
+		'labels' => array(
+			'plural_name'   => __( 'Moderators', 'message-board' ), 
+			'singular_name' => __( 'Modertor',  'message-board' ),
+		),
+		'capabilities'   => mb_get_moderator_role_caps()
+	);
+
+	/* Participant role args. */
+	$participant_args = array(
+		'labels' => array(
+			'plural_name'   => __( 'Participants', 'message-board' ), 
+			'singular_name' => __( 'Participant',  'message-board' ),
+		),
+		'capabilities'   => mb_get_participant_role_caps()
+	);
+
+	/* Spectator role args. */
+	$spectator_args = array(
+		'labels' => array(
+			'plural_name'   => __( 'Spectators', 'message-board' ), 
+			'singular_name' => __( 'Spectator',  'message-board' ),
+		),
+		'capabilities'   => mb_get_spectator_role_caps()
+	);
+
+	/* Banned role args. */
+	$banned_args = array(
+		'labels' => array(
+			'plural_name'   => __( 'Banned', 'message-board' ), 
+			'singular_name' => __( 'Banned',  'message-board' ),
+		),
+		'capabilities'   => mb_get_banned_role_caps()
+	);
+
+	/* Register the roles. */
+	mb_register_role( mb_get_keymaster_role(),   apply_filters( 'mb_keymaster_role_args',   $keymaster_args   ) );
+	mb_register_role( mb_get_moderator_role(),   apply_filters( 'mb_moderator_role_args',   $moderator_args   ) );
+	mb_register_role( mb_get_participant_role(), apply_filters( 'mb_participant_role_args', $participant_args ) );
+	mb_register_role( mb_get_spectator_role(),   apply_filters( 'mb_spectator_role_args',   $spectator_args   ) );
+	mb_register_role( mb_get_banned_role(),      apply_filters( 'mb_banned_role_args',      $banned_args      ) );
+}
+
+/**
+ * Merges user roles with WordPress.  Typically, WordPress roles are saved to the database.  We're going 
  * to bypass this and hook our roles into other roles when the page is loaded.  This allows us to keep the 
  * roles dynamic without having to save them to the DB.
  *
@@ -250,13 +315,12 @@ function mb_get_banned_role_caps() {
  * @global object $wpdb
  * @return void
  */
-function mb_register_user_roles() {
+function mb_merge_roles() {
 	global $wp_roles, $wpdb;
 
 	/* Make sure we have roles. */
 	if ( !isset( $wp_roles ) )
 		$wp_roles = new WP_Roles();
-
 	/*
 	 * Loop through each of the dynamic roles and merge them with the `$wp_roles` array. This is 
 	 * kind of hacky, but it's the best we can do because there's no API for dynamic roles in WP.
@@ -265,8 +329,8 @@ function mb_register_user_roles() {
 
 		/* Add the custom role. */
 		$wp_roles->roles[ $role ]        = $args;
-		$wp_roles->role_objects[ $role ] = new WP_Role( $role, $args['capabilities'] );
-		$wp_roles->role_names[ $role ]   = $args['name'];
+		$wp_roles->role_objects[ $role ] = new WP_Role( $role, $args->capabilities );
+		$wp_roles->role_names[ $role ]   = $args->labels->singular_name;
 	}
 
 	/* Filter the user roles option when WP decides to pull roles from the DB. */
@@ -290,27 +354,92 @@ function mb_option_user_roles_filter( $roles ) {
 }
 
 /**
+ * Register a custom user forum role.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $role
+ * @param  array   $args {
+ *     Array or string of arguments for registering a post type.
+ *
+ *     @type  array  $capabilities  Key/value pairs of capabilities.  The key should be the capability 
+ *                                  and the value should `TRUE` to explicity grant a cap or `FALSE` to 
+ *                                  explicitly deny a cap.
+ *     @type  array  $labels        Array of internationalized labels for this role.
+ * }
+ * @return void
+ */
+function mb_register_role( $role, $args = array() ) {
+	$mb = message_board();
+
+	/* Only allow alphanumeric characters, hyphens, and underscores. */
+	$role = sanitize_key( $role );
+
+	/* Don't register if the role is already registered. */
+	if ( isset( $mb->roles[ $role ] ) )
+		return false;
+
+	/* Default arguments. */
+	$defaults = array(
+		'capabilities' => array(),
+		'labels'       => array()  // singular_name, plural_name
+	);
+
+	$args = wp_parse_args( $args, $defaults );
+
+	/* Make caps and labels objects. */
+	$args['capabilities'] = (object)$args['capabilities'];
+	$args['labels']       = (object)$args['labels'];
+
+	/* Add the role object. */
+	$mb->roles[ $role ] = (object)$args;
+}
+
+/**
+ * Unregister a registered forum role.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $role
+ * @return bool
+ */
+function mb_unregister_role( $role ) {
+	$mb = message_board();
+
+	/* If the role is set, remove it. */
+	if ( isset( $mb->roles[ $role ] ) ) {
+		unset( $mb->roles[ $role ] );
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Return a role object.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $role
+ * @return object
+ */
+function mb_get_role_object( $role ) {
+	return message_board()->roles[ $role ];
+}
+
+/**
  * Returns an array of the plugin's dynamic roles.  These roles are "dynamic" because they are not saved in 
  * the database.  Instead, they're added early in the page load.
  *
- * Developers can overwrite the default roles with custom ones. If doing so, it is recommended that devs 
- * also filter the role slugs, unless completely overwriting.
+ * Developers can overwrite the default roles with custom ones. If doing so, it is recommended to use the 
+ * API (e.g., `mb_register_role()`, `mb_unregister_role()`).
  *
  * @since  1.0.0
  * @access public
  * @return array
  */
 function mb_get_dynamic_roles() {
-
-	$roles = array(
-		mb_get_keymaster_role()   => array( 'name' => __( 'Keymaster',   'message-board' ), 'capabilities' => mb_get_keymaster_role_caps()   ),
-		mb_get_moderator_role()   => array( 'name' => __( 'Moderator',   'message-board' ), 'capabilities' => mb_get_moderator_role_caps()   ),
-		mb_get_participant_role() => array( 'name' => __( 'Participant', 'message-board' ), 'capabilities' => mb_get_participant_role_caps() ),
-		mb_get_spectator_role()   => array( 'name' => __( 'Spectator',   'message-board' ), 'capabilities' => mb_get_spectator_role_caps()   ),
-		mb_get_banned_role()      => array( 'name' => __( 'Banned',      'message-board' ), 'capabilities' => mb_get_banned_role_caps()      ),
-	);
-
-	return apply_filters( 'mb_get_dynamic_roles', $roles );
+	return apply_filters( 'mb_get_dynamic_roles', message_board()->roles );
 }
 
 /**
@@ -473,9 +602,8 @@ function mb_role_name( $role ) {
  * @return string
  */
 function mb_get_role_name( $role ) {
-
-	$dynamic_roles = mb_get_dynamic_roles();
-	$name          = isset( $dynamic_roles[ $role ] ) ? $dynamic_roles[ $role ]['name'] : '';
+	$roles = mb_get_dynamic_roles();
+	$name  = isset( $roles[ $role ] ) ? mb_get_role_object( $role )->labels->singular_name : '';
 
 	return apply_filters( 'mb_get_role_name', $name, $role );
 }
@@ -696,7 +824,7 @@ function mb_dropdown_roles( $args = array() ) {
 		if ( in_array( $role, (array)$args['exclude'] ) )
 			continue;
 
-		$out .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $role ), selected( $role, $args['selected'], false ), esc_html( $role_args['name'] ) );
+		$out .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $role ), selected( $role, $args['selected'], false ), esc_html( $role_args->labels->singular_name ) );
 	}
 
 	$out .= '</select>';

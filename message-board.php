@@ -56,6 +56,15 @@ final class Message_Board {
 	public $dir_uri = '';
 
 	/**
+	 * Forum roles (e.g., keymaster, moderator, participant, spectator, banned).
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @var    array
+	 */
+	public $roles = array();
+
+	/**
 	 * Forum types (e.g., normal, category).
 	 *
 	 * @since  1.0.0

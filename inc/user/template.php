@@ -21,7 +21,7 @@ function mb_user_query() {
 			'orderby'      => 'login',
 			'order'        => 'ASC',
 			'offset'       => $offset,
-			'role'         => get_query_var( 'mb_role' ) ? sanitize_key( get_query_var( 'mb_role' ) ) : '',
+			'role'         => mb_is_user_role_archive() ? sanitize_key( get_query_var( 'mb_role' ) ) : '',
 			'search'       => '',
 			'number'       => mb_get_users_per_page(),
 			'count_total'  => true,
@@ -71,6 +71,11 @@ function mb_is_user_role_archive( $role = '' ) {
 		return false;
 
 	$q_role = get_query_var( 'mb_role' );
+
+	$roles = mb_get_dynamic_roles();
+
+	if ( !isset( $roles[ $q_role ] ) )
+		return false;
 
 	if ( empty( $role ) && $q_role )
 		return true;
@@ -188,10 +193,9 @@ function mb_user_role_archive_title() {
 }
 
 function mb_get_user_role_archive_title() {
+	$role = get_query_var( 'mb_role' );
 
-	$name = mb_get_role_name( get_query_var( 'mb_role' ) );
-
-	return apply_filters( 'mb_get_user_role_archive_title', sprintf( __( 'Users: %s Role', 'message-board' ), $name ) );
+	return apply_filters( 'mb_get_user_role_archive_title', mb_get_role_object( $role )->labels->plural_name );
 }
 
 function mb_user_archive_url() {
