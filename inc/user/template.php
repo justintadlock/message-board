@@ -347,8 +347,26 @@ function mb_loop_user_pagination( $args = array() ) {
 	return mb_pagination( $args, (object) $query );
 }
 
+function mb_user_url( $user_id = 0 ) {
+	echo mb_get_user_url( $user_id );
+}
+
 function mb_user_profile_url( $user_id = 0 ) {
 	echo mb_get_user_profile_url( $user_id );
+}
+
+function mb_get_user_url( $user_id = 0 ) {
+	global $wp_rewrite;
+
+	$user_id  = mb_get_user_id( $user_id );
+	$nicename = get_the_author_meta( 'user_nicename', $user_id );
+
+	if ( $wp_rewrite->using_permalinks() )
+		$url = user_trailingslashit( trailingslashit( home_url( mb_get_user_slug() ) ) . $nicename );
+	else
+		$url = add_query_arg( array( 'mb_custom' => 'users', 'author_name' => $nicename ), home_url() );
+
+	return apply_filters( 'mb_user_url', $url, $user_id );
 }
 
 function mb_get_user_profile_url( $user_id = 0 ) {
@@ -374,44 +392,16 @@ function mb_get_user_profile_link( $user_id = 0 ) {
 	return apply_filters( 'mb_get_user_profile_link', $link, $user_id );
 }
 
-function mb_user_page_url( $slug = '', $user_id = 0 ) {
-	echo mb_get_user_page_url( $slug, $user_id );
+function mb_user_link( $user_id = 0 ) {
+	echo mb_get_user_link( $user_id );
 }
 
-function mb_get_user_page_url( $slug = '', $user_id = 0 ) {
+function mb_get_user_link( $user_id = 0 ) {
 	$user_id = mb_get_user_id( $user_id );
 
-	$profile_url = mb_get_user_profile_url( $user_id );
+	$link = sprintf( '<a class="mb-user-link" href="%s">%s</a>', mb_get_user_url( $user_id ), get_the_author_meta( 'display_name', $user_id ) );
 
-	if ( !empty( $slug ) ) {
-		$url = user_trailingslashit( trailingslashit( $profile_url ) . $slug );
-	} else {
-		$url = $profile_url;
-	}
-
-	return apply_filters( 'mb_get_user_page_url', $url, $user_id, $slug );
-}
-
-function mb_user_page_link( $slug = '', $user_id = 0 ) {
-	echo mb_get_user_page_link( $slug, $user_id );
-}
-
-function mb_get_user_page_link( $slug = '', $user_id = 0 ) {
-	$user_id = mb_get_user_id( $user_id );
-
-	$url = mb_get_user_page_url( $slug, $user_id );
-
-	if ( !empty( $slug ) ) {
-		$class = "user-{$slug}-link";
-		$title = $slug; //temp
-	} else {
-		$class = 'user-profile-link';
-		$title = __( 'Profile', 'message-board' );
-	}
-
-	$link = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $url ), sanitize_html_class( $class ), $title );
-
-	return apply_filters( 'mb_get_user_page_link', $link, $user_id, $slug );
+	return apply_filters( 'mb_get_user_link', $link, $user_id );
 }
 
 function mb_user_topics_url( $user_id = 0 ) {
@@ -419,10 +409,89 @@ function mb_user_topics_url( $user_id = 0 ) {
 }
 
 function mb_get_user_topics_url( $user_id = 0 ) {
+	global $wp_rewrite;
 
-	$url = mb_get_user_profile_url( $user_id );
+	$user_id = mb_get_user_id( $user_id );
+	$url     = mb_get_user_url( $user_id );
 
-	return esc_url( trailingslashit( $url ) . 'topics' );
+	if ( $wp_rewrite->using_permalinks() )
+		$url = user_trailingslashit( trailingslashit( $url ) . 'topics' );
+	else
+		$url = add_query_arg( array( 'mb_user_page' => 'topics' ), $url );
+
+	return apply_filters( 'mb_user_topics_url', $url, $user_id );
+}
+
+function mb_user_topics_link( $user_id = 0 ) {
+	echo mb_get_user_topics_link( $user_id );
+}
+
+function mb_get_user_topics_link( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+
+	$link = sprintf( '<a class="mb-user-topics-link" href="%s">%s</a>', mb_get_user_topics_url( $user_id ), __( 'Topics', 'message-board' ) );
+
+	return apply_filters( 'mb_get_user_topics_link', $link, $user_id );
+}
+
+function mb_user_forums_url( $user_id = 0 ) {
+	echo mb_get_user_forums_url( $user_id );
+}
+
+function mb_get_user_forums_url( $user_id = 0 ) {
+	global $wp_rewrite;
+
+	$user_id = mb_get_user_id( $user_id );
+	$url     = mb_get_user_url( $user_id );
+
+	if ( $wp_rewrite->using_permalinks() )
+		$url = user_trailingslashit( trailingslashit( $url ) . 'forums' );
+	else
+		$url = add_query_arg( array( 'mb_user_page' => 'forums' ), $url );
+
+	return apply_filters( 'mb_user_forums_url', $url, $user_id );
+}
+
+function mb_user_forums_link( $user_id = 0 ) {
+	echo mb_get_user_forums_link( $user_id );
+}
+
+function mb_get_user_forums_link( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+
+	$link = sprintf( '<a class="mb-user-forums-link" href="%s">%s</a>', mb_get_user_forums_url( $user_id ), __( 'Forums', 'message-board' ) );
+
+	return apply_filters( 'mb_get_user_forums_link', $link, $user_id );
+}
+
+function mb_user_replies_url( $user_id = 0 ) {
+	echo mb_get_user_replies_url( $user_id );
+}
+
+function mb_get_user_replies_url( $user_id = 0 ) {
+	global $wp_rewrite;
+
+	$user_id = mb_get_user_id( $user_id );
+	$url     = mb_get_user_url( $user_id );
+
+	if ( $wp_rewrite->using_permalinks() )
+		$url = user_trailingslashit( trailingslashit( $url ) . 'replies' );
+	else
+		$url = add_query_arg( array( 'mb_user_page' => 'replies' ), $url );
+
+	return apply_filters( 'mb_user_replies_url', $url, $user_id );
+}
+
+function mb_user_replies_link( $user_id = 0 ) {
+	echo mb_get_user_replies_link( $user_id );
+}
+
+function mb_get_user_replies_link( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+
+	$link = sprintf( '<a class="mb-user-replies-link" href="%s">%s</a>', mb_get_user_replies_url( $user_id ), __( 'Replies', 'message-board' ) );
+
+	return apply_filters( 'mb_get_user_replies_link', $link, $user_id );
 }
 
 function mb_user_bookmarks_url( $user_id = 0 ) {
@@ -430,21 +499,89 @@ function mb_user_bookmarks_url( $user_id = 0 ) {
 }
 
 function mb_get_user_bookmarks_url( $user_id = 0 ) {
+	global $wp_rewrite;
 
-	$url = trailingslashit( mb_get_user_profile_url( $user_id ) ) . 'bookmarks';
+	$user_id = mb_get_user_id( $user_id );
+	$url     = mb_get_user_url( $user_id );
 
-	return apply_filters( 'mb_get_user_bookmarks_url', esc_url( $url ), $user_id );
+	if ( $wp_rewrite->using_permalinks() )
+		$url = user_trailingslashit( trailingslashit( $url ) . 'bookmarks' );
+	else
+		$url = add_query_arg( array( 'mb_user_page' => 'bookmarks' ), $url );
+
+	return apply_filters( 'mb_user_bookmarks_url', $url, $user_id );
 }
 
-function mb_user_subscriptions_url( $user_id = 0 ) {
-	echo mb_get_user_subscriptions_url( $user_id );
+function mb_user_bookmarks_link( $user_id = 0 ) {
+	echo mb_get_user_bookmarks_link( $user_id );
 }
 
-function mb_get_user_subscriptions_url( $user_id = 0 ) {
+function mb_get_user_bookmarks_link( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
 
-	$url = trailingslashit( mb_get_user_profile_url( $user_id ) ) . 'subscriptions';
+	$link = sprintf( '<a class="mb-user-bookmarks-link" href="%s">%s</a>', mb_get_user_bookmarks_url( $user_id ), __( 'Bookmarks', 'message-board' ) );
 
-	return apply_filters( 'mb_get_user_subscriptions_url', esc_url( $url ), $user_id );
+	return apply_filters( 'mb_get_user_bookmarks_link', $link, $user_id );
+}
+
+function mb_user_topic_subscriptions_url( $user_id = 0 ) {
+	echo mb_get_user_topic_subscriptions_url( $user_id );
+}
+
+function mb_get_user_topic_subscriptions_url( $user_id = 0 ) {
+	global $wp_rewrite;
+
+	$user_id = mb_get_user_id( $user_id );
+	$url     = mb_get_user_url( $user_id );
+
+	if ( $wp_rewrite->using_permalinks() )
+		$url = user_trailingslashit( trailingslashit( $url ) . 'topic-subscriptions' );
+	else
+		$url = add_query_arg( array( 'mb_user_page' => 'topic-subscriptions' ), $url );
+
+	return apply_filters( 'mb_user_topic_subscriptions_url', $url, $user_id );
+}
+
+function mb_user_topic_subscriptions_link( $user_id = 0 ) {
+	echo mb_get_user_topic_subscriptions_link( $user_id );
+}
+
+function mb_get_user_topic_subscriptions_link( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+
+	$link = sprintf( '<a class="mb-user-topic-subscriptions-link" href="%s">%s</a>', mb_get_user_topic_subscriptions_url( $user_id ), __( 'Topic Subscriptions', 'message-board' ) );
+
+	return apply_filters( 'mb_get_user_topic_subscriptions_link', $link, $user_id );
+}
+
+function mb_user_forum_subscriptions_url( $user_id = 0 ) {
+	echo mb_get_user_forum_subscriptions_url( $user_id );
+}
+
+function mb_get_user_forum_subscriptions_url( $user_id = 0 ) {
+	global $wp_rewrite;
+
+	$user_id = mb_get_user_id( $user_id );
+	$url     = mb_get_user_url( $user_id );
+
+	if ( $wp_rewrite->using_permalinks() )
+		$url = user_trailingslashit( trailingslashit( $url ) . 'forum-subscriptions' );
+	else
+		$url = add_query_arg( array( 'mb_user_page' => 'forum-subscriptions' ), $url );
+
+	return apply_filters( 'mb_user_forum_subscriptions_url', $url, $user_id );
+}
+
+function mb_user_forum_subscriptions_link( $user_id = 0 ) {
+	echo mb_get_user_forum_subscriptions_link( $user_id );
+}
+
+function mb_get_user_forum_subscriptions_link( $user_id = 0 ) {
+	$user_id = mb_get_user_id( $user_id );
+
+	$link = sprintf( '<a class="mb-user-forum-subscriptions-link" href="%s">%s</a>', mb_get_user_forum_subscriptions_url( $user_id ), __( 'Forum Subscriptions', 'message-board' ) );
+
+	return apply_filters( 'mb_get_user_forum_subscriptions_link', $link, $user_id );
 }
 
 /**

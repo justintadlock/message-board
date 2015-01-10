@@ -37,7 +37,7 @@
 	tbody .mb-col-title .forum-link,
 	.mb-col-title .mb-topic-link,
 	.mb-col-title .mb-reply-link,
-	.archive-user .mb-col-title .user-profile-link { font-size: 19px; font-weight: bold; }
+	.archive-user .mb-col-title .mb-user-link { font-size: 19px; font-weight: bold; }
 
 	.mb-col-title .mb-forum-content,
 	.mb-col-title .mb-topic-meta,

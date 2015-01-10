@@ -26,14 +26,14 @@
 			<tr>
 				<td class="mb-col-title">
 					<?php echo get_avatar( mb_get_user_id() ); ?>
-					<?php mb_user_profile_link(); ?>
+					<?php mb_user_link(); ?>
 					<div class="mb-user-description">
 						<?php the_author_meta( 'description', mb_get_user_id() ); ?>
 					</div><!-- .mb-user-description -->
 				</td>
 				<td class="mb-col-role"><?php mb_role_link( mb_get_user_role() ); ?></td>
-				<td class="mb-col-count"><a href="<?php mb_user_page_url( 'topics' ); ?>"><?php mb_user_topic_count(); ?></a></td>
-				<td class="mb-col-count"><a href="<?php mb_user_page_url( 'replies' ); ?>"><?php mb_user_reply_count(); ?></a></td>
+				<td class="mb-col-count"><a href="<?php mb_user_topics_url(); ?>"><?php mb_user_topic_count(); ?></a></td>
+				<td class="mb-col-count"><a href="<?php mb_user_replies_url(); ?>"><?php mb_user_reply_count(); ?></a></td>
 			</tr>
 
 		<?php endwhile; // End found users loop. ?>

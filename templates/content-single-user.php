@@ -3,13 +3,13 @@
 </div><!-- .loop-meta -->
 
 <ul class="mb-user-page-links">
-	<li><?php mb_user_profile_link(); ?></li>
-	<li><?php mb_user_page_link( 'forums' ); ?></li>
-	<li><?php mb_user_page_link( 'topics' ); ?></li>
-	<li><?php mb_user_page_link( 'replies' ); ?></li>
-	<li><?php mb_user_page_link( 'bookmarks' ); ?></li>
-	<li><?php mb_user_page_link( 'topic-subscriptions' ); ?></li>
-	<li><?php mb_user_page_link( 'forum-subscriptions' ); ?></li>
+	<li><?php mb_user_link(); ?></li>
+	<li><?php mb_user_forums_link(); ?></li>
+	<li><?php mb_user_topics_link(); ?></li>
+	<li><?php mb_user_replies_link(); ?></li>
+	<li><?php mb_user_bookmarks_link(); ?></li>
+	<li><?php mb_user_topic_subscriptions_link(); ?></li>
+	<li><?php mb_user_forum_subscriptions_link(); ?></li>
 	<?php if ( current_user_can( 'edit_user', mb_get_user_id() ) ) printf( '<li>%s</li>', mb_get_user_edit_link() ); ?>
 </ul>
 
