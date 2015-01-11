@@ -1,4 +1,16 @@
 <?php
+/**
+ * Template functions for forum-related functionality.
+ *
+ * @package    MessageBoard
+ * @subpackage Includes
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
+
+/* ====== Forum Query ====== */
 
 /**
  * Creates a new forum query and checks if there are any forums found.
@@ -50,6 +62,17 @@ function mb_forum_query() {
 }
 
 /**
+ * Sets up the forum data for the current forum in the forum loop.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_the_forum() {
+	return message_board()->forum_query->the_post();
+}
+
+/**
  * Creates a new sub-forum query and checks if there are any forums found.
  *
  * @since  1.0.0
@@ -71,9 +94,6 @@ function mb_subforum_query() {
 		return $have_posts;
 	}
 
-	add_action( 'loop_end',             'mb_subforum_loop_end' );
-	add_filter( 'mb_in_subforum_loop', '__return_true'         );
-
 	$defaults = array(
 		'post_type'           => mb_get_forum_post_type(),
 		'posts_per_page'      => mb_get_forums_per_page(),
@@ -83,10 +103,9 @@ function mb_subforum_query() {
 
 	if ( $mb->forum_query->in_the_loop )
 		$defaults['post_parent'] = mb_get_forum_id();
+
 	elseif ( mb_is_single_forum() )
 		$defaults['post_parent'] = get_queried_object_id();
-
-	//add_filter( 'the_posts', 'mb_posts_hierarchy_filter', 10, 2 );
 
 	$mb->subforum_query = new WP_Query( $defaults );
 
@@ -94,55 +113,116 @@ function mb_subforum_query() {
 }
 
 /**
- * Remove filters/actions when the sub-forum loop ends.
+ * Sets up the forum data for the current forum in the subforum loop.
  *
  * @since  1.0.0
  * @access public
  * @return void
  */
-function mb_subforum_loop_end() {
-	remove_action( 'loop_end',             'mb_subforum_loop_end' );
-	remove_filter( 'mb_in_subforum_loop', '__return_true'         );
-}
-
-/**
- * Sets up the forum data for the current forum in The Loop.
- *
- * @since  1.0.0
- * @access public
- * @return void
- */
-function mb_the_forum() {
-	return message_board()->forum_query->the_post();
-}
-
 function mb_the_subforum() {
 	return message_board()->subforum_query->the_post();
 }
 
-/* ====== Conditionals ====== */
+/* ====== Forum ID ====== */
 
-function mb_is_single_forum( $forum = '' ) {
-
-	if ( !is_singular( mb_get_forum_post_type() ) )
-		return false;
-
-	if ( !empty( $forum ) )
-		return is_single( $forum );
-
-	return true;
+/**
+ * Displays the forum ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return void
+ */
+function mb_forum_id( $forum_id = 0 ) {
+	echo mb_get_forum_id( $forum_id );
 }
 
+/**
+ * Returns the forum ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return int
+ */
+function mb_get_forum_id( $forum_id = 0 ) {
+	$mb = message_board();
+
+	if ( is_numeric( $forum_id ) && 0 < $forum_id )
+		$_forum_id = $forum_id;
+
+	elseif ( $mb->forum_query->in_the_loop && mb_get_forum_post_type() === get_post_type( get_the_ID() ) )
+		$_forum_id = get_the_ID();
+
+	elseif ( $mb->subforum_query->in_the_loop && mb_get_forum_post_type() === get_post_type( get_the_ID() ) )
+		$_forum_id = get_the_ID();
+
+	elseif ( $mb->search_query->in_the_loop && mb_get_forum_post_type() === get_post_type( get_the_ID() ) )
+		$_forum_id = get_the_ID();
+
+	elseif ( mb_is_single_forum() )
+		$_forum_id = get_queried_object_id();
+
+	elseif ( get_query_var( 'forum_id' ) )
+		$_forum_id = get_query_var( 'forum_id' );
+
+	else
+		$_forum_id = 0;
+
+	return apply_filters( 'mb_get_forum_id', absint( $_forum_id ), $forum_id );
+}
+
+/* ====== Conditionals ====== */
+
+/**
+ * Checks if viewing a single forum.  Wrapper function for the WordPress `is_single()` function.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int|string
+ * @return bool
+ */
+function mb_is_single_forum( $forum = '' ) {
+	$is_single_forum = is_singular( mb_get_forum_post_type() ) ? is_single( $forum ) : false;
+
+	return apply_filters( 'mb_is_single_forum', $is_single_forum );
+}
+
+/**
+ * Checks if viewing the forum archive.  Wrapper function for `is_post_type_archive()`.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
 function mb_is_forum_archive() {
-	return get_query_var( 'mb_custom' ) ? false : is_post_type_archive( mb_get_forum_post_type() );
+	$is_forum_archive = get_query_var( 'mb_custom' ) ? false : is_post_type_archive( mb_get_forum_post_type() );
+
+	return apply_filters( 'mb_is_forum_archive', $is_forum_archive );
 }
 
 /* ====== Forum Status ====== */
 
+/**
+ * Displays the forum post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return void
+ */
 function mb_forum_status( $forum_id = 0 ) {
 	echo mb_get_forum_status( $forum_id );
 }
 
+/**
+ * Returns the forum post status.  Wrapper function for `get_post_status()`.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return void
+ */
 function mb_get_forum_status( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 	$status   = $forum_id ? get_post_status( $forum_id ) : '';
@@ -317,18 +397,36 @@ function mb_get_forum_toggle_trash_link( $forum_id = 0 ) {
 
 /* ====== Forum Labels ====== */
 
+/**
+ * Displays a forum post type label.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $label
+ * @return void
+ */
 function mb_forum_label( $label ) {
 	echo mb_get_forum_label( $label );
 }
 
+/**
+ * Returns a forum post type label.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $label
+ * @return void
+ */
 function mb_get_forum_label( $label ) {
 	$labels = get_post_type_object( mb_get_forum_post_type() )->labels;
 
-	return $labels->$label;
+	return apply_filters( 'mb_get_forum_label', $labels->$label, $label );
 }
 
+/* ====== Forum States (better function names?) ====== */
+
 /**
- * Outputs a forums labels.
+ * Outputs a forum's states.
  *
  * @since  1.0.0
  * @access public
@@ -364,55 +462,6 @@ function mb_get_forum_states( $forum_id = 0 ) {
 	}
 
 	return '';
-}
-
-/* ====== Forum ID ====== */
-
-/**
- * Displays the forum ID.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $forum_id
- * @return void
- */
-function mb_forum_id( $forum_id = 0 ) {
-	echo mb_get_forum_id( $forum_id );
-}
-
-/**
- * Returns the forum ID.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $forum_id
- * @return int
- */
-function mb_get_forum_id( $forum_id = 0 ) {
-	$mb = message_board();
-
-	if ( is_numeric( $forum_id ) && 0 < $forum_id )
-		$_forum_id = $forum_id;
-
-	elseif ( $mb->forum_query->in_the_loop && mb_get_forum_post_type() === get_post_type( get_the_ID() ) )
-		$_forum_id = get_the_ID();
-
-	elseif ( $mb->subforum_query->in_the_loop && mb_get_forum_post_type() === get_post_type( get_the_ID() ) )
-		$_forum_id = get_the_ID();
-
-	elseif ( $mb->search_query->in_the_loop && mb_get_forum_post_type() === get_post_type( get_the_ID() ) )
-		$_forum_id = get_the_ID();
-
-	elseif ( mb_is_single_forum() )
-		$_forum_id = get_queried_object_id();
-
-	elseif ( get_query_var( 'forum_id' ) )
-		$_forum_id = get_query_var( 'forum_id' );
-
-	else
-		$_forum_id = 0;
-
-	return apply_filters( 'mb_get_forum_id', absint( $_forum_id ), $forum_id );
 }
 
 /* ====== Forum Content ====== */
@@ -461,14 +510,35 @@ function mb_single_forum_title() {
 	echo mb_get_single_forum_title();
 }
 
+/**
+ * Returns the single forum title.  Wrapper function for `single_post_title()`.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
 function mb_get_single_forum_title() {
 	return apply_filters( 'mb_get_single_forum_title', single_post_title( '', false ) );
 }
 
+/**
+ * Displays the the forum archive title.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_forum_archive_title() {
 	echo mb_get_forum_archive_title();
 }
 
+/**
+ * Returns the forum archive title.  Wrapper function for `post_type_archive_title()`.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
 function mb_get_forum_archive_title() {
 	return apply_filters( 'mb_get_forum_archive_title', post_type_archive_title( '', false ) );
 }
@@ -515,7 +585,7 @@ function mb_forum_url( $forum_id = 0 ) {
 }
 
 /**
- * Returns the forum URL.
+ * Returns the forum URL.  Wrapper function for `get_permalink()`.
  *
  * @since  1.0.0
  * @access public
@@ -523,8 +593,10 @@ function mb_forum_url( $forum_id = 0 ) {
  * @return string
  */
 function mb_get_forum_url( $forum_id = 0 ) {
-	$forum_id = mb_get_forum_id( $forum_id );
-	return apply_filters( 'mb_get_forum_url', mb_get_post_url( $forum_id ), $forum_id );
+	$forum_id  = mb_get_forum_id( $forum_id );
+	$forum_url = $forum_id ? get_permalink( $forum_id ) : '';
+
+	return apply_filters( 'mb_get_forum_url', $forum_url, $forum_id );
 }
 
 /**
@@ -548,11 +620,10 @@ function mb_forum_link( $forum_id = 0 ) {
  * @return string
  */
 function mb_get_forum_link( $forum_id = 0 ) {
-	$forum_id = mb_get_forum_id(    $forum_id );
-	$url      = mb_get_forum_url(   $forum_id );
-	$title    = mb_get_forum_title( $forum_id );
+	$forum_id   = mb_get_forum_id( $forum_id );
+	$forum_link = $forum_id ? sprintf( '<a class="mb-forum-link" href="%s">%s</a>', mb_get_forum_url( $forum_id ), mb_get_forum_title( $forum_id ) ) : '';
 
-	return apply_filters( 'mb_get_forum_link', sprintf( '<a class="forum-link" href="%s">%s</a>', $url, $title ), $forum_id );
+	return apply_filters( 'mb_get_forum_link', $forum_link, $forum_id );
 }
 
 /**
@@ -569,7 +640,7 @@ function mb_forum_date( $forum_id = 0, $format = '' ) {
 }
 
 /**
- * Returns the forum date.
+ * Returns the forum date.  Wrapper function for `get_post_time()`.
  *
  * @since  1.0.0
  * @access public
@@ -578,10 +649,11 @@ function mb_forum_date( $forum_id = 0, $format = '' ) {
  * @return void
  */
 function mb_get_forum_date( $forum_id = 0, $format = '' ) {
-	$forum_id = mb_get_forum_id( $forum_id );
-	$format   = !empty( $format ) ? $format : get_option( 'date_format' );
+	$forum_id   = mb_get_forum_id( $forum_id );
+	$format     = !empty( $format ) ? $format : get_option( 'date_format' );
+	$forum_date = $forum_id ? get_post_time( $format, false, $forum_id, true ) : '';
 
-	return get_post_time( $format, false, $forum_id, true );
+	return apply_filters( 'mb_get_forum_date', $forum_date, $forum_id );
 }
 
 /**
@@ -598,7 +670,7 @@ function mb_forum_time( $forum_id = 0, $format = '' ) {
 }
 
 /**
- * Returns the forum time.
+ * Returns the forum time.  Wrapper function for `get_post_time()`.
  *
  * @since  1.0.0
  * @access public
@@ -607,10 +679,11 @@ function mb_forum_time( $forum_id = 0, $format = '' ) {
  * @return void
  */
 function mb_get_forum_time( $forum_id = 0, $format = '' ) {
-	$forum_id = mb_get_forum_id( $forum_id );
-	$format   = !empty( $format ) ? $format : get_option( 'time_format' );
+	$forum_id   = mb_get_forum_id( $forum_id );
+	$format     = !empty( $format ) ? $format : get_option( 'time_format' );
+	$forum_time = $forum_id ? get_post_time( $format, false, $forum_id, true ) : '';
 
-	return get_post_time( $format, false, $forum_id, true );
+	return apply_filters( 'mb_get_forum_time', $forum_time, $forum_id );
 }
 
 /* ====== Forum Author ====== */
@@ -637,7 +710,7 @@ function mb_forum_author_id( $forum_id = 0 ) {
  */
 function mb_get_forum_author_id( $forum_id = 0 ) {
 	$forum_id  = mb_get_forum_id( $forum_id );
-	$author_id = get_post_field( 'post_author', $forum_id );
+	$author_id = $forum_id ? get_post_field( 'post_author', $forum_id ) : 0;
 
 	return apply_filters( 'mb_get_forum_author_id', absint( $author_id ), $forum_id );
 }
@@ -663,55 +736,68 @@ function mb_forum_author( $forum_id = 0 ) {
  * @return string
  */
 function mb_get_forum_author( $forum_id = 0 ) {
-	return apply_filters( 'mb_get_forum_author', mb_get_post_author( $forum_id ), $forum_id );
+	$forum_id     = mb_get_forum_id( $forum_id );
+	$author_id    = mb_get_forum_author_id( $post_id );
+	$forum_author = $author_id ? get_the_author_meta( 'display_name', $author_id ) : '';
+
+	return apply_filters( 'mb_get_forum_author', $forum_author, $forum_id );
 }
 
 /**
- * Displays the forum author profile URL.
+ * Displays the forum author URL.
  *
  * @since  1.0.0
  * @access public
  * @param  int     $forum_id
  * @return void
  */
-function mb_forum_author_profile_url( $forum_id = 0 ) {
-	echo mb_get_forum_author_profile_url( $forum_id );
+function mb_forum_author_url( $forum_id = 0 ) {
+	echo mb_get_forum_author_url( $forum_id );
 }
 
 /**
- * Returns the forum author profile URL.
+ * Returns the forum author URL.
  *
  * @since  1.0.0
  * @access public
  * @param  int     $forum_id
  * @return string
  */
-function mb_get_forum_author_profile_url( $forum_id = 0 ) {
-	return apply_filters( 'mb_get_forum_author_profile_url', mb_get_post_author_profile_url( $forum_id ), $forum_id );
+function mb_get_forum_author_url( $forum_id = 0 ) {
+	$forum_id   = mb_get_forum_id( $forum_id );
+	$author_id  = mb_get_forum_author_id( $forum_id );
+	$author_url = $author_id ? mb_get_user_url( $author_id ) : '';
+
+	return apply_filters( 'mb_get_forum_author_url', $author_url, $forum_id );
 }
 
 /**
- * Displays the forum author profile link.
+ * Displays the forum author link.
  *
  * @since  1.0.0
  * @access public
  * @param  int     $forum_id
  * @return void
  */
-function mb_forum_author_profile_link( $forum_id = 0 ) {
-	echo mb_get_forum_author_profile_link( $forum_id );
+function mb_forum_author_link( $forum_id = 0 ) {
+	echo mb_get_forum_author_link( $forum_id );
 }
 
 /**
- * Returns the forum author profile link.
+ * Returns the forum author link.
  *
  * @since  1.0.0
  * @access public
  * @param  int     $forum_id
  * @return string
  */
-function mb_get_forum_author_profile_link( $forum_id = 0 ) {
-	return apply_filters( 'mb_get_forum_author_profile_link', mb_get_post_author_profile_link( $forum_id ), $forum_id );
+function mb_get_forum_author_link( $forum_id = 0 ) {
+	$forum_id     = mb_get_forum_id( $forum_id );
+	$forum_author = mb_get_forum_author( $forum_id );
+	$author_url   = mb_get_forum_author_url( $forum_id );
+	$author_link  = $author_url ? sprintf( '<a class="mb-forum-author-link" href="%s">%s</a>', $author_url, $forum_author ) : '';
+
+	return apply_filters( 'mb_get_forum_author_link', $author_link, $forum_id );
 }
 
 /* ====== Last Activity ====== */
@@ -746,6 +832,13 @@ function mb_get_forum_last_active_time( $forum_id = 0 ) {
 
 /* ====== Last Reply ID ====== */
 
+/**
+ * Display the forum last reply ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_forum_last_reply_id( $forum_id = 0 ) {
 	echo mb_get_forum_last_reply_id( $forum_id );
 }
@@ -761,10 +854,9 @@ function mb_forum_last_reply_id( $forum_id = 0 ) {
 function mb_get_forum_last_reply_id( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 	$reply_id = get_post_meta( $forum_id, mb_get_forum_last_reply_id_meta_key(), true );
+	$reply_id = is_numeric( $reply_id ) ? absint( $reply_id ) : 0;
 
-	$mb_reply_id = !empty( $reply_id ) && is_numeric( $reply_id ) ? absint( $reply_id ) : 0;
-
-	return apply_filters( 'mb_get_forum_last_reply_id', $mb_reply_id, $forum_id );
+	return apply_filters( 'mb_get_forum_last_reply_id', $reply_id, $forum_id );
 }
 
 /* ====== Last Post Author ====== */
@@ -801,19 +893,32 @@ function mb_get_forum_last_poster( $forum_id = 0 ) {
 
 /* ====== Last Post ID ====== */
 
-
+/**
+ * Displays the forum last post (topic or reply) ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_forum_last_post_id( $forum_id ) {
 	echo mb_get_forum_last_post_id( $forum_id );
 }
 
+/**
+ * Returns the forum last post (topic or reply) ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_get_forum_last_post_id( $forum_id ) {
-
+	$forum_id = mb_get_forum_id( $forum_id );
 	$topic_id = mb_get_forum_last_topic_id( $forum_id );
 	$reply_id = mb_get_forum_last_reply_id( $forum_id );
+	$post_id  = $reply_id > $topic_id ? $reply_id : $topic_id;
 
-	return $reply_id > $topic_id ? $reply_id : $topic_id;
+	return apply_filters( 'mb_get_forum_last_post_id', $post_id, $forum_id );
 }
-
 
 /* ====== Last Post URL ====== */
 
