@@ -225,6 +225,9 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/functions-admin-bar.php'      );
 		require_once( $this->dir_path . 'inc/template-hierarchy.php'       );
 
+		/* Load core files. */
+		require_once( $this->dir_path . 'inc/core/roles.php' );
+
 		/* Load common files. */
 		require_once( $this->dir_path . 'inc/common/template.php' );
 
