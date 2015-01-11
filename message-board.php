@@ -211,22 +211,21 @@ final class Message_Board {
 	 */
 	private function includes() {
 
-		require_once( $this->dir_path . 'inc/functions-post-types.php'     );
-		require_once( $this->dir_path . 'inc/functions-post-statuses.php'  );
-		require_once( $this->dir_path . 'inc/functions-meta.php'           );
-		require_once( $this->dir_path . 'inc/functions-filters.php'        );
-		require_once( $this->dir_path . 'inc/functions-formatting.php'     );
-		require_once( $this->dir_path . 'inc/functions-query.php'          );
-		require_once( $this->dir_path . 'inc/functions-capabilities.php'   );
-		require_once( $this->dir_path . 'inc/functions-rewrite.php'        );
-		require_once( $this->dir_path . 'inc/functions-handler.php'        );
-		require_once( $this->dir_path . 'inc/functions-shortcodes.php'     );
-		require_once( $this->dir_path . 'inc/functions-options.php'        );
-		require_once( $this->dir_path . 'inc/functions-admin-bar.php'      );
-		require_once( $this->dir_path . 'inc/template-hierarchy.php'       );
-
 		/* Load core files. */
-		require_once( $this->dir_path . 'inc/core/roles.php' );
+		require_once( $this->dir_path . 'inc/core/roles.php'          );
+		require_once( $this->dir_path . 'inc/core/post-types.php'     );
+		require_once( $this->dir_path . 'inc/core/post-statuses.php'  );
+		require_once( $this->dir_path . 'inc/core/meta.php'           );
+		require_once( $this->dir_path . 'inc/core/filters.php'        );
+		require_once( $this->dir_path . 'inc/core/formatting.php'     );
+		require_once( $this->dir_path . 'inc/core/query.php'          );
+		require_once( $this->dir_path . 'inc/core/capabilities.php'   );
+		require_once( $this->dir_path . 'inc/core/rewrite.php'        );
+		require_once( $this->dir_path . 'inc/core/handler.php'        );
+		require_once( $this->dir_path . 'inc/core/shortcodes.php'     );
+		require_once( $this->dir_path . 'inc/core/options.php'        );
+		require_once( $this->dir_path . 'inc/core/admin-bar.php'      );
+		require_once( $this->dir_path . 'inc/core/theme.php'          );
 
 		/* Load common files. */
 		require_once( $this->dir_path . 'inc/common/template.php' );
