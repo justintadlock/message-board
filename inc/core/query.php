@@ -97,17 +97,6 @@ function mb_is_reply_edit() {
 }
 
 /**
- * Checks if viewing the edit page.
- *
- * @since  1.0.0
- * @access public
- * @return bool
- */
-function mb_is_user_edit() {
-	return mb_is_edit() && is_numeric( get_query_var( 'user_id' ) ) ? true : false;
-}
-
-/**
  * Checks if viewing one of the Message Board plugin pages.
  *
  * @since  1.0.0

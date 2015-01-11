@@ -3,7 +3,7 @@ if ( !current_user_can( 'edit_user', mb_get_user_id() ) )
 	return;
 ?>
 
-<form id="topic-form" method="post" action="<?php mb_user_profile_url(); ?>">
+<form id="topic-form" method="post" action="<?php mb_user_url(); ?>">
 
 	<p>
 		<?php printf( __( 'Required fields are marked %s', 'message-board' ), '<span class="required">*</span>' ); ?>

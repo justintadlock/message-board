@@ -591,7 +591,7 @@ function mb_handler_edit_user() {
 			update_user_meta( $user_id, 'description', $description );
 
 		/* Redirect to user profile. */
-		wp_safe_redirect( mb_get_user_profile_url( $user_id ) );
+		wp_safe_redirect( mb_get_user_url( $user_id ) );
 	}
 }
 

@@ -270,7 +270,7 @@ function mb_post_author_profile_url( $post_id = 0 ) {
 function mb_get_post_author_profile_url( $post_id = 0 ) {
 	$post_id     = mb_get_post_id( $post_id );
 	$author_id   = mb_get_post_author_id( $post_id );
-	$profile_url = mb_get_user_profile_url( $author_id );
+	$profile_url = mb_get_user_url( $author_id );
 
 	return apply_filters( 'mb_get_post_author_profile_url', $profile_url, $author_id, $post_id );
 }
