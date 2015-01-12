@@ -15,6 +15,39 @@
 add_action( 'init', 'mb_register_topic_types' );
 
 /**
+ * Returns the "normal" topic type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_normal_topic_type() {
+	return apply_filters( 'mb_get_normal_topic_type', 'normal' );
+}
+
+/**
+ * Returns the "super" topic type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_super_topic_type() {
+	return apply_filters( 'mb_get_super_topic_type', 'super' );
+}
+
+/**
+ * Returns the "sticky" topic type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_sticky_topic_type() {
+	return apply_filters( 'mb_get_sticky_topic_type', 'sticky' );
+}
+
+/**
  * Registers custom topic types.
  *
  * @since  1.0.0
@@ -51,9 +84,9 @@ function mb_register_topic_types() {
 	);
 
 	/* Register topic types. */
-	mb_register_topic_type( 'normal', apply_filters( 'mb_normal_topic_type_args', $normal_args ) );
-	mb_register_topic_type( 'super',  apply_filters( 'mb_super_topic_type_args',  $super_args  ) );
-	mb_register_topic_type( 'sticky', apply_filters( 'mb_sticky_topic_type_args', $sticky_args ) );
+	mb_register_topic_type( mb_get_normal_topic_type(), apply_filters( 'mb_normal_topic_type_args', $normal_args ) );
+	mb_register_topic_type( mb_get_super_topic_type(),  apply_filters( 'mb_super_topic_type_args',  $super_args  ) );
+	mb_register_topic_type( mb_get_sticky_topic_type(), apply_filters( 'mb_sticky_topic_type_args', $sticky_args ) );
 }
 
 /**
@@ -136,7 +169,7 @@ function mb_get_topic_type_object( $name ) {
 }
 
 /**
- * Conditional check to see if a topic has the "super" type.
+ * Conditional check to see if a topic has the "normal" type.
  *
  * @since  1.0.0
  * @access public
@@ -146,7 +179,7 @@ function mb_get_topic_type_object( $name ) {
 function mb_is_topic_normal( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	return 'normal' === mb_get_topic_type( $topic_id ) ? true : false;
+	return mb_get_normal_topic_type() === mb_get_topic_type( $topic_id ) ? true : false;
 }
 
 /**
@@ -160,7 +193,7 @@ function mb_is_topic_normal( $topic_id = 0 ) {
 function mb_is_topic_super( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	return 'super' === mb_get_topic_type( $topic_id ) ? true : false;
+	return mb_get_super_topic_type() === mb_get_topic_type( $topic_id ) ? true : false;
 }
 
 /**
@@ -174,7 +207,7 @@ function mb_is_topic_super( $topic_id = 0 ) {
 function mb_is_topic_sticky( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	return 'sticky' === mb_get_topic_type( $topic_id ) ? true : false;
+	return mb_get_sticky_topic_type() === mb_get_topic_type( $topic_id ) ? true : false;
 }
 
 /**
@@ -202,7 +235,7 @@ function mb_get_topic_type( $topic_id = 0 ) {
 
 	$topic_type = $topic_id ? get_post_meta( $topic_id, mb_get_topic_type_meta_key(), true ) : '';
 
-	$topic_type = !empty( $topic_type ) && mb_topic_type_exists( $topic_type ) ? $topic_type : 'normal';
+	$topic_type = !empty( $topic_type ) && mb_topic_type_exists( $topic_type ) ? $topic_type : mb_get_normal_topic_type();
 
 	return apply_filters( 'mb_get_topic_type', $topic_type, $topic_id );
 }
@@ -218,7 +251,7 @@ function mb_get_topic_type( $topic_id = 0 ) {
  */
 function mb_set_topic_type( $topic_id, $type ) {
 
-	$type = mb_topic_type_exists( $type ) ? $type : 'normal';
+	$type = mb_topic_type_exists( $type ) ? $type : mb_get_normal_topic_type();
 
 	return update_post_meta( $topic_id, mb_get_topic_type_meta_key(), $type );
 }

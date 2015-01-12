@@ -1,7 +1,7 @@
 <?php
 /**
  * Forum types API.  Forum types are a way to distinguish between different types of forums.  The default 
- * types are "forum" and "category".  Developers can add new types if they wish to do so.
+ * types are "normal" and "category".  Developers can add new types if they wish to do so.
  *
  * @package    MessageBoard
  * @subpackage Admin
@@ -15,6 +15,28 @@
 add_action( 'init', 'mb_register_forum_types' );
 
 /**
+ * Returns the "normal" forum type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_normal_forum_type() {
+	return apply_filters( 'mb_get_normal_forum_type', 'normal' );
+}
+
+/**
+ * Returns the "category" forum type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_category_forum_type() {
+	return apply_filters( 'mb_get_category_forum_type', 'category' );
+}
+
+/**
  * Registers custom forum types.
  *
  * @since  1.0.0
@@ -23,8 +45,8 @@ add_action( 'init', 'mb_register_forum_types' );
  */
 function mb_register_forum_types() {
 
-	/* Forum type args. */
-	$forum_args = array(
+	/* Normal type args. */
+	$normal_args = array(
 		'topics_allowed'    => true,
 		'subforums_allowed' => true,
 		'_builtin'          => true,
@@ -42,8 +64,8 @@ function mb_register_forum_types() {
 	);
 
 	/* Register forum types. */
-	mb_register_forum_type( 'forum',    apply_filters( 'mb_forum_forum_type_args',    $forum_args    ) );
-	mb_register_forum_type( 'category', apply_filters( 'mb_category_forum_type_args', $category_args ) );
+	mb_register_forum_type( mb_get_normal_forum_type(),   apply_filters( 'mb_normal_forum_type_args',   $normal_args   ) );
+	mb_register_forum_type( mb_get_category_forum_type(), apply_filters( 'mb_category_forum_type_args', $category_args ) );
 }
 
 /**
@@ -126,6 +148,20 @@ function mb_get_forum_type_object( $name ) {
 }
 
 /**
+ * Conditional check to see if a forum has the "normal" type.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $forum_id
+ * @return bool
+ */
+function mb_is_forum_normal( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	return mb_get_normal_forum_type() === mb_get_forum_type( $forum_id ) ? true : false;
+}
+
+/**
  * Conditional check to see if a forum has the "category" type.
  *
  * @since  1.0.0
@@ -136,7 +172,7 @@ function mb_get_forum_type_object( $name ) {
 function mb_is_forum_category( $forum_id = 0 ) {
 	$forum_id = mb_get_forum_id( $forum_id );
 
-	return 'category' === mb_get_forum_type( $forum_id ) ? true : false;
+	return mb_get_category_forum_type() === mb_get_forum_type( $forum_id ) ? true : false;
 }
 
 /**
@@ -164,7 +200,7 @@ function mb_get_forum_type( $forum_id = 0 ) {
 
 	$forum_type = $forum_id ? get_post_meta( $forum_id, mb_get_forum_type_meta_key(), true ) : '';
 
-	$forum_type = !empty( $forum_type ) && mb_forum_type_exists( $forum_type ) ? $forum_type : 'forum';
+	$forum_type = !empty( $forum_type ) && mb_forum_type_exists( $forum_type ) ? $forum_type : mb_get_normal_forum_type();
 
 	return apply_filters( 'mb_get_forum_type', $forum_type, $forum_id );
 }
@@ -180,7 +216,7 @@ function mb_get_forum_type( $forum_id = 0 ) {
  */
 function mb_set_forum_type( $forum_id, $type ) {
 
-	$type = mb_forum_type_exists( $type ) ? $type : 'forum';
+	$type = mb_forum_type_exists( $type ) ? $type : mb_get_normal_forum_type();
 
 	return update_post_meta( $forum_id, mb_get_forum_type_meta_key(), $type );
 }
