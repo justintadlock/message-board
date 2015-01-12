@@ -37,19 +37,38 @@ function mb_get_topic_capabilities() {
 		'create_posts'           => 'create_topics',
 
 		// primitive caps used outside of map_meta_cap()
+		'publish_posts'          => 'create_topics',
+		'open_topics'            => 'open_topics',          // custom
+		'close_topics'           => 'close_topics',         // custom
+		'privatize_topics'       => 'privatize_topics',     // custom
+		'hide_topics'            => 'hide_topics',          // custom
+		'spam_topics'            => 'spam_topics',          // custom
+
 		'edit_posts'             => 'edit_topics',
 		'edit_others_posts'      => 'edit_others_topics',
-		'publish_posts'          => 'create_topics',
+
 		'read_private_posts'     => 'read_private_topics',
 		'read_hidden_topics'     => 'read_hidden_topics', // custom
 
 		// primitive caps used inside of map_meta_cap()
-		'read'                   => 'read_topics',
+		'edit_published_posts'   => 'edit_topics',
+		'edit_others_posts'      => 'edit_others_topics',
+		'edit_private_posts'     => 'edit_private_topics',
+		'edit_open_topics'       => 'edit_open_topics',     // custom
+		'edit_hidden_topics'     => 'edit_hidden_topics',   // custom
+		'edit_closed_topics'     => 'edit_closed_topics',   // custom
+		'edit_archived_topics'   => 'edit_archived_topics', // custom
+		'edit_spam_topics'       => 'edit_spam_topics',     // custom
+		'edit_orphan_topics'     => 'edit_orphan_topics',   // custom
+
 		'delete_posts'           => 'delete_topics',
 		'delete_published_posts' => 'delete_topics',
+		'delete_private_posts'   => 'delete_topics',
 		'delete_others_posts'    => 'delete_others_topics',
-		'edit_published_posts'   => 'edit_topics',
-		'moderate_posts'         => 'moderate_topics', // custom
+
+		'read'                   => 'read_topics',
+
+		'moderate_posts'         => 'moderate_topics',      // custom
 	);
 
 	return apply_filters( 'mb_get_topic_capabilities', $caps );
@@ -102,6 +121,65 @@ function mb_topic_map_meta_cap( $caps, $cap, $user_id, $args ) {
 		} else {
 			$caps = array();
 		}
+
+	/* Meta cap for editing a single topic. */
+	} elseif ( 'edit_post' === $cap && mb_get_topic_post_type() === get_post_type( $args[0] ) ) {
+
+		$post      = get_post( $args[0] );
+		$topic_obj = get_post_type_object( mb_get_topic_post_type() );
+
+		if ( $user_id != $post->post_author ) {
+
+			// Open topics.
+			if ( mb_is_topic_open( $args[0] ) )
+				$caps[] = $topic_obj->cap->edit_open_topics;
+
+			// Closed topics.
+			elseif ( mb_is_topic_closed( $args[0] ) )
+				$caps[] = $topic_obj->cap->edit_closed_topics;
+
+			// Hidden topics.
+			elseif ( mb_is_topic_hidden( $args[0] ) )
+				$caps[] = $topic_obj->cap->edit_hidden_topics;
+		}
+
+		// Spam topics
+		if ( mb_is_topic_spam( $args[0] ) )
+			$caps[] = $topic_obj->cap->edit_spam_topics;
+
+		// Orphan topics.
+		elseif ( mb_is_topic_orphan( $args[0] ) )
+			$caps[] = $topic_obj->cap->edit_orphan_topics;
+
+	/* Meta cap for opening a single topic. */
+	} elseif ( 'open_topic' === $cap ) {
+
+		$caps = array();
+		$caps[] = user_can( $user_id, 'edit_topic', $args[0] ) ? 'open_topics' : 'do_not_allow';
+
+	/* Meta cap for closing a single topic. */
+	} elseif ( 'close_topic' === $cap ) {
+
+		$caps = array();
+		$caps[] = user_can( $user_id, 'edit_topic', $args[0] ) ? 'close_topics' : 'do_not_allow';
+
+	/* Meta cap for privatizing a single topic. */
+	} elseif ( 'privatize_topic' === $cap ) {
+
+		$caps = array();
+		$caps[] = user_can( $user_id, 'edit_topic', $args[0] ) ? 'privatize_topics' : 'do_not_allow';
+
+	/* Meta cap for hiding a single topic. */
+	} elseif ( 'hide_topic' === $cap ) {
+
+		$caps = array();
+		$caps[] = user_can( $user_id, 'edit_topic', $args[0] ) ? 'hide_topics' : 'do_not_allow';
+
+	/* Meta cap for spamming a single topic. */
+	} elseif ( 'spam_topic' === $cap ) {
+
+		$caps = array();
+		$caps[] = user_can( $user_id, 'edit_topic', $args[0] ) ? 'spam_topics' : 'do_not_allow';
 
 	/* Meta cap for moderating a single topic. */
 	} elseif ( 'moderate_topic' === $cap ) {

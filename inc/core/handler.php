@@ -696,22 +696,38 @@ function mb_handler_forum_toggle_open() {
 
 function mb_handler_topic_toggle_open() {
 
-	if ( !isset( $_GET['action'] ) || 'mb_toggle_open' !== $_GET['action'] || !isset( $_GET['topic_id'] ) )
+	$actions = array( 'mb_toggle_open', 'mb_toggle_close' );
+
+	if ( !isset( $_GET['action'] ) || !in_array( $_GET['action'], $actions ) || !isset( $_GET['topic_id'] ) )
 		return;
 
 	$topic_id = mb_get_topic_id( $_GET['topic_id'] );
 
-	/* Verify nonce. */
-	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "open_topic_{$topic_id}" ) )
-		return;
+	if ( 'mb_toggle_open' === $_GET['action'] ) {
 
-	if ( !current_user_can( 'moderate_topic', $topic_id ) )
-		return;
+		/* Verify nonce. */
+		if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "open_topic_{$topic_id}" ) )
+			return;
 
-	$updated = mb_is_topic_open( $topic_id ) ? mb_close_topic( $topic_id ) : mb_open_topic( $topic_id );
+		if ( mb_is_topic_open( $topic_id ) || !current_user_can( 'open_topic', $topic_id ) )
+			return;
+
+		$updated = mb_open_topic( $topic_id );
+	}
+
+	elseif ( 'mb_toggle_close' === $_GET['action'] ) {
+
+		/* Verify nonce. */
+		if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "close_topic_{$topic_id}" ) )
+			return;
+
+		if ( mb_is_topic_closed( $topic_id ) || !current_user_can( 'close_topic', $topic_id ) )
+			return;
+
+		$updated = mb_close_topic( $topic_id );
+	}
 
 	$redirect = remove_query_arg( array( 'action', 'topic_id', 'mb_nonce' ) );
-
 	wp_safe_redirect( esc_url( $redirect ) );
 }
 

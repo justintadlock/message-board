@@ -100,6 +100,34 @@ function mb_get_board_home_url() {
 
 /* ====== Post Status ====== */
 
+function mb_dropdown_topic_status( $args = array() ) {
+
+	$args['post_type'] = mb_get_topic_post_type();
+	$args['selected'] = !empty( $args['selected'] ) ? $args['selected'] : mb_get_open_post_status();
+
+	if ( !isset( $args['exclude'] ) ) {
+
+		$args['exclude'] = array();
+
+		if ( !current_user_can( 'open_topics' ) && mb_get_open_post_status() !== $args['selected'] )
+			$args['exclude'][] = mb_get_open_post_status();
+
+		if ( !current_user_can( 'close_topics' ) && mb_get_close_post_status() !== $args['selected'] )
+			$args['exclude'][] = mb_get_close_post_status();
+
+		if ( !current_user_can( 'privatize_topics' ) && mb_get_private_post_status() !== $args['selected'] )
+			$args['exclude'][] = mb_get_private_post_status();
+
+		if ( !current_user_can( 'hide_topics' ) && mb_get_hidden_post_status() !== $args['selected'] )
+			$args['exclude'][] = mb_get_hidden_post_status();
+
+		if ( !current_user_can( 'spam_topics' ) && mb_get_spam_post_status() !== $args['selected'] )
+			$args['exclude'][] = mb_get_spam_post_status();
+	}
+
+	return mb_dropdown_post_status( $args );
+}
+
 function mb_dropdown_post_status( $args = array() ) {
 
 	$defaults = array(
@@ -124,10 +152,6 @@ function mb_dropdown_post_status( $args = array() ) {
 
 	if ( is_array( $args['exclude'] ) )
 		$stati = array_diff( $stati, $args['exclude'] );
-
-	/* Don't show spam status if the post isn't yet published. */
-	if ( empty( $args['selected'] ) && in_array( mb_get_spam_post_status(), $stati ) )
-		$stati = array_diff( $stati, array( mb_get_spam_post_status() ) );
 
 	$out = sprintf( '<select name="%s" id="%s">', sanitize_html_class( $args['name'] ), sanitize_html_class( $args['id'] ) );
 

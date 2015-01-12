@@ -7,6 +7,7 @@
 			<?php mb_topic_toggle_spam_link(); ?>
 			<?php mb_topic_toggle_trash_link(); ?>
 			<?php mb_topic_toggle_open_link(); ?>
+			<?php mb_topic_toggle_close_link(); ?>
 			<a class="mb-topic-permalink" href="<?php mb_post_jump_url(); ?>" rel="bookmark" itemprop="url">#<?php mb_thread_position(); ?></a>
 		</header>
 

@@ -320,7 +320,7 @@ final class Message_Board_Admin_Edit_Topics {
 		}
 
 		/* Add spam toggle link if user has permission. */
-		if ( current_user_can( 'moderate_topic', $topic_id ) && !mb_is_topic_orphan( $topic_id ) ) {
+		if ( current_user_can( 'spam_topic', $topic_id ) && current_user_can( 'spam_topics' ) && !mb_is_topic_orphan( $topic_id ) ) {
 
 			/* Get post status objects. */
 			$spam_object  = get_post_status_object( mb_get_spam_post_status() );
@@ -330,7 +330,7 @@ final class Message_Board_Admin_Edit_Topics {
 
 			/* Build spam toggle URL. */
 			$spam_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
-			$spam_url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_spam' ), $spam_url );
+			$spam_url = add_query_arg( array( 'topic_id' => $topic_id, 'mb_toggle_status' => 'spam' ), $spam_url );
 			$spam_url = wp_nonce_url( $spam_url, "spam_topic_{$topic_id}" );
 
 			/* Add toggle spam action link. */
@@ -338,22 +338,33 @@ final class Message_Board_Admin_Edit_Topics {
 		}
 
 		/* Add open/close toggle link if user has permission and topic is not spam. */
-		if ( current_user_can( 'moderate_topic', $topic_id ) && !mb_is_topic_spam( $topic_id ) && !mb_is_topic_orphan( $topic_id ) ) {
+		if ( current_user_can( 'open_topic', $topic_id ) && current_user_can( 'open_topics' ) && !mb_is_topic_open( $topic_id ) && !mb_is_topic_spam( $topic_id ) && !mb_is_topic_orphan( $topic_id ) ) {
 
 			/* Get post status objects. */
 			$open_object  = get_post_status_object( mb_get_open_post_status()  );
-			$close_object = get_post_status_object( mb_get_close_post_status() );
-
-			/* Get open/close link text. */
-			$open_text = mb_is_topic_open() ? $close_object->mb_label_verb : $open_object->mb_label_verb;
 
 			/* Build open/close toggle URL. */
 			$open_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
-			$open_url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_open' ), $open_url );
+			$open_url = add_query_arg( array( 'topic_id' => $topic_id, 'mb_toggle_status' => 'open' ), $open_url );
 			$open_url = wp_nonce_url( $open_url, "open_topic_{$topic_id}" );
 
 			/* Add toggle open/close action link. */
-			$actions['mb_toggle_open'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $open_url ), mb_is_topic_open() ? 'close' : 'open', $open_text );
+			$actions['mb_toggle_open'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $open_url ), 'open', $open_object->mb_label_verb );
+		}
+
+		/* Add open/close toggle link if user has permission and topic is not spam. */
+		if ( current_user_can( 'close_topic', $topic_id ) && current_user_can( 'close_topics' ) && !mb_is_topic_closed( $topic_id ) && !mb_is_topic_spam( $topic_id ) && !mb_is_topic_orphan( $topic_id ) ) {
+
+			/* Get post status objects. */
+			$close_object  = get_post_status_object( mb_get_close_post_status()  );
+
+			/* Build open/close toggle URL. */
+			$close_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
+			$close_url = add_query_arg( array( 'topic_id' => $topic_id, 'mb_toggle_status' => 'close' ), $close_url );
+			$close_url = wp_nonce_url( $close_url, "close_topic_{$topic_id}" );
+
+			/* Add toggle open/close action link. */
+			$actions['mb_toggle_close'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $close_url ), 'open', $close_object->mb_label_verb );
 		}
 
 		/* Add sticky toggle link if user has permission and topic has a public status. */
@@ -419,8 +430,66 @@ final class Message_Board_Admin_Edit_Topics {
 	 */
 	public function handler() {
 
+		/* Checks if the open/close toggle link was clicked. */
+		if ( isset( $_GET['mb_toggle_status'] ) && isset( $_GET['topic_id'] ) ) {
+
+			$topic_id = absint( mb_get_topic_id( $_GET['topic_id'] ) );
+
+			/* Assume the changed failed. */
+			$notice = 'failure';
+
+			if ( 'spam' === $_GET['mb_toggle_status'] ) {
+
+				/* Verify the nonce. */
+				check_admin_referer( "spam_topic_{$topic_id}" );
+
+				/* Check if the topic is open. */
+				$is_spam = mb_is_topic_spam( $topic_id );
+
+				/* Update the post status. */
+				$updated = $is_spam ? mb_unspam_topic( $topic_id ) : mb_spam_topic( $topic_id );
+
+				/* If the status was updated, add notice slug. */
+				if ( $updated && !is_wp_error( $updated ) )
+					$notice = $is_spam ? 'restore' : mb_get_spam_post_status();
+			}
+
+			elseif ( 'open' === $_GET['mb_toggle_status'] && !mb_is_topic_open( $topic_id ) ) {
+
+				/* Verify the nonce. */
+				check_admin_referer( "open_topic_{$topic_id}" );
+
+				/* Update the post status. */
+				$updated = mb_open_topic( $topic_id );
+
+				/* If the status was updated, add notice slug. */
+				if ( $updated && !is_wp_error( $updated ) )
+					$notice = mb_get_open_post_status();
+			}
+
+			elseif ( 'close' === $_GET['mb_toggle_status'] && !mb_is_topic_closed( $topic_id ) ) {
+
+				/* Verify the nonce. */
+				check_admin_referer( "close_topic_{$topic_id}" );
+
+				/* Update the post status. */
+				$updated = mb_close_topic( $topic_id );
+
+				/* If the status was updated, add notice slug. */
+				if ( $updated && !is_wp_error( $updated ) )
+					$notice = mb_get_close_post_status();
+			}
+
+			/* Redirect to correct admin page. */
+			$redirect = add_query_arg( array( 'topic_id' => $topic_id, 'mb_topic_notice' => $notice ), remove_query_arg( array( 'action', 'mb_toggle_status', 'topic_id', '_wpnonce' ) ) );
+			wp_safe_redirect( $redirect );
+
+			/* Always exit for good measure. */
+			exit();
+		}
+
 		/* Checks if the spam toggle link was clicked. */
-		if ( isset( $_GET['action'] ) && 'mb_toggle_spam' === $_GET['action'] && isset( $_GET['topic_id'] ) ) {
+		elseif ( isset( $_GET['action'] ) && 'mb_toggle_spam' === $_GET['action'] && isset( $_GET['topic_id'] ) ) {
 
 			$topic_id = absint( mb_get_topic_id( $_GET['topic_id'] ) );
 
@@ -439,36 +508,6 @@ final class Message_Board_Admin_Edit_Topics {
 			/* If the status was updated, add notice slug. */
 			if ( $updated && !is_wp_error( $updated ) ) {
 				$notice = $is_spam ? 'restore' : mb_get_spam_post_status();
-			}
-
-			/* Redirect to correct admin page. */
-			$redirect = add_query_arg( array( 'topic_id' => $topic_id, 'mb_topic_notice' => $notice ), remove_query_arg( array( 'action', 'topic_id', '_wpnonce' ) ) );
-			wp_safe_redirect( $redirect );
-
-			/* Always exit for good measure. */
-			exit();
-		}
-
-		/* Checks if the open/close toggle link was clicked. */
-		elseif ( isset( $_GET['action'] ) && 'mb_toggle_open' === $_GET['action'] && isset( $_GET['topic_id'] ) ) {
-
-			$topic_id = absint( mb_get_topic_id( $_GET['topic_id'] ) );
-
-			/* Verify the nonce. */
-			check_admin_referer( "open_topic_{$topic_id}" );
-
-			/* Assume the changed failed. */
-			$notice = 'failure';
-
-			/* Check if the topic is open. */
-			$is_open = mb_is_topic_open( $topic_id );
-
-			/* Update the post status. */
-			$updated = $is_open ? mb_close_topic( $topic_id ) : mb_open_topic( $topic_id );
-
-			/* If the status was updated, add notice slug. */
-			if ( $updated && !is_wp_error( $updated ) ) {
-				$notice = $is_open ? mb_get_close_post_status() : mb_get_open_post_status();
 			}
 
 			/* Redirect to correct admin page. */

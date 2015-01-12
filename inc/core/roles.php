@@ -106,12 +106,28 @@ function mb_get_keymaster_role_caps() {
 		'read_hidden_forums'  => true,
 
 		// Topic caps
-		'create_topics'       => true,
-		'edit_topics'         => true,
-		'edit_others_topics'  => true,
-		'read_topics'         => true,
-		'read_private_topics' => true,
-		'read_hidden_topics'  => true,
+		'create_topics'        => true,
+		'open_topics'          => true,
+		'close_topics'         => true,
+		'privatize_topics'     => true,
+		'hide_topics'          => true,
+		'spam_topics'          => true,
+
+		'edit_topics'          => true,
+		'edit_others_topics'   => true,
+		'edit_open_topics'     => true,
+		'edit_closed_topics'   => true,
+		'edit_private_topics'  => true,
+		'edit_hidden_topics'   => true,
+		'edit_spam_topics'     => true,
+		'edit_orphan_topics'   => true,
+
+		'delete_topics'        => true,
+		'delete_others_topics' => true,
+
+		'read_topics'          => true,
+		'read_private_topics'  => true,
+		'read_hidden_topics'   => true,
 
 		// Reply caps
 		'create_replies'      => true,
@@ -141,12 +157,30 @@ function mb_get_moderator_role_caps() {
 		'read_hidden_forums'  => true,
 
 		// Topic caps
-		'create_topics'       => true,
-		'edit_topics'         => true,
-		'edit_others_topics'  => true,
-		'read_topics'         => true,
-		'read_private_topics' => true,
-		'read_hidden_topics'  => true,
+
+		// Topic caps
+		'create_topics'        => true,
+		'open_topics'          => true,
+		'close_topics'         => true,
+		'privatize_topics'     => true,
+		'hide_topics'          => true,
+		'spam_topics'          => true,
+
+		'edit_topics'          => true,
+		'edit_others_topics'   => true,
+		'edit_open_topics'     => true,
+		'edit_closed_topics'   => true,
+		'edit_private_topics'  => true,
+		'edit_hidden_topics'   => true,
+		'edit_spam_topics'     => true,
+		'edit_orphan_topics'   => true,
+
+		'delete_topics'        => true,
+		'delete_others_topics' => true,
+
+		'read_topics'          => true,
+		'read_private_topics'  => true,
+		'read_hidden_topics'   => true,
 
 		// Reply caps
 		'create_replies'      => true,
@@ -173,10 +207,13 @@ function mb_get_participant_role_caps() {
 		'read_private_forums' => true,
 
 		// Topic caps
-		'create_topics'       => true,
-		'edit_topics'         => true,
-		'read_topics'         => true,
-		'read_private_topics' => true,
+
+		// Topic caps
+		'create_topics'        => true,
+		'edit_topics'          => true,
+		'edit_open_topics'     => true,
+		'read_topics'          => true,
+		'read_private_topics'  => true,
 
 		// Reply caps
 		'create_replies'      => true,
@@ -233,12 +270,25 @@ function mb_get_banned_role_caps() {
 		'read_hidden_forums'  => false,
 
 		// Topic caps
-		'create_topics'       => false,
-		'edit_topics'         => false,
-		'edit_others_topics'  => false,
-		'read_topics'         => false,
-		'read_private_topics' => false,
-		'read_hidden_topics'  => false,
+		'create_topics'        => false,
+		'open_topics'          => false,
+		'close_topics'         => false,
+		'privatize_topics'     => false,
+		'hide_topics'          => false,
+		'spam_topics'          => false,
+		'edit_topics'          => false,
+		'edit_others_topics'   => false,
+		'edit_open_topics'     => false,
+		'edit_closed_topics'   => false,
+		'edit_private_topics'  => false,
+		'edit_hidden_topics'   => false,
+		'edit_spam_topics'     => false,
+		'edit_orphan_topics'   => false,
+		'delete_topics'        => false,
+		'delete_others_topics' => false,
+		'read_topics'          => false,
+		'read_private_topics'  => false,
+		'read_hidden_topics'   => false,
 
 		// Reply caps
 		'create_replies'      => false,

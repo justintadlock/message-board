@@ -253,14 +253,15 @@ function mb_is_topic_orphan( $topic_id = 0 ) {
 }
 
 function mb_topic_toggle_open_url( $topic_id = 0 ) {
-	echo mb_get_topic_toggle_open_close_url( $topic_id = 0 );
+	echo mb_get_topic_toggle_open_open_url( $topic_id = 0 );
 }
 
 function mb_get_topic_toggle_open_url( $topic_id = 0 ) {
 
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	$action = mb_is_topic_open( $topic_id ) ? 'close' : 'open';
+	if ( mb_is_topic_open( $topic_id ) || !current_user_can( 'open_topic', $topic_id ) )
+		return '';
 
 	$url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_open' ) );
 	$url = wp_nonce_url( $url, "open_topic_{$topic_id}", 'mb_nonce' );
@@ -276,12 +277,51 @@ function mb_get_topic_toggle_open_link( $topic_id = 0 ) {
 
 	$topic_id = mb_get_topic_id( $topic_id );
 
-	if ( !current_user_can( 'moderate_topic', $topic_id ) )
+	$url = mb_get_topic_toggle_open_url( $topic_id );
+
+	if ( empty( $url ) )
 		return '';
 
-	$status = mb_is_topic_open( $topic_id ) ? get_post_status_object( mb_get_close_post_status() ) : get_post_status_object( mb_get_open_post_status() );
+	$status = get_post_status_object( mb_get_open_post_status() );
 
-	$link = sprintf( '<a class="toggle-open-link" href="%s">%s</a>', mb_get_topic_toggle_open_url( $topic_id ), $status->mb_label_verb );
+	$link = sprintf( '<a class="mb-topic-open-link" href="%s">%s</a>', $url, $status->mb_label_verb );
+
+	return $link;
+}
+
+function mb_topic_toggle_close_url( $topic_id = 0 ) {
+	echo mb_get_topic_toggle_close_url( $topic_id = 0 );
+}
+
+function mb_get_topic_toggle_close_url( $topic_id = 0 ) {
+
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	if ( mb_is_topic_closed( $topic_id ) || !current_user_can( 'close_topic', $topic_id ) )
+		return '';
+
+	$url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_close' ) );
+	$url = wp_nonce_url( $url, "close_topic_{$topic_id}", 'mb_nonce' );
+
+	return $url;
+}
+
+function mb_topic_toggle_close_link( $topic_id = 0 ) {
+	echo mb_get_topic_toggle_close_link( $topic_id );
+}
+
+function mb_get_topic_toggle_close_link( $topic_id = 0 ) {
+
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	$url = mb_get_topic_toggle_close_url( $topic_id );
+
+	if ( empty( $url ) )
+		return '';
+
+	$status = get_post_status_object( mb_get_close_post_status() );
+
+	$link = sprintf( '<a class="mb-topic-close-link" href="%s">%s</a>', $url, $status->mb_label_verb );
 
 	return $link;
 }

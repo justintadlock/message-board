@@ -55,7 +55,12 @@ function mb_submit_meta_box( $post, $args = array() ) {
 					<div id="post-status-select" class="hide-if-js">
 						<input type="hidden" name="hidden_post_status" id="hidden_post_status" value="<?php echo esc_attr( ('auto-draft' == $post->post_status ) ? 'draft' : $post->post_status); ?>" />
 							<div id="post_status">
-						<?php mb_dropdown_post_status( array( 'post_type' => $post_type, 'selected' => $post->post_status, 'exclude' => array( mb_get_trash_post_status(), mb_get_orphan_post_status() ) ) ); ?>
+						<?php if ( mb_get_topic_post_type() === $post_type ) :
+							mb_dropdown_topic_status( array( 'selected' => $post->post_status ) );
+						else :
+							mb_dropdown_post_status( array( 'post_type' => $post_type, 'selected' => $post->post_status, 'exclude' => array( mb_get_trash_post_status(), mb_get_orphan_post_status() ) ) );
+						endif;
+						?>
  <a href="#post_status" class="save-post-status hide-if-no-js button"><?php _e('OK'); ?></a>
  <a href="#post_status" class="cancel-post-status hide-if-no-js button-cancel"><?php _e('Cancel'); ?></a>
 							</div><!-- #post_status -->

@@ -35,9 +35,8 @@
 
 		<p class="mb-form-status">
 			<label for="mb_post_status"><?php mb_topic_label( 'mb_form_status' ); ?></label>
-			<?php mb_dropdown_post_status(
+			<?php mb_dropdown_topic_status(
 				array(
-					'post_type' => mb_get_topic_post_type(),
 					'name'      => 'mb_post_status',
 					'id'        => 'mb_post_status',
 					'selected'  => mb_get_topic_status()
