@@ -21,7 +21,7 @@
  */
 
 /* Register dynamic user roles. */
-add_action( 'mb_loaded', 'mb_register_roles' );
+add_action( 'plugins_loaded', 'mb_register_roles', 0 );
 
 /* Merge dynamic roles with WP roles. */
 add_action( 'setup_theme', 'mb_merge_roles', 95 );
