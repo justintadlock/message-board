@@ -317,7 +317,7 @@ function mb_register_roles() {
 	do_action( 'mb_register_roles' );
 
 	/* Filter the user roles option when WP decides to pull roles from the DB. */
-	add_filter( "option_{$wpdb->prefix}_user_roles", 'mb_option_user_roles_filter' );
+	add_filter( "option_{$wpdb->prefix}user_roles", 'mb_option_user_roles_filter' );
 }
 
 /**
