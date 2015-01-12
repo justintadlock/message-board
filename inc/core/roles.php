@@ -8,7 +8,7 @@
  *
  * The plugin's forum roles system still works within the bounds of WordPress roles/caps system.  We're 
  * just building on top of it.  Plugin developers can register custom roles, unregister the default roles 
- * or even overwrite the defaults.
+ * or even overwrite the defaults.  If adding custom roles, devs must use the `mb_register_roles` hook.
  *
  * @todo Figure out why the heck dynamic roles keep getting added to the database. :(
  *
@@ -21,7 +21,7 @@
  */
 
 /* Register dynamic user roles. */
-add_action( 'plugins_loaded', 'mb_register_roles', 5 );
+add_action( 'mb_loaded', 'mb_register_roles' );
 
 /* Merge dynamic roles with WP roles. */
 add_action( 'setup_theme', 'mb_merge_roles', 95 );
@@ -255,9 +255,11 @@ function mb_get_banned_role_caps() {
  *
  * @since  1.0.0
  * @access public
+ * @global object $wpdb
  * @return void
  */
 function mb_register_roles() {
+	global $wpdb;
 
 	/* Keymaster role args. */
 	$keymaster_args = array(
@@ -310,6 +312,12 @@ function mb_register_roles() {
 	mb_register_role( mb_get_participant_role(), apply_filters( 'mb_participant_role_args', $participant_args ) );
 	mb_register_role( mb_get_spectator_role(),   apply_filters( 'mb_spectator_role_args',   $spectator_args   ) );
 	mb_register_role( mb_get_banned_role(),      apply_filters( 'mb_banned_role_args',      $banned_args      ) );
+
+	/* Action hook for registering custom forum roles. */
+	do_action( 'mb_register_roles' );
+
+	/* Filter the user roles option when WP decides to pull roles from the DB. */
+	add_filter( "option_{$wpdb->prefix}_user_roles", 'mb_option_user_roles_filter' );
 }
 
 /**
@@ -320,11 +328,10 @@ function mb_register_roles() {
  * @since  1.0.0
  * @access public
  * @global array  $wp_roles
- * @global object $wpdb
  * @return void
  */
 function mb_merge_roles() {
-	global $wp_roles, $wpdb;
+	global $wp_roles;
 
 	/* Make sure we have roles. */
 	if ( !isset( $wp_roles ) )
@@ -341,9 +348,6 @@ function mb_merge_roles() {
 		$wp_roles->role_objects[ $role ] = new WP_Role( $role, $args->capabilities );
 		$wp_roles->role_names[ $role ]   = $args->labels->singular_name;
 	}
-
-	/* Filter the user roles option when WP decides to pull roles from the DB. */
-	add_filter( "option_{$wpdb->prefix}user_roles", 'mb_option_user_roles_filter' );
 }
 
 /**

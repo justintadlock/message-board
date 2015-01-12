@@ -277,6 +277,9 @@ final class Message_Board {
 			require_once( $this->dir_path . 'admin/users.php'     );
 			require_once( $this->dir_path . 'admin/user-edit.php' );
 		}
+
+		/* Action hook to signify that the plugin has fully loaded all of its files. */
+		do_action( 'mb_loaded' );
 	}
 
 	/**
