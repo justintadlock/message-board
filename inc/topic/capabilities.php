@@ -33,11 +33,11 @@ function mb_get_topic_capabilities() {
 
 		// primitive caps used outside of map_meta_cap()
 		'publish_posts'          => 'create_topics',
-		'open_posts'            => 'open_topics',          // custom
-		'close_posts'           => 'close_topics',         // custom
-		'privatize_posts'       => 'privatize_topics',     // custom
-		'hide_posts'            => 'hide_topics',          // custom
-		'spam_posts'            => 'spam_topics',          // custom
+		'open_posts'             => 'open_topics',          // custom
+		'close_posts'            => 'close_topics',         // custom
+		'privatize_posts'        => 'privatize_topics',     // custom
+		'hide_posts'             => 'hide_topics',          // custom
+		'spam_posts'             => 'spam_topics',          // custom
 		'super_topics'           => 'super_topics',         // custom
 		'stick_topics'           => 'stick_topics',         // custom
 
@@ -174,7 +174,7 @@ function mb_topic_map_meta_cap( $caps, $cap, $user_id, $args ) {
 	} elseif ( 'spam_topic' === $cap ) {
 
 		$caps = array();
-		$caps[] = user_can( $user_id, 'edit_topic', $args[0] ) ? 'edit_topic_types' : 'do_not_allow';
+		$caps[] = user_can( $user_id, 'edit_topic', $args[0] ) ? 'spam_topics' : 'do_not_allow';
 
 	/* Meta cap for spamming a single topic. */
 	} elseif ( 'super_topic' === $cap ) {

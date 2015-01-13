@@ -234,7 +234,7 @@ function mb_is_reply_orphan( $reply_id = 0 ) {
 }
 
 function mb_reply_toggle_spam_url( $reply_id = 0 ) {
-	echo mb_get_reply_toggle_spam_spam_url( $reply_id = 0 );
+	echo mb_get_reply_toggle_spam_url( $reply_id = 0 );
 }
 
 function mb_get_reply_toggle_spam_url( $reply_id = 0 ) {
@@ -255,10 +255,10 @@ function mb_get_reply_toggle_spam_link( $reply_id = 0 ) {
 
 	$reply_id = mb_get_reply_id( $reply_id );
 
-	if ( !current_user_can( 'moderate_reply', $reply_id ) )
+	if ( !current_user_can( 'spam_reply', $reply_id ) )
 		return '';
 
-	$text = mb_is_reply_spam( $reply_id ) ? __( 'Unspam', 'message-board' ) : get_post_status_object( mb_get_spam_post_status() )->label;
+	$text = mb_is_reply_spam( $reply_id ) ? __( 'Unspam', 'message-board' ) : get_post_status_object( mb_get_spam_post_status() )->mb_label_verb;
 
 	$link = sprintf( '<a class="toggle-spam-link" href="%s">%s</a>', mb_get_reply_toggle_spam_url( $reply_id ), $text );
 

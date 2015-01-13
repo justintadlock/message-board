@@ -271,7 +271,7 @@ final class Message_Board_Admin_Edit_Replies {
 		}
 
 		/* Add spam toggle link if user has permission. */
-		if ( current_user_can( 'moderate_reply', $reply_id ) && !mb_is_reply_orphan( $reply_id ) ) {
+		if ( current_user_can( 'spam_reply', $reply_id ) && !mb_is_reply_orphan( $reply_id ) ) {
 
 			/* Get post status objects. */
 			$spam_object  = get_post_status_object( mb_get_spam_post_status() );

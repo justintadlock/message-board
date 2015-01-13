@@ -131,8 +131,10 @@ function mb_get_keymaster_role_caps() {
 
 		// Reply caps
 		'create_replies'      => true,
+		'spam_replies'        => true,
 		'edit_replies'        => true,
 		'edit_others_replies' => true,
+		'edit_spam_replies'   => true,
 		'read_replies'        => true,
 	);
 

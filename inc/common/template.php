@@ -105,27 +105,13 @@ function mb_dropdown_topic_status( $args = array() ) {
 	$args['post_type'] = mb_get_topic_post_type();
 	$args['selected'] = !empty( $args['selected'] ) ? $args['selected'] : mb_get_open_post_status();
 
-/*
-	if ( !isset( $args['exclude'] ) ) {
+	return mb_dropdown_post_status( $args );
+}
 
-		$args['exclude'] = array();
+function mb_dropdown_reply_status( $args = array() ) {
 
-		if ( !current_user_can( 'open_topics' ) && mb_get_open_post_status() !== $args['selected'] )
-			$args['exclude'][] = mb_get_open_post_status();
-
-		if ( !current_user_can( 'close_topics' ) && mb_get_close_post_status() !== $args['selected'] )
-			$args['exclude'][] = mb_get_close_post_status();
-
-		if ( !current_user_can( 'privatize_topics' ) && mb_get_private_post_status() !== $args['selected'] )
-			$args['exclude'][] = mb_get_private_post_status();
-
-		if ( !current_user_can( 'hide_topics' ) && mb_get_hidden_post_status() !== $args['selected'] )
-			$args['exclude'][] = mb_get_hidden_post_status();
-
-		if ( !current_user_can( 'spam_topics' ) && mb_get_spam_post_status() !== $args['selected'] )
-			$args['exclude'][] = mb_get_spam_post_status();
-	}
-*/
+	$args['post_type'] = mb_get_reply_post_type();
+	$args['selected'] = !empty( $args['selected'] ) ? $args['selected'] : mb_get_publish_post_status();
 
 	return mb_dropdown_post_status( $args );
 }
@@ -164,7 +150,7 @@ function mb_dropdown_post_status( $args = array() ) {
 
 	$current_status_cap = $post_type_object->cap->$current_status_cap;
 
-	if ( mb_get_topic_post_type() === $args['post_type'] && !empty( $args['selected'] ) && !current_user_can( $current_status_cap ) ) {
+	if ( in_array( $args['post_type'], array( mb_get_topic_post_type(), mb_get_reply_post_type() ) ) && !empty( $args['selected'] ) && !current_user_can( $current_status_cap ) ) {
 		$status_obj = $current_status_object;
 		$out .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $status_obj->name ), selected( $status_obj->name, $args['selected'], false ), $status_obj->label );
 	}
@@ -173,7 +159,7 @@ function mb_dropdown_post_status( $args = array() ) {
 	foreach ( $stati as $status ) {
 		$status_obj = get_post_status_object( $status );
 
-		$status_cap =  mb_get_topic_post_type() === $args['post_type'] && isset( $status_obj->mb_capability ) ? $status_obj->mb_capability : 'edit_posts';
+		$status_cap =  in_array( $args['post_type'], array( mb_get_topic_post_type(), mb_get_reply_post_type() ) ) && isset( $status_obj->mb_capability ) ? $status_obj->mb_capability : 'edit_posts';
 		$status_cap = $post_type_object->cap->$status_cap;
 
 		if ( !current_user_can( $status_cap ) )

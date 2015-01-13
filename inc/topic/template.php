@@ -327,7 +327,7 @@ function mb_get_topic_toggle_close_link( $topic_id = 0 ) {
 }
 
 function mb_topic_toggle_spam_url( $topic_id = 0 ) {
-	echo mb_get_topic_toggle_spam_unspam_url( $topic_id = 0 );
+	echo mb_get_topic_toggle_spam_url( $topic_id = 0 );
 }
 
 function mb_get_topic_toggle_spam_url( $topic_id = 0 ) {

@@ -27,25 +27,23 @@ function mb_get_reply_capabilities() {
 		'edit_post'              => 'edit_reply',
 		'read_post'              => 'read_reply',
 		'delete_post'            => 'delete_reply',
-		'moderate_reply'         => 'moderate_reply',    // custom
-		'spam_reply'             => 'spam_reply',        // custom
-		'access_reply_form'      => 'access_reply_form', // custom
 
 		// primitive/meta caps
 		'create_posts'           => 'create_replies',
 
 		// primitive caps used outside of map_meta_cap()
+		'publish_posts'          => 'create_replies',
+		'spam_posts'             => 'spam_replies',          // custom
 		'edit_posts'             => 'edit_replies',
 		'edit_others_posts'      => 'edit_others_replies',
-		'publish_posts'          => 'create_replies',
 
 		// primitive caps used inside of map_meta_cap()
-		'read'                   => 'read_replies',
+		'edit_published_posts'   => 'edit_replies',
+		'edit_spam_replies'      => 'edit_spam_replies',     // custom
 		'delete_posts'           => 'delete_replies',
 		'delete_published_posts' => 'delete_replies',
 		'delete_others_posts'    => 'delete_others_replies',
-		'edit_published_posts'   => 'edit_replies',
-		'moderate_posts'         => 'moderate_replies', // custom
+		'read'                   => 'read_replies',
 	);
 
 	return apply_filters( 'mb_get_reply_capabilities', $caps );
@@ -91,32 +89,21 @@ function mb_reply_map_meta_cap( $caps, $cap, $user_id, $args ) {
 			$caps = array();
 		}
 
-	/* Meta cap for moderating a single reply. */
-	} elseif ( 'moderate_reply' === $cap ) {
+	/* Meta cap for editing a single reply. */
+	} elseif ( 'edit_post' === $cap && mb_get_reply_post_type() === get_post_type( $args[0] ) ) {
+
+		$post      = get_post( $args[0] );
+		$reply_obj = get_post_type_object( mb_get_reply_post_type() );
+
+		// Spam topics
+		if ( mb_is_reply_spam( $args[0] ) )
+			$caps[] = $reply_obj->cap->edit_spam_replies;
+
+	/* Meta cap for spamming a single reply. */
+	} elseif ( 'spam_reply' === $cap ) {
 
 		$caps = array();
-
-		$reply_id = mb_get_reply_id( $args[0] );
-		$topic_id = mb_get_reply_topic_id( $reply_id );
-		$forum_id = mb_get_reply_forum_id( $reply_id );
-
-		/* If user can moderate the reply forum. */
-		if ( user_can( $user_id, 'moderate_forum', $forum_id ) ) {
-			$forum_type_object = get_post_type_object( mb_get_forum_post_type() );
-			$caps[] = $forum_type_object->cap->moderate_posts;
-		}
-
-		/* Else, if the user can moderate the reply topic. */
-		elseif ( user_can( $user_id, 'moderate_topic', $topic_id ) ) {
-			$topic_type_object = get_post_type_object( mb_get_topic_post_type() );
-			$caps[] = $topic_type_object->cap->moderate_posts;
-		}
-
-		/* Else, add cap for moderating replies. */
-		else {
-			$reply_type_object = get_post_type_object( mb_get_reply_post_type() );
-			$caps[] = $reply_type_object->cap->moderate_posts;
-		}
+		$caps[] = user_can( $user_id, 'edit_reply', $args[0] ) ? 'spam_replies' : 'do_not_allow';
 
 	/* Meta cap check for accessing the reply form. */
 	} elseif ( 'access_reply_form' === $cap ) {
