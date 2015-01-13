@@ -1114,6 +1114,7 @@ function mb_dropdown_forums( $args = array() ) {
 		'post_type'   => mb_get_forum_post_type(),
 		'post_status' => mb_get_forum_post_statuses(),
 		'walker'      => new MB_Walker_Forum_Dropdown,
+		'echo'        => true,
 	);
 
 	$trash = array_search( mb_get_trash_post_status(), $defaults['post_status'] );
@@ -1121,7 +1122,21 @@ function mb_dropdown_forums( $args = array() ) {
 	if ( $trash )
 		unset( $defaults['post_status'][ $trash ] );
 
-	return wp_dropdown_pages( wp_parse_args( $args, $defaults ) );
+	$r = $args = wp_parse_args( $args, $defaults );
+	$r['echo'] = false;
+
+	$forums = wp_dropdown_pages( $r );
+
+	if ( !empty( $args['selected'] ) ) {
+
+		if ( mb_get_topic_post_type() === $args['child_type'] && !current_user_can( 'move_topics' ) )
+			$forums = preg_replace( '/<select(.*?)>/i', "<select disabled='disabled'$1>", $forums );
+	}
+
+	if ( false === $args['echo'] )
+		return $forums;
+
+	echo $forums;
 }
 
 

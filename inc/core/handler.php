@@ -742,7 +742,7 @@ function mb_handler_topic_toggle_spam() {
 	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "spam_topic_{$topic_id}" ) )
 		return;
 
-	if ( !current_user_can( 'moderate_topic', $topic_id ) )
+	if ( !current_user_can( 'spam_topic', $topic_id ) )
 		return;
 
 	$updated = mb_is_topic_spam( $topic_id ) ? mb_unspam_topic( $topic_id ) : mb_spam_topic( $topic_id );
@@ -806,7 +806,7 @@ function mb_handler_topic_toggle_trash() {
 	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "trash_topic_{$topic_id}" ) )
 		return;
 
-	if ( !current_user_can( 'moderate_topic', $topic_id ) )
+	if ( !current_user_can( 'delete_topic', $topic_id ) )
 		return;
 
 	$updated = mb_is_topic_trash( $topic_id ) ? wp_untrash_post( $topic_id ) : wp_trash_post( $topic_id );

@@ -92,7 +92,7 @@ if ( 0 != $post->ID ) {
 </div>
 
 				<div class="misc-pub-section">
-<i class="dashicons dashicons-admin-users"></i> Author: <strong><?php the_author_meta( 'display_name', $post->post_author ); ?></strong>
+<i class="dashicons dashicons-admin-users"></i> <?php printf( __( 'Author: %s', 'message-board' ), '<strong>' . get_the_author_meta( 'display_name', $post->post_author ) . '</strong>' ); ?>
 				</div>
 
 				<?php do_action( 'post_submitbox_misc_actions' ); ?>
@@ -196,9 +196,7 @@ function mb_topic_attributes_meta_box( $post ) {
 
 	wp_nonce_field( '_mb_topic_attr_nonce', 'mb_topic_attr_nonce' );
 
-	$topic_type_object = get_post_type_object( mb_get_topic_post_type() );
-
-	$topic_types = mb_get_topic_type_objects(); ?>
+	$topic_type_object = get_post_type_object( mb_get_topic_post_type() ); ?>
 
 	<p>
 		<label for="mb_topic_type">

@@ -112,7 +112,9 @@ function mb_get_keymaster_role_caps() {
 		'privatize_topics'     => true,
 		'hide_topics'          => true,
 		'spam_topics'          => true,
-
+		'super_topics'         => true,
+		'stick_topics'         => true,
+		'move_topics'          => true,
 		'edit_topics'          => true,
 		'edit_others_topics'   => true,
 		'edit_open_topics'     => true,
@@ -121,10 +123,8 @@ function mb_get_keymaster_role_caps() {
 		'edit_hidden_topics'   => true,
 		'edit_spam_topics'     => true,
 		'edit_orphan_topics'   => true,
-
 		'delete_topics'        => true,
 		'delete_others_topics' => true,
-
 		'read_topics'          => true,
 		'read_private_topics'  => true,
 		'read_hidden_topics'   => true,
@@ -157,15 +157,15 @@ function mb_get_moderator_role_caps() {
 		'read_hidden_forums'  => true,
 
 		// Topic caps
-
-		// Topic caps
 		'create_topics'        => true,
 		'open_topics'          => true,
 		'close_topics'         => true,
 		'privatize_topics'     => true,
 		'hide_topics'          => true,
 		'spam_topics'          => true,
-
+		'super_topics'         => true,
+		'stick_topics'         => true,
+		'move_topics'          => true,
 		'edit_topics'          => true,
 		'edit_others_topics'   => true,
 		'edit_open_topics'     => true,
@@ -174,10 +174,8 @@ function mb_get_moderator_role_caps() {
 		'edit_hidden_topics'   => true,
 		'edit_spam_topics'     => true,
 		'edit_orphan_topics'   => true,
-
 		'delete_topics'        => true,
 		'delete_others_topics' => true,
-
 		'read_topics'          => true,
 		'read_private_topics'  => true,
 		'read_hidden_topics'   => true,
@@ -205,8 +203,6 @@ function mb_get_participant_role_caps() {
 		// Forum caps
 		'read_forums'         => true,
 		'read_private_forums' => true,
-
-		// Topic caps
 
 		// Topic caps
 		'create_topics'        => true,
@@ -276,6 +272,8 @@ function mb_get_banned_role_caps() {
 		'privatize_topics'     => false,
 		'hide_topics'          => false,
 		'spam_topics'          => false,
+		'super_topics'         => false,
+		'stick_topics'         => false,
 		'edit_topics'          => false,
 		'edit_others_topics'   => false,
 		'edit_open_topics'     => false,

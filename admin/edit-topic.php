@@ -367,25 +367,34 @@ final class Message_Board_Admin_Edit_Topics {
 			$actions['mb_toggle_close'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $close_url ), 'open', $close_object->mb_label_verb );
 		}
 
-		/* Add sticky toggle link if user has permission and topic has a public status. */
-		if ( current_user_can( 'moderate_topic', $topic_id ) && mb_is_topic_public( $topic_id ) ) {
+		/* Add super toggle link if user has permission and topic has a public status. */
+		if ( current_user_can( 'super_topic', $topic_id ) && mb_is_topic_public( $topic_id ) ) {
 
 			$current_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
 
 			/* Build sticky text. */
-			$sticky_text = mb_is_topic_sticky( $topic_id ) ? __( 'Unstick',  'message-board' ) : __( 'Stick', 'message-board' );
-			$super_text  = mb_is_topic_super(  $topic_id ) ? __( 'Unsuper',  'message-board' ) : __( 'Super', 'message-board' );
-
-			/* Build sticky toggle URL. */
-			$sticky_url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_sticky' ), $current_url );
-			$sticky_url = wp_nonce_url( $sticky_url, "sticky_topic_{$topic_id}" );
+			$super_text  = mb_is_topic_super( $topic_id ) ? __( 'Unsuper',  'message-board' ) : __( 'Super', 'message-board' );
 
 			/* Build super toggle URL. */
 			$super_url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_super' ), $current_url );
 			$super_url = wp_nonce_url( $super_url, "super_topic_{$topic_id}" );
 
-			$actions['mb_toggle_sticky'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $sticky_url ), 'sticky', $sticky_text );
 			$actions['mb_toggle_super']  = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $super_url  ), 'super',  $super_text  );
+		}
+
+		/* Add sticky toggle link if user has permission and topic has a public status. */
+		if ( current_user_can( 'stick_topic', $topic_id ) && mb_is_topic_public( $topic_id ) ) {
+
+			$current_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
+
+			/* Build sticky text. */
+			$sticky_text = mb_is_topic_sticky( $topic_id ) ? __( 'Unstick',  'message-board' ) : __( 'Stick', 'message-board' );
+
+			/* Build sticky toggle URL. */
+			$sticky_url = add_query_arg( array( 'topic_id' => $topic_id, 'action' => 'mb_toggle_sticky' ), $current_url );
+			$sticky_url = wp_nonce_url( $sticky_url, "sticky_topic_{$topic_id}" );
+
+			$actions['mb_toggle_sticky'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $sticky_url ), 'sticky', $sticky_text );
 		}
 
 		/* Move view action to the end. */

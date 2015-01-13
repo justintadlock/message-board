@@ -27,22 +27,19 @@ function mb_get_topic_capabilities() {
 		'edit_post'              => 'edit_topic',
 		'read_post'              => 'read_topic',
 		'delete_post'            => 'delete_topic',
-		'moderate_topic'         => 'moderate_topic',    // custom
-		'close_topic'            => 'close_topic',       // custom
-		'open_topic'             => 'open_topic',        // custom
-		'spam_topic'             => 'spam_topic',        // custom
-		'access_topic_form'      => 'access_topic_form', // custom
 
 		// primitive/meta caps
 		'create_posts'           => 'create_topics',
 
 		// primitive caps used outside of map_meta_cap()
 		'publish_posts'          => 'create_topics',
-		'open_topics'            => 'open_topics',          // custom
-		'close_topics'           => 'close_topics',         // custom
-		'privatize_topics'       => 'privatize_topics',     // custom
-		'hide_topics'            => 'hide_topics',          // custom
-		'spam_topics'            => 'spam_topics',          // custom
+		'open_posts'            => 'open_topics',          // custom
+		'close_posts'           => 'close_topics',         // custom
+		'privatize_posts'       => 'privatize_topics',     // custom
+		'hide_posts'            => 'hide_topics',          // custom
+		'spam_posts'            => 'spam_topics',          // custom
+		'super_topics'           => 'super_topics',         // custom
+		'stick_topics'           => 'stick_topics',         // custom
 
 		'edit_posts'             => 'edit_topics',
 		'edit_others_posts'      => 'edit_others_topics',
@@ -67,8 +64,6 @@ function mb_get_topic_capabilities() {
 		'delete_others_posts'    => 'delete_others_topics',
 
 		'read'                   => 'read_topics',
-
-		'moderate_posts'         => 'moderate_topics',      // custom
 	);
 
 	return apply_filters( 'mb_get_topic_capabilities', $caps );
@@ -179,27 +174,19 @@ function mb_topic_map_meta_cap( $caps, $cap, $user_id, $args ) {
 	} elseif ( 'spam_topic' === $cap ) {
 
 		$caps = array();
-		$caps[] = user_can( $user_id, 'edit_topic', $args[0] ) ? 'spam_topics' : 'do_not_allow';
+		$caps[] = user_can( $user_id, 'edit_topic', $args[0] ) ? 'edit_topic_types' : 'do_not_allow';
 
-	/* Meta cap for moderating a single topic. */
-	} elseif ( 'moderate_topic' === $cap ) {
+	/* Meta cap for spamming a single topic. */
+	} elseif ( 'super_topic' === $cap ) {
 
 		$caps = array();
+		$caps[] = user_can( $user_id, 'edit_topic', $args[0] ) ? 'super_topics' : 'do_not_allow';
 
-		$topic_id = mb_get_topic_id( $args[0] );
-		$forum_id = mb_get_topic_forum_id( $topic_id );
+	/* Meta cap for spamming a single topic. */
+	} elseif ( 'stick_topic' === $cap ) {
 
-		/* If user can moderate the topic forum. */
-		if ( user_can( $user_id, 'moderate_forum', $forum_id ) ) {
-			$forum_type_object = get_post_type_object( mb_get_forum_post_type() );
-			$caps[] = $forum_type_object->cap->moderate_posts;
-		}
-
-		/* Else, add cap for moderating topics. */
-		else {
-			$topic_type_object = get_post_type_object( mb_get_topic_post_type() );
-			$caps[] = $topic_type_object->cap->moderate_posts;
-		}
+		$caps = array();
+		$caps[] = user_can( $user_id, 'edit_topic', $args[0] ) ? 'stick_topics' : 'do_not_allow';
 
 	/* Meta cap check for accessing the topic form. */
 	} elseif ( 'access_topic_form' === $cap ) {

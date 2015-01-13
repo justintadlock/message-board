@@ -105,6 +105,7 @@ function mb_dropdown_topic_status( $args = array() ) {
 	$args['post_type'] = mb_get_topic_post_type();
 	$args['selected'] = !empty( $args['selected'] ) ? $args['selected'] : mb_get_open_post_status();
 
+/*
 	if ( !isset( $args['exclude'] ) ) {
 
 		$args['exclude'] = array();
@@ -124,6 +125,7 @@ function mb_dropdown_topic_status( $args = array() ) {
 		if ( !current_user_can( 'spam_topics' ) && mb_get_spam_post_status() !== $args['selected'] )
 			$args['exclude'][] = mb_get_spam_post_status();
 	}
+*/
 
 	return mb_dropdown_post_status( $args );
 }
@@ -141,6 +143,8 @@ function mb_dropdown_post_status( $args = array() ) {
 
 	$args = wp_parse_args( $args, $defaults );
 
+	$post_type_object = get_post_type_object( $args['post_type'] );
+
 	if ( mb_get_forum_post_type() === $args['post_type'] )
 		$stati = apply_filters( 'mb_select_forum_post_statuses', mb_get_forum_post_statuses() );
 
@@ -155,13 +159,31 @@ function mb_dropdown_post_status( $args = array() ) {
 
 	$out = sprintf( '<select name="%s" id="%s">', sanitize_html_class( $args['name'] ), sanitize_html_class( $args['id'] ) );
 
+	$current_status_object = get_post_status_object( $args['selected'] );
+	$current_status_cap    =  mb_get_topic_post_type() === $args['post_type'] && isset( $current_status_object->mb_capability ) ? $current_status_object->mb_capability : 'edit_posts';
+
+	$current_status_cap = $post_type_object->cap->$current_status_cap;
+
+	if ( mb_get_topic_post_type() === $args['post_type'] && !empty( $args['selected'] ) && !current_user_can( $current_status_cap ) ) {
+		$status_obj = $current_status_object;
+		$out .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $status_obj->name ), selected( $status_obj->name, $args['selected'], false ), $status_obj->label );
+	}
+
+	else {
 	foreach ( $stati as $status ) {
 		$status_obj = get_post_status_object( $status );
+
+		$status_cap =  mb_get_topic_post_type() === $args['post_type'] && isset( $status_obj->mb_capability ) ? $status_obj->mb_capability : 'edit_posts';
+		$status_cap = $post_type_object->cap->$status_cap;
+
+		if ( !current_user_can( $status_cap ) )
+			continue;
 
 		if ( false === $status_obj->mb_show_in_status_select )
 			continue;
 
 		$out .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $status_obj->name ), selected( $status_obj->name, $args['selected'], false ), $status_obj->label );
+	}
 	}
 
 	$out .= '</select>';

@@ -61,6 +61,7 @@ function mb_register_topic_types() {
 		'replies_allowed' => true,
 		'_builtin'        => true,
 		'_internal'       => true,
+		'capability'      => 'create_topics',
 		'label'           => __( 'Normal', 'message-board' ),
 		'label_count'     => _n_noop( 'Normal <span class="count">(%s)</span>', 'Normal <span class="count">(%s)</span>', 'message-board' ),
 	);
@@ -70,6 +71,7 @@ function mb_register_topic_types() {
 		'replies_allowed' => true,
 		'_builtin'        => true,
 		'_internal'       => false,
+		'capability'      => 'super_topics',
 		'label'           => __( 'Super', 'message-board' ),
 		'label_count'     => _n_noop( 'Super <span class="count">(%s)</span>', 'Super <span class="count">(%s)</span>', 'message-board' ),
 	);
@@ -79,6 +81,7 @@ function mb_register_topic_types() {
 		'replies_allowed' => true,
 		'_builtin'        => true,
 		'_internal'       => false,
+		'capability'      => 'stick_topics',
 		'label'           => __( 'Sticky', 'message-board' ),
 		'label_count'     => _n_noop( 'Sticky <span class="count">(%s)</span>', 'Sticky <span class="count">(%s)</span>', 'message-board' ),
 	);
@@ -379,8 +382,19 @@ function mb_dropdown_topic_type( $args = array() ) {
 
 	$out = sprintf( '<select name="%s" id="%s">', sanitize_html_class( $args['name'] ), sanitize_html_class( $args['id'] ) );
 
-	foreach ( $types as $type ) {
+	if ( !empty( $args['selected'] ) && !current_user_can( mb_get_topic_type_object( $args['selected'] )->capability ) ) {
+
+		$type = mb_get_topic_type_object( $args['selected'] );
 		$out .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $type->name ), selected( $type->name, $args['selected'], false ), $type->label );
+
+	} else {
+		foreach ( $types as $type ) {
+
+			if ( !current_user_can( $type->capability ) )
+				continue;
+
+			$out .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $type->name ), selected( $type->name, $args['selected'], false ), $type->label );
+		}
 	}
 
 	$out .= '</select>';

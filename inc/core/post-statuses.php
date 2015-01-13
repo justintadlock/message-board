@@ -179,6 +179,7 @@ function mb_register_post_statuses() {
 	/* Add custom arguments to the "publish" status. */
 	if ( isset( $wp_post_statuses['publish'] ) && 'publish' === mb_get_publish_post_status() ) {
 		$wp_post_statuses['publish']->mb_show_in_status_select = true;
+		$wp_post_statuses['publish']->mb_capability            = 'publish_posts';
 	}
 
 	/* Add custom arguments to the "trash" status. */
@@ -189,6 +190,7 @@ function mb_register_post_statuses() {
 	/* Add custom arguments to the "private" status. */
 	if ( isset( $wp_post_statuses['private'] ) && 'private' === mb_get_private_post_status() ) {
 		$wp_post_statuses['private']->mb_show_in_status_select = true;
+		$wp_post_statuses['private']->mb_capability            = 'privatize_posts';
 	}
 
 	/* Open status args. */
@@ -205,6 +207,7 @@ function mb_register_post_statuses() {
 		/* Custom arguments. */
 		'mb_label_verb'             => __( 'Open', 'message-board' ),
 		'mb_show_in_status_select'  => true,
+		'mb_capability'             => 'open_posts',
 	);
 
 	/* Close status args. */
@@ -221,6 +224,7 @@ function mb_register_post_statuses() {
 		/* Custom arguments. */
 		'mb_label_verb'             => __( 'Close', 'message-board' ),
 		'mb_show_in_status_select'  => true,
+		'mb_capability'             => 'close_posts',
 	);
 
 	/* Archive status args. */
@@ -237,6 +241,7 @@ function mb_register_post_statuses() {
 		/* Custom arguments. */
 		'mb_label_verb'             => __( 'Archive', 'message-board' ),
 		'mb_show_in_status_select'  => true,
+		'mb_capability'             => 'archive_posts',
 	);
 
 	/* Spam status args. */
@@ -254,6 +259,7 @@ function mb_register_post_statuses() {
 		/* Custom arguments. */
 		'mb_label_verb'             => __( 'Spam', 'message-board' ),
 		'mb_show_in_status_select'  => true,
+		'mb_capability'             => 'spam_posts',
 	);
 
 	/* Orphan status args. */
@@ -288,6 +294,7 @@ function mb_register_post_statuses() {
 		/* Custom arguments. */
 		'mb_label_verb'             => __( 'Hide', 'message-board' ),
 		'mb_show_in_status_select'  => true,
+		'mb_capability'             => 'hide_posts',
 	);
 
 	/* Register post statuses. */
