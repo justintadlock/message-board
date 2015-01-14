@@ -17,7 +17,7 @@ jQuery( document ).ready( function() {
 
 	/* If there's no title, disable the submit button. */
 	if ( '' == mb_forum_title ) {
-		jQuery( '#mb-forum-form input[type="submit"]' ).attr( 'disabled', 'disabled' );
+		jQuery( '#mb-forum-form input[type="submit"]' ).prop( 'disabled', true );
 	}
 
 	/* Wait for changes to the forum title and remove the `disable` attribute if there's a title. */
@@ -27,9 +27,9 @@ jQuery( document ).ready( function() {
 			mb_forum_title = jQuery( this ).attr( 'value' );
 
 			if ( '' != mb_forum_title ) {
-				jQuery( '#mb-forum-form input[type="submit"]' ).removeAttr( 'disabled' );
+				jQuery( '#mb-forum-form input[type="submit"]' ).prop( 'disabled', false );
 			} else {
-				jQuery( '#mb-forum-form input[type="submit"]' ).attr( 'disabled', 'disabled' );
+				jQuery( '#mb-forum-form input[type="submit"]' ).prop( 'disabled', true );
 			}
 		}
 	);
@@ -42,7 +42,7 @@ jQuery( document ).ready( function() {
 
 	/* If there's no title or content, disable the submit button. */
 	if ( '' == mb_topic_title || '' == mb_topic_content ) {
-		jQuery( '#mb-topic-form input[type="submit"]' ).attr( 'disabled', 'disabled' );
+		jQuery( '#mb-topic-form input[type="submit"]' ).prop( 'disabled', true );
 	}
 
 	/* Wait for changes to the topic title and remove the `disable` attribute if there's a title and content. */
@@ -52,9 +52,9 @@ jQuery( document ).ready( function() {
 			mb_topic_title = jQuery( this ).attr( 'value' );
 
 			if ( '' != mb_topic_title && '' != mb_topic_content ) {
-				jQuery( '#mb-topic-form input[type="submit"]' ).removeAttr( 'disabled' );
+				jQuery( '#mb-topic-form input[type="submit"]' ).prop( 'disabled', false );
 			} else {
-				jQuery( '#mb-topic-form input[type="submit"]' ).attr( 'disabled', 'disabled' );
+				jQuery( '#mb-topic-form input[type="submit"]' ).prop( 'disabled', true );
 			}
 		}
 	);
@@ -66,9 +66,9 @@ jQuery( document ).ready( function() {
 			mb_topic_content = jQuery( '#mb-topic-form textarea[name="mb_topic_content"]' ).val();
 
 			if ( '' != mb_topic_title && '' != mb_topic_content ) {
-				jQuery( '#mb-topic-form input[type="submit"]' ).removeAttr( 'disabled' );
+				jQuery( '#mb-topic-form input[type="submit"]' ).prop( 'disabled', false );
 			} else {
-				jQuery( '#mb-topic-form input[type="submit"]' ).attr( 'disabled', 'disabled' );
+				jQuery( '#mb-topic-form input[type="submit"]' ).prop( 'disabled', true );
 			}
 		}
 	);
@@ -80,7 +80,7 @@ jQuery( document ).ready( function() {
 
 	/* If there's no content, disable the submit button. */
 	if ( '' == mb_reply_content ) {
-		jQuery( '#mb-reply-form input[type="submit"]' ).attr( 'disabled', 'disabled' );
+		jQuery( '#mb-reply-form input[type="submit"]' ).prop( 'disabled', true );
 	}
 
 	/* Wait for changes to the reply content and remove the `disable` attribute if there's content. */
@@ -90,9 +90,9 @@ jQuery( document ).ready( function() {
 			mb_reply_content = jQuery( '#mb-reply-form textarea[name="mb_reply_content"]' ).val();
 
 			if ( '' != mb_reply_content ) {
-				jQuery( '#mb-reply-form input[type="submit"]' ).removeAttr( 'disabled' );
+				jQuery( '#mb-reply-form input[type="submit"]' ).prop( 'disabled', false );
 			} else {
-				jQuery( '#mb-reply-form input[type="submit"]' ).attr( 'disabled', 'disabled' );
+				jQuery( '#mb-reply-form input[type="submit"]' ).prop( 'disabled', true );
 			}
 		}
 	);
