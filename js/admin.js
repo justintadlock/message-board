@@ -2,6 +2,8 @@ jQuery( document ).ready( function() {
 
 	/* ====== Post Screen (post.php, post-new.php) ====== */
 
+	/* === Post Status Select === */
+
 	/* Get the original post status in the case the user clicks "Cancel". */
 	var orig_status = jQuery( 'select[name=post_status] option:selected' ).val();
 

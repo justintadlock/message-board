@@ -48,9 +48,48 @@ final class Message_Board_Admin_Post_Forum {
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
+		/* Filter the forum content editor. */
+		add_filter( 'wp_editor_expand',   '__return_false'                  );
+		add_filter( 'wp_editor_settings', array( $this, 'editor_settings' ) );
+		add_filter( 'the_editor',         array( $this, 'the_editor'      ) );
+
 		add_action( "add_meta_boxes_{$screen->post_type}", array( $this, 'add_meta_boxes' ) );
 
 		add_action( 'save_post', array( $this, 'save_post' ), 10, 2 );
+	}
+
+	/**
+	 * Changes the editor's default height to 175px since it's merely being used as a description.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array   $settings
+	 * @return array
+	 */
+	public function editor_settings( $settings ) {
+
+		$settings['editor_height'] = 175;
+
+		return $settings;
+	}
+
+	/**
+	 * Makes sure the editor's height stays the same. Adds the placeholder attribute to the 
+	 * editor `<textarea>`.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  string  $html
+	 * @return string
+	 */
+	public function the_editor( $html ) {
+
+		$placeholder = esc_attr__( 'Enter forum description&hellip;', 'message-board' );
+
+		$html = preg_replace( '/(<textarea.*?height:).*?px(.*?)/i', '${1}175px${2}', $html );
+		$html = str_replace( '<textarea', '<textarea placeholder="' . $placeholder . '"', $html );
+
+		return $html;
 	}
 
 	/**
