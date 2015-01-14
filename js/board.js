@@ -11,6 +11,14 @@ jQuery( document ).ready( function() {
 		'mb_topic_type' 
 	];
 
+	/* Prevent double submissions of plugin forms. */
+	jQuery( '#mb-forum-form, #mb-topic-form, #mb-reply-form' ).on(
+		'submit',
+		function( e ) {
+			jQuery( '[type="submit"]' ).prop( 'disabled', true );
+		}
+	);
+
 	/* Loop through each select element. */
 	mb_form_selects.forEach(
 		function( form_select ) {
