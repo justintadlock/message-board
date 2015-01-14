@@ -2,7 +2,7 @@
 	return;
 ?>
 
-<form id="reply-form" method="post" action="<?php mb_topic_url(); ?>">
+<form id="mb-reply-form" method="post" action="<?php mb_topic_url(); ?>">
 
 	<fieldset>
 		<legend><?php mb_reply_label( 'add_new_item' ); ?></legend>

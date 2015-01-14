@@ -3,7 +3,7 @@ if ( !current_user_can( 'access_forum_form' ) )
 	return;
 ?>
 
-<form id="forum-form" class="mb-form-forum" method="post" action="<?php mb_board_home_url(); ?>">
+<form id="mb-forum-form" class="mb-form-forum" method="post" action="<?php mb_board_home_url(); ?>">
 
 	<fieldset>
 		<legend><?php mb_forum_label( 'add_new_item' ); ?></legend>

@@ -310,7 +310,7 @@ final class Message_Board {
 	}
 
 	/**
-	 * Loads the front end stylesheet in case the theme doesn't support the plugin.
+	 * Loads the front end scripts and styles.  No styles are loaded if the theme supports the plugin.
 	 *
 	 * @since  1.0.0
 	 * @access public
@@ -318,6 +318,10 @@ final class Message_Board {
 	 */
 	public function enqueue_scripts() {
 
+		/* Load the plugin script. */
+		wp_enqueue_script( 'message-board', trailingslashit( $this->dir_uri ) . 'js/board.js', array( 'jquery' ), false, true );
+
+		/* Load the plugin stylesheet if no theme support. */
 		if ( !current_theme_supports( 'message-board' ) )
 			wp_enqueue_style( 'message-board', trailingslashit( $this->dir_uri ) . 'css/style.css' );
 	}
