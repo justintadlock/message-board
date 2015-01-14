@@ -9,7 +9,7 @@
 
 		<p>
 			<label for="mb_reply_content" name="mb_reply_content"><?php mb_reply_label( 'mb_form_content' ); ?></label>
-			<textarea id="mb_reply_content" name="mb_reply_content"><?php echo format_to_edit( mb_code_trick_reverse( mb_get_reply_content( mb_get_reply_id(), 'raw' ) ) ); ?></textarea>
+			<textarea id="mb_reply_content" name="mb_reply_content" placeholder="<?php echo esc_attr( mb_get_reply_label( 'mb_form_content_placeholder' ) ); ?>"><?php echo format_to_edit( mb_code_trick_reverse( mb_get_reply_content( mb_get_reply_id(), 'raw' ) ) ); ?></textarea>
 		</p>
 
 		<p>

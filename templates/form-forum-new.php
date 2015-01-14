@@ -10,7 +10,7 @@ if ( !current_user_can( 'access_forum_form' ) )
 
 		<p class="mb-form-title">
 			<label for="mb_forum_title"><?php mb_forum_label( 'mb_form_title' ); ?></label>
-			<input type="text" id="mb_forum_title" name="mb_forum_title" value="<?php echo esc_attr( mb_get_forum_title() ); ?>" />
+			<input type="text" id="mb_forum_title" name="mb_forum_title" value="<?php echo esc_attr( mb_get_forum_title() ); ?>" placeholder="<?php echo esc_attr( mb_get_forum_label( 'mb_form_title_placeholder' ) ); ?>" />
 		</p><!-- .mb-form-title -->
 
 		<?php if ( !mb_is_single_forum() ) : ?>
@@ -52,7 +52,7 @@ if ( !current_user_can( 'access_forum_form' ) )
 
 		<p class="mb-form-content">
 			<label for="mb_forum_content"><?php mb_forum_label( 'mb_form_content' ); ?></label>
-			<textarea id="mb_forum_content" name="mb_forum_content"><?php echo format_to_edit( mb_code_trick_reverse( mb_get_forum_content( mb_get_forum_id(), 'raw' ) ) ); ?></textarea>
+			<textarea id="mb_forum_content" name="mb_forum_content" placeholder="<?php echo esc_attr( mb_get_forum_label( 'mb_form_content_placeholder' ) ); ?>"><?php echo format_to_edit( mb_code_trick_reverse( mb_get_forum_content( mb_get_forum_id(), 'raw' ) ) ); ?></textarea>
 		<p><!-- .mb-form-content -->
 
 		<p class="mb-form-submit">

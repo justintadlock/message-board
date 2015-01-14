@@ -9,7 +9,7 @@
 
 		<p class="mb-form-title">
 			<label for="mb_topic_title"><?php mb_topic_label( 'mb_form_title' ); ?></label>
-			<input type="text" id="mb_topic_title" name="mb_topic_title" value="<?php echo esc_attr( mb_get_topic_title() ); ?>" />
+			<input type="text" id="mb_topic_title" name="mb_topic_title" value="<?php echo esc_attr( mb_get_topic_title() ); ?>" placeholder="<?php echo esc_attr( mb_get_topic_label( 'mb_form_title_placeholder' ) ); ?>" />
 		</p><!-- .mb-form-title -->
 
 		<?php if ( !mb_is_single_forum() ) : ?>
@@ -46,7 +46,7 @@
 
 		<p class="mb-form-content">
 			<label for="mb_topic_content"><?php mb_topic_label( 'mb_form_content' ); ?></label>
-			<textarea id="mb_topic_content" name="mb_topic_content"><?php echo format_to_edit( mb_code_trick_reverse( mb_get_topic_content( mb_get_topic_id(), 'raw' ) ) ); ?></textarea>
+			<textarea id="mb_topic_content" name="mb_topic_content" placeholder="<?php echo esc_attr( mb_get_topic_label( 'mb_form_content_placeholder' ) ); ?>"><?php echo format_to_edit( mb_code_trick_reverse( mb_get_topic_content( mb_get_topic_id(), 'raw' ) ) ); ?></textarea>
 		</p><!-- .mb-form-content -->
 
 		<p class="mb-form-submit">

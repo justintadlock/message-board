@@ -165,6 +165,8 @@ function mb_register_post_types() {
 			'mb_form_order'      => __( 'Order:',                   'message-board' ),
 			'mb_form_content'    => __( 'Description:',             'message-board' ),
 			'mb_form_edit_item'  => __( 'Edit Forum: %s',           'message-board' ),
+			'mb_form_title_placeholder' => __( 'Enter forum title',  'message-board' ),
+			'mb_form_content_placeholder' => __( 'Enter forum description&hellip;', 'message-board' ),
 			'mb_form_subscribe'  => __( 'Notify me of topics and posts via email', 'message-board' ),
 		)
 	);
@@ -224,8 +226,10 @@ function mb_register_post_types() {
 			'mb_form_title'      => __( 'Topic Title:',             'message-board' ),
 			'mb_form_type'       => __( 'Topic Type:',              'message-board' ),
 			'mb_form_status'     => __( 'Status:',                  'message-board' ),
-			'mb_form_content'    => __( 'Content:',                 'message-board' ),
+			'mb_form_content'    => __( 'Message:',                 'message-board' ),
 			'mb_form_edit_item'  => __( 'Edit Topic: %s',           'message-board' ),
+			'mb_form_title_placeholder' => __( 'Enter topic title',  'message-board' ),
+			'mb_form_content_placeholder' => __( 'Enter topic message&hellip;', 'message-board' ),
 			'mb_form_subscribe'  => __( 'Notify me of follow-up posts via email', 'message-board' ),
 		)
 	);
@@ -283,6 +287,7 @@ function mb_register_post_types() {
 			'archive_title'      => __( 'Replies',                   'message-board' ),
 			'mb_form_content'    => __( 'Message:',                  'message-board' ),
 			'mb_form_edit_item'  => __( 'Edit Reply: %s',           'message-board' ),
+			'mb_form_content_placeholder' => __( 'Enter reply message&hellip;', 'message-board' ),
 			'mb_form_subscribe'  => __( 'Notify me of follow-up posts via email', 'message-board' ),
 		)
 	);
@@ -365,10 +370,10 @@ function mb_translate_post_type( $post_type ) {
 function mb_enter_title_here( $title, $post ) {
 
 	if ( mb_get_forum_post_type() === $post->post_type )
-		$title = __( 'Enter forum title', 'message-board' );
+		$title = mb_get_forum_label( 'mb_form_title_placeholder' );
 
 	elseif ( mb_get_topic_post_type() === $post->post_type )
-		$title = __( 'Enter topic title', 'message-board' );
+		$title = mb_get_topic_label( 'mb_form_title_placeholder' );
 
 	return $title;
 }
