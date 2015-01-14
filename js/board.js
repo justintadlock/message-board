@@ -2,33 +2,11 @@ jQuery( document ).ready( function() {
 
 	/* ====== Form Handling ====== */
 
-	/* Get the names of the various select elements used in forms. */
-	var mb_form_selects = [ 
-		'mb_post_parent', 
-		'mb_forum_type', 
-		'mb_post_status', 
-		'mb_forum_id', 
-		'mb_topic_type' 
-	];
-
 	/* Prevent double submissions of plugin forms. */
 	jQuery( '#mb-forum-form, #mb-topic-form, #mb-reply-form' ).on(
 		'submit',
 		function( e ) {
 			jQuery( '[type="submit"]' ).prop( 'disabled', true );
-		}
-	);
-
-	/* Loop through each select element. */
-	mb_form_selects.forEach(
-		function( form_select ) {
-
-			var select_length = jQuery( 'select[name="' + form_select + '"] option' ).length;
-
-			/* If the select only has one option, disable it. */
-			if ( 1 >= select_length ) {
-				jQuery( 'select[name="' + form_select + '"]' ).attr( 'disabled', 'disabled' );
-			}
 		}
 	);
 
