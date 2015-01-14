@@ -10,6 +10,7 @@
 		<span class="mb-topic-count"><?php printf( __( 'Topics: %s', 'message-board' ), mb_get_forum_topic_count() ); ?></span> 
 		<span class="mb-reply-count"><?php printf( __( 'Replies: %s', 'message-board' ), mb_get_forum_reply_count() ); ?></span> 
 		<?php mb_forum_toggle_open_link(); ?> 
+		<?php mb_forum_toggle_close_link(); ?>
 		<?php mb_forum_toggle_trash_link(); ?>
 	</p>
 

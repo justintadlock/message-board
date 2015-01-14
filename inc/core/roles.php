@@ -98,12 +98,26 @@ function mb_get_keymaster_role_caps() {
 
 	$caps = array(
 		// Forum caps
-		'create_forums'       => true,
-		'edit_forums'         => true,
-		'edit_others_forums'  => true,
-		'read_forums'         => true,
-		'read_private_forums' => true,
-		'read_hidden_forums'  => true,
+		'create_forums'        => true,
+		'open_forums'          => true,
+		'close_forums'         => true,
+		'privatize_forums'     => true,
+		'hide_forums'          => true,
+		'archive_forums'       => true,
+		'move_forums'          => true,
+		'edit_forums'          => true,
+		'edit_others_forums'   => true,
+		'edit_open_forums'     => true,
+		'edit_closed_forums'   => true,
+		'edit_private_forums'  => true,
+		'edit_hidden_forums'   => true,
+		'edit_archived_forums' => true,
+		'delete_forums'        => true,
+		'delete_others_forums' => true,
+		'read_forums'          => true,
+		'read_private_forums'  => true,
+		'read_hidden_forums'   => true,
+		'read_archived_forums' => true,
 
 		// Topic caps
 		'create_topics'        => true,

@@ -8,8 +8,9 @@
 .ltr .mb-page-header .mb-subforum-count,
 .ltr .mb-page-header .mb-topic-count,
 .ltr .mb-page-header .mb-reply-count,
-.ltr .mb-page-header .toggle-open-link,
-.ltr .mb-page-header .toggle-trash-link { margin-right: 8px; }
+.ltr .mb-page-header .mb-forum-open-link,
+.ltr .mb-page-header .mb-forum-close-link,
+.ltr .mb-page-header .mb-forum-trash-link { margin-right: 8px; }
 
 /* === Single Topic Meta === */
 

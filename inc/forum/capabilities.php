@@ -27,28 +27,36 @@ function mb_get_forum_capabilities() {
 		'edit_post'              => 'edit_forum',
 		'read_post'              => 'read_forum',
 		'delete_post'            => 'delete_forum',
-		'moderate_forum'         => 'moderate_forum',    // custom
-		'close_forum'            => 'close_forum',       // custom
-		'open_forum'             => 'open_forum',        // custom
-		'access_forum_form'      => 'access_forum_form', // custom
 
 		// primitive/meta caps
 		'create_posts'           => 'create_forums',
 
 		// primitive caps used outside of map_meta_cap()
-		'edit_posts'             => 'edit_forums',
-		'edit_others_posts'      => 'edit_others_forums',
 		'publish_posts'          => 'create_forums',
+		'open_posts'             => 'open_forums',          // custom
+		'close_posts'            => 'close_forums',         // custom
+		'privatize_posts'        => 'privatize_forums',     // custom
+		'hide_posts'             => 'hide_forums',          // custom
+		'archive_posts'          => 'archive_forums',       // custom
+
+		'edit_posts'             => 'edit_forums',
+
 		'read_private_posts'     => 'read_private_forums',
-		'read_hidden_forums'     => 'read_hidden_forums', // custom
+		'read_hidden_forums'     => 'read_hidden_forums',   // custom
+		'read_archived_forums'   => 'read_archived_forums', // custom
 
 		// primitive caps used inside of map_meta_cap()
-		'read'                   => 'read_forums',
+		'edit_published_posts'   => 'edit_forums',
+		'edit_others_posts'      => 'edit_others_forums',
+		'edit_private_posts'     => 'edit_private_forums',
+		'edit_open_forums'       => 'edit_open_forums',     // custom
+		'edit_hidden_forums'     => 'edit_hidden_forums',   // custom
+		'edit_closed_forums'     => 'edit_closed_forums',   // custom
+		'edit_archived_forums'   => 'edit_archived_forums', // custom
 		'delete_posts'           => 'delete_forums',
 		'delete_published_posts' => 'delete_forums',
 		'delete_others_posts'    => 'delete_others_forums',
-		'edit_published_posts'   => 'edit_forums',
-		'moderate_posts'         => 'moderate_forums', // custom
+		'read'                   => 'read_forums',
 	);
 
 	return apply_filters( 'mb_get_forum_capabilities', $caps );
@@ -86,20 +94,60 @@ function mb_forum_map_meta_cap( $caps, $cap, $user_id, $args ) {
 			$caps = array();
 		}
 
-	/* Meta cap for moderating a single forum. */
-	} elseif ( 'moderate_forum' === $cap ) {
+	/* Meta cap for editing a single forum. */
+	} elseif ( 'edit_post' === $cap && mb_get_forum_post_type() === get_post_type( $args[0] ) ) {
+
+		$post      = get_post( $args[0] );
+		$forum_obj = get_post_type_object( mb_get_forum_post_type() );
+
+		if ( $user_id != $post->post_author ) {
+
+			// Open forums.
+			if ( mb_is_forum_open( $args[0] ) )
+				$caps[] = $forum_obj->cap->edit_open_forums;
+
+			// Closed forums.
+			elseif ( mb_is_forum_closed( $args[0] ) )
+				$caps[] = $forum_obj->cap->edit_closed_forums;
+
+			// Hidden forums.
+			elseif ( mb_is_forum_hidden( $args[0] ) )
+				$caps[] = $forum_obj->cap->edit_hidden_forums;
+		}
+
+	/* Meta cap for opening a single forum. */
+	} elseif ( 'open_forum' === $cap ) {
 
 		$caps = array();
+		$caps[] = user_can( $user_id, 'edit_forum', $args[0] ) ? 'open_forums' : 'do_not_allow';
 
-		$forum_id = mb_get_forum_id( $args[0] );
+	/* Meta cap for closing a single forum. */
+	} elseif ( 'close_forum' === $cap ) {
 
-		$forum_type_object = get_post_type_object( mb_get_forum_post_type() );
+		$caps = array();
+		$caps[] = user_can( $user_id, 'edit_forum', $args[0] ) ? 'close_forums' : 'do_not_allow';
 
-		$caps[] = $forum_type_object->cap->moderate_posts;
-	}
+	/* Meta cap for privatizing a single forum. */
+	} elseif ( 'privatize_forum' === $cap ) {
+
+		$caps = array();
+		$caps[] = user_can( $user_id, 'edit_forum', $args[0] ) ? 'privatize_forums' : 'do_not_allow';
+
+	/* Meta cap for hiding a single forum. */
+	} elseif ( 'hide_forum' === $cap ) {
+
+		$caps = array();
+		$caps[] = user_can( $user_id, 'edit_forum', $args[0] ) ? 'hide_forums' : 'do_not_allow';
+
+	/* Meta cap for spamming a single forum. */
+	} elseif ( 'archive_forum' === $cap ) {
+
+		$caps = array();
+		$caps[] = user_can( $user_id, 'edit_forum', $args[0] ) ? 'archive_forums' : 'do_not_allow';
+
 
 	/* Meta cap for deleting a specific forum. */
-	elseif ( 'delete_post' === $cap && mb_get_forum_post_type() === get_post_type( $args[0] ) ) {
+	} elseif ( 'delete_post' === $cap && mb_get_forum_post_type() === get_post_type( $args[0] ) ) {
 
 		$forum_id = mb_get_forum_id( $args[0] );
 

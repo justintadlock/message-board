@@ -330,14 +330,15 @@ function mb_is_forum_trash( $forum_id = 0 ) {
 }
 
 function mb_forum_toggle_open_url( $forum_id = 0 ) {
-	echo mb_get_forum_toggle_open_close_url( $forum_id = 0 );
+	echo mb_get_forum_toggle_open_open_url( $forum_id = 0 );
 }
 
 function mb_get_forum_toggle_open_url( $forum_id = 0 ) {
 
 	$forum_id = mb_get_forum_id( $forum_id );
 
-	$action = mb_is_forum_open( $forum_id ) ? 'close' : 'open';
+	if ( mb_is_forum_open( $forum_id ) || !current_user_can( 'open_forum', $forum_id ) )
+		return '';
 
 	$url = add_query_arg( array( 'forum_id' => $forum_id, 'action' => 'mb_toggle_open' ) );
 	$url = wp_nonce_url( $url, "open_forum_{$forum_id}", 'mb_nonce' );
@@ -351,14 +352,53 @@ function mb_forum_toggle_open_link( $forum_id = 0 ) {
 
 function mb_get_forum_toggle_open_link( $forum_id = 0 ) {
 
-	$forum_id = mb_get_topic_id( $forum_id );
+	$forum_id = mb_get_forum_id( $forum_id );
 
-	if ( !current_user_can( 'moderate_forum', $forum_id ) )
+	$url = mb_get_forum_toggle_open_url( $forum_id );
+
+	if ( empty( $url ) )
 		return '';
 
-	$status = mb_is_forum_open( $forum_id ) ? get_post_status_object( mb_get_close_post_status() ) : get_post_status_object( mb_get_open_post_status() );
+	$status = get_post_status_object( mb_get_open_post_status() );
 
-	$link = sprintf( '<a class="toggle-open-link" href="%s">%s</a>', mb_get_forum_toggle_open_url( $forum_id ), $status->mb_label_verb );
+	$link = sprintf( '<a class="mb-forum-open-link" href="%s">%s</a>', $url, $status->mb_label_verb );
+
+	return $link;
+}
+
+function mb_forum_toggle_close_url( $forum_id = 0 ) {
+	echo mb_get_forum_toggle_close_url( $forum_id = 0 );
+}
+
+function mb_get_forum_toggle_close_url( $forum_id = 0 ) {
+
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	if ( mb_is_forum_closed( $forum_id ) || !current_user_can( 'close_forum', $forum_id ) )
+		return '';
+
+	$url = add_query_arg( array( 'forum_id' => $forum_id, 'action' => 'mb_toggle_close' ) );
+	$url = wp_nonce_url( $url, "close_forum_{$forum_id}", 'mb_nonce' );
+
+	return $url;
+}
+
+function mb_forum_toggle_close_link( $forum_id = 0 ) {
+	echo mb_get_forum_toggle_close_link( $forum_id );
+}
+
+function mb_get_forum_toggle_close_link( $forum_id = 0 ) {
+
+	$forum_id = mb_get_forum_id( $forum_id );
+
+	$url = mb_get_forum_toggle_close_url( $forum_id );
+
+	if ( empty( $url ) )
+		return '';
+
+	$status = get_post_status_object( mb_get_close_post_status() );
+
+	$link = sprintf( '<a class="mb-forum-close-link" href="%s">%s</a>', $url, $status->mb_label_verb );
 
 	return $link;
 }
@@ -1127,9 +1167,9 @@ function mb_dropdown_forums( $args = array() ) {
 
 	$forums = wp_dropdown_pages( $r );
 
-	if ( !empty( $args['selected'] ) ) {
+	if ( '' != $args['selected'] ) {
 
-		if ( mb_get_topic_post_type() === $args['child_type'] && !current_user_can( 'move_topics' ) )
+		if ( ( mb_get_forum_post_type() === $args['child_type'] && !current_user_can( 'move_forums' ) ) || ( mb_get_topic_post_type() === $args['child_type'] && !current_user_can( 'move_topics' ) ) )
 			$forums = preg_replace( '/<select(.*?)>/i', "<select disabled='disabled'$1>", $forums );
 	}
 

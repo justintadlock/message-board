@@ -42,7 +42,6 @@ function mb_get_topic_capabilities() {
 		'stick_topics'           => 'stick_topics',         // custom
 
 		'edit_posts'             => 'edit_topics',
-		'edit_others_posts'      => 'edit_others_topics',
 
 		'read_private_posts'     => 'read_private_topics',
 		'read_hidden_topics'     => 'read_hidden_topics', // custom
@@ -54,7 +53,6 @@ function mb_get_topic_capabilities() {
 		'edit_open_topics'       => 'edit_open_topics',     // custom
 		'edit_hidden_topics'     => 'edit_hidden_topics',   // custom
 		'edit_closed_topics'     => 'edit_closed_topics',   // custom
-		'edit_archived_topics'   => 'edit_archived_topics', // custom
 		'edit_spam_topics'       => 'edit_spam_topics',     // custom
 		'edit_orphan_topics'     => 'edit_orphan_topics',   // custom
 

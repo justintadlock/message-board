@@ -675,22 +675,38 @@ function mb_handler_topic_bookmark() {
 
 function mb_handler_forum_toggle_open() {
 
-	if ( !isset( $_GET['action'] ) || 'mb_toggle_open' !== $_GET['action'] || !isset( $_GET['forum_id'] ) )
+	$actions = array( 'mb_toggle_open', 'mb_toggle_close' );
+
+	if ( !isset( $_GET['action'] ) || !in_array( $_GET['action'], $actions ) || !isset( $_GET['forum_id'] ) )
 		return;
 
 	$forum_id = mb_get_forum_id( $_GET['forum_id'] );
 
-	/* Verify nonce. */
-	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "open_forum_{$forum_id}" ) )
-		return;
+	if ( 'mb_toggle_open' === $_GET['action'] ) {
 
-	if ( !current_user_can( 'moderate_forum', $forum_id ) )
-		return;
+		/* Verify nonce. */
+		if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "open_forum_{$forum_id}" ) )
+			return;
 
-	$updated = mb_is_forum_open( $forum_id ) ? mb_close_forum( $forum_id ) : mb_open_forum( $forum_id );
+		if ( mb_is_forum_open( $forum_id ) || !current_user_can( 'open_forum', $forum_id ) )
+			return;
+
+		$updated = mb_open_forum( $forum_id );
+	}
+
+	elseif ( 'mb_toggle_close' === $_GET['action'] ) {
+
+		/* Verify nonce. */
+		if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "close_forum_{$forum_id}" ) )
+			return;
+
+		if ( mb_is_forum_closed( $forum_id ) || !current_user_can( 'close_forum', $forum_id ) )
+			return;
+
+		$updated = mb_close_forum( $forum_id );
+	}
 
 	$redirect = remove_query_arg( array( 'action', 'forum_id', 'mb_nonce' ) );
-
 	wp_safe_redirect( esc_url( $redirect ) );
 }
 
@@ -785,7 +801,7 @@ function mb_handler_forum_toggle_trash() {
 	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "trash_forum_{$forum_id}" ) )
 		return;
 
-	if ( !current_user_can( 'moderate_forum', $forum_id ) )
+	if ( !current_user_can( 'delete_forum', $forum_id ) )
 		return;
 
 	$updated = mb_is_forum_trash( $forum_id ) ? wp_untrash_post( $forum_id ) : wp_trash_post( $forum_id );

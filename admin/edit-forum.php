@@ -322,23 +322,49 @@ final class Message_Board_Admin_Edit_Forums {
 			unset( $actions['inline hide-if-no-js'] );
 		}
 
-		/* Only add moderate links if the user has permission. */
-		if ( current_user_can( 'moderate_forum', $forum_id ) ) {
+		/* Add open/close toggle link if user has permission and forum is not spam. */
+		if ( current_user_can( 'open_forum', $forum_id ) && !mb_is_forum_open( $forum_id ) ) {
 
 			/* Get post status objects. */
 			$open_object  = get_post_status_object( mb_get_open_post_status()  );
-			$close_object = get_post_status_object( mb_get_close_post_status() );
-
-			/* Get open/close link text. */
-			$open_text = mb_is_forum_open( $forum_id ) ? $close_object->mb_label_verb : $open_object->mb_label_verb;
 
 			/* Build open/close toggle URL. */
 			$open_url = remove_query_arg( array( 'forum_id', 'mb_forum_notice' ) );
-			$open_url = add_query_arg( array( 'forum_id' => $forum_id, 'action' => 'mb_toggle_open' ), $open_url );
+			$open_url = add_query_arg( array( 'forum_id' => $forum_id, 'mb_toggle_status' => 'open' ), $open_url );
 			$open_url = wp_nonce_url( $open_url, "open_forum_{$forum_id}" );
 
 			/* Add toggle open/close action link. */
-			$actions['mb_toggle_open'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $open_url ), mb_is_forum_open() ? 'close' : 'open', $open_text );
+			$actions['mb_toggle_open'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $open_url ), 'open', $open_object->mb_label_verb );
+		}
+
+		/* Add open/close toggle link if user has permission and forum is not spam. */
+		if ( current_user_can( 'close_forum', $forum_id ) && !mb_is_forum_closed( $forum_id ) ) {
+
+			/* Get post status objects. */
+			$close_object  = get_post_status_object( mb_get_close_post_status()  );
+
+			/* Build open/close toggle URL. */
+			$close_url = remove_query_arg( array( 'forum_id', 'mb_forum_notice' ) );
+			$close_url = add_query_arg( array( 'forum_id' => $forum_id, 'mb_toggle_status' => 'close' ), $close_url );
+			$close_url = wp_nonce_url( $close_url, "close_forum_{$forum_id}" );
+
+			/* Add toggle open/close action link. */
+			$actions['mb_toggle_close'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $close_url ), 'close', $close_object->mb_label_verb );
+		}
+
+		/* Add open/close toggle link if user has permission and forum is not spam. */
+		if ( current_user_can( 'archive_forum', $forum_id ) && !mb_is_forum_archived( $forum_id ) ) {
+
+			/* Get post status objects. */
+			$archive_object  = get_post_status_object( mb_get_archive_post_status()  );
+
+			/* Build open/close toggle URL. */
+			$archive_url = remove_query_arg( array( 'forum_id', 'mb_forum_notice' ) );
+			$archive_url = add_query_arg( array( 'forum_id' => $forum_id, 'mb_toggle_status' => 'archive' ), $archive_url );
+			$archive_url = wp_nonce_url( $archive_url, "archive_forum_{$forum_id}" );
+
+			/* Add toggle open/close action link. */
+			$actions['mb_toggle_archive'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $archive_url ), 'open', $archive_object->mb_label_verb );
 		}
 
 		/* Move view action to the end. */
@@ -382,29 +408,54 @@ final class Message_Board_Admin_Edit_Forums {
 	public function handler() {
 
 		/* Checks if the close toggle link was clicked. */
-		if ( isset( $_GET['action'] ) && 'mb_toggle_open' === $_GET['action'] && isset( $_GET['forum_id'] ) ) {
+		if ( isset( $_GET['mb_toggle_status'] ) && isset( $_GET['forum_id'] ) ) {
 
 			$forum_id = absint( mb_get_forum_id( $_GET['forum_id'] ) );
-
-			/* Verify the nonce. */
-			check_admin_referer( "open_forum_{$forum_id}" );
 
 			/* Assume the changed failed. */
 			$notice = 'failure';
 
-			/* Check if the forum is open. */
-			$is_open = mb_is_forum_open( $forum_id );
+			if ( 'open' === $_GET['mb_toggle_status'] && !mb_is_forum_open( $forum_id ) ) {
 
-			/* Update the post status. */
-			$updated = $is_open ? mb_close_forum( $forum_id ) : mb_open_forum( $forum_id );
+				/* Verify the nonce. */
+				check_admin_referer( "open_forum_{$forum_id}" );
 
-			/* If the status was updated, add notice slug. */
-			if ( $updated && !is_wp_error( $updated ) ) {
-				$notice = $is_open ? mb_get_close_post_status() : mb_get_open_post_status();
+				/* Update the post status. */
+				$updated = mb_open_forum( $forum_id );
+
+				/* If the status was updated, add notice slug. */
+				if ( $updated && !is_wp_error( $updated ) )
+					$notice = mb_get_open_post_status();
+			}
+
+			elseif ( 'close' === $_GET['mb_toggle_status'] && !mb_is_forum_closed( $forum_id ) ) {
+
+				/* Verify the nonce. */
+				check_admin_referer( "close_forum_{$forum_id}" );
+
+				/* Update the post status. */
+				$updated = mb_close_forum( $forum_id );
+
+				/* If the status was updated, add notice slug. */
+				if ( $updated && !is_wp_error( $updated ) )
+					$notice = mb_get_close_post_status();
+			}
+
+			elseif ( 'archive' === $_GET['mb_toggle_status'] && !mb_is_forum_archived( $forum_id ) ) {
+
+				/* Verify the nonce. */
+				check_admin_referer( "archive_forum_{$forum_id}" );
+
+				/* Update the post status. */
+				$updated = mb_archive_forum( $forum_id );
+
+				/* If the status was updated, add notice slug. */
+				if ( $updated && !is_wp_error( $updated ) )
+					$notice = mb_get_archive_post_status();
 			}
 
 			/* Redirect to correct admin page. */
-			$redirect = add_query_arg( array( 'forum_id' => $forum_id, 'mb_forum_notice' => $notice ), remove_query_arg( array( 'action', 'forum_id', '_wpnonce' ) ) );
+			$redirect = add_query_arg( array( 'forum_id' => $forum_id, 'mb_forum_notice' => $notice ), remove_query_arg( array( 'action', 'mb_toggle_status', 'forum_id', '_wpnonce' ) ) );
 			wp_safe_redirect( $redirect );
 
 			/* Always exit for good measure. */
@@ -421,7 +472,7 @@ final class Message_Board_Admin_Edit_Forums {
 	 */
 	public function admin_notices() {
 
-		$allowed_notices = array( mb_get_open_post_status(), mb_get_close_post_status() );
+		$allowed_notices = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_archive_post_status() );
 
 		/* If we have an allowed notice. */
 		if ( isset( $_GET['mb_forum_notice'] ) && in_array( $_GET['mb_forum_notice'], $allowed_notices ) && isset( $_GET['forum_id'] ) ) {
@@ -434,6 +485,9 @@ final class Message_Board_Admin_Edit_Forums {
 
 			elseif ( mb_get_open_post_status() === $notice )
 				$text = sprintf( __( 'The forum "%s" was successfully opened.', 'message-board' ), mb_get_forum_title( $forum_id ) );
+
+			elseif ( mb_get_archive_post_status() === $notice )
+				$text = sprintf( __( 'The forum "%s" was successfully archived.', 'message-board' ), mb_get_forum_title( $forum_id ) );
 
 			if ( !empty( $text ) )
 				printf( '<div class="updated"><p>%s</p></div>', $text );

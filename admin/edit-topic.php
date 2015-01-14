@@ -320,7 +320,7 @@ final class Message_Board_Admin_Edit_Topics {
 		}
 
 		/* Add spam toggle link if user has permission. */
-		if ( current_user_can( 'spam_topic', $topic_id ) && current_user_can( 'spam_topics' ) && !mb_is_topic_orphan( $topic_id ) ) {
+		if ( current_user_can( 'spam_topic', $topic_id ) && !mb_is_topic_orphan( $topic_id ) ) {
 
 			/* Get post status objects. */
 			$spam_object  = get_post_status_object( mb_get_spam_post_status() );
@@ -338,7 +338,7 @@ final class Message_Board_Admin_Edit_Topics {
 		}
 
 		/* Add open/close toggle link if user has permission and topic is not spam. */
-		if ( current_user_can( 'open_topic', $topic_id ) && current_user_can( 'open_topics' ) && !mb_is_topic_open( $topic_id ) && !mb_is_topic_spam( $topic_id ) && !mb_is_topic_orphan( $topic_id ) ) {
+		if ( current_user_can( 'open_topic', $topic_id ) && !mb_is_topic_open( $topic_id ) && !mb_is_topic_spam( $topic_id ) && !mb_is_topic_orphan( $topic_id ) ) {
 
 			/* Get post status objects. */
 			$open_object  = get_post_status_object( mb_get_open_post_status()  );
@@ -353,7 +353,7 @@ final class Message_Board_Admin_Edit_Topics {
 		}
 
 		/* Add open/close toggle link if user has permission and topic is not spam. */
-		if ( current_user_can( 'close_topic', $topic_id ) && current_user_can( 'close_topics' ) && !mb_is_topic_closed( $topic_id ) && !mb_is_topic_spam( $topic_id ) && !mb_is_topic_orphan( $topic_id ) ) {
+		if ( current_user_can( 'close_topic', $topic_id ) && !mb_is_topic_closed( $topic_id ) && !mb_is_topic_spam( $topic_id ) && !mb_is_topic_orphan( $topic_id ) ) {
 
 			/* Get post status objects. */
 			$close_object  = get_post_status_object( mb_get_close_post_status()  );
@@ -364,7 +364,7 @@ final class Message_Board_Admin_Edit_Topics {
 			$close_url = wp_nonce_url( $close_url, "close_topic_{$topic_id}" );
 
 			/* Add toggle open/close action link. */
-			$actions['mb_toggle_close'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $close_url ), 'open', $close_object->mb_label_verb );
+			$actions['mb_toggle_close'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $close_url ), 'close', $close_object->mb_label_verb );
 		}
 
 		/* Add super toggle link if user has permission and topic has a public status. */

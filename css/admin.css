@@ -49,7 +49,7 @@
 .row-actions .mb_toggle_open a.open,
 .row-actions .mb_toggle_spam a.restore { color: #006505; }
 
-.row-actions .mb_toggle_open a.close { color: #d98500; }
+.row-actions .mb_toggle_close a { color: #d98500; }
 
 .row-actions .mb_toggle_spam a.spam        { color: #a00; }
 .row-actions .mb_toggle_spam a.spam:hover { color: #f00; }
