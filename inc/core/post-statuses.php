@@ -340,6 +340,8 @@ function mb_transition_post_status( $new_status, $old_status, $post ) {
 	$publish_status = mb_get_publish_post_status();
 	$open_status    = mb_get_open_post_status();
 	$close_status   = mb_get_close_post_status();
+	$private_status = mb_get_private_post_status();
+	$hidden_status  = mb_get_hidden_post_status();
 	$spam_status    = mb_get_spam_post_status();
 	$trash_status   = mb_get_trash_post_status();
 
@@ -365,15 +367,27 @@ function mb_transition_post_status( $new_status, $old_status, $post ) {
 	add_action( "{$close_status}_to_{$spam_status}",    'mb_close_to_spam'    );
 	add_action( "{$close_status}_to_{$trash_status}",   'mb_close_to_trash'   );
 
+	/* Private status change. */
+	add_action( "{$private_status}_to_{$spam_status}",  'mb_publish_to_spam'  );
+	add_action( "{$private_status}_to_{$trash_status}", 'mb_publish_to_trash' );
+
+	/* Hidden status change. */
+	add_action( "{$hidden_status}_to_{$spam_status}",   'mb_publish_to_spam'  );
+	add_action( "{$hidden_status}_to_{$trash_status}",  'mb_publish_to_trash' );
+
 	/* Spam status change. */
 	add_action( "{$spam_status}_to_{$publish_status}",  'mb_spam_to_publish'  );
-	add_action( "{$spam_status}_to_{$open_status}",     'mb_spam_to_pubish'   );
+	add_action( "{$spam_status}_to_{$open_status}",     'mb_spam_to_publish'  );
 	add_action( "{$spam_status}_to_{$close_status}",    'mb_spam_to_close'    );
+	add_action( "{$spam_status}_to_{$private_status}",  'mb_spam_to_publish'  );
+	add_action( "{$spam_status}_to_{$hidden_status}",   'mb_spam_to_publish'  );
 
 	/* Trash status change. */
 	add_action( "{$trash_status}_to_{$publish_status}", 'mb_trash_to_publish' );
 	add_action( "{$trash_status}_to_{$open_status}",    'mb_trash_to_publish' );
 	add_action( "{$trash_status}_to_{$close_status}",   'mb_trash_to_close'   );
+	add_action( "{$trash_status}_to_{$private_status}", 'mb_trash_to_publish' );
+	add_action( "{$trash_status}_to_{$hidden_status}",  'mb_trash_to_publish' );
 }
 
 /**

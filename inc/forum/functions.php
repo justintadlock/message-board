@@ -258,14 +258,15 @@ function mb_reset_forum_reply_count( $forum_id ) {
 function mb_get_forum_topic_ids( $forum_id ) {
 	global $wpdb;
 
-	$open_status  = mb_get_open_post_status();
-	$close_status = mb_get_close_post_status();
+	$open_status    = mb_get_open_post_status();
+	$close_status   = mb_get_close_post_status();
+	$publish_status = mb_get_publish_post_status();
+	$private_status = mb_get_private_post_status();
+	$hidden_status  = mb_get_hidden_post_status();
 
-	$statuses = array();
-	$statuses[] = "post_status = '{$open_status}'";
-	$statuses[] = "post_status = '{$close_status}'";
+	$status_where = "AND (post_status = '{$open_status}' OR post_status = '{$close_status}' OR post_status = '{$publish_status}' OR post_status = '{$private_status}' OR post_status = '{$hidden_status}')";
 
-	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND (" . implode( ' OR ', $statuses ) . ") AND post_parent = %s ORDER BY menu_order DESC", mb_get_topic_post_type(), absint( $forum_id ) ) );
+	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s $status_where AND post_parent = %s ORDER BY menu_order DESC", mb_get_topic_post_type(), absint( $forum_id ) ) );
 }
 
 /**
