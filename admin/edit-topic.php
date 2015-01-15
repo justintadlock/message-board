@@ -367,8 +367,12 @@ final class Message_Board_Admin_Edit_Topics {
 			$actions['mb_toggle_close'] = sprintf( '<a href="%s" class="%s">%s</a>', esc_url( $close_url ), 'close', $close_object->mb_label_verb );
 		}
 
+		/* Don't allow stickies for these topic statuses. */
+		$icky_sticky  = array( mb_get_orphan_post_status(), mb_get_spam_post_status(), mb_get_trash_post_status() );
+		$topic_status = mb_get_topic_status( $topic_id );
+
 		/* Add super toggle link if user has permission and topic has a public status. */
-		if ( current_user_can( 'super_topic', $topic_id ) && mb_is_topic_public( $topic_id ) ) {
+		if ( current_user_can( 'super_topic', $topic_id ) && !in_array( $topic_status, $icky_sticky ) ) {
 
 			$current_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
 
@@ -383,7 +387,7 @@ final class Message_Board_Admin_Edit_Topics {
 		}
 
 		/* Add sticky toggle link if user has permission and topic has a public status. */
-		if ( current_user_can( 'stick_topic', $topic_id ) && mb_is_topic_public( $topic_id ) ) {
+		if ( current_user_can( 'stick_topic', $topic_id ) && !in_array( $topic_status, $icky_sticky ) ) {
 
 			$current_url = remove_query_arg( array( 'topic_id', 'mb_topic_notice' ) );
 
