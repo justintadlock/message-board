@@ -21,7 +21,7 @@
 					<a href="<?php echo esc_url( get_the_author_meta( 'url' ), mb_get_reply_author_id() ); ?>"><?php _e( 'Web Site', 'message-board' ); ?></a>
 				<?php endif; ?>
 				<br />
-				<span class="mb-user-topic-count"><?php printf( __( 'Topics: %s', 'message-board' ), mb_get_user_reply_count( mb_get_reply_author_id() ) ); ?></span>
+				<span class="mb-user-topic-count"><?php printf( __( 'Topics: %s', 'message-board' ), mb_get_user_topic_count( mb_get_reply_author_id() ) ); ?></span>
 				<br />
 				<span class="mb-user-reply-count"><?php printf( __( 'Replies: %s', 'message-board' ), mb_get_user_reply_count( mb_get_reply_author_id() ) ); ?></span>
 			</div><!-- .mb-author-info -->
