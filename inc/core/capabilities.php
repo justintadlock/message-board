@@ -44,7 +44,14 @@ function mb_user_can( $user_id, $cap, $post_id ) {
 	// @todo Check hierarchy.
 	if ( in_array( $cap, array( 'read_forum', 'read_topic', 'read_reply' ) ) ) {
 
-		$status_obj = get_post_status_object( get_post_status( $post_id ) );
+		if ( 'read_forum' === $cap )
+			$status_obj = get_post_status_object( get_forum_status( $post_id ) );
+
+		elseif ( 'read_topic' === $cap )
+			$status_obj = get_post_status_object( get_topic_status( $post_id ) );
+
+		elseif ( 'read_forum' === $cap )
+			$status_obj = get_post_status_object( get_reply_status( $post_id ) );
 
 		if ( false === $status_obj->private && false === $status_obj->protected )
 			return true;

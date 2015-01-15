@@ -249,7 +249,7 @@ final class Message_Board_Admin_Edit_Topics {
 		if ( 'status' === $column ) {
 
 			$post_type = mb_get_topic_post_type();
-			$status    = get_post_status_object( get_post_status( $post_id ) );
+			$status    = get_post_status_object( mb_get_topic_status( $post_id ) );
 
 			if ( mb_get_publish_post_status() === $status->name )
 				wp_update_post( array( 'ID' => $post_id, 'post_status' => mb_get_open_post_status() ) );

@@ -126,7 +126,7 @@ function mb_generate_reply_url( $reply_id = 0 ) {
 
 	$reply_id       = mb_get_reply_id( $reply_id );
 
-	if ( mb_get_publish_post_status() !== get_post_status( $reply_id ) )
+	if ( mb_get_publish_post_status() !== mb_get_reply_status( $reply_id ) )
 		return '';
 
 	$per_page       = mb_get_replies_per_page();

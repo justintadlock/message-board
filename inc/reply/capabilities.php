@@ -113,7 +113,7 @@ function mb_reply_map_meta_cap( $caps, $cap, $user_id, $args ) {
 		if ( mb_is_single_topic() ) {
 
 			$topic_id     = mb_get_topic_id();
-			$topic_status = get_post_status( $topic_id );
+			$topic_status = mb_get_topic_status( $topic_id );
 			$topic_type   = mb_get_topic_type( $topic_id );
 
 			if ( !current_user_can( 'read_topic', $topic_id ) )

@@ -239,7 +239,7 @@ final class Message_Board_Admin_Edit_Forums {
 			case 'status' :
 
 				$post_type = mb_get_forum_post_type();
-				$status    = get_post_status_object( get_post_status( $post_id ) );
+				$status    = get_post_status_object( mb_get_forum_status( $post_id ) );
 
 				/* If the forum has the "publish" post status, change it to "open". */
 				if ( mb_get_publish_post_status() === $status->name )

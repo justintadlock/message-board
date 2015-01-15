@@ -194,7 +194,7 @@ function mb_topic_map_meta_cap( $caps, $cap, $user_id, $args ) {
 		if ( mb_is_single_forum() ) {
 
 			$forum_id     = mb_get_forum_id();
-			$forum_status = get_post_status( $forum_id );
+			$forum_status = mb_get_forum_status( $forum_id );
 			$forum_type   = mb_get_forum_type( $forum_id );
 
 			if ( !current_user_can( 'read_forum', $forum_id ) )
