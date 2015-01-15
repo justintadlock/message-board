@@ -63,7 +63,7 @@ function mb_get_reply_capabilities() {
 function mb_reply_map_meta_cap( $caps, $cap, $user_id, $args ) {
 
 	/* Checks if a user can read a specific reply. */
-	if ( 'read_post' === $cap && mb_get_reply_post_type() === get_post_type( $args[0] ) ) {
+	if ( 'read_post' === $cap && mb_is_reply( $args[0] ) ) {
 
 		$post = get_post( $args[0] );
 
@@ -90,7 +90,7 @@ function mb_reply_map_meta_cap( $caps, $cap, $user_id, $args ) {
 		}
 
 	/* Meta cap for editing a single reply. */
-	} elseif ( 'edit_post' === $cap && mb_get_reply_post_type() === get_post_type( $args[0] ) ) {
+	} elseif ( 'edit_post' === $cap && mb_is_reply( $args[0] ) ) {
 
 		$post      = get_post( $args[0] );
 		$reply_obj = get_post_type_object( mb_get_reply_post_type() );

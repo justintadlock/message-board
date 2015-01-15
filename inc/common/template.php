@@ -13,14 +13,17 @@ function mb_get_content_type( $post_id = 0 ) {
 
 	$post_type = get_post_type( $post_id );
 
-	if ( mb_get_forum_post_type() === $post_type )
+	if ( mb_is_forum( $post_id ) )
 		$type = 'forum';
-	elseif ( mb_get_topic_post_type() === $post_type )
+
+	elseif ( mb_is_topic( $post_id ) )
 		$type = 'topic';
-	elseif ( mb_get_reply_post_type() === $post_type )
+
+	elseif ( mb_is_reply( $post_id ) )
 		$type = 'reply';
+
 	else
-		$type = $post_type;
+		$type = get_post_type( $post_id );
 
 	return $type;
 }
@@ -65,9 +68,8 @@ function mb_thread_position( $post_id = 0 ) {
 
 function mb_get_thread_position( $post_id = 0 ) {
 	$post_id   = mb_get_post_id( $post_id );
-	$post_type = get_post_type( $post_id );
 
-	$position = mb_get_reply_post_type() === $post_type ? mb_get_reply_position( $post_id ) + 1 : 1;
+	$position = mb_is_reply( $post_id ) ? mb_get_reply_position( $post_id ) + 1 : 1;
 
 	return apply_filters( 'mb_get_thread_position', $position );
 }

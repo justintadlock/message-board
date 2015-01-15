@@ -162,13 +162,13 @@ function mb_get_forum_id( $forum_id = 0 ) {
 	if ( is_numeric( $forum_id ) && 0 < $forum_id )
 		$_forum_id = $forum_id;
 
-	elseif ( $mb->forum_query->in_the_loop && mb_get_forum_post_type() === get_post_type( get_the_ID() ) )
+	elseif ( $mb->forum_query->in_the_loop && mb_is_forum( get_the_ID() ) )
 		$_forum_id = get_the_ID();
 
-	elseif ( $mb->subforum_query->in_the_loop && mb_get_forum_post_type() === get_post_type( get_the_ID() ) )
+	elseif ( $mb->subforum_query->in_the_loop && mb_is_forum( get_the_ID() ) )
 		$_forum_id = get_the_ID();
 
-	elseif ( $mb->search_query->in_the_loop && mb_get_forum_post_type() === get_post_type( get_the_ID() ) )
+	elseif ( $mb->search_query->in_the_loop && mb_is_forum( get_the_ID() ) )
 		$_forum_id = get_the_ID();
 
 	elseif ( mb_is_single_forum() )
@@ -184,6 +184,21 @@ function mb_get_forum_id( $forum_id = 0 ) {
 }
 
 /* ====== Conditionals ====== */
+
+/**
+ * Checks if the post is a forum.  This is a wrapper for `get_post_type()`.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return bool
+ */
+function mb_is_forum( $post_id = 0 ) {
+	$post_id  = mb_get_forum_id( $post_id );
+	$is_forum = mb_get_forum_post_type() === get_post_type( $post_id ) ? true : false;
+
+	return apply_filters( 'mb_is_forum', $is_forum, $post_id );
+}
 
 /**
  * Checks if viewing a single forum.  Wrapper function for the WordPress `is_single()` function.

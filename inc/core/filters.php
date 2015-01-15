@@ -202,24 +202,20 @@ function mb_post_title_filter( $title, $post ) {
 	$post_id   = is_object( $post ) ? $post->ID : $post;
 	$post_type = get_post_type( $post_id );
 
-	$forum_type = mb_get_forum_post_type();
-	$topic_type = mb_get_topic_post_type();
-	$reply_type = mb_get_reply_post_type();
-
 	/* Forum post type. */
-	if ( empty( $title ) && $forum_type === $post_type ) {
+	if ( empty( $title ) && mb_is_forum( $post_id ) ) {
 
 		/* Translators: Empty forum title "%s" is the forum ID. */
 		$title = sprintf( __( 'Forum #%s', 'message-board' ), $post_id );
 
 	/* Topic post type. */
-	} elseif ( empty( $title ) && $topic_type === $post_type ) {
+	} elseif ( empty( $title ) && mb_is_topic( $post_id ) ) {
 
 		/* Translators: Empty topic title "%s" is the topic ID. */
 		$title = sprintf( __( 'Topic #%s', 'message-board' ), $post_id );
 
 	/* Reply post type. */
-	} elseif ( empty( $title ) && $reply_type === $post_type ) {
+	} elseif ( empty( $title ) && mb_is_reply( $post_id ) ) {
 		$post = get_post( $post_id );
 
 		/* If the reply doesn't have a parent topic. */
@@ -236,22 +232,22 @@ function mb_post_title_filter( $title, $post ) {
 		}
 	}
 
-	if ( !is_admin() && $forum_type === $post_type && mb_is_forum_hidden( $post_id ) ) {
+	if ( !is_admin() && mb_is_forum( $post_id ) && mb_is_forum_hidden( $post_id ) ) {
 
 		/* Translators: Hidden title. */
 		$title = sprintf( __( 'Hidden: %s', 'message-board' ), $title );
 
-	} elseif ( !is_admin() && $forum_type === $post_type && mb_is_forum_private( $post_id ) ) {
+	} elseif ( !is_admin() && mb_is_forum( $post_id ) && mb_is_forum_private( $post_id ) ) {
 
 		/* Translators: Private title. */
 		$title = sprintf( __( 'Private: %s', 'message-board' ), $title );
 
-	} elseif ( !is_admin() && $topic_type === $post_type && mb_is_topic_hidden( $post_id ) ) {
+	} elseif ( !is_admin() && mb_is_topic( $post_id ) && mb_is_topic_hidden( $post_id ) ) {
 
 		/* Translators: Hidden title. */
 		$title = sprintf( __( 'Hidden: %s', 'message-board' ), $title );
 
-	} elseif ( !is_admin() && $topic_type === $post_type && mb_is_topic_private( $post_id ) ) {
+	} elseif ( !is_admin() && mb_is_topic( $post_id ) && mb_is_topic_private( $post_id ) ) {
 
 		/* Translators: Private title. */
 		$title = sprintf( __( 'Private: %s', 'message-board' ), $title );
@@ -274,15 +270,13 @@ function mb_get_edit_post_link( $url, $post_id ) {
 	if ( is_admin() )
 		return $url;
 
-	$post_type = get_post_type( $post_id );
-
-	if ( mb_get_forum_post_type() === $post_type )
+	if ( mb_is_forum( $post_id ) )
 		$url = add_query_arg( array( 'mb_action' => 'edit', 'forum_id' => $post_id ), mb_get_board_home_url() );
 
-	elseif ( mb_get_topic_post_type() === $post_type )
+	elseif ( mb_is_topic( $post_id ) )
 		$url = add_query_arg( array( 'mb_action' => 'edit', 'topic_id' => $post_id ), mb_get_board_home_url() );
 
-	elseif ( mb_get_reply_post_type() === $post_type )
+	elseif ( mb_is_reply( $post_id ) )
 		$url = add_query_arg( array( 'mb_action' => 'edit', 'reply_id' => $post_id ), mb_get_board_home_url() );
 
 	return $url;

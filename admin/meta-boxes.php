@@ -24,14 +24,17 @@
 function mb_submit_meta_box( $post, $args = array() ) {
 	global $action;
 
-	$post_type = $post->post_type;
+	$avail_status     = array();
+	$post_type        = $post->post_type;
 	$post_type_object = get_post_type_object( $post_type );
 
-	if ( $post_type === mb_get_forum_post_type() )
+	if ( mb_is_forum( $post->ID ) )
 		$avail_statuses = mb_get_forum_post_statuses();
-	elseif ( $post_type === mb_get_topic_post_type() )
+
+	elseif ( mb_is_topic( $post->ID ) )
 		$avail_statuses = mb_get_topic_post_statuses();
-	else
+
+	elseif ( mb_is_reply( $post->ID ) )
 		$avail_statuses = mb_get_reply_post_statuses();
 
 	$can_publish = current_user_can( $post_type_object->cap->publish_posts ); ?>
@@ -55,11 +58,11 @@ function mb_submit_meta_box( $post, $args = array() ) {
 					<div id="post-status-select" class="hide-if-js">
 						<input type="hidden" name="hidden_post_status" id="hidden_post_status" value="<?php echo esc_attr( ('auto-draft' == $post->post_status ) ? 'draft' : $post->post_status); ?>" />
 							<div id="post_status">
-						<?php if ( mb_get_forum_post_type() === $post_type ) :
+						<?php if ( mb_is_forum( $post->ID ) ) :
 							mb_dropdown_forum_status( array( 'selected' => $post->post_status ) );
-						elseif ( mb_get_topic_post_type() === $post_type ) :
+						elseif ( mb_is_topic( $post->ID ) ) :
 							mb_dropdown_topic_status( array( 'selected' => $post->post_status ) );
-						elseif ( mb_get_reply_post_type() === $post_type ) :
+						elseif ( mb_is_reply( $post->ID ) ) :
 							mb_dropdown_reply_status( array( 'selected' => $post->post_status ) );
 						endif;
 						?>
@@ -83,7 +86,7 @@ if ( 0 != $post->ID ) {
 
 ?>
 
-<?php if ( mb_get_topic_post_type() === $post->post_type ) : ?>
+<?php if ( mb_is_topic( $post->ID ) ) : ?>
 <?php $_m_order = 0 != $post->ID ? $post->post_date : current_time( 'mysql' ); ?>
 <input type="hidden" name="menu_order" value="<?php echo esc_attr( mysql2date( 'U', $_m_order ) ); ?>" />
 <?php endif; ?>

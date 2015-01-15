@@ -369,10 +369,10 @@ function mb_translate_post_type( $post_type ) {
  */
 function mb_enter_title_here( $title, $post ) {
 
-	if ( mb_get_forum_post_type() === $post->post_type )
+	if ( mb_is_forum( $post->ID ) )
 		$title = mb_get_forum_label( 'mb_form_title_placeholder' );
 
-	elseif ( mb_get_topic_post_type() === $post->post_type )
+	elseif ( mb_is_topic( $post->ID ) )
 		$title = mb_get_topic_label( 'mb_form_title_placeholder' );
 
 	return $title;

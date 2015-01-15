@@ -76,7 +76,7 @@ function mb_get_forum_capabilities() {
 function mb_forum_map_meta_cap( $caps, $cap, $user_id, $args ) {
 
 	/* Checks if a user can read a specific forum. */
-	if ( 'read_post' === $cap && mb_get_forum_post_type() === get_post_type( $args[0] ) ) {
+	if ( 'read_post' === $cap && mb_is_forum( $args[0] ) ) {
 		$post       = get_post( $args[0] );
 
 		if ( $user_id != $post->post_author ) {
@@ -95,7 +95,7 @@ function mb_forum_map_meta_cap( $caps, $cap, $user_id, $args ) {
 		}
 
 	/* Meta cap for editing a single forum. */
-	} elseif ( 'edit_post' === $cap && mb_get_forum_post_type() === get_post_type( $args[0] ) ) {
+	} elseif ( 'edit_post' === $cap && mb_is_forum( $args[0] ) ) {
 
 		$post      = get_post( $args[0] );
 		$forum_obj = get_post_type_object( mb_get_forum_post_type() );
@@ -147,7 +147,7 @@ function mb_forum_map_meta_cap( $caps, $cap, $user_id, $args ) {
 
 
 	/* Meta cap for deleting a specific forum. */
-	} elseif ( 'delete_post' === $cap && mb_get_forum_post_type() === get_post_type( $args[0] ) ) {
+	} elseif ( 'delete_post' === $cap && mb_is_forum( $args[0] ) ) {
 
 		$forum_id = mb_get_forum_id( $args[0] );
 

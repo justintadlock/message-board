@@ -81,7 +81,7 @@ function mb_get_topic_capabilities() {
 function mb_topic_map_meta_cap( $caps, $cap, $user_id, $args ) {
 
 	/* Checks if a user can read a specific topic. */
-	if ( 'read_post' === $cap && mb_get_topic_post_type() === get_post_type( $args[0] ) ) {
+	if ( 'read_post' === $cap && mb_is_topic( $args[0] ) ) {
 
 		$post = get_post( $args[0] );
 
@@ -116,7 +116,7 @@ function mb_topic_map_meta_cap( $caps, $cap, $user_id, $args ) {
 		}
 
 	/* Meta cap for editing a single topic. */
-	} elseif ( 'edit_post' === $cap && mb_get_topic_post_type() === get_post_type( $args[0] ) ) {
+	} elseif ( 'edit_post' === $cap && mb_is_topic( $args[0] ) ) {
 
 		$post      = get_post( $args[0] );
 		$topic_obj = get_post_type_object( mb_get_topic_post_type() );

@@ -76,6 +76,21 @@ function mb_the_topic() {
 
 /* ====== Conditionals ====== */
 
+/**
+ * Checks if the post is a topic.  This is a wrapper for `get_post_type()`.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return bool
+ */
+function mb_is_topic( $post_id = 0 ) {
+	$post_id  = mb_get_topic_id( $post_id );
+	$is_topic = mb_get_topic_post_type() === get_post_type( $post_id ) ? true : false;
+
+	return apply_filters( 'mb_is_topic', $is_topic, $post_id );
+}
+
 function mb_is_single_topic( $topic = '' ) {
 
 	if ( !is_singular( mb_get_topic_post_type() ) )
@@ -483,10 +498,10 @@ function mb_get_topic_id( $topic_id = 0 ) {
 	if ( is_numeric( $topic_id ) && 0 < $topic_id )
 		$_topic_id = $topic_id;
 
-	elseif ( $mb->topic_query->in_the_loop && mb_get_topic_post_type() === get_post_type( get_the_ID() ) )
+	elseif ( $mb->topic_query->in_the_loop && mb_is_topic( get_the_ID() ) )
 		$_topic_id = get_the_ID();
 
-	elseif ( $mb->search_query->in_the_loop && mb_get_topic_post_type() === get_post_type( get_the_ID() ) )
+	elseif ( $mb->search_query->in_the_loop && mb_is_topic( get_the_ID() ) )
 		$_topic_id = get_the_ID();
 
 	elseif ( mb_is_single_topic() )

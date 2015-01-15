@@ -400,10 +400,10 @@ function mb_transition_post_status( $new_status, $old_status, $post ) {
  */
 function mb_publish_to_spam( $post ) {
 
-	if ( mb_get_topic_post_type() === $post->post_type )
+	if ( mb_is_topic( $post->ID ) )
 		mb_reset_topic_data( $post );
 
-	elseif ( mb_get_reply_post_type() === $post->post_type )
+	elseif ( mb_is_reply( $post->ID ) )
 		mb_reset_reply_data( $post );
 }
 
@@ -417,10 +417,10 @@ function mb_publish_to_spam( $post ) {
  */
 function mb_publish_to_trash( $post ) {
 
-	if ( mb_get_topic_post_type() === $post->post_type )
+	if ( mb_is_topic( $post->ID ) )
 		mb_reset_topic_data( $post );
 
-	elseif ( mb_get_reply_post_type() === $post->post_type )
+	elseif ( mb_is_reply( $post->ID ) )
 		mb_reset_reply_data( $post );
 }
 
@@ -434,7 +434,7 @@ function mb_publish_to_trash( $post ) {
  */
 function mb_close_to_spam( $post ) {
 
-	if ( mb_get_topic_post_type() === $post->post_type )
+	if ( mb_is_topic( $post->ID ) )
 		mb_reset_topic_data( $post );
 }
 
@@ -448,7 +448,7 @@ function mb_close_to_spam( $post ) {
  */
 function mb_close_to_trash( $post ) {
 
-	if ( mb_get_topic_post_type() === $post->post_type )
+	if ( mb_is_topic( $post->ID ) )
 		mb_reset_topic_data( $post );
 }
 
@@ -462,10 +462,10 @@ function mb_close_to_trash( $post ) {
  */
 function mb_spam_to_publish( $post ) {
 
-	if ( mb_get_topic_post_type() === $post->post_type )
+	if ( mb_is_topic( $post->ID ) )
 		mb_reset_topic_data( $post, true );
 
-	elseif ( mb_get_reply_post_type() === $post->post_type )
+	elseif ( mb_is_reply( $post->ID ) )
 		mb_reset_reply_data( $post, true );
 }
 
@@ -479,7 +479,7 @@ function mb_spam_to_publish( $post ) {
  */
 function mb_spam_to_close( $post ) {
 
-	if ( mb_get_topic_post_type() === $post->post_type )
+	if ( mb_is_topic( $post->ID ) )
 		mb_reset_topic_data( $post, true );
 }
 
@@ -493,10 +493,10 @@ function mb_spam_to_close( $post ) {
  */
 function mb_trash_to_publish( $post ) {
 
-	if ( mb_get_topic_post_type() === $post->post_type )
+	if ( mb_is_topic( $post->ID ) )
 		mb_reset_topic_data( $post, true );
 
-	elseif ( mb_get_reply_post_type() === $post->post_type )
+	elseif ( mb_is_reply( $post->ID ) )
 		mb_reset_reply_data( $post, true );
 }
 
@@ -510,7 +510,7 @@ function mb_trash_to_publish( $post ) {
  */
 function mb_trash_to_close( $post ) {
 
-	if ( mb_get_topic_post_type() === $post->post_type )
+	if ( mb_is_topic( $post->ID ) )
 		mb_reset_topic_data( $post, true );
 }
 

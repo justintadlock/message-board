@@ -63,6 +63,21 @@ function mb_the_reply() {
 
 /* ====== Conditionals ====== */
 
+/**
+ * Checks if the post is a reply.  This is a wrapper for `get_post_type()`.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return bool
+ */
+function mb_is_reply( $post_id = 0 ) {
+	$post_id  = mb_get_reply_id( $post_id );
+	$is_reply = mb_get_reply_post_type() === get_post_type( $post_id ) ? true : false;
+
+	return apply_filters( 'mb_is_reply', $is_reply, $post_id );
+}
+
 function mb_is_single_reply( $reply = '' ) {
 
 	if ( !is_singular( mb_get_reply_post_type() ) )
@@ -337,10 +352,10 @@ function mb_get_reply_id( $reply_id = 0 ) {
 	if ( is_numeric( $reply_id ) && 0 < $reply_id )
 		$_reply_id = $reply_id;
 
-	elseif ( $mb->reply_query->in_the_loop && mb_get_reply_post_type() === get_post_type( get_the_ID() ) )
+	elseif ( $mb->reply_query->in_the_loop && mb_is_reply( get_the_ID() ) )
 		$_reply_id = get_the_ID();
 
-	elseif ( $mb->search_query->in_the_loop && mb_get_reply_post_type() === get_post_type( get_the_ID() ) )
+	elseif ( $mb->search_query->in_the_loop && mb_is_reply( get_the_ID() ) )
 		$_reply_id = get_the_ID();
 
 	elseif ( mb_is_single_reply() )
