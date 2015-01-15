@@ -779,8 +779,7 @@ function mb_handler_reply_toggle_spam() {
 	if ( !isset( $_GET['mb_nonce'] ) || !wp_verify_nonce( $_GET['mb_nonce'], "spam_reply_{$reply_id}" ) )
 		return;
 
-	// @todo - moderate cap for this specific reply
-	if ( !current_user_can( 'manage_forums' ) )
+	if ( !current_user_can( 'spam_reply', $reply_id ) )
 		return;
 
 	$updated = mb_is_reply_spam( $reply_id ) ? mb_unspam_reply( $reply_id ) : mb_spam_reply( $reply_id );
