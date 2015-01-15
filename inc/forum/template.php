@@ -41,9 +41,14 @@ function mb_forum_query() {
 	else {
 		$per_page = mb_get_forums_per_page();
 
+		$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_private_post_status(), mb_get_archive_post_status() );
+
+		if ( current_user_can( 'read_hidden_forums' ) )
+			$statuses[] = mb_get_hidden_post_status();
+
 		$defaults = array(
 			'post_type'           => mb_get_forum_post_type(),
-			'post_status'         => array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_hidden_post_status(), mb_get_private_post_status(), mb_get_archive_post_status() ),
+			'post_status'         => $statuses,
 			'posts_per_page'      => $per_page,
 			'paged'               => get_query_var( 'paged' ),
 			'orderby'             => array( 'menu_order' => 'ASC', 'title' => 'ASC' ),
@@ -94,8 +99,14 @@ function mb_subforum_query() {
 		return $have_posts;
 	}
 
+	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_private_post_status(), mb_get_archive_post_status() );
+
+	if ( current_user_can( 'read_hidden_forums' ) )
+		$statuses[] = mb_get_hidden_post_status();
+
 	$defaults = array(
 		'post_type'           => mb_get_forum_post_type(),
+		'post_status'         => $statuses,
 		'posts_per_page'      => mb_get_forums_per_page(),
 		'orderby'             => array( 'menu_order' => 'ASC', 'title' => 'ASC' ),
 		'ignore_sticky_posts' => true,

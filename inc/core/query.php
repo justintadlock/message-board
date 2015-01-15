@@ -140,8 +140,13 @@ function mb_pre_get_posts( $query ) {
 	/* If viewing the forum archive page. */
 	if ( !is_admin() && $query->is_main_query() && mb_is_forum_archive() ) {
 
+		$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_private_post_status(), mb_get_archive_post_status() );
+
+		if ( current_user_can( 'read_hidden_forums' ) )
+			$statuses[] = mb_get_hidden_post_status();
+
 		$query->set( 'post_type',      mb_get_forum_post_type()    );
-		$query->set( 'post_status',    array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_hidden_post_status(), mb_get_private_post_status(), mb_get_archive_post_status() ) );
+		$query->set( 'post_status',    $statuses );
 		$query->set( 'posts_per_page', mb_get_forums_per_page()    );
 		$query->set( 'orderby',        array( 'menu_order' => 'ASC', 'title' => 'ASC' ) );
 		$query->set( 'post_parent',    0                           );
