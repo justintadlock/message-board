@@ -34,11 +34,16 @@ function mb_topic_query() {
 	/* Create a new query if all else fails. */
 	else {
 
+		$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_private_post_status() );
+
+		if ( current_user_can( 'read_hidden_topics' ) )
+			$statuses[] = mb_get_hidden_post_status();
+
 		$per_page = mb_get_topics_per_page();
 
 		$defaults = array(
 			'post_type'           => mb_get_topic_post_type(),
-			'post_status'         => array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_hidden_post_status(), mb_get_private_post_status() ),
+			'post_status'         => $statuses,
 			'posts_per_page'      => $per_page,
 			'paged'               => get_query_var( 'paged' ),
 			'orderby'             => 'menu_order',
@@ -49,7 +54,7 @@ function mb_topic_query() {
 		if ( mb_is_single_forum() ) {
 			$defaults['post_parent'] = get_queried_object_id();
 			add_filter( 'the_posts', 'mb_posts_sticky_filter', 10, 2 );
-		add_filter( 'the_posts', 'mb_posts_super_filter', 10, 2 );
+			add_filter( 'the_posts', 'mb_posts_super_filter', 10, 2 );
 		}
 
 		$mb->topic_query = new WP_Query( $defaults );
