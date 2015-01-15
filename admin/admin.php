@@ -76,6 +76,9 @@ final class Message_Board_Admin {
 
 		/* Add custom body class. */
 		add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
+
+		/* Overwrite the nav menu meta box object query. */
+		add_filter( 'nav_menu_meta_box_object', array( $this, 'nav_menu_meta_box_object' ) );
 	}
 
 	/**
@@ -163,6 +166,34 @@ final class Message_Board_Admin {
 			$class .= 'mb-reply ';
 
 		return $class;
+	}
+
+	/**
+	 * Makes sure the correct post status is used when loading forums on the nav menus screen.  By 
+	 * default, WordPress will only load them if they have the "publish" post status.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  object  $object
+	 * @return object
+	 */
+	public function nav_menu_meta_box_object( $object ) {
+
+		if ( isset( $object->name ) && mb_get_forum_post_type() === $object->name ) {
+
+			$statuses = array(
+				mb_get_open_post_status(),
+				mb_get_close_post_status(),
+				mb_get_publish_post_status(),
+				mb_get_private_post_status(),
+				mb_get_hidden_post_status(),
+				mb_get_archive_post_status()
+			);
+
+			$object->_default_query = wp_parse_args( array( 'post_status' => $statuses ), $object->_default_query );
+		}
+
+		return $object;
 	}
 
 	/**
