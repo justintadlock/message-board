@@ -24,7 +24,7 @@
 function mb_submit_meta_box( $post, $args = array() ) {
 	global $action;
 
-	$avail_status     = array();
+	$avail_statuses   = array();
 	$post_type        = $post->post_type;
 	$post_type_object = get_post_type_object( $post_type );
 
