@@ -45,13 +45,13 @@ function mb_user_can( $user_id, $cap, $post_id ) {
 	if ( in_array( $cap, array( 'read_forum', 'read_topic', 'read_reply' ) ) ) {
 
 		if ( 'read_forum' === $cap )
-			$status_obj = get_post_status_object( get_forum_status( $post_id ) );
+			$status_obj = get_post_status_object( mb_get_forum_status( $post_id ) );
 
 		elseif ( 'read_topic' === $cap )
-			$status_obj = get_post_status_object( get_topic_status( $post_id ) );
+			$status_obj = get_post_status_object( mb_get_topic_status( $post_id ) );
 
 		elseif ( 'read_forum' === $cap )
-			$status_obj = get_post_status_object( get_reply_status( $post_id ) );
+			$status_obj = get_post_status_object( mb_get_reply_status( $post_id ) );
 
 		if ( false === $status_obj->private && false === $status_obj->protected )
 			return true;
