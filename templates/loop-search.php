@@ -79,7 +79,7 @@
 						</td><!-- .mb-col-datetime -->
 
 						<td class="mb-col-author">
-							<?php mb_reply_author_profile_link(); ?>
+							<?php mb_reply_author_link(); ?>
 						</td><!-- .mb-col-author -->
 					</tr>
 

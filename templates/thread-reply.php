@@ -13,7 +13,7 @@
 			<?php echo get_avatar( mb_get_reply_author_id() ); ?>
 
 			<div class="mb-author-info">
-				<?php mb_reply_author_profile_link(); ?>
+				<?php mb_reply_author_link(); ?>
 				<br />
 				<?php mb_role_link( mb_get_user_role( mb_get_reply_author_id() ) ); ?>
 				<?php if ( get_the_author_meta('url') ) : ?>

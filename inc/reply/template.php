@@ -1,4 +1,14 @@
 <?php
+/**
+ * Reply template functions for theme authors.
+ *
+ * @package    MessageBoard
+ * @subpackage Includes
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 /**
  * Creates a new reply query and checks if there are any replies found.
@@ -78,19 +88,29 @@ function mb_is_reply( $post_id = 0 ) {
 	return apply_filters( 'mb_is_reply', $is_reply, $post_id );
 }
 
+/**
+ * Checks if viewing a single reply page.  This is a wrapper for `is_single()`.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int|string  $reply
+ * @return bool
+ */
 function mb_is_single_reply( $reply = '' ) {
+	$is_single_reply = is_singular( mb_get_reply_post_type() ) ? is_single( $reply ) : false;
 
-	if ( !is_singular( mb_get_reply_post_type() ) )
-		return false;
-
-	if ( !empty( $reply ) )
-		return is_single( $reply );
-
-	return true;
+	return apply_filters( 'mb_is_single_reply', $is_single_reply );
 }
 
+/**
+ * Checks if viewing the reply archive.  Wrapper function for `is_post_type_archive()`.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
 function mb_is_reply_archive() {
-	return is_post_type_archive( mb_get_reply_post_type() );
+	return apply_filters( 'mb_is_reply_archive', is_post_type_archive( mb_get_reply_post_type() ) );
 }
 
 /* ====== Reply Title ====== */
@@ -106,70 +126,156 @@ function mb_single_reply_title() {
 	echo single_post_title();
 }
 
+/**
+ * Returns the single reply title.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
 function mb_get_single_reply_title() {
 	return apply_filters( 'mb_get_single_reply_title', single_post_title( '', false ) );
 }
 
+/**
+ * Displays the reply archive title.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
 function mb_reply_archive_title() {
 	echo mb_get_reply_archive_title();
 }
 
+/**
+ * Returns the reply archive title.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
 function mb_get_reply_archive_title() {
 	return apply_filters( 'mb_get_reply_archive_title', post_type_archive_title( '', false ) );
 }
 
 /* ====== Reply Position ====== */
 
+/**
+ * Displays the reply position.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
 function mb_reply_position( $reply_id = 0 ) {
 	echo mb_get_reply_position( $reply_id );
 }
 
+/**
+ * Returns the reply position. The reply position is stored as the `menu_order` post field. The position 
+ * indicates where the reply is in reference to the other replies for a topic. It's used for keeping 
+ * them in the correct order.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
 function mb_get_reply_position( $reply_id = 0 ) {
 
 	$reply_id       = mb_get_reply_id( $reply_id );
 	$reply_position = get_post_field( 'menu_order', $reply_id );
 
-	if ( empty( $reply_position ) ) {
+	/* If there's no reply position, we need to reset the positions for the topic's replies. */
+	if ( 0 >= $reply_position ) {
 		$topic_id = mb_get_reply_topic_id( $reply_id );
 		mb_reset_reply_positions( $topic_id );
 		$reply_position = get_post_field( 'menu_order', $reply_id );
 	}
 
-	return $reply_position;
+	return apply_filters( 'mb_get_reply_position', absint( $reply_position ), $reply_id );
 }
 
 /* ====== Reply Edit ====== */
 
+/**
+ * Displays the reply edit URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
 function mb_reply_edit_url( $reply_id = 0 ) {
 	echo mb_get_reply_edit_url( $reply_id );
 }
 
+/**
+ * Returns the reply edit URL.  This is a wrapper for `get_edit_post_link()`.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return string
+ */
 function mb_get_reply_edit_url( $reply_id = 0 ) {
 	$reply_id = mb_get_reply_id( $reply_id );
 	return apply_filters( 'mb_get_reply_edit_url', get_edit_post_link( $reply_id ), $reply_id );
 }
 
+/**
+ * Displays the reply edit link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
 function mb_reply_edit_link( $reply_id = 0 ) {
 	echo mb_get_reply_edit_link( $reply_id );
 }
 
+/**
+ * Returns the reply edit link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return string
+ */
 function mb_get_reply_edit_link( $reply_id = 0 ) {
 
 	$reply_id = mb_get_reply_id( $reply_id );
-	$link     = '';
-
-	if ( current_user_can( 'edit_reply', $reply_id ) && $url  = mb_get_reply_edit_url( $reply_id ) )
-		$link = sprintf( '<a href="%s" class="reply-edit-link edit-link">%s</a>', $url, __( 'Edit', 'message-board' ) );
+	$url      = mb_get_reply_edit_url( $reply_id );
+	$link     = $url ? sprintf( '<a href="%s" class="mb-reply-edit-link">%s</a>', $url, __( 'Edit', 'message-board' ) ) : '';
 
 	return apply_filters( 'mb_get_reply_edit_link', $link, $reply_id );
 }
 
 /* ====== Reply Status ====== */
 
+/**
+ * Displays the reply post status.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
 function mb_reply_status( $reply_id = 0 ) {
 	echo mb_get_reply_status( $reply_id );
 }
 
+/**
+ * Returns the reply post status.  Wrapper for the `get_post_status()` function.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return string
+ */
 function mb_get_reply_status( $reply_id = 0 ) {
 	$reply_id = mb_get_reply_id( $reply_id );
 	$status   = $reply_id ? get_post_status( $reply_id ) : '';
@@ -495,69 +601,177 @@ function mb_get_reply_time( $reply_id = 0, $format = '' ) {
 
 /* ====== Reply Author ====== */
 
+/**
+ * Displays the reply author ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
 function mb_reply_author_id( $reply_id = 0 ) {
 	echo mb_get_reply_author_id( $reply_id );
 }
 
+/**
+ * Returns the reply author ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return int
+ */
 function mb_get_reply_author_id( $reply_id = 0 ) {
 	$reply_id  = mb_get_reply_id( $reply_id );
-	$author_id = get_post_field( 'post_author', $reply_id );
+	$author_id = $reply_id ? get_post_field( 'post_author', $reply_id ) : 0;
 
 	return apply_filters( 'mb_get_reply_author_id', absint( $author_id ), $reply_id );
 }
 
+/**
+ * Displays the reply author display name.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
 function mb_reply_author( $reply_id = 0 ) {
 	echo mb_get_reply_author( $reply_id );
 }
 
+/**
+ * Returns the reply author display name.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return string
+ */
 function mb_get_reply_author( $reply_id = 0 ) {
-	return apply_filters( 'mb_get_reply_author_display_name', mb_get_post_author( $reply_id ), $reply_id );
+
+	$reply_id    = mb_get_reply_id( $reply_id );
+	$author_id   = mb_get_reply_author_id( $reply_id );
+	$author_name = $author_id ? get_the_author_meta( 'display_name', $author_id ) : '';
+
+	return apply_filters( 'mb_get_reply_author', $author_name, $reply_id );
 }
 
-function mb_reply_author_profile_url( $reply_id = 0 ) {
-	echo mb_get_reply_author_profile_url( $reply_id );
+/**
+ * Displays the reply author URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
+function mb_reply_author_url( $reply_id = 0 ) {
+	echo mb_get_reply_author_url( $reply_id );
 }
 
-function mb_get_reply_author_profile_url( $reply_id = 0 ) {
-	return apply_filters( 'mb_get_reply_author_profile_url', mb_get_post_author_profile_url( $reply_id ), $reply_id );
+/**
+ * Returns the reply author URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return string
+ */
+function mb_get_reply_author_url( $reply_id = 0 ) {
+	$reply_id   = mb_get_reply_id( $reply_id );
+	$author_id  = mb_get_reply_author_id( $reply_id );
+	$author_url = $author_id ? mb_get_user_url( $author_id ) : '';
+
+	return apply_filters( 'mb_get_reply_author_url', $author_url, $reply_id );
 }
 
-function mb_reply_author_profile_link( $reply_id = 0 ) {
-	echo mb_get_reply_author_profile_link( $reply_id );
+/**
+ * Displays the reply author link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
+function mb_reply_author_link( $reply_id = 0 ) {
+	echo mb_get_reply_author_link( $reply_id );
 }
 
-function mb_get_reply_author_profile_link( $reply_id = 0 ) {
-	return apply_filters( 'mb_get_reply_author_profile_link', mb_get_post_author_profile_link( $reply_id ), $reply_id );
-}
+/**
+ * Displays the reply author link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return string
+ */
+function mb_get_reply_author_link( $reply_id = 0 ) {
+	$reply_id    = mb_get_reply_id( $reply_id );
+	$author_id   = mb_get_reply_author_id( $reply_id );
+	$author_url  = mb_get_reply_author_url( $reply_id );
+	$author_name = mb_get_reply_author( $reply_id );
+	$author_link = $author_url ? sprintf( '<a class="mb-reply-author-link" href="%s">%s</a>', $author_url, $author_name ) : '';
 
-/* ====== Reply Form ====== */
-
-function mb_reply_form() {
-	mb_get_template_part( 'form-reply', 'new' );
-}
-
-function mb_reply_edit_form() {
-	mb_get_template_part( 'form-reply', 'edit' );
+	return apply_filters( 'mb_get_reply_author_link', $author_link, $reply_id );
 }
 
 /* ====== Reply Forum ====== */
 
+/**
+ * Displays the reply's forum ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
+function mb_reply_forum_id( $reply_id = 0 ) {
+	echo mb_get_reply_forum_id( $reply_id );
+}
+
+/**
+ * Returns the reply's forum ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return int
+ */
 function mb_get_reply_forum_id( $reply_id = 0 ) {
 
 	$reply_id = mb_get_reply_id( $reply_id );
+	$topic_id = mb_get_reply_topic_id( $reply_id );
+	$forum_id = $topic_id ? mb_get_topic_forum_id( $topic_id ) : 0;
 
-	return mb_get_topic_forum_id( mb_get_reply_topic_id( $reply_id ) );
+	return apply_filters( 'mb_get_reply_forum_id', $forum_id, $reply_id );
 }
 
 /* ====== Reply Topic ====== */
 
+/**
+ * Displays the reply's topic ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
 function mb_reply_topic_id( $reply_id = 0 ) {
 	echo mb_get_reply_topic_id( $reply_id );
 }
 
+/**
+ * Returns the reply's topic ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return int
+ */
 function mb_get_reply_topic_id( $reply_id = 0 ) {
 	$reply_id = mb_get_reply_id( $reply_id );
-	return get_post_field( 'post_parent', $reply_id );
+
+	return apply_filters( 'mb_get_reply_topic_id', get_post_field( 'post_parent', $reply_id ), $reply_id );
 }
 
 /**
