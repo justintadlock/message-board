@@ -195,6 +195,16 @@ function mb_get_template_hierarchy() {
 
 		$hierarchy[] = 'archive-topic.php';
 
+	/* If viewing a single reply. */
+	} elseif ( mb_is_single_reply() ) {
+
+		$hierarchy[] = "single-reply.php";
+
+	/* If viewing the reply archive. */
+	} elseif ( mb_is_reply_archive() ) {
+
+		$hierarchy[] = 'archive-reply.php';
+
 	/* If viewing a user sub-page. */
 	} elseif ( mb_is_user_page() ) {
 
