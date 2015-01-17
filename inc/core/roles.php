@@ -166,11 +166,24 @@ function mb_get_moderator_role_caps() {
 
 	$caps = array(
 		// Forum caps
-		'create_forums'       => true,
-		'edit_forums'         => true,
-		'read_forums'         => true,
-		'read_private_forums' => true,
-		'read_hidden_forums'  => true,
+		'create_forums'        => true,
+		'open_forums'          => true,
+		'close_forums'         => true,
+		'privatize_forums'     => true,
+		'hide_forums'          => true,
+		'archive_forums'       => true,
+		'move_forums'          => true,
+		'edit_forums'          => true,
+		'edit_open_forums'     => true,
+		'edit_closed_forums'   => true,
+		'edit_private_forums'  => true,
+		'edit_hidden_forums'   => true,
+		'edit_archived_forums' => true,
+		'delete_forums'        => true,
+		'read_forums'          => true,
+		'read_private_forums'  => true,
+		'read_hidden_forums'   => true,
+		'read_archived_forums' => true,
 
 		// Topic caps
 		'create_topics'        => true,
@@ -198,8 +211,10 @@ function mb_get_moderator_role_caps() {
 
 		// Reply caps
 		'create_replies'      => true,
+		'spam_replies'        => true,
 		'edit_replies'        => true,
 		'edit_others_replies' => true,
+		'edit_spam_replies'   => true,
 		'read_replies'        => true,
 	);
 
@@ -217,11 +232,13 @@ function mb_get_participant_role_caps() {
 
 	$caps = array(
 		// Forum caps
-		'read_forums'         => true,
-		'read_private_forums' => true,
+		'read_forums'          => true,
+		'read_private_forums'  => true,
+		'read_archived_forums' => true,
 
 		// Topic caps
 		'create_topics'        => true,
+		'open_topics'          => true,
 		'edit_topics'          => true,
 		'edit_open_topics'     => true,
 		'read_topics'          => true,
@@ -247,12 +264,13 @@ function mb_get_spectator_role_caps() {
 
 	$caps = array(
 		// Forum caps
-		'read_forums'         => true,
-		'read_private_forums' => true,
+		'read_forums'          => true,
+		'read_private_forums'  => true,
+		'read_archived_forums' => true,
 
 		// Topic caps
-		'read_topics'         => true,
-		'read_private_topics' => true,
+		'read_topics'          => true,
+		'read_private_topics'  => true,
 
 		// Reply caps
 		'read_replies'        => true,
@@ -274,12 +292,26 @@ function mb_get_banned_role_caps() {
 
 	$caps = array(
 		// Forum caps
-		'create_forums'       => false,
-		'edit_forums'         => false,
-		'edit_others_forums'  => false,
-		'read_forums'         => false,
-		'read_private_forums' => false,
-		'read_hidden_forums'  => false,
+		'create_forums'        => false,
+		'open_forums'          => false,
+		'close_forums'         => false,
+		'privatize_forums'     => false,
+		'hide_forums'          => false,
+		'archive_forums'       => false,
+		'move_forums'          => false,
+		'edit_forums'          => false,
+		'edit_others_forums'   => false,
+		'edit_open_forums'     => false,
+		'edit_closed_forums'   => false,
+		'edit_private_forums'  => false,
+		'edit_hidden_forums'   => false,
+		'edit_archived_forums' => false,
+		'delete_forums'        => false,
+		'delete_others_forums' => false,
+		'read_forums'          => false,
+		'read_private_forums'  => false,
+		'read_hidden_forums'   => false,
+		'read_archived_forums' => false,
 
 		// Topic caps
 		'create_topics'        => false,
@@ -290,6 +322,7 @@ function mb_get_banned_role_caps() {
 		'spam_topics'          => false,
 		'super_topics'         => false,
 		'stick_topics'         => false,
+		'move_topics'          => false,
 		'edit_topics'          => false,
 		'edit_others_topics'   => false,
 		'edit_open_topics'     => false,
@@ -306,8 +339,10 @@ function mb_get_banned_role_caps() {
 
 		// Reply caps
 		'create_replies'      => false,
+		'spam_replies'        => false,
 		'edit_replies'        => false,
 		'edit_others_replies' => false,
+		'edit_spam_replies'   => false,
 		'read_replies'        => false,
 	);
 
@@ -437,7 +472,7 @@ function mb_option_user_roles_filter( $roles ) {
  * @access public
  * @param  string  $role
  * @param  array   $args {
- *     Array or string of arguments for registering a post type.
+ *     Array of arguments for registering a user forum role.
  *
  *     @type  array  $capabilities  Key/value pairs of capabilities.  The key should be the capability 
  *                                  and the value should `TRUE` to explicity grant a cap or `FALSE` to 
@@ -464,9 +499,8 @@ function mb_register_role( $role, $args = array() ) {
 
 	$args = wp_parse_args( $args, $defaults );
 
-	/* Make caps and labels objects. */
-	//$args['capabilities'] = (object)$args['capabilities'];
-	$args['labels']       = (object)$args['labels'];
+	/* Make labels objects. */
+	$args['labels'] = (object)$args['labels'];
 
 	/* Add the role object. */
 	$mb->roles[ $role ] = (object)$args;
