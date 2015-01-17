@@ -803,7 +803,7 @@ function mb_forum_author( $forum_id = 0 ) {
  */
 function mb_get_forum_author( $forum_id = 0 ) {
 	$forum_id     = mb_get_forum_id( $forum_id );
-	$author_id    = mb_get_forum_author_id( $post_id );
+	$author_id    = mb_get_forum_author_id( $forum_id );
 	$forum_author = $author_id ? get_the_author_meta( 'display_name', $author_id ) : '';
 
 	return apply_filters( 'mb_get_forum_author', $forum_author, $forum_id );
