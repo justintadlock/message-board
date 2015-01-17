@@ -172,6 +172,8 @@ function mb_rewrite_rules() {
 	/* User role archive rewrite rules. */
 	add_rewrite_rule( $user_slug . '/roles/([^/]+)/page/?([0-9]{1,})/?$', 'index.php?mb_custom=users&mb_role=$matches[1]&paged=$matches[2]', 'top' );
 	add_rewrite_rule( $user_slug . '/roles/([^/]+)/?$',                   'index.php?mb_custom=users&mb_role=$matches[1]',                   'top' );
+	add_rewrite_rule( $user_slug . '/roles/page/?([0-9]{1,})/?$',                   'index.php?mb_custom=roles&paged=$matches[1]',                   'top' );
+	add_rewrite_rule( $user_slug . '/roles/?$',                   'index.php?mb_custom=roles',                   'top' );
 
 	$user_pages = 'forums|topics|replies|bookmarks|topic-subscriptions|forum-subscriptions';
 

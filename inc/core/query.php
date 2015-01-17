@@ -119,7 +119,9 @@ function mb_is_message_board() {
 		|| mb_is_single_forum()
 		|| mb_is_single_topic()
 		|| mb_is_single_reply()
-		|| mb_is_single_user()
+		|| mb_is_single_user() 
+		|| mb_is_role_archive()
+		|| mb_is_single_role()
 	) {
 		$is_message_board = true;
 	}

@@ -3,7 +3,7 @@
 	<table class="mb-loop-user">
 		<thead>
 			<tr>
-				<th class="mb-col-title"><?php _e( 'Users', 'message-board' ); ?></th>
+				<th class="mb-col-title"><?php _e( 'User', 'message-board' ); ?></th>
 				<th class="mb-col-role"><?php _e( 'Role', 'message-board' ); ?></th>
 				<th class="mb-col-count"><?php _e( 'Topics', 'message-board' ); ?></th>
 				<th class="mb-col-count"><?php _e( 'Replies', 'message-board' ); ?></th>
@@ -11,7 +11,7 @@
 		</thead>
 		<tfoot>
 			<tr>
-				<th class="mb-col-title"><?php _e( 'Users', 'message-board' ); ?></th>
+				<th class="mb-col-title"><?php _e( 'User', 'message-board' ); ?></th>
 				<th class="mb-col-role"><?php _e( 'Role', 'message-board' ); ?></th>
 				<th class="mb-col-count"><?php _e( 'Topics', 'message-board' ); ?></th>
 				<th class="mb-col-count"><?php _e( 'Replies', 'message-board' ); ?></th>
@@ -44,4 +44,4 @@
 
 	<?php mb_loop_user_pagination(); ?>
 
-<?php endif; // End check for posts. ?>
+<?php endif; // End check for users. ?>

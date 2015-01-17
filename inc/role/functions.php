@@ -366,7 +366,8 @@ function mb_register_roles() {
 			'plural_name'   => __( 'Keymasters', 'message-board' ), 
 			'singular_name' => __( 'Keymaster',  'message-board' ),
 		),
-		'capabilities'   => mb_get_keymaster_role_caps()
+		'capabilities'   => mb_get_keymaster_role_caps(),
+		'description'    => __( 'Keymasters are the administrators of the board. They have the permission to perform any forum-related tasks.', 'message-board' ),
 	);
 
 	/* Moderator role args. */
@@ -375,7 +376,8 @@ function mb_register_roles() {
 			'plural_name'   => __( 'Moderators', 'message-board' ), 
 			'singular_name' => __( 'Moderator',  'message-board' ),
 		),
-		'capabilities'   => mb_get_moderator_role_caps()
+		'capabilities'   => mb_get_moderator_role_caps(),
+		'description'    => __( 'Moderators are allowed to participate in the forums and moderate all topics and replies created by forum members.', 'message-board' ),
 	);
 
 	/* Participant role args. */
@@ -384,7 +386,8 @@ function mb_register_roles() {
 			'plural_name'   => __( 'Participants', 'message-board' ), 
 			'singular_name' => __( 'Participant',  'message-board' ),
 		),
-		'capabilities'   => mb_get_participant_role_caps()
+		'capabilities'   => mb_get_participant_role_caps(),
+		'description'    => __( 'Participants are allowed to participate in the forums by creating topics and replies.', 'message-board' ),
 	);
 
 	/* Spectator role args. */
@@ -393,7 +396,8 @@ function mb_register_roles() {
 			'plural_name'   => __( 'Spectators', 'message-board' ), 
 			'singular_name' => __( 'Spectator',  'message-board' ),
 		),
-		'capabilities'   => mb_get_spectator_role_caps()
+		'capabilities'   => mb_get_spectator_role_caps(),
+		'description'    => __( 'Spectators are allowed to read topics and replies but are not allowed to participate in the discussion.', 'message-board' ),
 	);
 
 	/* Banned role args. */
@@ -402,7 +406,8 @@ function mb_register_roles() {
 			'plural_name'   => __( 'Banned', 'message-board' ), 
 			'singular_name' => __( 'Banned',  'message-board' ),
 		),
-		'capabilities'   => mb_get_banned_role_caps()
+		'capabilities'   => mb_get_banned_role_caps(),
+		'description'    => __( 'Banned users are explicitly denied access to using the forums in any way.', 'message-board' ),
 	);
 
 	/* Register the roles. */
@@ -478,6 +483,7 @@ function mb_option_user_roles_filter( $roles ) {
  *                                  and the value should `TRUE` to explicity grant a cap or `FALSE` to 
  *                                  explicitly deny a cap.
  *     @type  array  $labels        Array of internationalized labels for this role.
+ *     @type  string $description   Description of the role.
  * }
  * @return void
  */
@@ -494,7 +500,8 @@ function mb_register_role( $role, $args = array() ) {
 	/* Default arguments. */
 	$defaults = array(
 		'capabilities' => array(),
-		'labels'       => array()  // singular_name, plural_name
+		'labels'       => array(),  // singular_name, plural_name
+		'description'  => '',
 	);
 
 	$args = wp_parse_args( $args, $defaults );
@@ -534,7 +541,8 @@ function mb_unregister_role( $role ) {
  * @param  string  $role
  * @return object
  */
-function mb_get_role_object( $role ) {
+function mb_get_role_object( $role = '' ) {
+	$role = mb_get_role( $role );
 	return message_board()->roles[ $role ];
 }
 
@@ -645,7 +653,7 @@ function mb_get_user_role( $user_id = 0 ) {
 	$role = !empty( $forum_roles ) ? array_shift( $forum_roles ) : '';
 
 	/* Return the forum role and allow devs to filter. */
-	return apply_filters( 'mb_get_user_forum_role', $role, $user_id );
+	return apply_filters( 'mb_get_user_role', $role, $user_id );
 }
 
 /**
@@ -700,7 +708,7 @@ function mb_get_user_role_name( $user_id = 0 ) {
  * @param  string  $role
  * @return void
  */
-function mb_role_name( $role ) {
+function mb_role_name( $role = '' ) {
 	echo mb_get_role_name( $role );
 }
 
@@ -712,7 +720,8 @@ function mb_role_name( $role ) {
  * @param  string  $role
  * @return string
  */
-function mb_get_role_name( $role ) {
+function mb_get_role_name( $role = '' ) {
+	$role  = mb_get_role( $role );
 	$roles = mb_get_dynamic_roles();
 	$name  = isset( $roles[ $role ] ) ? mb_get_role_object( $role )->labels->singular_name : '';
 
@@ -727,7 +736,7 @@ function mb_get_role_name( $role ) {
  * @param  string  $role
  * @return void
  */
-function mb_role_url( $role ) {
+function mb_role_url( $role = '' ) {
 	echo mb_get_role_url( $role );
 }
 
@@ -740,9 +749,10 @@ function mb_role_url( $role ) {
  * @param  string  $role
  * @return string
  */
-function mb_get_role_url( $role ) {
+function mb_get_role_url( $role = '' ) {
 	global $wp_rewrite;
 
+	$role          = mb_get_role( $role );
 	$dynamic_roles = mb_get_dynamic_roles();
 	$url           = '';
 
@@ -765,7 +775,7 @@ function mb_get_role_url( $role ) {
  * @param  string  $role
  * @return void
  */
-function mb_role_link( $role ) {
+function mb_role_link( $role = '' ) {
 	echo mb_get_role_link( $role );
 }
 
@@ -777,8 +787,9 @@ function mb_role_link( $role ) {
  * @param  string  $role
  * @return void
  */
-function mb_get_role_link( $role ) {
+function mb_get_role_link( $role = '' ) {
 
+	$role = mb_get_role( $role );
 	$url  = mb_get_role_url( $role );
 	$text = mb_get_role_name( $role );
 

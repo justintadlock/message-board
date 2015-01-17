@@ -76,6 +76,17 @@ function mb_get_users_per_page() {
 }
 
 /**
+ * Returns the number of roles to show per page on the role archive.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return int
+ */
+function mb_get_roles_per_page() {
+	return apply_filters( 'mb_get_roles_per_page', 15 );
+}
+
+/**
  * Returns the default forum ID.  This is the first-selected forum in drop-down lists for forums.  Also, 
  * this forum should not be allowed to be trashed/deleted.  Any permanently-deleted forum's topics should 
  * be assigned to the default forum.

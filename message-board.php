@@ -143,6 +143,16 @@ final class Message_Board {
 	public $user_query = null;
 
 	/**
+	 * Role query. This holds the results of `mb_get_dynamic_roles()` and is used on the role 
+	 * archive page.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @var    object|null
+	 */
+	public $role_query = null;
+
+	/**
 	 * Used for temporarily saving a deleted post object.
 	 *
 	 * @since  1.0.0
@@ -212,7 +222,6 @@ final class Message_Board {
 	private function includes() {
 
 		/* Load core files. */
-		require_once( $this->dir_path . 'inc/core/roles.php'          );
 		require_once( $this->dir_path . 'inc/core/post-types.php'     );
 		require_once( $this->dir_path . 'inc/core/post-statuses.php'  );
 		require_once( $this->dir_path . 'inc/core/meta.php'           );
@@ -252,6 +261,10 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/user/template.php'      );
 		require_once( $this->dir_path . 'inc/user/bookmarks.php'     );
 		require_once( $this->dir_path . 'inc/user/subscriptions.php' );
+
+		/* Load role files. */
+		require_once( $this->dir_path . 'inc/role/functions.php' );
+		require_once( $this->dir_path . 'inc/role/template.php'  );
 
 		/* Load search files. */
 		require_once( $this->dir_path . '/inc/search/template.php' );

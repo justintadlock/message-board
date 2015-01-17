@@ -38,18 +38,22 @@
 	.mb-col-title .mb-forum-link,
 	.mb-col-title .mb-topic-link,
 	.mb-col-title .mb-reply-link,
-	.archive-user .mb-col-title .mb-user-link { font-size: 19px; font-weight: bold; text-transform: none; }
+	.mb-col-title .mb-role-link,
+	.mb-loop-user .mb-col-title .mb-user-link { font-size: 19px; font-weight: bold; text-transform: none; }
 
 	.mb-col-title .mb-forum-content,
 	.mb-col-title .mb-topic-meta,
 	.mb-col-title .mb-reply-meta,
 	.mb-col-title .mb-reply-summary,
+	.mb-col-title .mb-role-description,
 	.mb-col-title .mb-user-description { margin-top: 5px; }
 
 		.mb-col-title .mb-forum-content p:last-of-type,
 		.mb-col-title .mb-forum-summary p:last-of-type,
 		.mb-col-title .mb-topic-summary p:last-of-type,
 		.mb-col-title .mb-reply-summary p:last-of-type,
+		.mb-col-title .mb-role-description p:last-of-type,
+		.mb-col-title .mb-user-description p:last-of-type,
 		.mb-col-content .mb-forum-content p:last-of-type { margin-bottom: 0; }
 
 	.mb-col-title .mb-subforum-list {
@@ -68,7 +72,14 @@
 
 .mb-col-count { width: 15%; }
 
+/* === Role loop columns. === */
+
+.mb-loop-role .mb-col-count { width: 10%; text-align: center; }
+
 /* === User loop columns. === */
+
+.mb-loop-user .mb-col-count,
+.mb-loop-user .mb-col-role { text-align: center; }
 
 .mb-loop-user .mb-col-count { width: 10%; }
 

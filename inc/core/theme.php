@@ -205,6 +205,14 @@ function mb_get_template_hierarchy() {
 
 		$hierarchy[] = 'archive-reply.php';
 
+	} elseif ( mb_is_role_archive() ) {
+
+		$hierarchy[] = 'archive-role.php';
+
+	} elseif ( mb_is_single_role() ) {
+
+		$hierarchy[] = 'single-role.php';
+
 	/* If viewing a user sub-page. */
 	} elseif ( mb_is_user_page() ) {
 
@@ -217,12 +225,6 @@ function mb_get_template_hierarchy() {
 	} elseif ( mb_is_single_user() ) {
 
 		$hierarchy[] = 'single-user.php';
-
-	/* If viewing a user role archive. */
-	} elseif ( mb_is_user_role_archive() ) {
-
-		$hierarchy[] = 'archive-user-role.php';
-		$hierarchy[] = 'archive-user.php';
 
 	/* If viewing the user archive. */
 	} elseif ( mb_is_user_archive() ) {

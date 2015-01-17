@@ -96,14 +96,17 @@ function mb_wp_title( $title ) {
 	elseif ( mb_is_reply_archive() )
 		$title = mb_get_reply_archive_title();
 
+	elseif ( mb_is_single_role() )
+		$title = mb_get_single_role_title();
+
+	elseif ( mb_is_role_archive() )
+		$title = mb_get_role_archive_title();
+
 	elseif ( mb_is_user_page() )
 		$title = mb_get_user_page_title();
 
 	elseif ( mb_is_single_user() )
 		$title = mb_get_single_user_title();
-
-	elseif ( mb_is_user_role_archive() )
-		$title = mb_get_user_role_archive_title();
 
 	elseif ( mb_is_user_archive() )
 		$title = mb_get_user_archive_title();
@@ -170,6 +173,9 @@ function mb_body_class( $classes ) {
 		} elseif ( mb_is_single_reply() ) {
 			$classes[] = 'single-reply';
 
+		} elseif ( mb_is_single_role() ) {
+			$classes[] = 'single-role';
+
 		} elseif ( mb_is_forum_archive() ) {
 			$classes[] = 'archive-forum';
 
@@ -178,6 +184,9 @@ function mb_body_class( $classes ) {
 
 		} elseif ( mb_is_reply_archive() ) {
 			$classes[] = 'archive-reply';
+
+		} elseif ( mb_is_role_archive() ) {
+			$classes[] = 'archive-role';
 
 		} elseif ( mb_is_user_archive() ) {
 			$classes[] = 'archive-user';

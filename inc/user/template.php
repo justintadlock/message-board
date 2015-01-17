@@ -44,7 +44,7 @@ function mb_user_query() {
 			'orderby'      => 'login',
 			'order'        => 'ASC',
 			'offset'       => $offset,
-			'role'         => mb_is_user_role_archive() ? sanitize_key( get_query_var( 'mb_role' ) ) : '',
+			'role'         => mb_is_single_role() ? sanitize_key( get_query_var( 'mb_role' ) ) : '',
 			'search'       => '',
 			'number'       => mb_get_users_per_page(),
 			'count_total'  => true,
@@ -142,37 +142,6 @@ function mb_is_user_archive() {
 }
 
 /**
- * Checks if viewing a user role archive page.
- *
- * @since  1.0.0
- * @access public
- * @param  string  $role
- * @return bool
- */
-function mb_is_user_role_archive( $role = '' ) {
-
-	/* Assume we're not viewing a role archive. */
-	$is_role_archive = false;
-
-	/* Get the role query var. */
-	$qv_role = get_query_var( 'mb_role' );
-
-	/* If viewing a user archive and we have a role. */
-	if ( mb_is_user_archive() && !empty( $qv_role ) ) {
-
-		$roles   = mb_get_dynamic_roles();
-
-		if ( empty( $role ) && isset( $roles[ $qv_role] ) )
-			$is_role_archive = true;
-
-		elseif ( !empty( $role ) && isset( $roles[ $qv_role ] ) && ( $qv_role === $role || $qv_role === "mb_{$role}" ) )
-			$is_role_archive = true;
-	}
-
-	return apply_filters( 'mb_is_user_role_archive', $is_role_archive );
-}
-
-/**
  * Checks if viewing a single user page.
  *
  * @since  1.0.0
@@ -258,34 +227,7 @@ function mb_user_archive_title() {
  * @return string
  */
 function mb_get_user_archive_title() {
-
-	$title = mb_is_user_role_archive() ? mb_get_user_role_archive_title() : __( 'Users', 'message-board' );
-
-	return apply_filters( 'mb_get_user_archive_title', $title );
-}
-
-/**
- * Displays the user role archive title.
- *
- * @since  1.0.0
- * @access public
- * @return void
- */
-function mb_user_role_archive_title() {
-	echo mb_get_user_role_archive_title();
-}
-
-/**
- * Returns the user role archive title.
- *
- * @since  1.0.0
- * @access public
- * @return string
- */
-function mb_get_user_role_archive_title() {
-	$role = get_query_var( 'mb_role' );
-
-	return apply_filters( 'mb_get_user_role_archive_title', mb_get_role_object( $role )->labels->plural_name );
+	return apply_filters( 'mb_get_user_archive_title', __( 'Users', 'message-board' ) );
 }
 
 /**
