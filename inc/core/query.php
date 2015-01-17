@@ -137,8 +137,12 @@ function mb_is_message_board() {
  */
 function mb_pre_get_posts( $query ) {
 
+	/* If viewing an admin page or this isn't the main query, bail. */
+	if ( is_admin() || !$query->is_main_query() )
+		return;
+
 	/* If viewing the forum archive page. */
-	if ( !is_admin() && $query->is_main_query() && mb_is_forum_archive() ) {
+	if ( mb_is_forum_archive() ) {
 
 		$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_private_post_status(), mb_get_archive_post_status() );
 
@@ -155,7 +159,7 @@ function mb_pre_get_posts( $query ) {
 	}
 
 	/* Is topic archive page. */
-	elseif ( !is_admin() && $query->is_main_query() && mb_is_topic_archive() ) {
+	elseif ( mb_is_topic_archive() ) {
 
 		$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_private_post_status() );
 
@@ -172,8 +176,9 @@ function mb_pre_get_posts( $query ) {
 	}
 
 	/* If viewing a user view. */
-	elseif ( !is_admin() && $query->is_main_query() && mb_is_user_page() ) {
+	elseif ( mb_is_user_page() ) {
 
+		/* Single user forums created page. */
 		if ( mb_is_user_page( 'forums' ) ) {
 
 			$query->set( 'post_type',      mb_get_forum_post_type() );
@@ -181,6 +186,7 @@ function mb_pre_get_posts( $query ) {
 			$query->set( 'order',          'ASC'                    );
 			$query->set( 'orderby',        'title'                  );
 
+		/* Single user topics created page. */
 		} elseif ( mb_is_user_page( 'topics' ) ) {
 
 			$query->set( 'post_type',      mb_get_topic_post_type() );
@@ -188,6 +194,7 @@ function mb_pre_get_posts( $query ) {
 			$query->set( 'order',          'DESC'                   );
 			$query->set( 'orderby',        'menu_order'             );
 
+		/* Single user replies created page. */
 		} elseif ( mb_is_user_page( 'replies' ) ) {
 
 			$query->set( 'post_type',      mb_get_reply_post_type()  );
@@ -195,6 +202,7 @@ function mb_pre_get_posts( $query ) {
 			$query->set( 'order',          'DESC'                    );
 			$query->set( 'orderby',        'date'                    );
 
+		/* Single user bookmarks saved page. */
 		} elseif ( mb_is_user_page( 'bookmarks' ) ) {
 
 			$user = get_user_by( 'slug', get_query_var( 'author_name' ) );
@@ -213,6 +221,7 @@ function mb_pre_get_posts( $query ) {
 
 			add_filter( 'posts_where', 'mb_auth_posts_where', 10, 2 );
 
+		/* Single user topic subscriptions page. */
 		} elseif ( mb_is_user_page( 'topic-subscriptions' ) ) {
 
 			$user = get_user_by( 'slug', get_query_var( 'author_name' ) );
@@ -230,6 +239,7 @@ function mb_pre_get_posts( $query ) {
 
 			add_filter( 'posts_where', 'mb_auth_posts_where', 10, 2 );
 
+		/* Single user forum subscriptions page. */
 		} elseif ( mb_is_user_page( 'forum-subscriptions' ) ) {
 
 			$user = get_user_by( 'slug', get_query_var( 'author_name' ) );
@@ -249,12 +259,14 @@ function mb_pre_get_posts( $query ) {
 		}
 	}
 
-	elseif ( !is_admin() && $query->is_main_query() && mb_is_search_results() ) {
+	/* If viewing the search results page. */
+	elseif ( mb_is_search_results() ) {
 
 		$post_type = $query->get( 'post_type' );
 
+		/* If not searching a specific post type, make sure to search all forum-related post types. */
 		if ( empty( $post_type ) || 'any' === $post_type || !isset( $_GET['mb_search_mode'] ) )
-			$query->set( 'post_type',      array( mb_get_forum_post_type(), mb_get_topic_post_type(), mb_get_reply_post_type() ) );
+			$query->set( 'post_type', array( mb_get_forum_post_type(), mb_get_topic_post_type(), mb_get_reply_post_type() ) );
 
 		$query->set( 'post_status',    array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status() ) );
 		$query->set( 'posts_per_page', mb_get_topics_per_page()    );
