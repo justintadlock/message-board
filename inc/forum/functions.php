@@ -182,6 +182,7 @@ function mb_reset_forum_level( $forum_id ) {
 }
 
 function mb_reset_forum_subforum_count( $forum_id ) {
+	global $wpdb;
 
 	$forum_id = mb_get_forum_id( $forum_id );
 
