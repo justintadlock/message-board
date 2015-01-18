@@ -890,10 +890,116 @@ function mb_get_forum_last_active_time( $forum_id = 0 ) {
 
 	$forum_id   = mb_get_forum_id( $forum_id );
 	$time       = get_post_meta( $forum_id, mb_get_forum_activity_datetime_meta_key(), true );
-	$mysql_date = mysql2date( 'U', $time );
-	$now        = current_time( 'timestamp' );
+	$human_time = '';
 
-	return apply_filters( 'mb_get_forum_last_active_time', human_time_diff( $mysql_date, $now ), $time, $forum_id );
+	if ( !empty( $time ) ) {
+		$mysql_date = mysql2date( 'U', $time );
+		$now        = current_time( 'timestamp' );
+		$human_time = human_time_diff( $mysql_date, $now );
+	}
+
+	return apply_filters( 'mb_get_forum_last_active_time', $human_time, $time, $forum_id );
+}
+
+/* ====== Last Post Author ====== */
+
+/**
+ * Displays the last post author for a forum.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return void
+ */
+function mb_forum_last_post_author( $forum_id = 0 ) {
+	echo mb_get_forum_last_post_author( $forum_id );
+}
+
+/**
+ * Returns the last post author for a forum.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return string
+ */
+function mb_get_forum_last_post_author( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+	$last_id  = mb_get_forum_last_post_id( $forum_id );
+	$author   = '';
+
+	if ( $last_id )
+		$author = mb_is_reply( $last_id ) ? mb_get_reply_author( $last_id ) : mb_get_topic_author( $last_id );
+
+	return apply_filters( 'mb_get_forum_last_post_author', $author, $forum_id );
+}
+
+/* ====== Last Post ID ====== */
+
+/**
+ * Displays the forum last post (topic or reply) ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_forum_last_post_id( $forum_id = 0 ) {
+	echo mb_get_forum_last_post_id( $forum_id );
+}
+
+/**
+ * Returns the forum last post (topic or reply) ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_get_forum_last_post_id( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+	$topic_id = mb_get_forum_last_topic_id( $forum_id );
+	$reply_id = mb_get_forum_last_reply_id( $forum_id );
+	$post_id  = 0;
+
+	if ( $topic_id && $reply_id )
+		$post_id = $reply_id > $topic_id ? $reply_id : $topic_id;
+
+	elseif ( $topic_id || $reply_id )
+		$post_id = $topic_id ? $topic_id : $reply_id;
+
+	return apply_filters( 'mb_get_forum_last_post_id', $post_id, $forum_id );
+}
+
+/* ====== Last Post URL ====== */
+
+/**
+ * Displays the last post URL for a forum.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return void
+ */
+function mb_forum_last_post_url( $forum_id = 0 ) {
+	echo mb_get_forum_last_post_url( $forum_id );
+}
+
+/**
+ * Returns a forum's last post URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return string
+ */
+function mb_get_forum_last_post_url( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
+	$last_id  = mb_get_forum_last_post_id( $forum_id );
+	$url   = '';
+
+	if ( $last_id )
+		$url = mb_is_reply( $last_id ) ? mb_get_reply_url( $last_id ) : mb_get_topic_url( $last_id );
+
+	return apply_filters( 'mb_get_forum_last_post_url', $url, $forum_id );
 }
 
 /* ====== Last Reply ID ====== */
@@ -925,146 +1031,95 @@ function mb_get_forum_last_reply_id( $forum_id = 0 ) {
 	return apply_filters( 'mb_get_forum_last_reply_id', $reply_id, $forum_id );
 }
 
-/* ====== Last Post Author ====== */
-
-/**
- * Displays the last post author for a forum.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $forum_id
- * @return void
- */
-function mb_forum_last_poster( $forum_id = 0 ) {
-	echo mb_get_forum_last_poster( $forum_id );
-}
-
-/**
- * Returns the last post author for a forum.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $forum_id
- * @return string
- */
-function mb_get_forum_last_poster( $forum_id = 0 ) {
-	$forum_id = mb_get_forum_id( $forum_id );
-	$reply_id = mb_get_forum_last_reply_id( $forum_id );
-	$topic_id = mb_get_forum_last_reply_id( $forum_id );
-
-	$author = $reply_id > $topic_id ? mb_get_reply_author( $reply_id ) : mb_get_topic_author( $topic_id );
-
-	return apply_filters( 'mb_get_forum_last_poster', $author, $reply_id, $forum_id );
-}
-
-/* ====== Last Post ID ====== */
-
-/**
- * Displays the forum last post (topic or reply) ID.
- *
- * @since  1.0.0
- * @access public
- * @return void
- */
-function mb_forum_last_post_id( $forum_id ) {
-	echo mb_get_forum_last_post_id( $forum_id );
-}
-
-/**
- * Returns the forum last post (topic or reply) ID.
- *
- * @since  1.0.0
- * @access public
- * @return void
- */
-function mb_get_forum_last_post_id( $forum_id ) {
-	$forum_id = mb_get_forum_id( $forum_id );
-	$topic_id = mb_get_forum_last_topic_id( $forum_id );
-	$reply_id = mb_get_forum_last_reply_id( $forum_id );
-	$post_id  = $reply_id > $topic_id ? $reply_id : $topic_id;
-
-	return apply_filters( 'mb_get_forum_last_post_id', $post_id, $forum_id );
-}
-
-/* ====== Last Post URL ====== */
-
-/**
- * Displays the last post URL for a forum.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $forum_id
- * @return void
- */
-function mb_forum_last_post_url( $forum_id = 0 ) {
-	echo mb_get_forum_last_post_url( $forum_id );
-}
-
-/**
- * Returns a forum's last post URL.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $forum_id
- * @return string
- */
-function mb_get_forum_last_post_url( $forum_id = 0 ) {
-	$forum_id = mb_get_forum_id( $forum_id );
-	$reply_id = mb_get_forum_last_reply_id( $forum_id );
-	$topic_id = mb_get_forum_last_topic_id( $forum_id );
-
-	$url = $reply_id > $topic_id ? mb_get_reply_url( $reply_id ) : mb_get_topic_url( $topic_id );
-
-	return apply_filters( 'mb_get_forum_last_post_url', $url, $reply_id, $forum_id );
-}
-
 /* ====== Last Topic ID ====== */
 
-function mb_forum_last_topic_id( $forum_id ) {
+/**
+ * Displays the forum last topic ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return void
+ */
+function mb_forum_last_topic_id( $forum_id = 0 ) {
 	echo mb_get_forum_last_topic_id( $forum_id );
 }
 
-function mb_get_forum_last_topic_id( $forum_id ) {
+/**
+ * Returns the forum last topic ID.  This returns the last topic by activity, which is not 
+ * necessarily the newest topic created.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return int
+ */
+function mb_get_forum_last_topic_id( $forum_id = 0 ) {
+	$forum_id = mb_get_forum_id( $forum_id );
 	$topic_id = get_post_meta( $forum_id, mb_get_forum_last_topic_id_meta_key(), true );
+	$topic_id = !empty( $topic_id ) ? absint( $topic_id ) : 0;
 
-	return !empty( $topic_id ) ? absint( $topic_id ) : 0;
+	return apply_filters( 'mb_get_forum_last_topic_id', $topic_id, $forum_id );
 }
 
 /* ====== Last Topic URL ====== */
 
+/**
+ * Displays the forum last topic URL.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return void
+ */
 function mb_forum_last_topic_url( $forum_id = 0 ) {
 	echo mb_get_forum_last_topic_url( $forum_id );
 }
 
+/**
+ * Returns the forum last topic URL.  This returns the last topic by activity, which is not 
+ * necessarily the newest topic created.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return string
+ */
 function mb_get_forum_last_topic_url( $forum_id = 0 ) {
-	$forum_id = mb_get_forum_id( $forum_id );
-	$topic_id = mb_get_forum_last_topic_id( $forum_id );
+	$forum_id  = mb_get_forum_id( $forum_id );
+	$topic_id  = mb_get_forum_last_topic_id( $forum_id );
+	$topic_url = $topic_id ? mb_get_topic_url( $topic_id ) : '';
 
-	return mb_get_topic_url( $topic_id );
+	return apply_filters( 'mb_get_forum_last_topic_url', $topic_url );
 }
 
+/**
+ * Displays the forum last topic link.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return void
+ */
 function mb_forum_last_topic_link( $forum_id = 0 ) {
 	echo mb_get_forum_last_topic_link( $forum_id );
 }
 
+/**
+ * Returns the forum last topic link.  This returns the last topic by activity, which is not 
+ * necessarily the newest topic created.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return string
+ */
 function mb_get_forum_last_topic_link( $forum_id = 0 ) {
-	$forum_id = mb_get_forum_id( $forum_id );
+	$forum_id   = mb_get_forum_id( $forum_id );
+	$topic_id   = mb_get_forum_last_topic_id( $forum_id );
+	$topic_link = $topic_id ? mb_get_topic_link( $topic_id ) : '';
 
-	$url   = mb_get_forum_last_topic_url(   $forum_id );
-	$title = mb_get_forum_last_topic_title( $forum_id );
-
-	return sprintf( '<a href="%s">%s</a>', $url, $title );
-}
-
-function mb_forum_last_topic_title( $forum_id = 0 ) {
-	echo mb_get_forum_last_topic_title( $forum_id );
-}
-
-function mb_get_forum_last_topic_title( $forum_id = 0 ) {
-	$forum_id = mb_get_forum_id( $forum_id );
-	$topic_id = mb_get_forum_last_topic_id( $forum_id );
-
-	return mb_get_topic_title( $topic_id );
+	return apply_filters( 'mb_get_forum_last_topic_link', $topic_link, $forum_id );
 }
 
 /* ====== Subforums ====== */

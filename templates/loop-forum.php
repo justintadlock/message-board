@@ -50,9 +50,11 @@
 					</td><!-- .mb-col-count -->
 
 					<td class="mb-col-latest">
-						<?php mb_forum_last_topic_link(); ?><br />
-						<?php printf( __( 'By %s', 'message-board' ), mb_get_forum_last_poster() ); ?><br />
-						<a href="<?php mb_forum_last_post_url(); ?>"><?php mb_forum_last_active_time(); ?> ago</a> 
+						<?php if ( mb_get_forum_last_post_id() ) : // Only show if the forum is not empty. ?>
+							<?php mb_forum_last_topic_link(); ?><br />
+							<?php mb_forum_last_post_author(); ?><br />
+							<a href="<?php mb_forum_last_post_url(); ?>"><?php mb_forum_last_active_time(); ?> ago</a> 
+						<?php endif; ?>
 					</td><!-- .mb-col-latest -->
 				</tr>
 
