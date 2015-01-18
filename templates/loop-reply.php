@@ -4,7 +4,7 @@
 
 		<thead>
 			<tr>
-				<th class="mb-col-title"><?php _e( 'Replies', 'message-board' ); ?></th>
+				<th class="mb-col-title"><?php _e( 'Reply', 'message-board' ); ?></th>
 				<th class="mb-col-datetime"><?php _e( 'Created', 'message-board' ); ?></th>
 				<th class="mb-col-author"><?php _e( 'Author', 'message-board' ); ?></th>
 			</tr>
@@ -12,7 +12,7 @@
 
 		<tfoot>
 			<tr>
-				<th class="mb-col-title"><?php _e( 'Replies', 'message-board' ); ?></th>
+				<th class="mb-col-title"><?php _e( 'Reply', 'message-board' ); ?></th>
 				<th class="mb-col-datetime"><?php _e( 'Created', 'message-board' ); ?></th>
 				<th class="mb-col-author"><?php _e( 'Author', 'message-board' ); ?></th>
 			</tr>

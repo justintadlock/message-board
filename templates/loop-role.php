@@ -3,13 +3,13 @@
 	<table class="mb-loop-role">
 		<thead>
 			<tr>
-				<th class="mb-col-title"><?php _e( 'Roles', 'message-board' ); ?></th>
+				<th class="mb-col-title"><?php _e( 'Role', 'message-board' ); ?></th>
 				<th class="mb-col-count"><?php _e( 'Users', 'message-board' ); ?></th>
 			</tr>
 		</thead>
 		<tfoot>
 			<tr>
-				<th class="mb-col-title"><?php _e( 'Roles', 'message-board' ); ?></th>
+				<th class="mb-col-title"><?php _e( 'Role', 'message-board' ); ?></th>
 				<th class="mb-col-count"><?php _e( 'Users', 'message-board' ); ?></th>
 			</tr>
 		</tfoot>
