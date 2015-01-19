@@ -285,6 +285,12 @@ function mb_pre_get_posts( $query ) {
 		if ( $role && in_array( "mb_{$role}", array_keys( mb_get_dynamic_roles() ) ) )
 			$query->set( 'mb_role', "mb_{$role}" );
 	}
+
+	/* Check if viewing a single topic or reply. */
+	elseif ( $query->is_single && in_array( $query->query_vars['post_type'], array( mb_get_topic_post_type(), mb_get_reply_post_type() ) ) ) {
+
+		add_filter( 'the_posts', 'mb_posts_can_read_parent' );
+	}
 }
 
 /**
@@ -303,6 +309,22 @@ function mb_auth_posts_where( $where, $query ) {
 	$author_id = absint( get_query_var( 'author' ) );
 
 	return str_replace( " AND ({$wpdb->posts}.post_author = {$author_id})", '', $where );
+}
+
+/**
+ * Make sure the current user can read the parent post.  Otherwise, return an empty array.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array  $posts
+ * @return array
+ */
+function mb_posts_can_read_parent( $posts ) {
+
+	if ( !empty( $posts ) && 0 < $posts[0]->post_parent && !current_user_can( 'read_post', $posts[0]->post_parent ) )
+		$posts = array();
+
+	return $posts;
 }
 
 /**
