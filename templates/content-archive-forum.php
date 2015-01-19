@@ -2,12 +2,19 @@
 /**
  * This template part outputs the forum archive content.  The forum archive is the board home page if 
  * the plugin is set to show forums on front (default).
+ *
+ * Theme authors can overwrite this template by placing a `/board/content-archive-forum.php` template 
+ * in their theme folder.
  */
 ?>
 
 <?php 
-	/* Loads the `loop-forum-hierarchical.php` template part.  Falls back to the `loop.php` template part. */
-	mb_get_template_part( 'loop', 'forum-hierarchical' );
+	/**
+	  Loads the `loop-forum-hierarchical.php` template part if the forum archive should be hierarchical. 
+	  Otherwise, it uses the `loop-forum-flat.php` template part.  Falls back to the `loop-forum.php` 
+	  template part.
+	 */
+	mb_get_template_part( 'loop-forum', mb_show_hierarchical_forums() ? 'hierarchical' : 'flat' );
 ?>
 
 <?php 

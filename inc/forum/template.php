@@ -99,28 +99,29 @@ function mb_subforum_query() {
 		return $have_posts;
 	}
 
-	$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_private_post_status(), mb_get_archive_post_status() );
+	if ( $mb->forum_query->in_the_loop ) {
 
-	if ( current_user_can( 'read_hidden_forums' ) )
-		$statuses[] = mb_get_hidden_post_status();
+		$statuses = array( mb_get_open_post_status(), mb_get_close_post_status(), mb_get_publish_post_status(), mb_get_private_post_status(), mb_get_archive_post_status() );
 
-	$defaults = array(
-		'post_type'           => mb_get_forum_post_type(),
-		'post_status'         => $statuses,
-		'posts_per_page'      => mb_get_forums_per_page(),
-		'orderby'             => array( 'menu_order' => 'ASC', 'title' => 'ASC' ),
-		'ignore_sticky_posts' => true,
-	);
+		if ( current_user_can( 'read_hidden_forums' ) )
+			$statuses[] = mb_get_hidden_post_status();
 
-	if ( $mb->forum_query->in_the_loop )
+		$defaults = array(
+			'post_type'           => mb_get_forum_post_type(),
+			'post_status'         => $statuses,
+			'posts_per_page'      => mb_get_forums_per_page(),
+			'orderby'             => array( 'menu_order' => 'ASC', 'title' => 'ASC' ),
+			'ignore_sticky_posts' => true,
+		);
+
 		$defaults['post_parent'] = mb_get_forum_id();
 
-	elseif ( mb_is_single_forum() )
-		$defaults['post_parent'] = get_queried_object_id();
+		$mb->subforum_query = new WP_Query( $defaults );
 
-	$mb->subforum_query = new WP_Query( $defaults );
+		return $mb->subforum_query->have_posts();
+	}
 
-	return $mb->subforum_query->have_posts();
+	return false;
 }
 
 /**
@@ -162,13 +163,16 @@ function mb_get_forum_id( $forum_id = 0 ) {
 	if ( is_numeric( $forum_id ) && 0 < $forum_id )
 		$_forum_id = $forum_id;
 
-	elseif ( $mb->forum_query->in_the_loop && mb_is_forum( get_the_ID() ) )
-		$_forum_id = get_the_ID();
+	elseif ( $mb->subforum_query->in_the_loop && isset( $mb->subforum_query->post->ID ) )
+		$_forum_id = $mb->subforum_query->post->ID;
 
-	elseif ( $mb->subforum_query->in_the_loop && mb_is_forum( get_the_ID() ) )
-		$_forum_id = get_the_ID();
+	elseif ( $mb->forum_query->in_the_loop && isset( $mb->forum_query->post->ID ) )
+		$_forum_id = $mb->forum_query->post->ID;
 
-	elseif ( $mb->search_query->in_the_loop && mb_is_forum( get_the_ID() ) )
+	elseif ( $mb->search_query->in_the_loop && isset( $mb->search_query->post->ID ) && mb_is_forum( $mb->search_query->post->ID ) )
+		$_forum_id = $mb->search_query->post->ID;
+
+	elseif ( mb_is_forum( get_the_ID() ) )
 		$_forum_id = get_the_ID();
 
 	elseif ( mb_is_single_forum() )
@@ -225,6 +229,18 @@ function mb_is_forum_archive() {
 	$is_forum_archive = get_query_var( 'mb_custom' ) ? false : is_post_type_archive( mb_get_forum_post_type() );
 
 	return apply_filters( 'mb_is_forum_archive', $is_forum_archive );
+}
+
+/**
+ * Checks if the forums should be shown in hierarchical (vs. flat) format.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return bool
+ */
+function mb_show_hierarchical_forums() {
+	$show = 'hierarchical' === mb_get_forum_archive_display() && mb_is_forum_archive() ? true : false;
+	return apply_filters( 'mb_show_hierarchical_forums', $show );
 }
 
 /* ====== Forum Status ====== */

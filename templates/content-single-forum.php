@@ -18,7 +18,7 @@
 
 <?php if ( current_user_can( 'read_forum', mb_get_forum_id() ) ) : // Check if the current user can read the forum. ?>
 
-	<?php mb_get_template_part( 'loop', 'forum' ); ?>
+	<?php mb_get_template_part( 'loop-forum', mb_show_hierarchical_forums() ? 'hierarchical' : 'flat' ); ?>
 
 	<?php if ( mb_forum_type_allows_topics( mb_get_forum_type() ) ) : // Only show topics if they're allowed. ?>
 

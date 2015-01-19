@@ -31,17 +31,6 @@
 						<div class="mb-forum-content">
 							<?php mb_forum_content(); ?>
 						</div><!-- .mb-forum-content -->
-
-						<?php if ( mb_is_forum_archive() && mb_subforum_query() ) : ?>
-
-							<ul class="mb-subforum-list">
-								<?php while ( mb_subforum_query() ) : ?>
-									<?php mb_the_subforum(); ?>
-									<li><?php mb_forum_link(); ?> (<?php mb_forum_topic_count(); ?>)</li>
-								<?php endwhile; ?>
-							</ul><!-- .mb-subforum-list -->
-
-						<?php endif; ?>
 					</td><!-- .mb-col-title -->
 
 					<td class="mb-col-count">

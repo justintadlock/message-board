@@ -15,15 +15,15 @@
 
 <?php if ( mb_is_user_page( array( 'forums', 'forum-subscriptions' ) ) ) : ?>
 
-	<?php mb_get_template_part( 'loop', 'forum' ); ?>
+	<?php mb_get_template_part( 'loop-forum', mb_show_hierarchical_forums() ? 'hierarchical' : 'flat' ); ?>
 
 <?php elseif ( mb_is_user_page( array( 'topics', 'topic-subscriptions', 'bookmarks' ) ) ) : ?>
 
-	<?php mb_get_template_part( 'loop', 'topic' ); ?>
+	<?php mb_get_template_part( 'loop-topic' ); ?>
 
 <?php elseif ( mb_is_user_page( 'replies' ) ) : ?>
 
-	<?php mb_get_template_part( 'loop', 'reply' ); ?>
+	<?php mb_get_template_part( 'loop-reply' ); ?>
 
 <?php else : ?>
 

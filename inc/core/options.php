@@ -24,6 +24,19 @@ function mb_get_show_on_front() {
 }
 
 /**
+ * Returns the forum archive display (hierarchical or flat).
+ *
+ * @todo Plugin setting.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_forum_archive_display() {
+	return apply_filters( 'mb_get_forum_archive_display', get_option( 'mb_forum_archive_display', 'hierarchical' ) );
+}
+
+/**
  * Returns the number of forums to show per page.
  *
  * @todo Plugin setting.
