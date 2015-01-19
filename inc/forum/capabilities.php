@@ -80,8 +80,9 @@ function mb_forum_map_meta_cap( $caps, $cap, $user_id, $args ) {
 		$post       = get_post( $args[0] );
 
 		if ( $user_id != $post->post_author ) {
-			$post_type  = get_post_type_object( $post->post_type );
-			$status_obj = get_post_status_object( $post->post_status );
+			$post_type   = get_post_type_object( $post->post_type );
+			$post_status = mb_get_forum_status( $post->ID );
+			$status_obj  = get_post_status_object( $post_status );
 
 			if ( mb_get_hidden_post_status() === $status_obj->name )
 				$caps[] = $post_type->cap->read_hidden_forums;

@@ -98,8 +98,9 @@ function mb_topic_map_meta_cap( $caps, $cap, $user_id, $args ) {
 			/* If the user can read the forum, check if they can read the topic. */
 			} else {
 
-				$post_type  = get_post_type_object( $post->post_type );
-				$status_obj = get_post_status_object( $post->post_status );
+				$post_type   = get_post_type_object( $post->post_type );
+				$post_status = mb_get_topic_status( $post->ID );
+				$status_obj  = get_post_status_object( $post_status );
 
 				if ( mb_get_hidden_post_status() === $status_obj->name )
 					$caps[] = $post_type->cap->read_hidden_topics;

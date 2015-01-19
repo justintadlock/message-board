@@ -1298,7 +1298,9 @@ class MB_Walker_Forum_Dropdown extends Walker_PageDropdown {
 		if ( $page->ID == $args['selected'] )
 			$output .= ' selected="selected"';
 
-		if ( mb_get_forum_post_type() !== $args['child_type'] && ( !in_array( $page->post_status, array( mb_get_open_post_status(), mb_get_publish_post_status() ) ) || false === $forum_type->topics_allowed ) )
+		$post_status = mb_get_forum_status( $page->ID );
+
+		if ( mb_get_forum_post_type() !== $args['child_type'] && ( !in_array( $post_status, array( mb_get_open_post_status(), mb_get_publish_post_status() ) ) || false === $forum_type->topics_allowed ) )
 			$output .= ' disabled="disabled"';
 		$output .= '>';
 
