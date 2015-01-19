@@ -172,9 +172,6 @@ function mb_get_forum_id( $forum_id = 0 ) {
 	elseif ( $mb->search_query->in_the_loop && isset( $mb->search_query->post->ID ) && mb_is_forum( $mb->search_query->post->ID ) )
 		$_forum_id = $mb->search_query->post->ID;
 
-	elseif ( mb_is_forum( get_the_ID() ) )
-		$_forum_id = get_the_ID();
-
 	elseif ( mb_is_single_forum() )
 		$_forum_id = get_queried_object_id();
 
