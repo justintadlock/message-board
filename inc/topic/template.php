@@ -624,8 +624,10 @@ function mb_topic_url( $topic_id = 0 ) {
  * @return string
  */
 function mb_get_topic_url( $topic_id = 0 ) {
-	$topic_id = mb_get_topic_id( $topic_id );
-	return apply_filters( 'mb_get_topic_url', mb_get_post_url( $topic_id ), $topic_id );
+	$topic_id  = mb_get_topic_id( $topic_id );
+	$topic_url = $topic_id ? get_permalink( $topic_id ) : '';
+
+	return apply_filters( 'mb_get_topic_url', $topic_url, $topic_id );
 }
 
 /**
@@ -652,8 +654,12 @@ function mb_get_topic_link( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 	$url      = mb_get_topic_url( $topic_id );
 	$title    = mb_get_topic_title( $topic_id );
+	$link     = $url ? sprintf( '<a class="mb-topic-link" href="%s">%s</a>', $url, $title ) : '';
 
-	return apply_filters( 'mb_get_topic_link', sprintf( '<a class="mb-topic-link" href="%s">%s</a>', $url, $title ), $topic_id );
+	if ( !$link && $title )
+		$link = sprintf( '<span class="mb-topic-link">%s</span>', $title );
+
+	return apply_filters( 'mb_get_topic_link', $link, $topic_id );
 }
 
 /**
@@ -857,12 +863,11 @@ function mb_topic_last_active_time( $topic_id = 0 ) {
  */
 function mb_get_topic_last_active_time( $topic_id = 0 ) {
 
-	$topic_id   = mb_get_topic_id( $topic_id );
-	$time       = get_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(), true );
-	$mysql_date = mysql2date( 'U', $time );
-	$now        = current_time( 'timestamp' );
+	$topic_id     = mb_get_topic_id( $topic_id );
+	$time         = get_post_meta( $topic_id, mb_get_topic_activity_datetime_meta_key(), true );
+	$natural_time = $topic_id ? mb_natural_time( mysql2date( 'U', $time ) ) : '';
 
-	return apply_filters( 'mb_get_topic_last_active_time', human_time_diff( $mysql_date, $now ), $time, $topic_id );
+	return apply_filters( 'mb_get_topic_last_active_time', $natural_time, $time, $topic_id );
 }
 
 /* ====== Last Reply ID ====== */
@@ -945,7 +950,12 @@ function mb_get_topic_last_post_url( $topic_id = 0 ) {
 	$topic_id = mb_get_topic_id( $topic_id );
 	$reply_id = mb_get_topic_last_reply_id( $topic_id );
 
-	$url = !empty( $reply_id ) ? mb_get_reply_url( $reply_id ) : mb_get_post_jump_url( $topic_id );
+	$url = $reply_id ? mb_get_reply_url( $reply_id ) : '';
+
+	if ( !$url && $topic_id ) {
+		$url = user_trailingslashit( mb_get_topic_url( $topic_id ) );
+		$url = $url ? "{$url}#{$topic_id}" : '';
+	}
 
 	return apply_filters( 'mb_get_topic_last_post_url', $url, $reply_id, $topic_id );
 }

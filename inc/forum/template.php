@@ -699,10 +699,12 @@ function mb_forum_link( $forum_id = 0 ) {
  * @return string
  */
 function mb_get_forum_link( $forum_id = 0 ) {
-	$forum_id   = mb_get_forum_id( $forum_id );
-	$forum_link = $forum_id ? sprintf( '<a class="mb-forum-link" href="%s">%s</a>', mb_get_forum_url( $forum_id ), mb_get_forum_title( $forum_id ) ) : '';
+	$forum_id    = mb_get_forum_id( $forum_id );
+	$forum_title = mb_get_forum_title( $forum_id );
+	$forum_url   = mb_get_forum_url( $forum_id );
+	$forum_link  = $forum_url ? '<a class="mb-forum-link" href="%s">%s</a>' : '<span class="mb-forum-link">%2$s</span>';
 
-	return apply_filters( 'mb_get_forum_link', $forum_link, $forum_id );
+	return apply_filters( 'mb_get_forum_link', sprintf( $forum_link, $forum_url, $forum_title ), $forum_id );
 }
 
 /**

@@ -13,6 +13,22 @@
 /* Update forum data on the `post_updated` hook. */
 add_action( 'post_updated', 'mb_forum_post_updated', 10, 3 );
 
+/* Private/hidden links. */
+add_filter( 'post_type_link', 'mb_forum_post_type_link', 10, 2 );
+
+function mb_forum_post_type_link( $link, $post ) {
+
+	return mb_is_forum( $post->ID ) && !current_user_can( 'read_forum', $post->ID ) ? '' : $link;
+}
+
+/* Private/hidden links. */
+add_filter( 'post_type_link', 'mb_topic_post_type_link', 10, 2 );
+
+function mb_topic_post_type_link( $link, $post ) {
+
+	return mb_is_topic( $post->ID ) && !current_user_can( 'read_topic', $post->ID ) ? '' : $link;
+}
+
 function mb_forum_post_updated( $post_id, $post_after, $post_before ) {
 
 	/* Bail if this is not the forum post type. */

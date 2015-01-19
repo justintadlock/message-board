@@ -11,6 +11,51 @@
  */
 
 /**
+ * @link https://core.trac.wordpress.org/ticket/29849
+ */
+function mb_natural_time( $from, $to = '', $limit = 1 ) {
+
+	if ( empty( $to ) )
+		$to = current_time( 'timestamp' );
+
+	$diff = absint( $to - $from );
+
+	if ( $diff < 1 )
+		return apply_filters( 'mb_natural_time', _x( 'now', 'time ago', 'message-board' ), $from, $to, $limit, $diff );
+
+	$result = array();
+
+	$l10n = array( 
+		array( YEAR_IN_SECONDS,     _nx_noop( '%s year',   '%s years',   'time ago', 'message-board' ) ),
+		array( 30 * DAY_IN_SECONDS, _nx_noop( '%s month',  '%s months',  'time ago', 'message-board' ) ),
+		array( WEEK_IN_SECONDS,     _nx_noop( '%s week',   '%s weeks',   'time ago', 'message-board' ) ),
+		array( DAY_IN_SECONDS,      _nx_noop( '%s day',    '%s days',    'time ago', 'message-board' ) ),
+		array( HOUR_IN_SECONDS,     _nx_noop( '%s hour',   '%s hours',   'time ago', 'message-board' ) ),
+		array( MINUTE_IN_SECONDS,   _nx_noop( '%s minute', '%s minutes', 'time ago', 'message-board' ) ),
+		array( 1,                   _nx_noop( '%s second', '%s seconds', 'time ago', 'message-board' ) ),
+	);
+
+	foreach ( $l10n as $key => $pair ) {
+
+		$count = (int) ( $diff / $pair[0] );
+
+		if ( $count > 0 ) {
+			$result[] = sprintf( translate_nooped_plural( $l10n[ $key ][1], $count ), $count );
+			$diff -= $count * $pair[0];
+		}
+
+		if ( $limit && count( $result ) >= $limit )
+			break;
+	}
+
+	$label  = $to > $from ? _x( '%s ago', 'time ago', 'message-board' ) : _x( '%s from now', 'time from now', 'message-board' );
+	$result = implode( _x( ', ', 'natural time separator', 'message-board' ), $result );
+	$result = sprintf( $label, $result );
+
+	return apply_filters( 'mb_natural_time', $result, $from, $to, $limit, $diff ); 
+} 
+
+/**
  * Post kses filter for topics/replies.
  *
  * @since  1.0.0

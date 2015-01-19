@@ -43,7 +43,7 @@
 
 					<td class="mb-col-latest">
 						<?php mb_topic_last_poster(); ?><br />
-						<a href="<?php mb_topic_last_post_url(); ?>"><?php mb_topic_last_active_time(); ?> ago</a> 
+						<a href="<?php mb_topic_last_post_url(); ?>"><?php mb_topic_last_active_time(); ?></a> 
 					</td><!-- .mb-col-latest -->
 				</tr>
 

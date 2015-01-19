@@ -117,6 +117,9 @@ function mb_reply_post_type_link( $link, $post ) {
 	if ( mb_get_reply_post_type() !== $post->post_type )
 		return $link;
 
+	if ( !current_user_can( 'read_reply', $post->ID ) )
+		return '';
+
 	$url = mb_generate_reply_url( $post->ID );
 
 	return !empty( $url ) ? $url : $link;
