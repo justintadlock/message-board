@@ -71,6 +71,55 @@ function mb_the_reply() {
 	return message_board()->reply_query->the_post();
 }
 
+/* ====== Reply ID ====== */
+
+/**
+ * Displays the reply ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
+function mb_reply_id( $reply_id = 0 ) {
+	echo mb_get_reply_id( $reply_id );
+}
+
+/**
+ * Returns the reply ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return int
+ */
+function mb_get_reply_id( $reply_id = 0 ) {
+	$mb = message_board();
+
+	if ( is_numeric( $reply_id ) && 0 < $reply_id )
+		$_reply_id = $reply_id;
+
+	elseif ( $mb->reply_query->in_the_loop && isset( $mb->reply_query->post->ID ) )
+		$_reply_id = $mb->reply_query->post->ID;
+
+	elseif ( $mb->search_query->in_the_loop && isset( $mb->search_query->post->ID ) && mb_is_reply( $mb->search_query->post->ID ) )
+		$_reply_id = $mb->search_query->post->ID;
+
+	elseif ( mb_is_reply( get_the_ID() ) )
+		$_reply_id = get_the_ID();
+
+	elseif ( mb_is_single_reply() )
+		$_reply_id = get_queried_object_id();
+
+	elseif ( get_query_var( 'reply_id' ) )
+		$_reply_id = get_query_var( 'reply_id' );
+
+	else
+		$_reply_id = 0;
+
+	return apply_filters( 'mb_get_reply_id', absint( $_reply_id ), $reply_id );
+}
+
 /* ====== Conditionals ====== */
 
 /**
@@ -428,52 +477,6 @@ function mb_get_reply_label( $label ) {
 	$labels = get_post_type_object( mb_get_reply_post_type() )->labels;
 
 	return $labels->$label;
-}
-
-/* ====== Reply ID ====== */
-
-/**
- * Displays the reply ID.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $reply_id
- * @return void
- */
-function mb_reply_id( $reply_id = 0 ) {
-	echo mb_get_reply_id( $reply_id );
-}
-
-/**
- * Returns the reply ID.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $reply_id
- * @return int
- */
-function mb_get_reply_id( $reply_id = 0 ) {
-	$mb = message_board();
-
-	if ( is_numeric( $reply_id ) && 0 < $reply_id )
-		$_reply_id = $reply_id;
-
-	elseif ( $mb->reply_query->in_the_loop && mb_is_reply( get_the_ID() ) )
-		$_reply_id = get_the_ID();
-
-	elseif ( $mb->search_query->in_the_loop && mb_is_reply( get_the_ID() ) )
-		$_reply_id = get_the_ID();
-
-	elseif ( mb_is_single_reply() )
-		$_reply_id = get_queried_object_id();
-
-	elseif ( get_query_var( 'reply_id' ) )
-		$_reply_id = get_query_var( 'reply_id' );
-
-	else
-		$_reply_id = 0;
-
-	return apply_filters( 'mb_get_reply_id', absint( $_reply_id ), $reply_id );
 }
 
 /* ====== Reply Content ====== */

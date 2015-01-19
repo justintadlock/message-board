@@ -74,6 +74,55 @@ function mb_the_topic() {
 	return message_board()->topic_query->the_post();
 }
 
+/* ====== Topic ID ====== */
+
+/**
+ * Displays the topic ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
+function mb_topic_id( $topic_id = 0 ) {
+	echo mb_get_topic_id( $topic_id );
+}
+
+/**
+ * Returns the topic ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return int
+ */
+function mb_get_topic_id( $topic_id = 0 ) {
+	$mb = message_board();
+
+	if ( is_numeric( $topic_id ) && 0 < $topic_id )
+		$_topic_id = $topic_id;
+
+	elseif ( $mb->topic_query->in_the_loop && isset( $mb->topic_query->post->ID ) )
+		$_topic_id = $mb->topic_query->post->ID;
+
+	elseif ( $mb->search_query->in_the_loop && isset( $mb->search_query->post->ID ) && mb_is_topic( $mb->search_query->post->ID ) )
+		$_topic_id = $mb->search_query->post->ID;
+
+	elseif ( mb_is_topic( get_the_ID() ) )
+		$_topic_id = get_the_ID();
+
+	elseif ( mb_is_single_topic() )
+		$_topic_id = get_queried_object_id();
+
+	elseif ( get_query_var( 'topic_id' ) )
+		$_topic_id = get_query_var( 'topic_id' );
+
+	else
+		$_topic_id = 0;
+
+	return apply_filters( 'mb_get_topic_id', absint( $_topic_id ), $topic_id );
+}
+
 /* ====== Conditionals ====== */
 
 /**
@@ -468,52 +517,6 @@ function mb_get_topic_states( $topic_id = 0 ) {
 	}
 
 	return '';
-}
-
-/* ====== Topic ID ====== */
-
-/**
- * Displays the topic ID.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $topic_id
- * @return void
- */
-function mb_topic_id( $topic_id = 0 ) {
-	echo mb_get_topic_id( $topic_id );
-}
-
-/**
- * Returns the topic ID.
- *
- * @since  1.0.0
- * @access public
- * @param  int     $topic_id
- * @return int
- */
-function mb_get_topic_id( $topic_id = 0 ) {
-	$mb = message_board();
-
-	if ( is_numeric( $topic_id ) && 0 < $topic_id )
-		$_topic_id = $topic_id;
-
-	elseif ( $mb->topic_query->in_the_loop && mb_is_topic( get_the_ID() ) )
-		$_topic_id = get_the_ID();
-
-	elseif ( $mb->search_query->in_the_loop && mb_is_topic( get_the_ID() ) )
-		$_topic_id = get_the_ID();
-
-	elseif ( mb_is_single_topic() )
-		$_topic_id = get_queried_object_id();
-
-	elseif ( get_query_var( 'topic_id' ) )
-		$_topic_id = get_query_var( 'topic_id' );
-
-	else
-		$_topic_id = 0;
-
-	return apply_filters( 'mb_get_topic_id', absint( $_topic_id ), $topic_id );
 }
 
 /* ====== Topic Content ====== */
