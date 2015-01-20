@@ -107,6 +107,12 @@ final class Message_Board_Admin_Edit_Forums {
 			);
 		}
 
+		/* Load topics of a specific forum. */
+		elseif ( isset( $_GET['post_parent'] ) ) {
+
+			$new_vars['post_parent'] = mb_get_forum_id( $_GET['post_parent'] );
+		}
+
 		/* Load forums with a specific type. */
 		elseif ( isset( $_GET['forum_type'] ) ) {
 
@@ -123,6 +129,13 @@ final class Message_Board_Admin_Edit_Forums {
 
 			$new_vars['orderby']  = 'meta_value';
 			$new_vars['meta_key'] = mb_get_forum_type_meta_key();
+		}
+
+		/* Order forums by their subforum count. */
+		elseif ( isset( $vars['orderby'] ) && 'subforum_count' === $vars['orderby'] ) {
+
+			$new_vars['orderby']  = 'meta_value_num';
+			$new_vars['meta_key'] = mb_get_forum_subforum_count_meta_key();
 		}
 
 		/* Order forums by their topic count. */
@@ -193,13 +206,14 @@ final class Message_Board_Admin_Edit_Forums {
 
 		/* Type column. */
 		if ( !isset( $_GET['forum_type'] ) )
-			$columns['type']      = __( 'Type', 'message-board' );
+			$columns['type'] = __( 'Type', 'message-board' );
 
 		/* Topics, replies, and datetime columns. */
-		$columns['topics']    = __( 'Topics',  'message-board' );
-		$columns['replies']   = __( 'Replies', 'message-board' );
-		$columns['author']    = __( 'Author',  'message-board' );
-		$columns['datetime']  = __( 'Created', 'message-board' );
+		$columns['subforums'] = __( 'Sub-forums', 'message-board' );
+		$columns['topics']    = __( 'Topics',     'message-board' );
+		$columns['replies']   = __( 'Replies',    'message-board' );
+		$columns['author']    = __( 'Author',     'message-board' );
+		$columns['datetime']  = __( 'Created',    'message-board' );
 
 		/* Return the columns. */
 		return $columns;
@@ -215,10 +229,11 @@ final class Message_Board_Admin_Edit_Forums {
 	 */
 	public function manage_sortable_columns( $columns ) {
 
-		$columns['type']    = array( 'forum_type',  true );
-		$columns['topics']  = array( 'topic_count', true );
-		$columns['replies'] = array( 'reply_count', true );
-		$columns['author']  = array( 'post_author', true );
+		$columns['type']      = array( 'forum_type',     true );
+		$columns['subforums'] = array( 'subforum_count', true );
+		$columns['topics']    = array( 'topic_count',    true );
+		$columns['replies']   = array( 'reply_count',    true );
+		$columns['author']    = array( 'post_author',    true );
 
 		return $columns;
 	}
@@ -260,6 +275,19 @@ final class Message_Board_Admin_Edit_Forums {
 				$url = add_query_arg( array( 'post_type' => $post_type, 'forum_type' => $forum_type->name ), admin_url( 'edit.php' ) );
 
 				printf( '<a href="%s">%s</a>', $url, $forum_type->label );
+
+				break;
+
+			/* Topic count column. */
+			case 'subforums' :
+
+				$subforum_count = mb_get_forum_subforum_count( $post_id );
+				$subforum_count = !empty( $subforum_count ) ? absint( $subforum_count ) : number_format_i18n( 0 );
+
+				if ( 0 < $subforum_count )
+					printf( '<a href="%s">%s</a>', add_query_arg( array( 'post_type' => mb_get_forum_post_type(), 'post_parent' => $post_id ), admin_url( 'edit.php' ) ), $subforum_count );
+				else
+					echo $subforum_count;
 
 				break;
 

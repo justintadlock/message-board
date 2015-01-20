@@ -27,13 +27,20 @@
 .mb-reply a.add-new-h2 { display: none; }
 
 .edit-php .wp-list-table .column-forum,
-.edit-php .wp-list-table .column-topic,
-.edit-php .wp-list-table .column-datetime { 
+.edit-php .wp-list-table .column-topic {
 	width: 15%;
+}
+
+.edit-php .wp-list-table .column-datetime { 
+	width: 14%;
 }
 
 .edit-php .wp-list-table .column-type,
 .edit-php .wp-list-table .column-forums {
+	width: 10%;
+}
+
+.edit-php .wp-list-table .column-subforums {
 	width: 10%;
 }
 
