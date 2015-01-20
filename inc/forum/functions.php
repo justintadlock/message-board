@@ -207,14 +207,17 @@ function mb_reset_forum_subforum_count( $forum_id ) {
 	$publish_status = mb_get_publish_post_status();
 	$hidden_status  = mb_get_hidden_post_status();
 	$private_status = mb_get_private_post_status();
+	$archive_status = mb_get_archive_post_status();
 
 	$where = $wpdb->prepare( "WHERE post_parent = %d AND post_type = %s", $forum_id, mb_get_forum_post_type() );
 
-	$status_where = "AND (post_status = '{$open_status}' OR post_status = '{$close_status}' OR post_status = '{$publish_status}' OR post_status = '{$private_status}' OR post_status = '{$hidden_status}')";
+	$status_where = "AND (post_status = '{$open_status}' OR post_status = '{$close_status}' OR post_status = '{$publish_status}' OR post_status = '{$private_status}' OR post_status = '{$hidden_status}' OR post_status = '{$archive_status}')";
 
 	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where $status_where" );
 
-	return mb_set_forum_subforum_count( $forum_id, $count );
+	mb_set_forum_subforum_count( $forum_id, $count );
+
+	return $count;
 }
 
 function mb_set_forum_subforum_count( $forum_id, $count ) {

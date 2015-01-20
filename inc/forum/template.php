@@ -1262,6 +1262,9 @@ function mb_get_forum_subforum_count( $forum_id = 0 ) {
 
 	$count = $forum_id ? get_post_meta( $forum_id, mb_get_forum_subforum_count_meta_key(), true ) : 0;
 
+	if ( '' === $count )
+		$count = mb_reset_forum_subforum_count( $forum_id );
+
 	return apply_filters( 'mb_get_forum_subforum_count', absint( $count ), $forum_id );
 }
 
