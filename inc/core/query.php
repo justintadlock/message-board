@@ -286,8 +286,8 @@ function mb_pre_get_posts( $query ) {
 			$query->set( 'mb_role', "mb_{$role}" );
 	}
 
-	/* Check if viewing a single topic or reply. */
-	elseif ( $query->is_single && in_array( $query->query_vars['post_type'], array( mb_get_topic_post_type(), mb_get_reply_post_type() ) ) ) {
+	/* Check if viewing a single forum, topic, or reply. */
+	elseif ( $query->is_single && in_array( $query->query_vars['post_type'], array( mb_get_forum_post_type(), mb_get_topic_post_type(), mb_get_reply_post_type() ) ) ) {
 
 		add_filter( 'the_posts', 'mb_posts_can_read_parent' );
 	}
@@ -312,7 +312,8 @@ function mb_auth_posts_where( $where, $query ) {
 }
 
 /**
- * Make sure the current user can read the parent post.  Otherwise, return an empty array.
+ * Filter on `the_posts` on single post views to make sure the current user can read the parent 
+ * post.  Otherwise, return an empty array.  This will cause the page to properly 404.
  *
  * @since  1.0.0
  * @access public

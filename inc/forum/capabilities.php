@@ -80,17 +80,30 @@ function mb_forum_map_meta_cap( $caps, $cap, $user_id, $args ) {
 		$post       = get_post( $args[0] );
 
 		if ( $user_id != $post->post_author ) {
-			$post_type   = get_post_type_object( $post->post_type );
-			$post_status = mb_get_forum_status( $post->ID );
-			$status_obj  = get_post_status_object( $post_status );
 
-			if ( mb_get_hidden_post_status() === $status_obj->name )
-				$caps[] = $post_type->cap->read_hidden_forums;
-			elseif ( mb_get_private_post_status() === $status_obj->name )
-				$caps[] = $post_type->cap->read_private_posts;
-			else
-				$caps = array();
-				//$caps[] = $post_type->cap->read;
+			$parent_id = $post->post_parent;
+
+			/* If we have a parent forum and the user can't read it, don't allow reading this forum. */
+			if ( 0 < $parent_id && !mb_user_can( $user_id, 'read_forum', $parent_id ) ) {
+
+				$caps = array( 'do_not_allow' );
+
+			/* If the user can read the parent forum, check if they can read this one. */
+			} else {
+				$post_type   = get_post_type_object( $post->post_type );
+				$post_status = mb_get_forum_status( $post->ID );
+				$status_obj  = get_post_status_object( $post_status );
+
+				if ( mb_get_hidden_post_status() === $status_obj->name )
+					$caps[] = $post_type->cap->read_hidden_forums;
+
+				elseif ( mb_get_private_post_status() === $status_obj->name )
+					$caps[] = $post_type->cap->read_private_posts;
+
+				else
+					$caps = array();
+					//$caps[] = $post_type->cap->read;
+			}
 		} else {
 			$caps = array();
 		}
