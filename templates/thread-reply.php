@@ -2,7 +2,7 @@
 
 	<article>
 		<header class="mb-reply-header">
-			<time class="mb-repy-date"><?php printf( __( '%s ago', 'message-board' ), human_time_diff( get_post_time( 'U' ), current_time( 'timestamp' ) ) ); ?></time> 
+			<time class="mb-reply-natural-time"><?php mb_reply_natural_time(); ?></time>
 			<?php mb_reply_edit_link(); ?>
 			<?php mb_reply_toggle_spam_link(); ?>
 			<a class="mb-reply-permalink" href="<?php mb_post_jump_url(); ?>" rel="bookmark" itemprop="url">#<?php mb_thread_position(); ?></a>

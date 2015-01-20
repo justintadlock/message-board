@@ -855,6 +855,33 @@ function mb_get_forum_time( $forum_id = 0, $format = '' ) {
 	return apply_filters( 'mb_get_forum_time', $forum_time, $forum_id );
 }
 
+/**
+ * Outputs the forum natural time (e.g., 1 month ago, 5 minutes ago, etc.)
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return void
+ */
+function mb_forum_natural_time( $forum_id = 0 ) {
+	echo mb_get_forum_natural_time( $forum_id );
+}
+
+/**
+ * Outputs the forum natural time (e.g., 1 month ago, 5 minutes ago, etc.)
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @return string
+ */
+function mb_get_forum_natural_time( $forum_id = 0 ) {
+	$forum_id   = mb_get_forum_id( $forum_id );
+	$forum_time = $forum_id ? mb_natural_time( get_post_time( 'U', false, $forum_id, true ) ) : '';
+
+	return apply_filters( 'mb_get_forum_natural_time', $forum_time, $forum_id );
+}
+
 /* ====== Forum Author ====== */
 
 /**

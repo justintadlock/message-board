@@ -764,6 +764,33 @@ function mb_get_topic_time( $topic_id = 0, $format = '' ) {
 	return get_post_time( $format, false, $topic_id, true );
 }
 
+/**
+ * Outputs the topic natural time (e.g., 1 month ago, 5 minutes ago, etc.)
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return void
+ */
+function mb_topic_natural_time( $topic_id = 0 ) {
+	echo mb_get_topic_natural_time( $topic_id );
+}
+
+/**
+ * Outputs the topic natural time (e.g., 1 month ago, 5 minutes ago, etc.)
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $topic_id
+ * @return string
+ */
+function mb_get_topic_natural_time( $topic_id = 0 ) {
+	$topic_id   = mb_get_topic_id( $topic_id );
+	$topic_time = $topic_id ? mb_natural_time( get_post_time( 'U', false, $topic_id, true ) ) : '';
+
+	return apply_filters( 'mb_get_topic_natural_time', $topic_time, $topic_id );
+}
+
 /* ====== Topic Author ====== */
 
 /**

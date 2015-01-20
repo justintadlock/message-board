@@ -599,6 +599,33 @@ function mb_get_reply_time( $reply_id = 0, $format = '' ) {
 	return get_post_time( $format, false, $reply_id, true );
 }
 
+/**
+ * Outputs the reply natural time (e.g., 1 month ago, 5 minutes ago, etc.)
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return void
+ */
+function mb_reply_natural_time( $reply_id = 0 ) {
+	echo mb_get_reply_natural_time( $reply_id );
+}
+
+/**
+ * Outputs the reply natural time (e.g., 1 month ago, 5 minutes ago, etc.)
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return string
+ */
+function mb_get_reply_natural_time( $reply_id = 0 ) {
+	$reply_id   = mb_get_reply_id( $reply_id );
+	$reply_time = $reply_id ? mb_natural_time( get_post_time( 'U', false, $reply_id, true ) ) : '';
+
+	return apply_filters( 'mb_get_reply_natural_time', $reply_time, $reply_id );
+}
+
 /* ====== Reply Author ====== */
 
 /**
