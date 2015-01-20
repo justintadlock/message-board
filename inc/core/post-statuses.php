@@ -167,6 +167,40 @@ function mb_get_reply_post_statuses() {
 }
 
 /**
+ * Returns an array of the statuses that are considered "published".  These are statuses that should
+ * always be shown on the front end regardless if they're private or protected.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return array
+ */
+function mb_get_published_post_statuses() {
+
+	$statuses = array(
+		mb_get_publish_post_status(),
+		mb_get_open_post_status(),
+		mb_get_close_post_status(),
+		mb_get_private_post_status(),
+		mb_get_hidden_post_status(),
+		mb_get_archive_post_status()
+	);
+
+	return apply_filters( 'mb_get_published_post_statuses', $statuses );
+}
+
+/**
+ * Checks if post status is considered "published".
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $status
+ * @return bool
+ */
+function mb_is_status_published( $status ) {
+	return apply_filters( 'mb_is_status_published', in_array( $status, mb_get_published_post_statuses() ) ? true : false, $status );
+}
+
+/**
  * Registers post statuses used by the plugin that WordPress doesn't offer out of the box.
  *
  * @since  1.0.0
