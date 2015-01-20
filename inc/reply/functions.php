@@ -253,7 +253,7 @@ function mb_set_reply_statuses( $topic_id, $status ) {
 		$wpdb->prepare( 
 			"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s AND post_parent = %d ORDER BY post_date ASC", 
 			mb_get_reply_post_type(), 
-			mb_get_open_post_status(),
+			$status,
 			absint( $topic_id ) 
 		) 
 	);
