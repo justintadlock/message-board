@@ -119,10 +119,7 @@ function mb_reply_map_meta_cap( $caps, $cap, $user_id, $args ) {
 			if ( !current_user_can( 'read_topic', $topic_id ) )
 				$caps[] = 'do_not_allow';
 
-			elseif ( in_array( $topic_status, array( mb_get_close_post_status(), mb_get_trash_post_status() ) ) )
-				$caps[] = 'do_not_allow';
-
-			elseif ( !mb_topic_type_allows_replies( $topic_type ) )
+			elseif ( !mb_topic_allows_replies( $topic_id ) )
 				$caps[] = 'do_not_allow';
 
 		} elseif ( mb_is_reply_edit() && !user_can( $user_id, 'edit_post', mb_get_reply_id() ) ) {

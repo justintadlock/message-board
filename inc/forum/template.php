@@ -240,6 +240,62 @@ function mb_show_hierarchical_forums() {
 	return apply_filters( 'mb_show_hierarchical_forums', $show );
 }
 
+/**
+ * Conditional check to see if a forum allows new subforums to be created.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $forum_id
+ * @return bool
+ */
+function mb_forum_allows_subforums( $forum_id = 0 ) {
+	$forum_id  = mb_get_forum_id( $forum_id );
+	$parent_id = mb_get_forum_parent_id( $forum_id );
+	$allow     = true;
+
+	/* Check if the forum type allows subforums. */
+	if ( !mb_forum_type_allows_subforums( mb_get_forum_type( $forum_id ) ) )
+		$allow = false;
+
+	/* Check if the forum status allows subforums. */
+	elseif ( !mb_forum_status_allows_subforums( mb_get_forum_status( $forum_id ) ) )
+		$allow = false;
+
+	/* If there's a parent forum, check if it allows subforums. */
+	elseif ( 0 < $parent_id && !mb_forum_status_allows_subforums( mb_get_forum_status( $parent_id ) ) )
+		$allow = false;
+
+	return apply_filters( 'mb_forum_allows_subforums', $allow, $forum_id );
+}
+
+/**
+ * Conditional check to see if a forum allows new topics to be created.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $forum_id
+ * @return bool
+ */
+function mb_forum_allows_topics( $forum_id = 0 ) {
+	$forum_id   = mb_get_forum_id( $forum_id );
+	$parent_id  = mb_get_forum_parent_id( $forum_id );
+	$allow      = true;
+
+	/* Check if the forum type allows topics. */
+	if ( !mb_forum_type_allows_topics( mb_get_forum_type( $forum_id ) ) )
+		$allow = false;
+
+	/* Check if the forum status allows topics. */
+	elseif ( !mb_forum_status_allows_topics( mb_get_forum_status( $forum_id ) ) )
+		$allow = false;
+
+	/* If there's a parent forum, check if it allows topics. */
+	elseif ( 0 < $parent_id && !mb_forum_status_allows_topics( mb_get_forum_status( $parent_id ) ) )
+		$allow = false;
+
+	return apply_filters( 'mb_forum_allows_subforums', $allow, $forum_id );
+}
+
 /* ====== Forum Status ====== */
 
 /**
@@ -366,6 +422,38 @@ function mb_is_forum_trash( $forum_id = 0 ) {
 	$status   = mb_get_forum_status( $forum_id );
 
 	return apply_filters( 'mb_is_forum_trash', mb_get_trash_post_status() === $status ? true : false, $forum_id );
+}
+
+/**
+ * Conditional check to see if a forum status allows new subforums to be created.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $status
+ * @return bool
+ */
+function mb_forum_status_allows_subforums( $status ) {
+
+	$statuses = array( mb_get_open_post_status(), mb_get_private_post_status(), mb_get_hidden_post_status() );
+	$allowed  = in_array( $status, $statuses ) ? true : false;
+
+	return apply_filters( 'mb_forum_status_allows_subforums', $allowed, $status );
+}
+
+/**
+ * Conditional check to see if a forum status allows new topics to be created.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $status
+ * @return bool
+ */
+function mb_forum_status_allows_topics( $status ) {
+
+	$statuses = array( mb_get_open_post_status(), mb_get_private_post_status(), mb_get_hidden_post_status() );
+	$allowed  = in_array( $status, $statuses ) ? true : false;
+
+	return apply_filters( 'mb_forum_status_allows_topics', $allowed, $status );
 }
 
 function mb_forum_toggle_open_url( $forum_id = 0 ) {
@@ -1300,8 +1388,12 @@ class MB_Walker_Forum_Dropdown extends Walker_PageDropdown {
 
 		$post_status = mb_get_forum_status( $page->ID );
 
-		if ( mb_get_forum_post_type() !== $args['child_type'] && ( !in_array( $post_status, array( mb_get_open_post_status(), mb_get_publish_post_status() ) ) || false === $forum_type->topics_allowed ) )
+		if ( mb_get_forum_post_type() === $args['child_type'] && !mb_forum_allows_subforums( $page->ID ) )
 			$output .= ' disabled="disabled"';
+
+		elseif ( mb_get_topic_post_type() === $args['child_type'] && !mb_forum_allows_topics( $page->ID ) )
+			$output .= ' disabled="disabled"';
+
 		$output .= '>';
 
 		$title = $page->post_title;

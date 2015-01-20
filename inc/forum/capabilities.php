@@ -177,16 +177,11 @@ function mb_forum_map_meta_cap( $caps, $cap, $user_id, $args ) {
 		if ( mb_is_single_forum() ) {
 
 			$forum_id     = mb_get_forum_id();
-			$forum_status = get_post_status( $forum_id );
-			$forum_type   = mb_get_forum_type( $forum_id );
 
 			if ( !current_user_can( 'read_forum', $forum_id ) )
 				$caps[] = 'do_not_allow';
 
-			elseif ( in_array( $forum_status, array( mb_get_close_post_status(), mb_get_trash_post_status(), mb_get_archive_post_status() ) ) )
-				$caps[] = 'do_not_allow';
-
-			elseif ( !mb_forum_type_allows_subforums( $forum_type ) )
+			elseif ( !mb_forum_allows_subforums( $forum_id ) )
 				$caps[] = 'do_not_allow';
 
 		} elseif ( mb_is_forum_edit() && !user_can( $user_id, 'edit_post', mb_get_forum_id() ) ) {

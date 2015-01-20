@@ -152,6 +152,34 @@ function mb_is_topic_archive() {
 	return get_query_var( 'mb_custom' ) ? false : is_post_type_archive( mb_get_topic_post_type() );
 }
 
+/**
+ * Conditional check to see if a topic allows new replies to be created.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $topic
+ * @return bool
+ */
+function mb_topic_allows_replies( $topic_id = 0 ) {
+	$topic_id = mb_get_forum_id( $topic_id );
+	$forum_id = mb_get_topic_forum_id( $topic_id );
+	$allow    = true;
+
+	/* Check if the topic type allows replies. */
+	if ( !mb_topic_type_allows_replies( mb_get_topic_type( $topic_id ) ) )
+		$allow = false;
+
+	/* Check if the topic status allows replies. */
+	elseif ( !mb_topic_status_allows_replies( mb_get_topic_status( $topic_id ) ) )
+		$allow = false;
+
+	/* If there's a parent forum, check if it allows topics (no topics == no replies). */
+	elseif ( 0 < $forum_id && !mb_forum_allows_topics( $forum_id ) )
+		$allow = false;
+
+	return apply_filters( 'mb_topic_allows_replies', $allow, $topic_id );
+}
+
 /* ====== Lead Topic ====== */
 
 /**
@@ -316,6 +344,22 @@ function mb_is_topic_orphan( $topic_id = 0 ) {
 	$status   = mb_get_topic_status( $topic_id );
 
 	return apply_filters( 'mb_is_topic_orphan', mb_get_orphan_post_status() === $status ? true : false, $topic_id );
+}
+
+/**
+ * Conditional check to see if a topic status allows new replies to be created.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $status
+ * @return bool
+ */
+function mb_topic_status_allows_replies( $status ) {
+
+	$statuses = array( mb_get_open_post_status(), mb_get_private_post_status(), mb_get_hidden_post_status() );
+	$allowed  = in_array( $status, $statuses ) ? true : false;
+
+	return apply_filters( 'mb_topic_status_allows_replies', $allowed, $status );
 }
 
 function mb_topic_toggle_open_url( $topic_id = 0 ) {
