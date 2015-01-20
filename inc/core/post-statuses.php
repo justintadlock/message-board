@@ -780,6 +780,42 @@ function mb_after_delete_forum( $post_id ) {
 
 		$parent_forum_id = $mb->deleted_post->post_parent;
 
+		/* Get the current forum's subforum IDs. */
+		$subforum_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_parent = %s ORDER BY menu_order DESC", mb_get_forum_post_type(), absint( $forum_id ) ) );
+
+		if ( !empty( $subforum_ids ) ) {
+
+			$moved_forums = false;
+
+			while ( 0 < $parent_forum_id ) {
+
+				if ( mb_forum_allows_subforums( $parent_forum_id ) ) {
+
+					/* Change all of the subforums' parents to the new forum ID. */
+					$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET post_parent = %d WHERE ID IN (" . implode( ',', $subforum_ids ) . ")", absint( $parent_forum_id ) ) );
+
+					/* Reset data based on new forum. */
+					mb_reset_forum_data( $parent_forum_id );
+
+					$parent_forum_id = 0;
+					$moved_forums    = true;
+
+					/* Break out of the while loop at this point. */
+					break;
+				}
+
+				$post = get_post( $parent_forum_id );
+				$parent_forum_id = $post->post_parent;
+			}
+
+			/* If subforums didn't get moved to a new forum, make them a top-level forum. */
+			if ( false === $moved_forums ) {
+				$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET post_parent = %d WHERE ID IN (" . implode( ',', $subforum_ids ) . ")", 0 ) );
+			}
+		}
+
+		$parent_forum_id = $mb->deleted_post->post_parent;
+
 		/* Get the current forum's topic IDs. */
 		$topic_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_parent = %s ORDER BY menu_order DESC", mb_get_topic_post_type(), absint( $forum_id ) ) );
 
