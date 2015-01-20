@@ -789,9 +789,7 @@ function mb_after_delete_forum( $post_id ) {
 
 			while ( 0 < $parent_forum_id ) {
 
-				$forum_type = mb_get_forum_type( $parent_forum_id );
-
-				if ( mb_forum_type_allows_topics( $forum_type ) ) {
+				if ( mb_forum_allows_topics( $parent_forum_id ) ) {
 
 					/* Change all of the topics' parents to the new forum ID. */
 					$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET post_parent = %d WHERE ID IN (" . implode( ',', $topic_ids ) . ")", absint( $parent_forum_id ) ) );
@@ -804,10 +802,10 @@ function mb_after_delete_forum( $post_id ) {
 
 					/* Break out of the while loop at this point. */
 					break;
-				} else {
-					$post = get_post( $parent_forum_id );
-					$parent_forum_id = $post->post_parent;
 				}
+
+				$post = get_post( $parent_forum_id );
+				$parent_forum_id = $post->post_parent;
 			}
 
 			/* If topics didn't get moved to a new forum, set their status to "orphan". */
