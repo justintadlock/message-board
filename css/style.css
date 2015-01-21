@@ -155,6 +155,18 @@
 		.ltr .mb-thread .mb-topic-permalink,
 		.ltr .mb-thread .mb-reply-permalink { float: right; text-align: right; }
 
+		.ltr .mb-topic-header .mb-topic-natural-time,
+		.ltr .mb-topic-header .topic-edit-link,
+		.ltr .mb-topic-header .toggle-spam-link,
+		.ltr .mb-topic-header .toggle-trash-link,
+		.ltr .mb-topic-header .mb-topic-open-link,
+		.ltr .mb-topic-header .mb-topic-close-link,
+		.ltr .mb-reply-header .mb-reply-natural-time,
+		.ltr .mb-reply-header .mb-reply-edit-link,
+		.ltr .mb-reply-header .toggle-spam-link {
+			margin-right: 8px;
+		}
+
 	.mb-thread .mb-author-box { width: 25%; }
 
 		.ltr .mb-thread .mb-author-box { float: left; margin-right: 5%; }
