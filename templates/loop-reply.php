@@ -26,6 +26,7 @@
 
 				<tr>
 					<td class="mb-col-title">
+						<?php if ( !mb_is_user_page() ) echo get_avatar( mb_get_reply_author_id() ); ?>
 						<?php mb_reply_link(); ?>
 						<div class="mb-reply-summary">
 							<?php the_excerpt(); ?>

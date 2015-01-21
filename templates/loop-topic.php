@@ -4,7 +4,7 @@
 
 		<thead>
 			<tr>
-				<th class="mb-col-title"><?php _e( 'Topic', 'message-board' ); ?> <?php mb_topic_form_link(); ?></th>
+				<th class="mb-col-title"><?php _e( 'Topic', 'message-board' ); ?></th>
 				<th class="mb-col-count"><?php _e( 'Replies / Voices', 'message-board' ); ?></th>
 				<th class="mb-col-latest"><?php _e( 'Last Post', 'message-board' ); ?></th>
 			</tr>
@@ -27,6 +27,7 @@
 				<tr <?php post_class(); ?>>
 
 					<td class="mb-col-title">
+						<?php if ( !mb_is_user_page() ) echo get_avatar( mb_get_topic_author_id() ); ?>
 						<?php mb_topic_link(); ?>
 						<div class="mb-topic-meta">
 							<?php mb_topic_states(); ?>
