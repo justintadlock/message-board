@@ -50,7 +50,7 @@
 		</p><!-- .mb-form-content -->
 
 		<p class="mb-form-submit">
-			<input type="submit" value="<?php esc_attr_e( 'Submit', 'message-board' ); ?>" />
+			<input type="submit" value="<?php esc_attr_e( 'Create Topic', 'message-board' ); ?>" />
 		</p><!-- .mb-form-submit -->
 
 		<p class="mb-form-subscribe">

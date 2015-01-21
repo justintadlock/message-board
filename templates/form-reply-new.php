@@ -13,7 +13,7 @@
 		</p>
 
 		<p>
-			<input type="submit" value="<?php esc_attr_e( 'Submit', 'message-board' ); ?>" />
+			<input type="submit" value="<?php esc_attr_e( 'Submit Reply', 'message-board' ); ?>" />
 		</p>
 
 		<?php if ( !mb_is_user_subscribed_topic( mb_get_topic_id() ) ) : ?>
