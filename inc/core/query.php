@@ -287,7 +287,7 @@ function mb_pre_get_posts( $query ) {
 	}
 
 	/* Check if viewing a single forum, topic, or reply. */
-	elseif ( $query->is_single && in_array( $query->query_vars['post_type'], array( mb_get_forum_post_type(), mb_get_topic_post_type(), mb_get_reply_post_type() ) ) ) {
+	elseif ( $query->is_single && isset( $query->query_vars['post_type'] ) && in_array( $query->query_vars['post_type'], array( mb_get_forum_post_type(), mb_get_topic_post_type(), mb_get_reply_post_type() ) ) ) {
 
 		add_filter( 'the_posts', 'mb_posts_can_read_parent' );
 	}
