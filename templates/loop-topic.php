@@ -27,14 +27,19 @@
 				<tr <?php post_class(); ?>>
 
 					<td class="mb-col-title">
+
 						<?php if ( !mb_is_user_page() ) echo get_avatar( mb_get_topic_author_id() ); ?>
+
 						<?php mb_topic_link(); ?>
+
 						<div class="mb-topic-meta">
 							<?php mb_topic_states(); ?>
-							<?php printf( __( 'Started by %s', 'message-board' ), mb_get_topic_author_profile_link() ); ?> 
-							<?php mb_topic_date(); ?> 
-							<?php mb_topic_time(); ?>
+							<?php
+							/* Translators: Topic author and date. 1 is the topic author. 2 is the topic date. */
+							printf( __( 'Started by %1$s %2$s', 'message-board' ), mb_get_topic_author_profile_link(), mb_get_topic_natural_time() ); 
+							?>
 						</div><!-- .mb-topic-meta -->
+
 					</td><!-- .mb-col-title -->
 
 					<td class="mb-col-count">
