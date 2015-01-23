@@ -24,13 +24,17 @@
  * @return bool
  */
 function mb_user_query() {
+	global $_mb_user_query_current;
+
 	$mb = message_board();
 
 	/* If a query has already been created, let's roll. */
 	if ( !is_null( $mb->user_query ) ) {
 
-		if ( $mb->user_query->current_user + 1 <= $mb->user_query->found_users )
+		if ( $_mb_user_query_current + 1 < count( $mb->user_query->results ) )
 			return true;
+
+		$_mb_user_query_current = -1;
 
 		return false;
 	}
@@ -53,8 +57,7 @@ function mb_user_query() {
 		)
 	);
 
-	$mb->user_query->found_users = count( $mb->user_query->results );
-	$mb->user_query->current_user = 0;
+	$_mb_user_query_current = -1;
 
 	return !empty( $mb->user_query->results ) ? true : false;
 }
@@ -69,11 +72,13 @@ function mb_user_query() {
  * @return void
  */
 function mb_the_user() {
+	global $_mb_user_query_current;
+
 	$mb = message_board();
 
-	$current = $mb->user_query->current_user++;
+	$current = $_mb_user_query_current++;
 
-	$mb->user_query->loop_user_id = $mb->user_query->results[ $current ]->ID;
+	//$mb->user_query->loop_user_id = $mb->user_query->results[ $current ]->ID;
 }
 
 /* ====== User ID ====== */
@@ -101,14 +106,15 @@ function mb_user_id( $user_id = 0 ) {
  * @return int
  */
 function mb_get_user_id( $user_id = 0 ) {
+	global $_mb_user_query_current;
 
 	/* If the numeric and greater than 0, we already have an ID. */
 	if ( is_numeric( $user_id ) && 0 < $user_id )
 		$user_id = $user_id;
 
 	/* If within a user loop, use the current user's ID in the loop. */
-	elseif ( !is_null( message_board()->user_query ) )
-		$user_id = message_board()->user_query->loop_user_id;
+	elseif ( !is_null( message_board()->user_query ) && isset( message_board()->user_query->results[ $_mb_user_query_current ] ) )
+		$user_id = message_board()->user_query->results[ $_mb_user_query_current ]->ID;
 
 	/* If viewing an user page, use that ID. */
 	elseif ( get_query_var( 'author' ) )
