@@ -65,6 +65,9 @@ add_filter( 'wp_title',   'mb_wp_title'   );
 /* Filter the front-end `<body>` classes. */
 add_filter( 'body_class', 'mb_body_class', 15 );
 
+/* Filter the archive title. */
+add_filter( 'get_the_archive_title', 'mb_the_archive_title_filter', 5 );
+
 /**
  * Filters `wp_title` to handle the title on the forum front page since this is a non-standard WP page.
  *
@@ -194,6 +197,37 @@ function mb_body_class( $classes ) {
 	}
 
 	return $classes;
+}
+
+/**
+ * Filter on `get_the_archive_title` to output the correct archive page title.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $title
+ * @return string
+ */
+function mb_the_archive_title_filter( $title ) {
+
+	if ( !mb_is_message_board() )
+		return $title;
+
+	if ( mb_is_forum_archive() )
+		$title = mb_get_forum_archive_title();
+
+	elseif ( mb_is_topic_archive() )
+		$title = mb_get_topic_archive_title();
+
+	elseif ( mb_is_reply_archive() )
+		$title = mb_get_reply_archive_title();
+
+	elseif ( mb_is_role_archive() )
+		$title = mb_get_role_archive_title();
+
+	elseif ( mb_is_user_archive() )
+		$title = mb_get_user_archive_title();
+
+	return $title;
 }
 
 /**

@@ -278,30 +278,28 @@ function mb_user_page_title() {
  */
 function mb_get_user_page_title() {
 
-	$name = get_the_author_meta( 'display_name', mb_get_user_id() );
-
 	if ( mb_is_user_page( 'forums' ) )
-		$title = __( '%s: Forums', 'message-board' );
+		$title = __( 'Forums', 'message-board' );
 
 	elseif ( mb_is_user_page( 'topics' ) )
-		$title = __( '%s: Topics', 'message-board' );
+		$title = __( 'Topics', 'message-board' );
 
 	elseif ( mb_is_user_page( 'replies' ) )
-		$title = __( '%s: Replies', 'message-board' );
+		$title = __( 'Replies', 'message-board' );
 
 	elseif ( mb_is_user_page( 'forum-subscriptions' ) )
-		$title = __( '%s: Forum Subscriptions', 'message-board' );
+		$title = __( 'Forum Subscriptions', 'message-board' );
 
 	elseif ( mb_is_user_page( 'topic-subscriptions' ) )
-		$title = __( '%s: Topic Subscriptions', 'message-board' );
+		$title = __( 'Topic Subscriptions', 'message-board' );
 
 	elseif ( mb_is_user_page( 'bookmarks' ) )
-		$title = __( '%s: Topic Bookmarks', 'message-board' );
+		$title = __( 'Topic Bookmarks', 'message-board' );
 
 	else
 		$title = mb_get_single_user_title();
 
-	return apply_filters( 'mb_get_user_page_title', sprintf( $title, get_the_author_meta( 'display_name', mb_get_user_id() ) ) );
+	return apply_filters( 'mb_get_user_page_title', $title );
 }
 
 /* ====== URLs / Links ====== */

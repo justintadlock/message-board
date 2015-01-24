@@ -8,6 +8,10 @@
  */
 ?>
 
+<header class="mb-page-header">
+	<h1 class="mb-page-title"><?php the_archive_title(); ?></h1>
+</header><!-- .mb-page-header -->
+
 <?php 
 	/**
 	  Loads the `loop-forum-hierarchical.php` template part if the forum archive should be hierarchical. 

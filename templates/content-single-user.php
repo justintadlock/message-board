@@ -1,6 +1,6 @@
-<div class="loop-meta">
-	<h1 class="loop-title"><?php mb_user_page_title(); ?></h1>
-</div><!-- .loop-meta -->
+<div class="mb-page-header">
+	<h1 class="mb-page-title"><?php mb_user_page_title(); ?></h1>
+</div><!-- .mb-page-header -->
 
 <ul class="mb-user-page-links">
 	<li><?php mb_user_link(); ?></li>
