@@ -267,7 +267,11 @@ final class Message_Board {
 		require_once( $this->dir_path . 'inc/role/template.php'  );
 
 		/* Load search files. */
-		require_once( $this->dir_path . '/inc/search/template.php' );
+		require_once( $this->dir_path . 'inc/search/template.php' );
+
+		/* Load extension files. */
+		if ( class_exists( 'Breadcrumb_Trail' ) )
+			require_once( $this->dir_path . 'inc/ext/breadcrumb-trail.php' );
 
 		/* Load admin files. */
 		if ( is_admin() ) {
