@@ -147,6 +147,35 @@ function mb_get_role_archive_title() {
 	return __( 'Roles', 'message-board' );
 }
 
+/* ====== Links ====== */
+
+function mb_role_archive_url() {
+	echo mb_get_role_archive_url();
+}
+
+function mb_get_role_archive_url() {
+	global $wp_rewrite;
+
+	if ( $wp_rewrite->using_permalinks() )
+		$url = user_trailingslashit( trailingslashit( mb_get_user_archive_url() ) . 'roles' );
+	else
+		$url = add_query_arg( 'mb_custom', 'roles', home_url() );
+
+	return apply_filters( 'mb_get_role_archive_url', $url );
+}
+
+function mb_role_archive_link() {
+	echo mb_get_role_archive_link();
+}
+
+function mb_get_role_archive_link() {
+	$title = mb_get_role_archive_title();
+	$url   = mb_get_role_archive_url();
+	$link  = sprintf( '<a class="mb-role-archive-link" href="%s">%s</a>', $url, $title );
+
+	return apply_filters( 'mb_get_role_archive_link', $link );
+}
+
 /* ====== Content ====== */
 
 function mb_role_description( $role = '' ) {
@@ -177,6 +206,8 @@ function mb_get_role_user_count( $role = '' ) {
 
 	return apply_filters( 'mb_get_role_user_count', $count, $role );
 }
+
+/* ====== Pagination ====== */
 
 /**
  * Pagination for the role loop.

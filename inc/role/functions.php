@@ -759,7 +759,7 @@ function mb_get_role_url( $role = '' ) {
 	if ( isset( $dynamic_roles[ $role ] ) ) {
 
 		if ( $wp_rewrite->using_permalinks() )
-			$url = user_trailingslashit( trailingslashit( mb_get_user_archive_url() ) . 'roles/' . str_replace( 'mb_', '', $role ) );
+			$url = user_trailingslashit( trailingslashit( mb_get_role_archive_url() ) . str_replace( 'mb_', '', $role ) );
 		else
 			$url = add_query_arg( 'mb_role', $role, mb_get_user_archive_url() );
 	}
