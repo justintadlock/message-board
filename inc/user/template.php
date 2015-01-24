@@ -174,16 +174,54 @@ function mb_is_user_page( $page = '' ) {
 	if ( !mb_is_single_user() )
 		return false;
 
-	elseif ( empty( $page ) )
+	elseif ( empty( $page ) && get_query_var( 'mb_user_page' ) )
 		return true;
 
-	foreach ( (array) $page as $_p ) {
+	if ( !empty( $page ) ) {
+		foreach ( (array) $page as $_p ) {
 
-		if ( get_query_var( 'mb_user_page' ) === $_p )
-			return true;
+			if ( get_query_var( 'mb_user_page' ) === $_p )
+				return true;
+		}
 	}
 
 	return false;
+}
+
+function mb_is_user_forums() {
+	$is_forums = mb_is_single_user() && 'forums' === get_query_var( 'mb_user_page' ) ? true : false;
+
+	return apply_filters( 'mb_is_user_forums', $is_forums );
+}
+
+function mb_is_user_topics() {
+	$is_topics = mb_is_single_user() && 'topics' === get_query_var( 'mb_user_page' ) ? true : false;
+
+	return apply_filters( 'mb_is_user_topics', $is_topics );
+}
+
+function mb_is_user_replies() {
+	$is_replies = mb_is_single_user() && 'replies' === get_query_var( 'mb_user_page' ) ? true : false;
+
+	return apply_filters( 'mb_is_user_replies', $is_replies );
+}
+
+function mb_is_user_bookmarks() {
+	$is_bookmarks = mb_is_single_user() && 'bookmarks' === get_query_var( 'mb_user_page' ) ? true : false;
+
+	return apply_filters( 'mb_is_user_bookmarks', $is_bookmarks );
+}
+
+function mb_is_user_forum_subscriptions() {
+	$is_forum_subscriptions = mb_is_single_user() && 'forum-subscriptions' === get_query_var( 'mb_user_page' ) ? true : false;
+
+	return apply_filters( 'mb_is_user_forum_subscriptions', $is_forum_subscriptions );
+}
+
+function mb_is_user_topic_subscriptions() {
+	$is_topic_subscriptions = mb_is_single_user() && 'topic-subscriptions' === get_query_var( 'mb_user_page' ) ? true : false;
+
+	return apply_filters( 'mb_is_user_topic_subscriptions', $is_topic_subscriptions );
 }
 
 /**
@@ -278,28 +316,76 @@ function mb_user_page_title() {
  */
 function mb_get_user_page_title() {
 
-	if ( mb_is_user_page( 'forums' ) )
-		$title = __( 'Forums', 'message-board' );
+	if ( mb_is_user_forums() )
+		$title = mb_get_user_forums_title();
 
-	elseif ( mb_is_user_page( 'topics' ) )
-		$title = __( 'Topics', 'message-board' );
+	elseif ( mb_is_user_topics() )
+		$title = mb_get_user_topics_title();
 
-	elseif ( mb_is_user_page( 'replies' ) )
-		$title = __( 'Replies', 'message-board' );
+	elseif ( mb_is_user_replies() )
+		$title = mb_get_user_replies_title();
 
-	elseif ( mb_is_user_page( 'forum-subscriptions' ) )
-		$title = __( 'Forum Subscriptions', 'message-board' );
+	elseif ( mb_is_user_forum_subscriptions() )
+		$title = mb_get_user_forum_subscriptions_title();
 
-	elseif ( mb_is_user_page( 'topic-subscriptions' ) )
-		$title = __( 'Topic Subscriptions', 'message-board' );
+	elseif ( mb_is_user_topic_subscriptions() )
+		$title = mb_get_user_topic_subscriptions_title();
 
-	elseif ( mb_is_user_page( 'bookmarks' ) )
-		$title = __( 'Topic Bookmarks', 'message-board' );
+	elseif ( mb_is_user_bookmarks() )
+		$title = mb_get_user_bookmarks_title();
 
 	else
 		$title = mb_get_single_user_title();
 
 	return apply_filters( 'mb_get_user_page_title', $title );
+}
+
+function mb_user_forums_title() {
+	echo mb_get_user_forums_title();
+}
+
+function mb_get_user_forums_title() {
+	return apply_filters( 'mb_get_user_forums_title', mb_get_forum_label( 'name' ) );
+}
+
+function mb_user_topics_title() {
+	echo mb_get_user_topics_title();
+}
+
+function mb_get_user_topics_title() {
+	return apply_filters( 'mb_get_user_topics_title', mb_get_topic_label( 'name' ) );
+}
+
+function mb_user_replies_title() {
+	echo mb_get_user_replies_title();
+}
+
+function mb_get_user_replies_title() {
+	return apply_filters( 'mb_get_user_replies_title', mb_get_reply_label( 'name' ) );
+}
+
+function mb_user_bookmarks_title() {
+	echo mb_get_user_bookmarks_title();
+}
+
+function mb_get_user_bookmarks_title() {
+	return apply_filters( 'mb_get_user_bookmarks_title', __( 'Bookmarks', 'message-board' ) );
+}
+
+function mb_user_forum_subscriptions_title() {
+	echo mb_get_user_forum_subscriptions_title();
+}
+
+function mb_get_user_forum_subscriptions_title() {
+	return apply_filters( 'mb_get_user_forum_subscriptions_title', sprintf( __( '%s Subscriptions', 'message-board' ), mb_get_forum_label( 'singular_name' ) ) );
+}
+
+function mb_user_topic_subscriptions_title() {
+	echo mb_get_user_topic_subscriptions_title();
+}
+
+function mb_get_user_topic_subscriptions_title() {
+	return apply_filters( 'mb_get_user_topic_subscriptions_title', sprintf( __( '%s Subscriptions', 'message-board' ), mb_get_topic_label( 'singular_name' ) ) );
 }
 
 /* ====== URLs / Links ====== */
