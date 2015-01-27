@@ -2,6 +2,48 @@
  * Admin CSS rules.
  */
 
+/* ====== Dashboard (index.php) ====== */
+
+#mb-dashboard-activity .inside {
+	padding: 0;
+	margin:  0;
+}
+
+	#mb-dashboard-activity .count-block {
+		overflow:      hidden;
+		padding:       12px 12px 4px;
+		border-bottom: 1px solid #eee;
+	}
+
+		#mb-dashboard-activity .count-block .dashicons { color: #888; }
+
+		#mb-dashboard-activity .count-block ul {
+			list-style: none;
+			display:    inline-block;
+			margin:     0 0 0 8px;
+		}
+
+			#mb-dashboard-activity .count-block li {
+				display:      inline-block;
+				margin-right: 16px;
+			}
+
+	#mb-dashboard-activity .activity-block {
+		padding: 12px 12px 0;
+	}
+
+		#mb-dashboard-activity .activity-block ul li {
+			overflow:      hidden;
+			margin-bottom: 8px;
+		}
+
+			#mb-dashboard-activity .activity-block ul span {
+				display:      inline-block;
+				min-width:    150px;
+				margin-right: 8px;
+				color:        #777;
+			}
+
 /* ====== Edit Single Post Screen (post.php, post-new.php) ====== */
 
 /**

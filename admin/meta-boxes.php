@@ -267,3 +267,107 @@ function mb_reply_info_meta_box( $post ) {
 	<p><?php printf( __( 'Topic: %s', 'message-board' ), mb_get_topic_link( $topic_id ) ); ?></p>
 	<p><?php printf( __( 'Forum: %s', 'message-board' ), mb_get_forum_link( $forum_id ) ); ?></p>
 <?php }
+
+/**
+ * Forum activity dashboard widget.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_dashboard_activity_meta_box() {
+
+	$statuses   = mb_get_published_post_statuses();
+	$post_types = array( mb_get_forum_post_type(), mb_get_topic_post_type(), mb_get_reply_post_type() );
+	?>
+
+	<div class="count-block">
+
+		<span class="dashicons dashicons-format-chat"></span>
+		<ul>
+
+			<?php foreach ( $post_types as $type ) {
+
+				$count     = 0;
+				$num_posts = wp_count_posts( $type );
+
+				foreach ( (array) $num_posts as $status => $num ) {
+
+					if ( in_array( $status, $statuses ) )
+						$count = $count + absint( $num );
+				}
+
+				$post_type_object = get_post_type_object( $type );
+
+				$text = translate_nooped_plural( $post_type_object->labels->mb_dashboard_count, $count, 'message-board' );
+				$text = sprintf( $text, number_format_i18n( $count ) );
+				$class = sanitize_html_class( 'mb-' . mb_translate_post_type( $type ) . '-count' );
+
+				if ( $post_type_object && current_user_can( $post_type_object->cap->edit_posts ) )
+					printf( '<li><a class="%s" href="%s">%s</a></li>', $class, add_query_arg( 'post_type', $type, admin_url( 'edit.php' ) ), $text );
+
+				else
+					printf( '<li><span class="%s">%s</span></li>', $class, $text );
+			} ?>
+
+		</ul>
+		</div><!-- .count-block -->
+
+		<div id="mb-activity-widget">
+
+		<?php $args = array(
+			'posts_per_page' => 7,
+			'post_type'      => $post_types,
+			'post_status'    => $statuses,
+			'order'          => 'DESC',
+			'orderby'        => 'date',
+			'no_found_rows'  => true,
+			'cache_results'  => false,
+			'perm'           => 'readable',
+
+		);
+
+		$loop = new WP_Query( $args );
+
+		if ( $loop->have_posts() ) : ?>
+
+			<div class="activity-block">
+
+				<h4><?php _e( 'Recently Published', 'message-board' ); ?></h4>
+				<ul>
+
+				<?php
+				$today    = date( 'Y-m-d', current_time( 'timestamp' ) );
+				$tomorrow = date( 'Y-m-d', strtotime( '+1 day', current_time( 'timestamp' ) ) );
+				?>
+
+				<?php while ( $loop->have_posts() ) : ?>
+
+					<?php $loop->the_post();
+
+					$time = get_the_time( 'U' );
+
+					if ( date( 'Y-m-d', $time ) == $today ) {
+						$relative = __( 'Today' );
+					} else {
+						/* translators: date and time format for recent posts on the dashboard, see http://php.net/date */
+						$relative = date_i18n( __( 'M jS' ), $time );
+					}
+
+					$url    = current_user_can( 'edit_post', get_the_ID() ) ? get_edit_post_link() : get_permalink();
+					$format = __( '<span>%1$s, %2$s</span> %3$s', 'message-board' );
+					$link   = sprintf( '<a href="%s">%s</a>', $url, get_the_title() );
+
+					printf( "<li>{$format}</li>", $relative, get_the_time(), $link );
+
+				endwhile; ?>
+
+				</ul>
+
+			</div><!-- .activity-block -->
+
+		<?php endif; ?>
+
+		<?php wp_reset_postdata(); ?>
+	</div>
+<?php }

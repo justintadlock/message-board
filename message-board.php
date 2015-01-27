@@ -280,6 +280,9 @@ final class Message_Board {
 			require_once( $this->dir_path . 'admin/admin.php'      );
 			require_once( $this->dir_path . 'admin/meta-boxes.php' );
 
+			/* Dashboard screen files. */
+			require_once( $this->dir_path . 'admin/dashboard.php' );
+
 			/* Edit posts screen files. */
 			require_once( $this->dir_path . 'admin/edit-forum.php' );
 			require_once( $this->dir_path . 'admin/edit-topic.php' );

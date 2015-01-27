@@ -159,6 +159,7 @@ function mb_register_post_types() {
 
 			/* Custom archive label.  Must filter 'post_type_archive_title' to use. */
 			'archive_title'      => __( 'Forums',                   'message-board' ),
+			'mb_dashboard_count' => _n_noop( '%s Forum', '%s Forums', 'message-board' ),
 			'mb_form_title'      => __( 'Forum Title:',             'message-board' ),
 			'mb_form_type'       => __( 'Forum Type:',              'message-board' ),
 			'mb_form_status'     => __( 'Status:',                  'message-board' ),
@@ -223,6 +224,7 @@ function mb_register_post_types() {
 
 			/* Custom archive label.  Must filter 'post_type_archive_title' to use. */
 			'archive_title'      => __( 'Topics',                   'message-board' ),
+			'mb_dashboard_count' => _n_noop( '%s Topic', '%s Topics', 'message-board' ),
 			'mb_form_title'      => __( 'Topic Title:',             'message-board' ),
 			'mb_form_type'       => __( 'Topic Type:',              'message-board' ),
 			'mb_form_status'     => __( 'Status:',                  'message-board' ),
@@ -285,6 +287,7 @@ function mb_register_post_types() {
 
 			/* Custom archive label.  Must filter 'post_type_archive_title' to use. */
 			'archive_title'      => __( 'Replies',                   'message-board' ),
+			'mb_dashboard_count' => _n_noop( '%s Reply', '%s Replies', 'message-board' ),
 			'mb_form_content'    => __( 'Message:',                  'message-board' ),
 			'mb_form_edit_item'  => __( 'Edit Reply: %s',           'message-board' ),
 			'mb_form_content_placeholder' => __( 'Enter reply message&hellip;', 'message-board' ),
