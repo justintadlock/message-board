@@ -247,15 +247,25 @@ function mb_set_forum_subforum_count( $forum_id, $count ) {
  * @since  1.0.0
  * @access public
  * @param  int    $forum_id
+ * @global object $wpdb
  * @return int
  */
 function mb_reset_forum_topic_count( $forum_id ) {
+	global $wpdb;
 
 	$forum_id = mb_get_forum_id( $forum_id );
 
-	$topic_ids = mb_get_forum_topic_ids( $forum_id );
+	$open_status    = mb_get_open_post_status();
+	$close_status   = mb_get_close_post_status();
+	$publish_status = mb_get_publish_post_status();
+	$private_status = mb_get_private_post_status();
+	$hidden_status  = mb_get_hidden_post_status();
 
-	$count = !empty( $topic_ids ) ? count( $topic_ids ) : 0;
+	$where = $wpdb->prepare( "WHERE post_parent = %d AND post_type = %s", $forum_id, mb_get_topic_post_type() );
+
+	$status_where = "AND (post_status = '{$open_status}' OR post_status = '{$close_status}' OR post_status = '{$publish_status}' OR post_status = '{$private_status}' OR post_status = '{$hidden_status}')";
+
+	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where $status_where" );
 
 	mb_set_forum_topic_count( $forum_id, $count );
 
@@ -268,18 +278,25 @@ function mb_reset_forum_topic_count( $forum_id ) {
  * @since  1.0.0
  * @access public
  * @param  int    $forum_id
+ * @global object $wpdb
  * @return int
  */
 function mb_reset_forum_reply_count( $forum_id ) {
+	global $wpdb;
 
-	$count     = 0;
-	$topic_ids = mb_get_forum_topic_ids( $forum_id );
+	$forum_id = mb_get_forum_id( $forum_id );
 
-	if ( !empty( $topic_ids ) ) {
-		$reply_ids = mb_get_multi_topic_reply_ids( $topic_ids );
+	$open_status    = mb_get_open_post_status();
+	$close_status   = mb_get_close_post_status();
+	$publish_status = mb_get_publish_post_status();
+	$private_status = mb_get_private_post_status();
+	$hidden_status  = mb_get_hidden_post_status();
 
-		$count = !empty( $reply_ids ) ? count( $reply_ids ) : 0;
-	}
+	$t_status_where = "AND (topic.post_status = '{$open_status}' OR topic.post_status = '{$close_status}' OR topic.post_status = '{$publish_status}' OR topic.post_status = '{$private_status}' OR topic.post_status = '{$hidden_status}')";
+	$r_status_where = "AND reply.post_status = '{$publish_status}'";
+	$status_where   = $t_status_where . $r_status_where;
+
+	$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->posts} AS reply INNER JOIN {$wpdb->posts} AS topic ON reply.post_parent = topic.ID WHERE topic.post_parent = %d {$status_where}", $forum_id ) );
 
 	mb_set_forum_reply_count( $forum_id, $count );
 
@@ -292,6 +309,7 @@ function mb_reset_forum_reply_count( $forum_id ) {
  * @since  1.0.0
  * @access public
  * @param  int    $forum_id
+ * @global object $wpdb
  * @return array
  */
 function mb_get_forum_topic_ids( $forum_id ) {

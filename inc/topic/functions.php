@@ -190,13 +190,21 @@ function mb_reset_topic_latest( $topic_id ) {
  * @since  1.0.0
  * @access public
  * @param  int     $topic_id
+ * @global object $wpdb
  * @return array
  */
 function mb_reset_topic_reply_count( $topic_id ) {
+	global $wpdb;
 
-	$replies = mb_get_topic_reply_ids( $topic_id );
+	$topic_id = mb_get_topic_id( $topic_id );
 
-	$count = !empty( $replies ) ? count( $replies ) : 0;
+	$publish_status = mb_get_publish_post_status();
+
+	$where = $wpdb->prepare( "WHERE post_parent = %d AND post_type = %s", $topic_id, mb_get_reply_post_type() );
+
+	$status_where = "AND post_status = '{$publish_status}'";
+
+	$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts $where $status_where" );
 
 	mb_set_topic_reply_count( $topic_id, $count );
 }
