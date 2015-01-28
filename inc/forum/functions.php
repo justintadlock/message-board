@@ -16,10 +16,20 @@ add_action( 'post_updated', 'mb_forum_post_updated', 10, 3 );
 /* Private/hidden links. */
 add_filter( 'post_type_link', 'mb_forum_post_type_link', 10, 2 );
 
+/**
+ * Callback function executed after a forum has been updated.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $post_id
+ * @param  object  $post_after
+ * @param  object  $post_before
+ * @return void
+ */
 function mb_forum_post_updated( $post_id, $post_after, $post_before ) {
 
 	/* Bail if this is not the forum post type. */
-	if ( mb_get_forum_post_type() !== $post_after->post_type )
+	if ( !mb_is_forum( $post_id ) )
 		return;
 
 	/* If the forum parent has changed. */
@@ -71,7 +81,7 @@ function mb_insert_forum( $args = array() ) {
 	/* Always make sure it's the correct post type. */
 	$args['post_type'] = mb_get_forum_post_type();
 
-	/* Insert the topic. */
+	/* Insert the forum. */
 	return wp_insert_post( $args );
 }
 
@@ -184,6 +194,17 @@ function mb_reset_forum_level( $forum_id ) {
 	return $level;
 }
 
+/**
+ * Resets a forum's subforum count.
+ *
+ * @todo Update the $status_where to use any published forum status rather than hardcoding them.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int    $forum_id
+ * @global object $wpdb
+ * @return int
+ */
 function mb_reset_forum_subforum_count( $forum_id ) {
 	global $wpdb;
 
@@ -207,12 +228,21 @@ function mb_reset_forum_subforum_count( $forum_id ) {
 	return $count;
 }
 
+/**
+ * Sets a forum's subforum count.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $forum_id
+ * @param  int     $count
+ * @return bool
+ */
 function mb_set_forum_subforum_count( $forum_id, $count ) {
 	return update_post_meta( $forum_id, mb_get_forum_subforum_count_meta_key(), absint( $count ) );
 }
 
 /**
- * Set the forum topic count.
+ * Resets the forum topic count.
  *
  * @since  1.0.0
  * @access public
@@ -220,6 +250,8 @@ function mb_set_forum_subforum_count( $forum_id, $count ) {
  * @return int
  */
 function mb_reset_forum_topic_count( $forum_id ) {
+
+	$forum_id = mb_get_forum_id( $forum_id );
 
 	$topic_ids = mb_get_forum_topic_ids( $forum_id );
 
