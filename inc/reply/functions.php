@@ -122,50 +122,76 @@ function mb_insert_reply_data( $post ) {
 	do_action( 'mb_after_insert_reply_data', $post );
 }
 
+/**
+ * Filter on the post type link for replies. If the user doesn't have permission to view the reply, 
+ * return an empty string.  Else, generate the reply URL based on the topic ID.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $link
+ * @param  object  $post
+ * @return string
+ */
 function mb_reply_post_type_link( $link, $post ) {
 
-	if ( mb_get_reply_post_type() !== $post->post_type )
+	/* If not viewing a reply, return the orignal URL. */
+	if ( !mb_is_reply( $post->ID ) )
 		return $link;
 
+	/* If the user can't read the reply, return empty string. */
 	if ( !current_user_can( 'read_reply', $post->ID ) )
 		return '';
 
+	/* Generate reply URL. */
 	$url = mb_generate_reply_url( $post->ID );
 
 	return !empty( $url ) ? $url : $link;
 }
 
+/**
+ * Generates the reply URL based on its position (`menu_order` field).
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $reply_id
+ * @return string
+ */
 function mb_generate_reply_url( $reply_id = 0 ) {
 
-	$reply_id       = mb_get_reply_id( $reply_id );
+	$reply_id = mb_get_reply_id( $reply_id );
 
+	/* If reply is not published, return empty string. */
 	if ( mb_get_publish_post_status() !== mb_get_reply_status( $reply_id ) )
 		return '';
 
+	$topic_id  = mb_get_reply_topic_id( $reply_id );
+
+	/* If no topic ID, return empty string. */
+	if ( 0 >= $topic_id )
+		return '';
+
+	/* Set up our variables. */
+	$topic_url      = get_permalink( $topic_id );
 	$per_page       = mb_get_replies_per_page();
 	$reply_position = mb_get_reply_position( $reply_id );
 	$reply_hash     = "#post-{$reply_id}";
+	$reply_page     = ceil( $reply_position / $per_page );
 
-	$reply_page = ceil( $reply_position / $per_page );
-
-	$topic_id  = mb_get_reply_topic_id( $reply_id );
-	$topic_url = get_permalink( $topic_id );
-
+	/* If viewing page 1, just add the reply hash. */
 	if ( 1 >= $reply_page ) {
 
 		$reply_url = user_trailingslashit( $topic_url ) . $reply_hash;
 	}
 
+	/* Else, generate the paginated link. */
 	else {
 		global $wp_rewrite;
 
-		if ( $wp_rewrite->using_permalinks() ) {
-
+		if ( $wp_rewrite->using_permalinks() )
 			$reply_url = trailingslashit( $topic_url ) . trailingslashit( $wp_rewrite->pagination_base ) . user_trailingslashit( $reply_page ) . $reply_hash;
 
-		} else {
+		else
 			$reply_url = add_query_arg( 'paged', $reply_page, $topic_url ) . $reply_hash;
-		}
 	}
 
 	return $reply_url;

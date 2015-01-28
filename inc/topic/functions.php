@@ -19,6 +19,9 @@ add_action( 'post_updated', 'mb_topic_post_updated', 10, 3 );
 /* Topic form fields. */
 add_action( 'mb_topic_form_fields', 'mb_topic_form_fields' );
 
+/* Private/hidden links. */
+add_filter( 'post_type_link', 'mb_topic_post_type_link', 10, 2 );
+
 /**
  * Inserts a new topic.  This is a wrapper for the `wp_insert_post()` function and should be used in 
  * its place where possible.
@@ -385,4 +388,18 @@ function mb_topic_form_fields() {
 	<?php endif;
 
 	wp_nonce_field( 'mb_new_topic_action', 'mb_new_topic_nonce', false );
+}
+
+/**
+ * Filter on the post type link for topics. If the user doesn't have permission to view the topic, 
+ * return an empty string.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $link
+ * @param  object  $post
+ * @return string
+ */
+function mb_topic_post_type_link( $link, $post ) {
+	return mb_is_topic( $post->ID ) && !current_user_can( 'read_topic', $post->ID ) ? '' : $link;
 }
