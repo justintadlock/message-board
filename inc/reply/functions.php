@@ -1,4 +1,14 @@
 <?php
+/**
+ * Plugin functions and filters for the reply post type.
+ *
+ * @package    MessageBoard
+ * @subpackage Includes
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 /* Filter the reply permalink. */
 add_filter( 'post_type_link', 'mb_reply_post_type_link', 10, 2 );

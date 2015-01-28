@@ -1,4 +1,14 @@
 <?php
+/**
+ * Plugin functions and filters for users.
+ *
+ * @package    MessageBoard
+ * @subpackage Includes
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 function mb_set_user_forum_count( $user_id ) {
 	global $wpdb;

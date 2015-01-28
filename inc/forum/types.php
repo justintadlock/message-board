@@ -4,7 +4,7 @@
  * types are "normal" and "category".  Developers can add new types if they wish to do so.
  *
  * @package    MessageBoard
- * @subpackage Admin
+ * @subpackage Includes
  * @author     Justin Tadlock <justin@justintadlock.com>
  * @copyright  Copyright (c) 2014, Justin Tadlock
  * @link       https://github.com/justintadlock/message-board

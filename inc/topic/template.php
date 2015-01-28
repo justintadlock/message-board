@@ -1,4 +1,14 @@
 <?php
+/**
+ * Topic template functions for theme authors.
+ *
+ * @package    MessageBoard
+ * @subpackage Includes
+ * @author     Justin Tadlock <justin@justintadlock.com>
+ * @copyright  Copyright (c) 2014, Justin Tadlock
+ * @link       https://github.com/justintadlock/message-board
+ * @license    http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ */
 
 /**
  * Creates a new topic query and checks if there are any topics found.  Note that we ue the main 
