@@ -6,9 +6,15 @@
 	</div><!-- .mb-forum-content -->
 
 	<p>
-		<span class="mb-subforum-count"><?php printf( __( 'Sub-forums: %s', 'message-board' ), mb_get_forum_subforum_count() ); ?></span>
-		<span class="mb-topic-count"><?php printf( __( 'Topics: %s', 'message-board' ), mb_get_forum_topic_count() ); ?></span> 
-		<span class="mb-reply-count"><?php printf( __( 'Replies: %s', 'message-board' ), mb_get_forum_reply_count() ); ?></span> 
+		<?php if ( mb_forum_allows_subforums() ) : ?>
+			<span class="mb-subforum-count"><?php printf( mb_forum_allows_topics() ? __( 'Sub-forums: %s', 'message-board' ) : __( 'Forums: %s', 'message-board' ), mb_get_forum_subforum_count() ); ?></span>
+		<?php endif; ?>
+
+		<?php if ( mb_forum_allows_topics() ) : ?>
+			<span class="mb-topic-count"><?php printf( __( 'Topics: %s', 'message-board' ), mb_get_forum_topic_count() ); ?></span> 
+			<span class="mb-reply-count"><?php printf( __( 'Replies: %s', 'message-board' ), mb_get_forum_reply_count() ); ?></span> 
+		<?php endif; ?>
+
 		<?php mb_forum_toggle_open_link(); ?> 
 		<?php mb_forum_toggle_close_link(); ?>
 		<?php mb_forum_toggle_trash_link(); ?>

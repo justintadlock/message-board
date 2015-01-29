@@ -168,7 +168,7 @@ function mb_register_post_types() {
 			'mb_form_edit_item'  => __( 'Edit Forum: %s',           'message-board' ),
 			'mb_form_title_placeholder' => __( 'Enter forum title',  'message-board' ),
 			'mb_form_content_placeholder' => __( 'Enter forum description&hellip;', 'message-board' ),
-			'mb_form_subscribe'  => __( 'Notify me of topics and posts via email', 'message-board' ),
+			'mb_form_subscribe'  => __( 'Notify me of topics and replies via email', 'message-board' ),
 		)
 	);
 
