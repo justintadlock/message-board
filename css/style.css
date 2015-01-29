@@ -35,6 +35,17 @@
 	.ltr .mb-col-title .new-forum-link,
 	.ltr .mb-col-title .new-topic-link { margin-left: 8px; }
 
+	.mb-col-title .attachment-post-thumbnail {
+		max-width:  100px;
+		max-height: 100px;
+		margin:     0;
+	}
+
+		.ltr .mb-col-title .attachment-post-thumbnail {
+			float:        left;
+			margin-right: 1rem;
+		}
+
 	.mb-col-title .avatar {
 		float:      left;
 		max-width:  60px;
@@ -56,7 +67,7 @@
 	.mb-col-title .mb-reply-meta,
 	.mb-col-title .mb-reply-summary,
 	.mb-col-title .mb-role-description,
-	.mb-col-title .mb-user-description { margin-top: 5px; }
+	.mb-col-title .mb-user-description { overflow: hidden; margin-top: 5px; }
 
 		.mb-col-title .mb-forum-content p:last-of-type,
 		.mb-col-title .mb-forum-summary p:last-of-type,

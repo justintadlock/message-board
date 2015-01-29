@@ -28,6 +28,7 @@
 				<tr <?php post_class(); ?>>
 
 					<td class="mb-col-title">
+						<?php the_post_thumbnail(); ?>
 						<?php mb_forum_link(); ?>
 
 						<div class="mb-forum-content">

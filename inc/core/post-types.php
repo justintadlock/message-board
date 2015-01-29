@@ -139,6 +139,7 @@ function mb_register_post_types() {
 		'supports' => array(
 			'title',
 			'editor',
+			'thumbnail'
 		),
 
 		'labels' => array(
