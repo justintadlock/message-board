@@ -156,32 +156,36 @@ function mb_get_multi_topic_reply_ids( $topic_ids ) {
  * @return void
  */
 function mb_reset_topic_latest( $topic_id ) {
+	global $wpdb;
 
-	$reply_ids = mb_get_topic_reply_ids( $topic_id );
+	$topic_id = mb_get_topic_id( $topic_id );
 
-	if ( !empty( $reply_ids ) ) {
+	$publish_status = mb_get_publish_post_status();
 
-		$reply_ids = array_reverse( $reply_ids );
-		$last_reply_id = array_shift( $reply_ids );
+	$status_where = "AND post_status = '{$publish_status}'";
 
-		$post_date  = get_post_field( 'post_date', $last_reply_id );
+	$reply_id = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s {$status_where} AND post_parent = %d ORDER BY post_date DESC", mb_get_reply_post_type(), $topic_id ) );
+
+	if ( !empty( $reply_id ) ) {
+
+		$post_date  = get_post_field( 'post_date', $reply_id );
 		$post_epoch = mysql2date( 'U', $post_date );
 
-		mb_set_topic_activity_datetime( $topic_id, $post_date     );
-		mb_set_topic_activity_epoch(    $topic_id, $post_epoch    );
-		mb_set_topic_last_reply_id(     $topic_id, $last_reply_id );
+		mb_set_topic_activity_datetime( $topic_id, $post_date  );
+		mb_set_topic_activity_epoch(    $topic_id, $post_epoch );
+		mb_set_topic_last_reply_id(     $topic_id, $reply_id   );
 
 	} else {
 		$post_date  = get_post_field( 'post_date', $topic_id );
 		$post_epoch = mysql2date( 'U', $post_date );
 
-		mb_set_topic_activity_datetime( $topic_id, $post_date     );
-		mb_set_topic_activity_epoch(    $topic_id, $post_epoch    );
+		mb_set_topic_activity_datetime( $topic_id, $post_date  );
+		mb_set_topic_activity_epoch(    $topic_id, $post_epoch );
 
 		delete_post_meta( $topic_id, mb_get_topic_last_reply_id_meta_key() );
 	}
 
-	mb_set_topic_position( absint( $topic_id ), mysql2date( 'U', $post_date ) );
+	mb_set_topic_position( $topic_id, $post_epoch );
 }
 
 /**

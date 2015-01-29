@@ -335,36 +335,50 @@ function mb_get_forum_topic_ids( $forum_id ) {
  * @return int
  */
 function mb_reset_forum_latest( $forum_id ) {
+	global $wpdb;
 
-	$topic_ids = mb_get_forum_topic_ids( $forum_id );
+	$forum_id = mb_get_forum_id( $forum_id );
 
-	if ( !empty( $topic_ids ) ) {
+	$open_status    = mb_get_open_post_status();
+	$close_status   = mb_get_close_post_status();
+	$publish_status = mb_get_publish_post_status();
+	$private_status = mb_get_private_post_status();
+	$hidden_status  = mb_get_hidden_post_status();
 
-		$reply_ids = mb_get_multi_topic_reply_ids( $topic_ids );
+	$status_where = "AND (post_status = '{$open_status}' OR post_status = '{$close_status}' OR post_status = '{$publish_status}' OR post_status = '{$private_status}' OR post_status = '{$hidden_status}')";
 
-		if ( !empty( $reply_ids ) ) {
-			$new_last_reply = array_shift( $reply_ids );
-			$new_last_topic = mb_get_reply_topic_id( $new_last_reply );
+	$topic_id = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s $status_where AND post_parent = %d ORDER BY menu_order DESC", mb_get_topic_post_type(), $forum_id ) );
 
-			mb_set_forum_last_reply_id( $forum_id, $new_last_reply );
-			mb_set_forum_last_topic_id( $forum_id, $new_last_topic );
+	if ( !empty( $topic_id ) ) {
 
-			$new_last_date = get_post( $new_last_reply )->post_date;
+		$t_status_where = "AND (topic.post_status = '{$open_status}' OR topic.post_status = '{$close_status}' OR topic.post_status = '{$publish_status}' OR topic.post_status = '{$private_status}' OR topic.post_status = '{$hidden_status}')";
+		$r_status_where = "AND reply.post_status = '{$publish_status}'";
+		$status_where   = $t_status_where . $r_status_where;
 
-			mb_set_forum_activity_datetime( $forum_id, $new_last_date );
-			mb_set_forum_activity_epoch( $forum_id, mysql2date( 'U', $new_last_date ) );
+		$reply_id = $wpdb->get_var( $wpdb->prepare( "SELECT reply.ID FROM {$wpdb->posts} AS reply INNER JOIN {$wpdb->posts} AS topic ON reply.post_parent = topic.ID WHERE topic.post_parent = %d {$status_where} ORDER BY reply.post_date DESC", $forum_id ) );
+
+		if ( $reply_id ) {
+
+			mb_set_forum_last_reply_id( $forum_id, $reply_id );
+			mb_set_forum_last_topic_id( $forum_id, $topic_id );
+
+			$last_date  = get_post( $reply_id )->post_date;
+			$epoch_date = mysql2date( 'U', $last_date );
+
+			mb_set_forum_activity_datetime( $forum_id, $last_date );
+			mb_set_forum_activity_epoch( $forum_id, $epoch_date );
+
 		} else {
-
-			$new_last_topic = array_shift( $topic_ids );
 
 			delete_post_meta( $forum_id, mb_get_forum_last_reply_id_meta_key() );
 
-			mb_set_forum_last_topic_id( $forum_id, $new_last_topic );
+			mb_set_forum_last_topic_id( $forum_id, $topic_id );
 
-			$new_last_date = get_post( $new_last_topic )->post_date;
+			$last_date  = get_post( $topic_id )->post_date;
+			$epoch_date = mysql2date( 'U', $last_date );
 
-			mb_set_forum_activity_datetime( $forum_id, $new_last_date );
-			mb_set_forum_activity_epoch( $forum_id, mysql2date( 'U', $new_last_date ) );
+			mb_set_forum_activity_datetime( $forum_id, $last_date );
+			mb_set_forum_activity_epoch( $forum_id, $epoch_date );
 		}
 	} else {
 		delete_post_meta( $forum_id, mb_get_forum_last_reply_id_meta_key()           );
