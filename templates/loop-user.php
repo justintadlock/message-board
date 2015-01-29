@@ -1,5 +1,7 @@
 <?php if ( mb_user_query() ) : // Checks if we have users. ?>
 
+	<?php do_action( 'mb_loop_user_before' ); ?>
+
 	<table class="mb-loop-user">
 		<thead>
 			<tr>
@@ -41,6 +43,8 @@
 		</tbody>
 
 	</table><!-- .mb-loop-user -->
+
+	<?php do_action( 'mb_loop_user_after' ); ?>
 
 	<?php mb_loop_user_pagination(); ?>
 

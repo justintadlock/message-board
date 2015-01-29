@@ -1,5 +1,7 @@
 <?php if ( mb_forum_query() ) : // If there are forums to show. ?>
 
+	<?php do_action( 'mb_loop_forum_before', 'hierarchical' ); ?>
+
 	<?php while ( mb_forum_query() ) : // Loop through the forums. ?>
 
 		<?php mb_the_forum(); // Set up forum data. ?>
@@ -90,6 +92,8 @@
 		</table><!-- .mb-loop-forum -->
 
 	<?php endwhile; // End forum loop. ?>
+
+	<?php do_action( 'mb_loop_forum_after', 'hierarchical' ); ?>
 
 	<?php mb_loop_forum_pagination(); ?>
 

@@ -1,5 +1,7 @@
 <?php if ( mb_role_query() ) : // Checks if we have roles. ?>
 
+	<?php do_action( 'mb_loop_role_before' ); ?>
+
 	<table class="mb-loop-role">
 		<thead>
 			<tr>
@@ -34,6 +36,8 @@
 		</tbody>
 
 	</table><!-- .mb-loop-role -->
+
+	<?php do_action( 'mb_loop_role_after' ); ?>
 
 	<?php mb_loop_role_pagination(); ?>
 

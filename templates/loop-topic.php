@@ -1,5 +1,7 @@
 <?php if ( mb_topic_query() ) : // If there are any topics to show. ?>
 
+	<?php do_action( 'mb_loop_topic_before' ); ?>
+
 	<table class="mb-loop-topic">
 
 		<thead>
@@ -58,6 +60,8 @@
 		</tbody>
 
 	</table><!-- .mb-loop-topic -->
+
+	<?php do_action( 'mb_loop_topic_after' ); ?>
 
 	<?php mb_loop_topic_pagination(); ?>
 

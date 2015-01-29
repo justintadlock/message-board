@@ -1,5 +1,7 @@
 <?php if ( mb_reply_query() ) : // Checks if any posts were found. ?>
 
+	<?php do_action( 'mb_loop_reply_before' ); ?>
+
 	<table class="mb-loop-reply">
 
 		<thead>
@@ -48,6 +50,8 @@
 		</tbody>
 
 	</table><!-- .mb-loop-reply -->
+
+	<?php do_action( 'mb_loop_reply_after' ); ?>
 
 	<?php mb_loop_reply_pagination(); ?>
 

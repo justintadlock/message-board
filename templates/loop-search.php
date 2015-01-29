@@ -1,5 +1,7 @@
 <?php if ( mb_search_query() ) : // If there are any posts found in the search results. ?>
 
+	<?php do_action( 'mb_loop_search_before' ); ?>
+
 	<table class="mb-loop-search">
 
 		<thead>
@@ -90,6 +92,8 @@
 		</tbody>
 
 	</table><!-- .mb-loop-reply -->
+
+	<?php do_action( 'mb_loop_search_after' ); ?>
 
 	<?php mb_loop_search_pagination(); ?>
 

@@ -1,5 +1,7 @@
 <?php if ( mb_forum_query() ) : // If there are forums to show. ?>
 
+	<?php do_action( 'mb_loop_forum_before', 'flat' ); ?>
+
 	<table class="mb-loop-forum">
 
 		<thead>
@@ -52,6 +54,8 @@
 		</tbody>
 
 	</table><!-- .mb-loop-forum -->
+
+	<?php do_action( 'mb_loop_forum_after', 'flat' ); ?>
 
 	<?php mb_loop_forum_pagination(); ?>
 
