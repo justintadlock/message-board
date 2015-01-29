@@ -200,7 +200,9 @@ function mb_generate_reply_url( $reply_id = 0 ) {
 function mb_get_topic_reply_ids( $topic_id ) {
 	global $wpdb;
 
-	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s AND post_parent = %d ORDER BY menu_order ASC", mb_get_reply_post_type(), mb_get_publish_post_status(), absint( $topic_id ) ) );
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s AND post_parent = %d ORDER BY menu_order ASC", mb_get_reply_post_type(), mb_get_publish_post_status(), $topic_id ) );
 }
 
 function mb_reset_reply_data( $post, $reset_latest = false ) {
@@ -241,62 +243,36 @@ function mb_reset_reply_data( $post, $reset_latest = false ) {
 function mb_reset_reply_positions( $topic_id ) {
 	global $wpdb;
 
-	$posts = $wpdb->get_results( 
+	$topic_id = mb_get_topic_id( $topic_id );
+
+	$replies = $wpdb->get_results( 
 		$wpdb->prepare( 
 			"SELECT ID, menu_order FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s AND post_parent = %d ORDER BY post_date ASC", 
 			mb_get_reply_post_type(), 
-			mb_get_open_post_status(),
-			absint( $topic_id ) 
+			mb_get_publish_post_status(),
+			$topic_id
 		) 
 	);
 
-	if ( empty( $posts ) )
+	if ( empty( $replies ) )
 		return false;
 
-	$post_ids = array();
+	$reply_ids = array();
 	$i = 0;
 
 	$update_sql = "UPDATE {$wpdb->posts} SET menu_order = CASE ID";
 
-	foreach ( $posts as $post ) {
+	foreach ( $replies as $reply ) {
 		$i++;
 
-		$post_ids[] = $post->ID;
+		$reply_ids[] = $reply->ID;
 
-		$update_sql .= sprintf( " WHEN %d THEN %d", $post->ID, $i );
+		$update_sql .= sprintf( " WHEN %d THEN %d", $reply->ID, $i );
 	}
 
-	$update_sql .= " END WHERE ID IN (" . implode( ',', $post_ids ) . ")";
+	$update_sql .= " END WHERE ID IN (" . implode( ',', $reply_ids ) . ")";
 
 	$wpdb->query( $update_sql );
-}
-
-
-function mb_set_reply_statuses( $topic_id, $status ) {
-	global $wpdb;
-
-	$allowed_statuses = array(
-		mb_get_publish_post_status(),
-		mb_get_trash_post_status(),
-		mb_get_spam_post_status(),
-		mb_get_orphan_post_status()
-	);
-
-	if ( !in_array( $status, $allowed_statuses ) )
-		return false;
-
-	$post_ids = $wpdb->get_results( 
-		$wpdb->prepare( 
-			"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_parent = %d ORDER BY post_date ASC", 
-			mb_get_reply_post_type(),
-			absint( $topic_id ) 
-		) 
-	);
-
-	if ( empty( $post_ids ) )
-		return false;
-
-	$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET post_status = %s WHERE ID IN (" . implode( ',', $post_ids ) . ")", $status ) );
 }
 
 function mb_orphanize_replies( $topic_id ) {

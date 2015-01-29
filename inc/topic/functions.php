@@ -134,20 +134,6 @@ function mb_insert_topic_post_parent( $post_parent, $post_id, $new_postarr ) {
 }
 
 /**
- * Get an array of reply IDs for multiple topics.
- *
- * @since  1.0.0
- * @access public
- * @param  array   $topic_ids
- * @return array
- */
-function mb_get_multi_topic_reply_ids( $topic_ids ) {
-	global $wpdb;
-
-	return $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status = %s AND post_parent IN ( " . implode( ',', $topic_ids ) . " ) ORDER BY post_date DESC", mb_get_reply_post_type(), mb_get_publish_post_status() ) );
-}
-
-/**
  * Resets the topic's latest data.
  *
  * @since  1.0.0
