@@ -91,6 +91,17 @@ function mb_get_reply_post_type() {
 }
 
 /**
+ * Returns an array of the forum-related post types.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return array
+ */
+function mb_get_post_types() {
+	return apply_filters( 'mb_get_post_types', array( mb_get_forum_post_type(), mb_get_topic_post_type(), mb_get_reply_post_type() ) );
+}
+
+/**
  * Registers post types needed by the plugin.
  *
  * @since  1.0.0

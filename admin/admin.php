@@ -79,6 +79,10 @@ final class Message_Board_Admin {
 
 		/* Overwrite the nav menu meta box object query. */
 		add_filter( 'nav_menu_meta_box_object', array( $this, 'nav_menu_meta_box_object' ) );
+
+		/* Edit screen views. */
+		foreach ( mb_get_post_types() as $post_type )
+			add_filter( "views_edit-{$post_type}", array( $this, 'views_edit' ), 5 );
 	}
 
 	/**
@@ -166,6 +170,43 @@ final class Message_Board_Admin {
 			$class .= 'mb-reply ';
 
 		return $class;
+	}
+
+	/**
+	 * Puts the post status links in the a better order. By default, WP will list these in the order 
+	 * they're registered.  Instead, we're going to put them in order from public, private, protected, 
+	 * and other.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @param  array  $views
+	 * @return array
+	 */
+	public function views_edit( $views ) {
+
+		$non_status = $public = $private = $protected = $other = array();
+
+		foreach ( $views as $view => $link ) {
+
+			$status_obj = get_post_status_object( $view );
+
+			if ( is_null( $status_obj ) || !is_object( $status_obj ) )
+				$non_status[ $view ] = $link;
+
+			elseif ( true === $status_obj->public )
+				$public[ $view ] = $link;
+
+			elseif ( true === $status_obj->private )
+				$private[ $view ] = $link;
+
+			elseif ( true === $status_obj->protected )
+
+				$protected[ $view ] = $link;
+			else
+				$other[ $view ] = $link;
+		}
+
+		return array_merge( $non_status, $public, $private, $protected, $other );
 	}
 
 	/**
