@@ -25,7 +25,7 @@
 
 				<?php mb_the_search_result(); // Loads the post data. ?>
 
-				<?php if ( 'forum' === mb_get_content_type() ) : ?>
+				<?php if ( mb_is_forum() ) : ?>
 
 					<tr <?php post_class(); ?>>
 						<td class="mb-col-title">
@@ -45,7 +45,7 @@
 						</td><!-- .mb-col-author -->
 					</tr>
 
-				<?php elseif ( 'topic' === mb_get_content_type() ) : ?>
+				<?php elseif ( mb_is_topic() ) : ?>
 
 					<tr <?php post_class(); ?>>
 						<td class="mb-col-title">
@@ -65,7 +65,7 @@
 						</td><!-- .mb-col-author -->
 					</tr>
 
-				<?php elseif ( 'reply' === mb_get_content_type() ) : ?>
+				<?php elseif ( mb_is_reply() ) : ?>
 
 					<tr <?php post_class(); ?>>
 						<td class="mb-col-title">
