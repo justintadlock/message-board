@@ -117,6 +117,9 @@ function mb_wp_title( $title ) {
 	elseif ( mb_is_search() )
 		$title = mb_get_search_page_title();
 
+	elseif ( mb_is_forum_login() )
+		$title = mb_get_login_page_title();
+
 	else
 		$title = __( 'Board', 'message-board' );
 

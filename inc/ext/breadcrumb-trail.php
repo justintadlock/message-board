@@ -133,6 +133,11 @@ class MB_Breadcrumb_Trail extends Breadcrumb_Trail {
 
 				$this->items[] = mb_get_single_user_title();
 			}
+
+		/* Login page. */
+		} elseif ( mb_is_forum_login() ) {
+
+			$this->items[] = mb_get_login_page_title();
 		}
 
 		/* Add paged items. */

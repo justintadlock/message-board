@@ -186,6 +186,30 @@ function mb_dropdown_post_status( $args = array() ) {
 	echo $out;
 }
 
+/* ====== Log In Page ====== */
+
+/**
+ * Displays the login page title.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_login_page_title() {
+	echo mb_get_login_page_title();
+}
+
+/**
+ * Returns the login page title.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return string
+ */
+function mb_get_login_page_title() {
+	return apply_filters( 'mb_get_login_page_title', is_user_logged_in() ? __( 'Logged In', 'message-board' ) : __( 'Log In', 'message-board' ) );
+}
+
 /* Edit page title. */
 
 function mb_edit_page_title() {
