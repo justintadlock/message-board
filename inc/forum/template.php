@@ -1383,8 +1383,13 @@ function mb_dropdown_forums( $args = array() ) {
 
 	if ( '' != $args['selected'] ) {
 
-		if ( ( mb_get_forum_post_type() === $args['child_type'] && !current_user_can( 'move_forums' ) ) || ( mb_get_topic_post_type() === $args['child_type'] && !current_user_can( 'move_topics' ) ) )
+		if ( ( mb_get_forum_post_type() === $args['child_type'] && !current_user_can( 'move_forums' ) ) || ( mb_get_topic_post_type() === $args['child_type'] && !current_user_can( 'move_topics' ) ) ) {
+
+			if ( isset( $args['name'] ) )
+				$forums = sprintf( '<input type="hidden" name="%s" value="%s" />', esc_attr( $args['name'] ), esc_attr( $args['selected'] ) ) . $forums;
+
 			$forums = preg_replace( '/<select(.*?)>/i', "<select disabled='disabled'$1>", $forums );
+		}
 	}
 
 	if ( false === $args['echo'] )
