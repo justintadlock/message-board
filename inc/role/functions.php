@@ -448,7 +448,7 @@ function mb_merge_roles() {
 	foreach ( mb_get_dynamic_roles() as $role => $args ) {
 
 		/* Add the custom role. */
-		$wp_roles->roles[ $role ]        = $args;
+		$wp_roles->roles[ $role ]        = array( 'name' => $args->labels->singular_name, 'capabilities' => $args->capabilities );
 		$wp_roles->role_objects[ $role ] = new WP_Role( $role, $args->capabilities );
 		$wp_roles->role_names[ $role ]   = $args->labels->singular_name;
 	}
