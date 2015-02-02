@@ -192,6 +192,52 @@ final class Message_Board {
 	private function __construct() {}
 
 	/**
+	 * Magic method to output a string if trying to use the object as a string.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function __toString() {
+		return __( 'Message Board', 'message-board' );
+	}
+
+	/**
+	 * Magic method to keep the object from being cloned.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function __clone() {
+		_doing_it_wrong( __FUNCTION__, __( 'Whoah, partner!', 'message-board' ), '1.0.0' );
+	}
+
+	/**
+	 * Magic method to keep the object from being unserialized.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function __wakeup() {
+		_doing_it_wrong( __FUNCTION__, __( 'Whoah, partner!', 'message-board' ), '1.0.0' );
+	}
+
+	/**
+	 * Magic method to prevent a fatal error when calling a method that doesn't exist.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function __call( $method = '', $args = array() ) {
+		_doing_it_wrong( "Message_Board::{$method}", __( 'Method does not exist.', 'message-board' ), '1.0.0' );
+		unset( $method, $args );
+		return null;
+	}
+
+	/**
 	 * Initial plugin setup.
 	 *
 	 * @since  1.0.0
