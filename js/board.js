@@ -39,6 +39,20 @@ jQuery( document ).ready( function() {
 
 	/* === Topic Form === */
 
+	/* Count the number of options in the topic type and status selects. */
+	var mb_topic_type_options   = jQuery( 'select#mb_topic_type option' ).length;
+	var mb_topic_status_options = jQuery( 'select#mb_post_status option' ).length;
+
+	/* If no more than one topic type option, hide the select. */
+	if ( 1 >= mb_topic_type_options ) {
+		jQuery( 'select#mb_topic_type' ).closest( '.mb-form-type' ).hide();
+	}
+
+	/* If no more than one topic status option, hide the select. */
+	if ( 1 >= mb_topic_status_options ) {
+		jQuery( 'select#mb_post_status' ).closest( '.mb-form-status' ).hide();
+	}
+
 	/* Get the topic title and content. */
 	var mb_topic_title   = jQuery( '#mb-topic-form input[name="mb_topic_title"]' ).attr( 'value' );
 	var mb_topic_content = jQuery( '#mb-topic-form textarea[name="mb_topic_content"]' ).val();
