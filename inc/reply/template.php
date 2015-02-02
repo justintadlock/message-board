@@ -812,3 +812,27 @@ function mb_get_reply_topic_id( $reply_id = 0 ) {
 function mb_loop_reply_pagination( $args = array() ) {
 	return mb_pagination( $args, message_board()->reply_query );
 }
+
+/* ====== Reply Form. ====== */
+
+/**
+ * Topic content editor.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_reply_editor() {
+	add_action( 'wp_enqueue_editor', 'mb_dequeue_editor_scripts'  );
+	add_filter( 'the_editor',        'mb_reply_the_editor_filter' );
+
+	wp_editor( 
+		format_to_edit( mb_code_trick_reverse( mb_get_reply_content( mb_get_reply_id(), 'raw' ) ) ),
+		'mb_reply_content',
+		array(
+			'tinymce'       => false,
+			'media_buttons' => false,
+			'editor_height' => 250
+		)
+	);
+}

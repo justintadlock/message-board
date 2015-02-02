@@ -284,3 +284,16 @@ function mb_orphanize_replies( $topic_id ) {
 			mb_orphan_reply( $reply_id );
 	}
 }
+
+/**
+ * Adds the placeholder text to the editor textarea.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $html
+ * @return string
+ */
+function mb_reply_the_editor_filter( $html ) {
+	remove_filter( 'the_editor', 'mb_reply_the_editor_filter' );
+	return str_replace( '<textarea', '<textarea placeholder="' . mb_get_reply_label( 'mb_form_content_placeholder' ) . '"', $html );
+}

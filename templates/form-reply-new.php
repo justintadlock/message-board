@@ -7,10 +7,10 @@
 	<fieldset>
 		<legend><?php mb_reply_label( 'add_new_item' ); ?></legend>
 
-		<p>
-			<label for="mb_reply_content" name="mb_reply_content"><?php mb_reply_label( 'mb_form_content' ); ?></label>
-			<textarea id="mb_reply_content" name="mb_reply_content" placeholder="<?php echo esc_attr( mb_get_reply_label( 'mb_form_content_placeholder' ) ); ?>"><?php echo format_to_edit( mb_code_trick_reverse( mb_get_reply_content( mb_get_reply_id(), 'raw' ) ) ); ?></textarea>
-		</p>
+		<div class="mb-form-content">
+			<label class="screen-reader-text" for="mb_reply_content"><?php mb_reply_label( 'mb_form_content' ); ?></label>
+			<?php mb_reply_editor(); ?>
+		</div><!-- .mb-form-content -->
 
 		<p>
 			<input type="submit" value="<?php esc_attr_e( 'Submit Reply', 'message-board' ); ?>" />

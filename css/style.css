@@ -120,6 +120,27 @@
 
 .mb form .description { font-size: 17px; font-style: italic; font-weight: 400; }
 
+.mb .mb-form-content {
+	clear:  both;
+	margin: 0 0 1.5rem;
+}
+
+	.mb .quicktags-toolbar {
+		padding: 0;
+		margin-bottom: 0.375rem;
+		background: transparent;
+		border: none;
+	}
+
+		.mb .wp-editor-wrap .quicktags-toolbar input.button.button-small {
+			height:      100%;
+			font-size:   1rem;
+			line-height: 1rem;
+			margin:      0;
+		}
+
+		.ltr.mb .wp-editor-wrap .quicktags-toolbar input.button.button-small { margin-right: 2px; }
+
 /* === Form: Forum === */
 
 @media only screen and ( min-width: 768px ) {

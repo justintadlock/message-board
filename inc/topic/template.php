@@ -1292,6 +1292,28 @@ function mb_topic_edit_form() {
 	mb_get_template_part( 'form-topic', 'edit' );
 }
 
+/**
+ * Topic content editor.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_topic_editor() {
+	add_action( 'wp_enqueue_editor', 'mb_dequeue_editor_scripts'  );
+	add_filter( 'the_editor',        'mb_topic_the_editor_filter' );
+
+	wp_editor( 
+		format_to_edit( mb_code_trick_reverse( mb_get_topic_content( mb_get_topic_id(), 'raw' ) ) ),
+		'mb_topic_content',
+		array(
+			'tinymce'       => false,
+			'media_buttons' => false,
+			'editor_height' => 250
+		)
+	);
+}
+
 /* ====== Topic Subscriptions ====== */
 
 /**

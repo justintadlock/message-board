@@ -50,10 +50,10 @@ if ( !current_user_can( 'access_forum_form' ) )
 			<input type="number" id="mb_menu_order" name="mb_menu_order" value="<?php echo esc_attr( mb_get_forum_order() ); ?>" />
 		</p><!-- .mb-form-order -->
 
-		<p class="mb-form-content">
+		<div class="mb-form-content">
 			<label for="mb_forum_content"><?php mb_forum_label( 'mb_form_content' ); ?></label>
-			<textarea id="mb_forum_content" name="mb_forum_content" placeholder="<?php echo esc_attr( mb_get_forum_label( 'mb_form_content_placeholder' ) ); ?>"><?php echo format_to_edit( mb_code_trick_reverse( mb_get_forum_content( mb_get_forum_id(), 'raw' ) ) ); ?></textarea>
-		<p><!-- .mb-form-content -->
+			<?php mb_forum_editor(); ?>
+		</div><!-- .mb-form-content -->
 
 		<p class="mb-form-submit">
 			<input type="submit" value="<?php esc_attr_e( 'Create Forum', 'message-board' ); ?>" />

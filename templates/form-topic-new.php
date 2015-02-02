@@ -44,10 +44,10 @@
 			); ?>
 		</p><!-- .mb-form-status -->
 
-		<p class="mb-form-content">
-			<label for="mb_topic_content"><?php mb_topic_label( 'mb_form_content' ); ?></label>
-			<textarea id="mb_topic_content" name="mb_topic_content" placeholder="<?php echo esc_attr( mb_get_topic_label( 'mb_form_content_placeholder' ) ); ?>"><?php echo format_to_edit( mb_code_trick_reverse( mb_get_topic_content( mb_get_topic_id(), 'raw' ) ) ); ?></textarea>
-		</p><!-- .mb-form-content -->
+		<div class="mb-form-content">
+			<label class="screen-reader-text" for="mb_topic_content"><?php mb_topic_label( 'mb_form_content' ); ?></label>
+			<?php mb_topic_editor(); ?>
+		</div><!-- .mb-form-content -->
 
 		<p class="mb-form-submit">
 			<input type="submit" value="<?php esc_attr_e( 'Create Topic', 'message-board' ); ?>" />

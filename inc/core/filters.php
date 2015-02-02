@@ -68,6 +68,9 @@ add_filter( 'body_class', 'mb_body_class', 15 );
 /* Filter the archive title. */
 add_filter( 'get_the_archive_title', 'mb_the_archive_title_filter', 5 );
 
+/* Filter editor settings on front end. */
+add_filter( 'quicktags_settings', 'mb_quicktags_settings_filter', 10, 2 );
+
 /**
  * Filters `wp_title` to handle the title on the forum front page since this is a non-standard WP page.
  *
@@ -342,4 +345,38 @@ function mb_get_edit_user_link_filter( $url, $user_id ) {
 		return $url;
 
 	return add_query_arg( array( 'mb_action' => 'edit', 'user_id' => $user_id ), mb_get_board_home_url() );
+}
+
+/**
+ * Removes some quicktag buttons from the editors.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array   $settings
+ * @param  string  $editor_id
+ * @return array
+ */
+function mb_quicktags_settings_filter( $settings, $editor_id ) {
+
+	if ( !in_array( $editor_id, array( 'mb_forum_content', 'mb_topic_content', 'mb_reply_content' ) ) )
+		return $settings;
+
+	$buttons = explode( ',', $settings['buttons'] );
+
+	$settings['buttons'] = implode( ',', array_diff( $buttons, array( 'del', 'ins', 'more' ) ) );
+
+	return $settings;
+}
+
+/**
+ * Removes scripts and styles that we don't need wit front end editors.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_dequeue_editor_scripts() {
+	remove_action( 'wp_enqueue_editor', 'mb_dequeue_editor_scripts'  );
+	wp_dequeue_script( 'word-count' );
+	wp_dequeue_style( 'buttons' );
 }

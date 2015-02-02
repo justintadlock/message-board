@@ -2,6 +2,9 @@ jQuery( document ).ready( function() {
 
 	/* ====== Form Handling ====== */
 
+	/* Change editor class so it doesn't overwrite theme styles. */
+	jQuery( 'textarea[name="mb_forum_content"], textarea[name="mb_topic_content"], textarea[name="mb_reply_content"]' ).removeClass( 'wp-editor-area' ).addClass( 'mb-editor-area' );
+
 	/* Prevent double submissions of plugin forms. */
 	jQuery( '#mb-forum-form, #mb-topic-form, #mb-reply-form' ).on(
 		'submit',

@@ -401,3 +401,16 @@ function mb_topic_form_fields() {
 function mb_topic_post_type_link( $link, $post ) {
 	return mb_is_topic( $post->ID ) && !current_user_can( 'read_topic', $post->ID ) ? '' : $link;
 }
+
+/**
+ * Adds the placeholder text to the editor textarea.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $html
+ * @return string
+ */
+function mb_topic_the_editor_filter( $html ) {
+	remove_filter( 'the_editor', 'mb_topic_the_editor_filter' );
+	return str_replace( '<textarea', '<textarea placeholder="' . mb_get_topic_label( 'mb_form_content_placeholder' ) . '"', $html );
+}

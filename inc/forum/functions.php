@@ -492,3 +492,16 @@ function mb_set_forum_activity_epoch( $forum_id, $epoch ) {
 function mb_forum_post_type_link( $link, $post ) {
 	return mb_is_forum( $post->ID ) && !current_user_can( 'read_forum', $post->ID ) ? '' : $link;
 }
+
+/**
+ * Adds the placeholder text to the editor textarea.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $html
+ * @return string
+ */
+function mb_forum_the_editor_filter( $html ) {
+	remove_filter( 'the_editor', 'mb_forum_the_editor_filter' );
+	return str_replace( '<textarea', '<textarea placeholder="' . mb_get_forum_label( 'mb_form_content_placeholder' ) . '"', $html );
+}

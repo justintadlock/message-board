@@ -1542,3 +1542,26 @@ function mb_forum_form() {
 function mb_forum_edit_form() {
 	mb_get_template_part( 'form-forum', 'edit' );
 }
+
+/**
+ * Topic content editor.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_forum_editor() {
+	add_action( 'wp_enqueue_editor', 'mb_dequeue_editor_scripts'  );
+	add_filter( 'the_editor',        'mb_forum_the_editor_filter' );
+
+	wp_editor( 
+		format_to_edit( mb_code_trick_reverse( mb_get_forum_content( mb_get_forum_id(), 'raw' ) ) ),
+		'mb_forum_content',
+		array(
+			'quicktags'     => false,
+			'tinymce'       => false,
+			'media_buttons' => false,
+			'editor_height' => 150
+		)
+	);
+}
