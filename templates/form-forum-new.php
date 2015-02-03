@@ -59,12 +59,16 @@ if ( !current_user_can( 'access_forum_form' ) )
 			<input type="submit" value="<?php esc_attr_e( 'Create Forum', 'message-board' ); ?>" />
 		</p><!-- .mb-form-submit -->
 
-		<p class="mb-form-subscribe">
-			<label>
-				<input type="checkbox" name="mb_forum_subscribe" value="1" /> 
-				<?php mb_forum_label( 'mb_form_subscribe' ); ?>
-			</label>
-		</p><!-- .mb-form-subscribe -->
+		<?php if ( mb_is_subscriptions_active() ) : // Only show subscribe if subscriptions enabled. ?>
+
+			<p class="mb-form-subscribe">
+				<label>
+					<input type="checkbox" name="mb_forum_subscribe" value="1" /> 
+					<?php mb_forum_label( 'mb_form_subscribe' ); ?>
+				</label>
+			</p><!-- .mb-form-subscribe -->
+
+		<?php endif; // End check if subscriptions enabled. ?>
 
 		<?php if ( mb_is_single_forum() ) : ?>
 

@@ -16,14 +16,16 @@
 			<input type="submit" value="<?php esc_attr_e( 'Submit Reply', 'message-board' ); ?>" />
 		</p>
 
-		<?php if ( !mb_is_user_subscribed_topic( mb_get_topic_id() ) ) : ?>
+		<?php if ( mb_is_subscriptions_active() && !mb_is_user_subscribed_topic( mb_get_topic_id() ) ) : ?>
+
 			<p>
 				<label>
 					<input type="checkbox" name="mb_reply_subscribe" value="1" />
 					<?php _e( 'Notify me of follow-up posts via email', 'message-board' ); ?>
 				</label>
 			</p>
-		<?php endif; ?>
+
+		<?php endif; // End check if subscriptions enabled. ?>
 
 		<input type="hidden" name="mb_reply_topic_id" value="<?php mb_topic_id(); ?>" />
 
