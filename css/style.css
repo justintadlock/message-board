@@ -145,7 +145,7 @@
 
 	/* Link quicktag modal style adjustments. */
 
-	.mb #wp-link-wrap { height: 275px; font-size: 16px; }
+	.mb #wp-link-wrap { height: 270px; font-size: 16px; }
 	
 		#wp-link-wrap .howto { font-style: italic; }
 
@@ -157,7 +157,7 @@
 			font-size: 16px;
 		}
 
-		#wp-link-wrap input[type="submit"] { padding: 5px 10px; }
+		#wp-link-wrap input[type="submit"] { padding: 8px 12px; }
 
 /* === Form: Forum === */
 
