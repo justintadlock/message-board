@@ -13,7 +13,7 @@
 		</div><!-- .mb-form-content -->
 
 		<p>
-			<input type="submit" value="<?php esc_attr_e( 'Submit Reply', 'message-board' ); ?>" />
+			<input type="submit" value="<?php esc_attr_e( 'Post Reply', 'message-board' ); ?>" />
 		</p>
 
 		<?php if ( mb_is_subscriptions_active() && !mb_is_user_subscribed_topic( mb_get_topic_id() ) ) : ?>
