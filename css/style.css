@@ -125,6 +125,8 @@
 	margin: 0 0 1.5rem;
 }
 
+	/* Quicktags toolbar. */
+
 	.mb .quicktags-toolbar {
 		padding: 0;
 		margin-bottom: 0.375rem;
@@ -140,6 +142,22 @@
 		}
 
 		.ltr.mb .wp-editor-wrap .quicktags-toolbar input.button.button-small { margin-right: 2px; }
+
+	/* Link quicktag modal style adjustments. */
+
+	.mb #wp-link-wrap { height: 275px; font-size: 16px; }
+	
+		#wp-link-wrap .howto { font-style: italic; }
+
+		#wp-link-wrap input[type="text"],
+		#wp-link-wrap input[type="url"],
+		#wp-link-wrap input[type="search"] {
+			display:   inline-block;
+			padding:   3px 5px;
+			font-size: 16px;
+		}
+
+		#wp-link-wrap input[type="submit"] { padding: 5px 10px; }
 
 /* === Form: Forum === */
 
