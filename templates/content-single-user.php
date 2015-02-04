@@ -33,6 +33,9 @@
 
 		<ul>
 			<li><?php printf( __( 'Forum role: %s', 'message-board' ), mb_get_role_link( mb_get_user_role() ) ); ?></li>
+			<li><?php printf( __( 'Forums created: %s', 'message-board' ), mb_get_user_forum_count() ); ?></li>
+			<li><?php printf( __( 'Topics started: %s', 'message-board' ), mb_get_user_topic_count() ); ?></li>
+			<li><?php printf( __( 'Replies posted: %s', 'message-board' ), mb_get_user_reply_count() ); ?></li>
 			<li><?php printf( __( 'Member since: %s', 'message-board' ), date( get_option( 'date_format' ), strtotime( get_the_author_meta( 'user_registered', get_query_var( 'author' ) ) ) ) ); ?></li>
 			<li><?php printf( __( 'Web site: %s', 'message-board' ), make_clickable( get_the_author_meta( 'url', get_query_var( 'author' ) ) ) ); ?></li>
 		</ul>
