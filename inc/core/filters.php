@@ -49,9 +49,12 @@ foreach ( $pre_title_hooks as $hook ) {
 
 
 /* Reply title filters. */
-add_filter( 'the_title',  'mb_post_title_filter', 5, 2 );
-add_filter( 'post_title', 'mb_post_title_filter', 5, 2 );
-add_filter( 'single_post_title', 'mb_post_title_filter', 5, 2 );
+add_filter( 'the_title',         'mb_post_title_empty',  5, 2 );
+add_filter( 'the_title',         'mb_post_title_status', 5, 2 );
+add_filter( 'post_title',        'mb_post_title_empty',  5, 2 );
+add_filter( 'post_title',        'mb_post_title_status', 5, 2 );
+add_filter( 'single_post_title', 'mb_post_title_empty',  5, 2 );
+add_filter( 'single_post_title', 'mb_post_title_status', 5, 2 );
 
 /* Edit post link filters. */
 add_filter( 'get_edit_post_link', 'mb_get_edit_post_link', 5, 2 );
@@ -246,10 +249,9 @@ function mb_the_archive_title_filter( $title ) {
  * @param  int     $post
  * @return string
  */
-function mb_post_title_filter( $title, $post ) {
+function mb_post_title_empty( $title, $post ) {
 
-	$post_id   = is_object( $post ) ? $post->ID : $post;
-	$post_type = get_post_type( $post_id );
+	$post_id = is_object( $post ) ? $post->ID : $post;
 
 	/* Forum post type. */
 	if ( empty( $title ) && mb_is_forum( $post_id ) ) {
@@ -281,25 +283,49 @@ function mb_post_title_filter( $title, $post ) {
 		}
 	}
 
-	if ( !is_admin() && mb_is_forum( $post_id ) && mb_is_forum_hidden( $post_id ) ) {
+	/* Return the filtered title. */
+	return $title;
+}
+
+/**
+ * Handles adding the post status to the post title for specific statuses.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  string  $title
+ * @param  int     $post
+ * @return string
+ */
+function mb_post_title_status( $title, $post ) {
+
+	if ( is_admin() )
+		return $title;
+
+	$post_id = is_object( $post ) ? $post->ID : $post;
+
+	/* Hidden forums/topics. */
+	if ( ( mb_is_forum( $post_id ) && mb_is_forum_hidden( $post_id ) ) || ( mb_is_topic( $post_id ) && mb_is_topic_hidden( $post_id ) ) ) {
 
 		/* Translators: Hidden title. */
 		$title = sprintf( __( 'Hidden: %s', 'message-board' ), $title );
 
-	} elseif ( !is_admin() && mb_is_forum( $post_id ) && mb_is_forum_private( $post_id ) ) {
+	/* Private forums/topics. */
+	} elseif ( ( mb_is_forum( $post_id ) && mb_is_forum_private( $post_id ) ) || ( mb_is_topic( $post_id ) && mb_is_topic_private( $post_id ) ) ) {
 
 		/* Translators: Private title. */
 		$title = sprintf( __( 'Private: %s', 'message-board' ), $title );
 
-	} elseif ( !is_admin() && mb_is_topic( $post_id ) && mb_is_topic_hidden( $post_id ) ) {
+	/* Closed forums/topics. */
+	} elseif ( ( mb_is_forum( $post_id ) && mb_is_forum_closed( $post_id ) ) || ( mb_is_topic( $post_id ) && mb_is_topic_closed( $post_id ) ) ) {
 
-		/* Translators: Hidden title. */
-		$title = sprintf( __( 'Hidden: %s', 'message-board' ), $title );
+		/* Translators: Closed title. */
+		$title = sprintf( __( 'Closed: %s', 'message-board' ), $title );
 
-	} elseif ( !is_admin() && mb_is_topic( $post_id ) && mb_is_topic_private( $post_id ) ) {
+	/* Archived forums. */
+	} elseif ( mb_is_forum( $post_id ) && mb_is_forum_archived( $post_id ) ) {
 
-		/* Translators: Private title. */
-		$title = sprintf( __( 'Private: %s', 'message-board' ), $title );
+		/* Translators: Archived title. */
+		$title = sprintf( __( 'Archived: %s', 'message-board' ), $title );
 	}
 
 	/* Return the filtered title. */
