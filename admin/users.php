@@ -2,10 +2,6 @@
 /**
  * Handles all the functionality for the `users.php` screen in WordPress.
  *
- * @link  https://core.trac.wordpress.org/ticket/27887
- * @todo  WordPress doesn't currently support ordering users by `meta_value_num`.  Once that happens, we can 
- *        go in and add sorting by topics and replies.
- *
  * @package    MessageBoard
  * @subpackage Admin
  * @author     Justin Tadlock <justin@justintadlock.com>
@@ -55,6 +51,7 @@ final class Message_Board_Admin_Users {
 
 		/* Filter the `request` vars. */
 		//add_filter( 'request', array( $this, 'request' ) );
+		add_action( 'pre_user_query', array( $this, 'pre_user_query' ) );
 
 		/* Enqueue custom styles. */
 		add_action( 'admin_enqueue_scripts', array( $this, 'print_styles'  ) );
@@ -67,24 +64,31 @@ final class Message_Board_Admin_Users {
 
 		/* Handle custom columns. */
 		add_filter( 'manage_users_columns',          array( $this, 'columns'          )        );
-		//add_filter( 'manage_users_sortable_columns', array( $this, 'sortable_columns' )        );
+		add_filter( 'manage_users_sortable_columns', array( $this, 'sortable_columns' )        );
 		add_action( 'manage_users_custom_column',    array( $this, 'custom_column'    ), 10, 3 );
 	}
 
 	/**
-	 * Filter on the `request` hook to change what posts are loaded.
+	 * Filter on the user query to change the users loaded.
 	 *
 	 * @since  1.0.0
 	 * @access public
-	 * @param  array  $vars
-	 * @return array
+	 * @param  object  $query
+	 * @return void
 	 */
-	public function request( $vars ) {
+	public function pre_user_query( $query ) {
 
-		$new_vars = array();
+		if ( 'topic_count' === $query->get( 'orderby' ) ) {
 
-		/* Return the vars, merging with the new ones. */
-		return array_merge( $vars, $new_vars );
+			$query->set( 'orderby', 'meta_value_num'                    );
+			$query->set( 'meta_key', mb_get_user_topic_count_meta_key() );
+		}
+
+		elseif ( 'reply_count' === $query->get( 'orderby' ) ) {
+
+			$query->set( 'orderby', 'meta_value_num'                    );
+			$query->set( 'meta_key', mb_get_user_reply_count_meta_key() );
+		}
 	}
 
 	/**
@@ -142,7 +146,7 @@ final class Message_Board_Admin_Users {
 	 */
 	public function sortable_columns( $columns ) {
 
-		$columns['topics']  = array( 'topic_count', false );
+		$columns['topics']  = array( 'topic_count', true );
 		$columns['replies'] = array( 'reply_count', true );
 
 		return $columns;
