@@ -51,7 +51,7 @@ final class Message_Board_Admin_Users {
 
 		/* Filter the `request` vars. */
 		//add_filter( 'request', array( $this, 'request' ) );
-		add_action( 'pre_user_query', array( $this, 'pre_user_query' ) );
+		add_action( 'pre_get_users', array( $this, 'pre_get_users' ) );
 
 		/* Enqueue custom styles. */
 		add_action( 'admin_enqueue_scripts', array( $this, 'print_styles'  ) );
@@ -76,7 +76,7 @@ final class Message_Board_Admin_Users {
 	 * @param  object  $query
 	 * @return void
 	 */
-	public function pre_user_query( $query ) {
+	public function pre_get_users( $query ) {
 
 		if ( 'topic_count' === $query->get( 'orderby' ) ) {
 
