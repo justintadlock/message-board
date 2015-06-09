@@ -118,6 +118,7 @@ function mb_get_keymaster_role_caps() {
 		'read_private_forums'  => true,
 		'read_hidden_forums'   => true,
 		'read_archived_forums' => true,
+		'read_others_forums'   => true,
 
 		// Topic caps
 		'create_topics'        => true,
@@ -142,6 +143,7 @@ function mb_get_keymaster_role_caps() {
 		'read_topics'          => true,
 		'read_private_topics'  => true,
 		'read_hidden_topics'   => true,
+		'read_others_topics'   => true,
 
 		// Reply caps
 		'create_replies'      => true,
@@ -150,6 +152,7 @@ function mb_get_keymaster_role_caps() {
 		'edit_others_replies' => true,
 		'edit_spam_replies'   => true,
 		'read_replies'        => true,
+		'read_others_replies' => true,
 	);
 
 	return apply_filters( 'mb_get_keymaster_role_caps', $caps );
@@ -184,6 +187,7 @@ function mb_get_moderator_role_caps() {
 		'read_private_forums'  => true,
 		'read_hidden_forums'   => true,
 		'read_archived_forums' => true,
+		'read_others_forums'   => true,
 
 		// Topic caps
 		'create_topics'        => true,
@@ -208,6 +212,8 @@ function mb_get_moderator_role_caps() {
 		'read_topics'          => true,
 		'read_private_topics'  => true,
 		'read_hidden_topics'   => true,
+		'read_others_topics'   => true,
+		'read_others_replies'  => true,
 
 		// Reply caps
 		'create_replies'      => true,
@@ -235,6 +241,7 @@ function mb_get_participant_role_caps() {
 		'read_forums'          => true,
 		'read_private_forums'  => true,
 		'read_archived_forums' => true,
+		'read_others_forums'   => true,
 
 		// Topic caps
 		'create_topics'        => true,
@@ -243,11 +250,13 @@ function mb_get_participant_role_caps() {
 		'edit_open_topics'     => true,
 		'read_topics'          => true,
 		'read_private_topics'  => true,
+		'read_others_topics'   => true,
 
 		// Reply caps
 		'create_replies'      => true,
 		'edit_replies'        => true,
 		'read_replies'        => true,
+		'read_others_replies' => true,
 	);
 
 	return apply_filters( 'mb_get_participant_role_caps', $caps );
@@ -267,13 +276,16 @@ function mb_get_spectator_role_caps() {
 		'read_forums'          => true,
 		'read_private_forums'  => true,
 		'read_archived_forums' => true,
+		'read_others_forums'   => true,
 
 		// Topic caps
 		'read_topics'          => true,
 		'read_private_topics'  => true,
+		'read_others_topics'   => true,
 
 		// Reply caps
 		'read_replies'        => true,
+		'read_others_replies' => true,
 	);
 
 	return apply_filters( 'mb_get_spectator_role_caps', $caps );
@@ -312,6 +324,7 @@ function mb_get_banned_role_caps() {
 		'read_private_forums'  => false,
 		'read_hidden_forums'   => false,
 		'read_archived_forums' => false,
+		'read_others_forums'   => false,
 
 		// Topic caps
 		'create_topics'        => false,
@@ -336,6 +349,7 @@ function mb_get_banned_role_caps() {
 		'read_topics'          => false,
 		'read_private_topics'  => false,
 		'read_hidden_topics'   => false,
+		'read_others_topics'   => false,
 
 		// Reply caps
 		'create_replies'      => false,
@@ -344,6 +358,7 @@ function mb_get_banned_role_caps() {
 		'edit_others_replies' => false,
 		'edit_spam_replies'   => false,
 		'read_replies'        => false,
+		'read_others_replies' => false,
 	);
 
 	return apply_filters( 'mb_get_banned_role_caps', $caps );

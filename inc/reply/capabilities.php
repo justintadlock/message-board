@@ -37,6 +37,8 @@ function mb_get_reply_capabilities() {
 		'edit_posts'             => 'edit_replies',
 		'edit_others_posts'      => 'edit_others_replies',
 
+		'read_others_replies'     => 'read_replies', // custom
+
 		// primitive caps used inside of map_meta_cap()
 		'edit_published_posts'   => 'edit_replies',
 		'edit_spam_replies'      => 'edit_spam_replies',     // custom
@@ -82,8 +84,11 @@ function mb_reply_map_meta_cap( $caps, $cap, $user_id, $args ) {
 
 				$post_type  = get_post_type_object( $post->post_type );
 
-				$caps = array();
-				//$caps[] = $post_type->cap->read;
+				if ( $post_type->cap->read !== $post_type->cap->read_others_replies )
+					$caps[] = $post_type->cap->read_others_replies;
+
+				else
+					$caps = array();
 			}
 		} else {
 			$caps = array();

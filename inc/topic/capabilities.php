@@ -45,6 +45,7 @@ function mb_get_topic_capabilities() {
 
 		'read_private_posts'     => 'read_private_topics',
 		'read_hidden_topics'     => 'read_hidden_topics', // custom
+		'read_others_topics'     => 'read_topics',        // custom
 
 		// primitive caps used inside of map_meta_cap()
 		'edit_published_posts'   => 'edit_topics',
@@ -107,6 +108,9 @@ function mb_topic_map_meta_cap( $caps, $cap, $user_id, $args ) {
 
 				elseif ( mb_get_private_post_status() === $status_obj->name )
 					$caps[] = $post_type->cap->read_private_posts;
+
+				elseif ( $post_type->cap->read !== $post_type->cap->read_others_topics )
+					$caps[] = $post_type->cap->read_others_topics;
 
 				else
 					$caps = array();

@@ -44,6 +44,7 @@ function mb_get_forum_capabilities() {
 		'read_private_posts'     => 'read_private_forums',
 		'read_hidden_forums'     => 'read_hidden_forums',   // custom
 		'read_archived_forums'   => 'read_archived_forums', // custom
+		'read_others_forums'     => 'read_forums',          // custom
 
 		// primitive caps used inside of map_meta_cap()
 		'edit_published_posts'   => 'edit_forums',
@@ -100,9 +101,11 @@ function mb_forum_map_meta_cap( $caps, $cap, $user_id, $args ) {
 				elseif ( mb_get_private_post_status() === $status_obj->name )
 					$caps[] = $post_type->cap->read_private_posts;
 
+				elseif ( $post_type->cap->read !== $post_type->cap->read_others_forums )
+					$caps[] = $post_type->cap->read_others_forums;
+
 				else
 					$caps = array();
-					//$caps[] = $post_type->cap->read;
 			}
 		} else {
 			$caps = array();
