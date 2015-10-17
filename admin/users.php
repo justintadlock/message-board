@@ -127,10 +127,8 @@ final class Message_Board_Admin_Users {
 	 */
 	public function columns( $columns ) {
 
-		/* Add custom columns. */
-		$columns['forum_role'] = __( 'Forum Role', 'message-board' );
-		$columns['topics']     = __( 'Topics',  'message-board' );
-		$columns['replies']    = __( 'Replies', 'message-board' );
+		$columns['topics']  = __( 'Topics',  'message-board' );
+		$columns['replies'] = __( 'Replies', 'message-board' );
 
 		/* Return the columns. */
 		return $columns;
@@ -163,14 +161,8 @@ final class Message_Board_Admin_Users {
 	 */
 	public function custom_column( $column, $column_name, $user_id ) {
 
-		/* Forum role column. */
-		if ( 'forum_role' === $column_name ) {
-
-			$role   = mb_get_user_role_name( $user_id );
-			$column = $role ? $role : '&mdash;';
-
 		/* Post status column. */
-		} elseif ( 'topics' === $column_name ) {
+		if ( 'topics' === $column_name ) {
 
 			$user_id     = mb_get_user_id( $user_id );
 			$topic_count = mb_get_user_topic_count( $user_id );

@@ -86,8 +86,8 @@ final class Message_Board_Admin {
 	}
 
 	/**
-	 * Adds admin menu items needed by the plugin.  Rather than having multiple top-level menu items 
-	 * like some plugins, which shall remain unnamed, we'll consolidate everything into a single 
+	 * Adds admin menu items needed by the plugin.  Rather than having multiple top-level menu items
+	 * like some plugins, which shall remain unnamed, we'll consolidate everything into a single
 	 * item.  Yay for no clutter!
 	 *
 	 * @since  1.0.0
@@ -125,7 +125,7 @@ final class Message_Board_Admin {
 	 * @access public
 	 * @return void
 	 */
-	function admin_notices() { 
+	function admin_notices() {
 
 		if ( !current_theme_supports( 'message-board' ) && current_user_can( 'switch_themes' ) ) { ?>
 			<div class="error">
@@ -173,8 +173,8 @@ final class Message_Board_Admin {
 	}
 
 	/**
-	 * Puts the post status links in the a better order. By default, WP will list these in the order 
-	 * they're registered.  Instead, we're going to put them in order from public, private, protected, 
+	 * Puts the post status links in the a better order. By default, WP will list these in the order
+	 * they're registered.  Instead, we're going to put them in order from public, private, protected,
 	 * and other.
 	 *
 	 * @since  1.0.0
@@ -210,7 +210,7 @@ final class Message_Board_Admin {
 	}
 
 	/**
-	 * Makes sure the correct post status is used when loading forums on the nav menus screen.  By 
+	 * Makes sure the correct post status is used when loading forums on the nav menus screen.  By
 	 * default, WordPress will only load them if they have the "publish" post status.
 	 *
 	 * @since  1.0.0
