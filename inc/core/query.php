@@ -1,6 +1,6 @@
 <?php
 /**
- * Handles query-related functionality.  In particular, this file's main purpose is to make sure each 
+ * Handles query-related functionality.  In particular, this file's main purpose is to make sure each
  * page is loading the posts that it is supposed to load.
  *
  * @package    MessageBoard
@@ -13,6 +13,9 @@
 
 /* Filter the arguments for grabbing posts. */
 add_action( 'pre_get_posts', 'mb_pre_get_posts' );
+
+// Filter the post SQL clauses.
+add_filter( 'posts_clauses', 'mb_posts_clauses', 10, 2 );
 
 /* Filter parse query. */
 add_action( 'parse_query', 'mb_parse_query' );
@@ -107,8 +110,8 @@ function mb_is_message_board() {
 
 	$is_message_board = false;
 
-	if ( 
-		   mb_is_search() 
+	if (
+		   mb_is_search()
 		|| mb_is_search_results()
 		|| mb_is_forum_login()
 		|| mb_is_edit()
@@ -119,7 +122,7 @@ function mb_is_message_board() {
 		|| mb_is_single_forum()
 		|| mb_is_single_topic()
 		|| mb_is_single_reply()
-		|| mb_is_single_user() 
+		|| mb_is_single_user()
 		|| mb_is_role_archive()
 		|| mb_is_single_role()
 	) {
@@ -275,7 +278,7 @@ function mb_pre_get_posts( $query ) {
 	}
 
 	/*
-	 * If viewing a user role archive. We're running this early in the page load to change the query 
+	 * If viewing a user role archive. We're running this early in the page load to change the query
 	 * var to match the actual role name. It's kind of hacky, but it gets the job done.
 	 */
 	elseif ( mb_is_user_archive() && get_query_var( 'mb_role' ) ) {
@@ -291,6 +294,35 @@ function mb_pre_get_posts( $query ) {
 
 		add_filter( 'the_posts', 'mb_posts_can_read_parent' );
 	}
+}
+
+/**
+ * This is a filter on `posts_clauses` that allows the plugin to work around core WP expecting
+ * hierarchical post types to have hierarchical permalinks.  Rather, we want our forums to be
+ * flat, so we need to make sure the correct forum is queried on single forum views.  We do this 
+ * by overwriting the "where" clause and querying by the post name.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  array   $clauses
+ * @param  object  $query
+ * @return array
+ */
+function mb_posts_clauses( $clauses, $query ) {
+	global $wpdb;
+
+	$type = mb_get_forum_post_type();
+
+	if ( $query->get( $type ) && $query->get( 'post_type' ) && $type === $query->get( 'post_type' ) ) {
+
+		$clauses['where'] = $wpdb->prepare(
+			" AND {$wpdb->posts}.post_name = %s AND {$wpdb->posts}.post_type = %s",
+			sanitize_title_for_query( $query->get( $type ) ),
+			$type
+		);
+	}
+
+	return $clauses;
 }
 
 /**
@@ -312,7 +344,7 @@ function mb_auth_posts_where( $where, $query ) {
 }
 
 /**
- * Filter on `the_posts` on single post views to make sure the current user can read the parent 
+ * Filter on `the_posts` on single post views to make sure the current user can read the parent
  * post.  Otherwise, return an empty array.  This will cause the page to properly 404.
  *
  * @since  1.0.0
@@ -483,7 +515,7 @@ function mb_add_stickies( $posts, $sticky_posts, $forum_id = 0 ) {
 }
 
 /**
- * Sets `$query->is_404` to `false` right after the query has been parsed when viewing the forum front 
+ * Sets `$query->is_404` to `false` right after the query has been parsed when viewing the forum front
  * page, which WP sets to 404 by default.
  *
  * @since  1.0.0

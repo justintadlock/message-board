@@ -1,10 +1,10 @@
 <?php
 /**
- * Sets up functions dealing with custom post types.  Registers post types.  Handles callbacks for some 
+ * Sets up functions dealing with custom post types.  Registers post types.  Handles callbacks for some
  * post-type related filters hooks.
  *
- * Note that the default post type names registered are `forum`, `forum_topic`, and `forum_reply`.  If 
- * coming from a different WordPress forum plugin, you can filter these names to be something that 
+ * Note that the default post type names registered are `forum`, `forum_topic`, and `forum_reply`.  If
+ * coming from a different WordPress forum plugin, you can filter these names to be something that
  * matched your old plugin.
  *
  * @package    MessageBoard
@@ -314,9 +314,9 @@ function mb_register_post_types() {
 }
 
 /**
- * Returns the top-level menu page.  This function is needed because the WordPress admin function 
- * `user_can_access_admin_page()` returns an incorrect result for sub-menu pages of post types 
- * when the user doesn't have permission to view the top-level page.  What this function does is 
+ * Returns the top-level menu page.  This function is needed because the WordPress admin function
+ * `user_can_access_admin_page()` returns an incorrect result for sub-menu pages of post types
+ * when the user doesn't have permission to view the top-level page.  What this function does is
  * change the top-level menu based on what capability the user does have.
  *
  * @link https://core.trac.wordpress.org/ticket/29714
@@ -351,7 +351,7 @@ function mb_get_admin_menu_page() {
 }
 
 /**
- * Changes the post type name to the "common" name used within the plugin.  Because the post type names 
+ * Changes the post type name to the "common" name used within the plugin.  Because the post type names
  * can be filtered, we need an easy way to track the common name.
  *
  * @since  1.0.0

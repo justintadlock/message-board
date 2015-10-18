@@ -25,7 +25,7 @@ function mb_natural_time( $from, $to = '', $limit = 1 ) {
 
 	$result = array();
 
-	$l10n = array( 
+	$l10n = array(
 		array( YEAR_IN_SECONDS,     _nx_noop( '%s year',   '%s years',   'time ago', 'message-board' ) ),
 		array( 30 * DAY_IN_SECONDS, _nx_noop( '%s month',  '%s months',  'time ago', 'message-board' ) ),
 		array( WEEK_IN_SECONDS,     _nx_noop( '%s week',   '%s weeks',   'time ago', 'message-board' ) ),
@@ -52,8 +52,8 @@ function mb_natural_time( $from, $to = '', $limit = 1 ) {
 	$result = implode( _x( ', ', 'natural time separator', 'message-board' ), $result );
 	$result = sprintf( $label, $result );
 
-	return apply_filters( 'mb_natural_time', $result, $from, $to, $limit, $diff ); 
-} 
+	return apply_filters( 'mb_natural_time', $result, $from, $to, $limit, $diff );
+}
 
 /**
  * Post kses filter for topics/replies.
@@ -68,7 +68,7 @@ function mb_filter_post_kses( $content ) {
 }
 
 /**
- * Function for using backticks to wrap text in code tags. This is code from the original standalone 
+ * Function for using backticks to wrap text in code tags. This is code from the original standalone
  * bbPress software (not the plugin).
  *
  * @author    bbPress
@@ -92,7 +92,7 @@ function mb_code_trick( $text ) {
 }
 
 /**
- * Function for reversing the `mb_code_trick()` output. This is code from the original standalone 
+ * Function for reversing the `mb_code_trick()` output. This is code from the original standalone
  * bbPress software (not the plugin).
  *
  * @author    bbPress
@@ -120,7 +120,7 @@ function mb_code_trick_reverse( $text ) {
 
 /**
  * Function for encoding HTML and wrapping the output in `<code>` and `<pre>` tags.  Used along with the
- * `mb_code_trick()` function as a callback. This is code from the original standalone bbPress software 
+ * `mb_code_trick()` function as a callback. This is code from the original standalone bbPress software
  * (not the plugin).
  *
  * @author    bbPress
@@ -156,8 +156,8 @@ function mb_encodeit( $matches ) {
 }
 
 /**
- * Function for decoding encoded HTML and wrapping the output in backtick (`) characters.  Used along with 
- * the `mb_code_trick_reverse()` function as a callback. This is code from the original standalone bbPress 
+ * Function for decoding encoded HTML and wrapping the output in backtick (`) characters.  Used along with
+ * the `mb_code_trick_reverse()` function as a callback. This is code from the original standalone bbPress
  * software (not the plugin).
  *
  * @author    bbPress

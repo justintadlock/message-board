@@ -1,6 +1,6 @@
 <?php
 /**
- * Adds custom rewrite rules and related functionality.  This file houses the functions for getting the 
+ * Adds custom rewrite rules and related functionality.  This file houses the functions for getting the
  * correct slugs for various pages of the board.
  *
  * @package    MessageBoard
@@ -13,6 +13,32 @@
 
 /* Add custom rewrite rules. */
 add_action( 'init', 'mb_rewrite_rules', 5 );
+
+// Filter the forum rewrite tag.
+add_action( 'registered_post_type', 'mb_forum_rewrite_tags', 5, 2 );
+
+function mb_forum_rewrite_tags( $post_type, $args ) {
+
+	if ( mb_get_forum_post_type() !== $post_type )
+		return;
+
+	add_rewrite_tag( "%{$post_type}%", '([^/]+)', $args->query_var ? "{$args->query_var}=" : "post_type={$post_type}&pagename=" );
+
+//	add_rewrite_tag("%{$post_type}%", '([^/]+)', "post_type=$post_type&pagename=");
+
+		$permastruct_args = $args->rewrite;
+		$permastruct_args['feed'] = $permastruct_args['feeds'];
+	add_permastruct( $post_type, mb_get_forum_slug() . "/%{$post_type}%", $permastruct_args );
+
+}
+//	add_filter( "forum_rewrite_rules", 'mb_forum_rewrite_rules' );
+
+function mb_forum_rewrite_rules( $rules ) {
+
+//	wp_die( var_dump( $rules ) );
+
+	return $rules;
+}
 
 /* Cancel redirect on paged single forums and topics. */
 add_filter( 'redirect_canonical', 'mb_redirect_canonical', 10, 2 );
@@ -140,7 +166,7 @@ function mb_query_vars( $vars ) {
 }
 
 /**
- * Sets up custom rewrite rules for pages that aren't handled by the CPT and CT APIs but are needed by 
+ * Sets up custom rewrite rules for pages that aren't handled by the CPT and CT APIs but are needed by
  * the plugin.
  *
  * @since  1.0.0
@@ -194,7 +220,23 @@ function mb_rewrite_rules() {
 }
 
 /**
- * Overwrites the rewrite rules for the `topic` post type.  In particular, we need to handle the 
+ * Changes the forum post type to use a non-hierarchical permalink structure, even though the
+ * post type itself is hierarchical.
+ *
+ * @since  1.0.0
+ * @access public
+ * @return void
+ */
+function mb_forum_rewrite_tag( $post_type, $args ) {
+
+//	if ( mb_get_forum_post_type() === $post_type )
+//		add_rewrite_tag( "%{$post_type}%", '([^/]+)', $args->query_var ? "{$args->query_var}=" : "post_type={$post_type}&pagename=" );
+
+//		add_rewrite_tag( "%{$post_type}%", '([^/]+)', $post_type ? "{$post_type}=" : "post_type={$post_type}&name=" );
+}
+
+/**
+ * Overwrites the rewrite rules for the `topic` post type.  In particular, we need to handle the
  * pagination on singular topics because the `reply` post type is paginated on this page.
  *
  * @todo See if this can be simplified where we're only taking care of the things we need.
