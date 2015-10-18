@@ -319,6 +319,9 @@ final class Message_Board {
 		if ( class_exists( 'Breadcrumb_Trail' ) )
 			require_once( $this->dir_path . 'inc/ext/breadcrumb-trail.php' );
 
+		if ( class_exists( 'Members_Plugin' ) )
+			require_once( $this->dir_path . 'inc/ext/members.php' );
+
 		/* Load admin files. */
 		if ( is_admin() ) {
 
