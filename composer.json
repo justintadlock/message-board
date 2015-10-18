@@ -1,0 +1,27 @@
+{
+    "name": "justintadlock/message-board",
+    "description": "A simple WordPress forum plugin for us simple folks.",
+    "type": "wordpress-plugin",
+    "keywords": [
+        "forum",
+        "message board",
+        "bulletin board",
+        "wordpress"
+    ],
+    "homepage": "https://github.com/justintadlock/message-board",
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "Justin Tadlock",
+            "email": "justin@justintadlock.com",
+            "homepage": "http://justintadlock.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/justintadlock/message-board/issues",
+        "forum" : "http://themehybrid.com/board/forums/message-board"
+    },
+    "require": {
+        "composer/installers": "~1.0"
+    }
+}
