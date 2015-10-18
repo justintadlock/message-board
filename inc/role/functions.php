@@ -1,13 +1,13 @@
 <?php
 /**
- * Complete Roles API for extending WordPress' role system with dynamic, on-the-fly roles.  Message Board 
- * uses custom forum roles for handling permissions.  The reason for this is so that users don't have to 
- * figure out the complexities of setting capabilities for their roles.  They can essentially plug and 
- * play.  The secondary reason is that it allows us to keep the forum roles system separate from the main 
+ * Complete Roles API for extending WordPress' role system with dynamic, on-the-fly roles.  Message Board
+ * uses custom forum roles for handling permissions.  The reason for this is so that users don't have to
+ * figure out the complexities of setting capabilities for their roles.  They can essentially plug and
+ * play.  The secondary reason is that it allows us to keep the forum roles system separate from the main
  * WordPress roles or other custom roles.
  *
- * The plugin's forum roles system still works within the bounds of WordPress roles/caps system.  We're 
- * just building on top of it.  Plugin developers can register custom roles, unregister the default roles 
+ * The plugin's forum roles system still works within the bounds of WordPress roles/caps system.  We're
+ * just building on top of it.  Plugin developers can register custom roles, unregister the default roles
  * or even overwrite the defaults.  If adding custom roles, devs must use the `mb_register_roles` hook.
  *
  * @todo Figure out why the heck dynamic roles keep getting added to the database. :(
@@ -31,6 +31,9 @@ add_action( 'set_current_user', 'mb_set_current_user_role', 0 );
 
 /* Filter the editable roles. */
 add_filter( 'editable_roles', 'mb_editable_roles_filter' );
+
+// Make sure forum role doesn't get wiped out.
+add_action( 'set_user_role', 'mb_overwrite_set_user_role', 10, 3 );
 
 /**
  * Returns the role ID/slug for the forum keymaster role.
@@ -292,8 +295,8 @@ function mb_get_spectator_role_caps() {
 }
 
 /**
- * Returns the capabilities for the banned forum role. Note that we're explicitly denying all 
- * forum-related capabilities for this role.  This means that any user with this role, regardless of 
+ * Returns the capabilities for the banned forum role. Note that we're explicitly denying all
+ * forum-related capabilities for this role.  This means that any user with this role, regardless of
  * any other roles they have, will be denied forum permissions.
  *
  * @since  1.0.0
@@ -378,7 +381,7 @@ function mb_register_roles() {
 	/* Keymaster role args. */
 	$keymaster_args = array(
 		'labels' => array(
-			'plural_name'   => __( 'Keymasters', 'message-board' ), 
+			'plural_name'   => __( 'Keymasters', 'message-board' ),
 			'singular_name' => __( 'Keymaster',  'message-board' ),
 		),
 		'capabilities'   => mb_get_keymaster_role_caps(),
@@ -388,7 +391,7 @@ function mb_register_roles() {
 	/* Moderator role args. */
 	$moderator_args = array(
 		'labels' => array(
-			'plural_name'   => __( 'Moderators', 'message-board' ), 
+			'plural_name'   => __( 'Moderators', 'message-board' ),
 			'singular_name' => __( 'Moderator',  'message-board' ),
 		),
 		'capabilities'   => mb_get_moderator_role_caps(),
@@ -398,7 +401,7 @@ function mb_register_roles() {
 	/* Participant role args. */
 	$participant_args = array(
 		'labels' => array(
-			'plural_name'   => __( 'Participants', 'message-board' ), 
+			'plural_name'   => __( 'Participants', 'message-board' ),
 			'singular_name' => __( 'Participant',  'message-board' ),
 		),
 		'capabilities'   => mb_get_participant_role_caps(),
@@ -408,7 +411,7 @@ function mb_register_roles() {
 	/* Spectator role args. */
 	$spectator_args = array(
 		'labels' => array(
-			'plural_name'   => __( 'Spectators', 'message-board' ), 
+			'plural_name'   => __( 'Spectators', 'message-board' ),
 			'singular_name' => __( 'Spectator',  'message-board' ),
 		),
 		'capabilities'   => mb_get_spectator_role_caps(),
@@ -418,7 +421,7 @@ function mb_register_roles() {
 	/* Banned role args. */
 	$banned_args = array(
 		'labels' => array(
-			'plural_name'   => __( 'Banned', 'message-board' ), 
+			'plural_name'   => __( 'Banned', 'message-board' ),
 			'singular_name' => __( 'Banned',  'message-board' ),
 		),
 		'capabilities'   => mb_get_banned_role_caps(),
@@ -440,8 +443,8 @@ function mb_register_roles() {
 }
 
 /**
- * Merges user roles with WordPress.  Typically, WordPress roles are saved to the database.  We're going 
- * to bypass this and hook our roles into other roles when the page is loaded.  This allows us to keep the 
+ * Merges user roles with WordPress.  Typically, WordPress roles are saved to the database.  We're going
+ * to bypass this and hook our roles into other roles when the page is loaded.  This allows us to keep the
  * roles dynamic without having to save them to the DB.
  *
  * @since  1.0.0
@@ -457,7 +460,7 @@ function mb_merge_roles() {
 		$wp_roles = new WP_Roles();
 
 	/*
-	 * Loop through each of the dynamic roles and merge them with the `$wp_roles` array. This is 
+	 * Loop through each of the dynamic roles and merge them with the `$wp_roles` array. This is
 	 * kind of hacky, but it's the best we can do because there's no API for dynamic roles in WP.
 	 */
 	foreach ( mb_get_dynamic_roles() as $role => $args ) {
@@ -494,8 +497,8 @@ function mb_option_user_roles_filter( $roles ) {
  * @param  array   $args {
  *     Array of arguments for registering a user forum role.
  *
- *     @type  array  $capabilities  Key/value pairs of capabilities.  The key should be the capability 
- *                                  and the value should `TRUE` to explicity grant a cap or `FALSE` to 
+ *     @type  array  $capabilities  Key/value pairs of capabilities.  The key should be the capability
+ *                                  and the value should `TRUE` to explicity grant a cap or `FALSE` to
  *                                  explicitly deny a cap.
  *     @type  array  $labels        Array of internationalized labels for this role.
  *     @type  string $description   Description of the role.
@@ -562,10 +565,10 @@ function mb_get_role_object( $role = '' ) {
 }
 
 /**
- * Returns an array of the plugin's dynamic roles.  These roles are "dynamic" because they are not saved in 
+ * Returns an array of the plugin's dynamic roles.  These roles are "dynamic" because they are not saved in
  * the database.  Instead, they're added early in the page load.
  *
- * Developers can overwrite the default roles with custom ones. If doing so, it is recommended to use the 
+ * Developers can overwrite the default roles with custom ones. If doing so, it is recommended to use the
  * API (e.g., `mb_register_role()`, `mb_unregister_role()`).
  *
  * @since  1.0.0
@@ -814,9 +817,9 @@ function mb_get_role_link( $role = '' ) {
 }
 
 /**
- * Maps default WordPress roles to the plugin's roles.  This is the default used when a user doesn't yet 
- * have a forum role.  Developers can add custom-created roles to the map using a filter on the 
- * `mb_get_role_map` hook.  Roles are mapped in key/value pairs.  The key is the WP or custom role.  The 
+ * Maps default WordPress roles to the plugin's roles.  This is the default used when a user doesn't yet
+ * have a forum role.  Developers can add custom-created roles to the map using a filter on the
+ * `mb_get_role_map` hook.  Roles are mapped in key/value pairs.  The key is the WP or custom role.  The
  * value is the forum role to map it to.
  *
  * @since  1.0.0
@@ -882,6 +885,41 @@ function mb_editable_roles_filter( $roles ) {
 	}
 
 	return $roles;
+}
+
+/**
+ * Action on the `set_user_role` hook that makes sure that a user's forum role doesn't get wiped
+ * when WP or another plugin calls `set_user_role()` instead of `add_user_role()`, which is
+ * often the most appropriate function to call.
+ *
+ * @since  1.0.0
+ * @access public
+ * @param  int     $user_id
+ * @param  string  $role
+ * @param  array   $old_roles
+ * @return void
+ */
+function mb_overwrite_set_user_role( $user_id, $role, $old_roles ) {
+
+	// Bail if there are no old roles.
+	if ( empty( $old_roles ) )
+		return;
+
+	// Get the forum roles.
+	$forum_roles = array_keys( mb_get_dynamic_roles() );
+
+	// Bail if the role being set is a forum role.
+	if ( in_array( $role, $forum_roles ) )
+		return;
+
+	// Get the user previously had any forum roles.
+	$has_forum_roles = array_intersect( $forum_roles, $old_roles );
+
+	// If the user had forum roles, get the first and add it.
+	if ( $has_forum_roles ) {
+		$user = new WP_User( $user_id );
+		$user->add_role( reset( $has_forum_roles ) );
+	}
 }
 
 /**
