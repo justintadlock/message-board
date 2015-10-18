@@ -83,7 +83,7 @@ final class Message_Board {
 	public $topic_types = array();
 
 	/**
-	 * Forum query.  Is assigned a WP_Query object.  On forum archive/single views, this is the 
+	 * Forum query.  Is assigned a WP_Query object.  On forum archive/single views, this is the
 	 * main `$wp_query` object.
 	 *
 	 * @since  1.0.0
@@ -93,7 +93,7 @@ final class Message_Board {
 	public $forum_query;
 
 	/**
-	 * Sub-forum query.  Is assigned a WP_Query object.  This is only useful when getting the sub-forums 
+	 * Sub-forum query.  Is assigned a WP_Query object.  This is only useful when getting the sub-forums
 	 * of a particular forum.
 	 *
 	 * @since  1.0.0
@@ -103,7 +103,7 @@ final class Message_Board {
 	public $subforum_query;
 
 	/**
-	 * Topic query.  Is assigned a WP_Query object.  On topic single/archive views, this is the 
+	 * Topic query.  Is assigned a WP_Query object.  On topic single/archive views, this is the
 	 * main `$wp_query` object.
 	 *
 	 * @since  1.0.0
@@ -113,7 +113,7 @@ final class Message_Board {
 	public $topic_query;
 
 	/**
-	 * Reply query.  Is assigned a WP_Query object.  This is mainly useful on single topic views, 
+	 * Reply query.  Is assigned a WP_Query object.  This is mainly useful on single topic views,
 	 * where it is used to display the replies to the current topic.
 	 *
 	 * @since  1.0.0
@@ -123,7 +123,7 @@ final class Message_Board {
 	public $reply_query;
 
 	/**
-	 * Search query.  Is assigned a WP_Query object.  This is the `$wp_query` object when viewing 
+	 * Search query.  Is assigned a WP_Query object.  This is the `$wp_query` object when viewing
 	 * a forum search results page.
 	 *
 	 * @since  1.0.0
@@ -133,7 +133,7 @@ final class Message_Board {
 	public $search_query;
 
 	/**
-	 * User query. This holds the results of `get_users()` and is particularly useful for the user 
+	 * User query. This holds the results of `get_users()` and is particularly useful for the user
 	 * archive page.
 	 *
 	 * @since  1.0.0
@@ -143,7 +143,7 @@ final class Message_Board {
 	public $user_query = null;
 
 	/**
-	 * Role query. This holds the results of `mb_get_dynamic_roles()` and is used on the role 
+	 * Role query. This holds the results of `mb_get_dynamic_roles()` and is used on the role
 	 * archive page.
 	 *
 	 * @since  1.0.0
@@ -404,19 +404,18 @@ final class Message_Board {
 		/* Set the current user's forum role so that they can access forum stuff. */
 		mb_set_current_user_role();
 
-		/*
-		 * Temporary code to simplify post type names and to match bbPress.
-		 *
+		/**
+		// Temporary code to simplify post type names and to match bbPress.
 		global $wpdb;
 
 		$wpdb->query( "UPDATE  {$wpdb->posts} SET  post_type = 'topic' WHERE  post_type = 'forum_topic'" );
 		$wpdb->query( "UPDATE  {$wpdb->posts} SET  post_type = 'reply' WHERE  post_type = 'forum_reply'" );
-		*/
+		/**/
 	}
 }
 
 /**
- * Gets the instance of the Message_Board class.  This function is useful for quickly grabbing data 
+ * Gets the instance of the Message_Board class.  This function is useful for quickly grabbing data
  * used throughout the plugin.
  *
  * @since  1.0.0

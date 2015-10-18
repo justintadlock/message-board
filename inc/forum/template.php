@@ -1176,7 +1176,7 @@ function mb_forum_last_topic_id( $forum_id = 0 ) {
 }
 
 /**
- * Returns the forum last topic ID.  This returns the last topic by activity, which is not 
+ * Returns the forum last topic ID.  This returns the last topic by activity, which is not
  * necessarily the newest topic created.
  *
  * @since  1.0.0
@@ -1207,7 +1207,7 @@ function mb_forum_last_topic_url( $forum_id = 0 ) {
 }
 
 /**
- * Returns the forum last topic URL.  This returns the last topic by activity, which is not 
+ * Returns the forum last topic URL.  This returns the last topic by activity, which is not
  * necessarily the newest topic created.
  *
  * @since  1.0.0
@@ -1236,7 +1236,7 @@ function mb_forum_last_topic_link( $forum_id = 0 ) {
 }
 
 /**
- * Returns the forum last topic link.  This returns the last topic by activity, which is not 
+ * Returns the forum last topic link.  This returns the last topic by activity, which is not
  * necessarily the newest topic created.
  *
  * @since  1.0.0
@@ -1554,7 +1554,7 @@ function mb_forum_editor() {
 	add_action( 'wp_enqueue_editor', 'mb_dequeue_editor_scripts'  );
 	add_filter( 'the_editor',        'mb_forum_the_editor_filter' );
 
-	wp_editor( 
+	wp_editor(
 		format_to_edit( mb_code_trick_reverse( mb_get_forum_content( mb_get_forum_id(), 'raw' ) ) ),
 		'mb_forum_content',
 		array(

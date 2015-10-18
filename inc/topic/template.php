@@ -11,9 +11,9 @@
  */
 
 /**
- * Creates a new topic query and checks if there are any topics found.  Note that we ue the main 
- * WordPress query if viewing the topic archive or a single topic.  This function is a wrapper 
- * function for the standard WP `have_posts()`, but this function should be used instead because 
+ * Creates a new topic query and checks if there are any topics found.  Note that we ue the main
+ * WordPress query if viewing the topic archive or a single topic.  This function is a wrapper
+ * function for the standard WP `have_posts()`, but this function should be used instead because
  * it must also create a query of its own under some circumstances.
  *
  * @since  1.0.0
@@ -37,7 +37,7 @@ function mb_topic_query() {
 	/* Use the main WP query when viewing a single topic or topic archive. */
 	if ( mb_is_single_topic() || mb_is_topic_archive() || mb_is_user_page( array( 'topics', 'topic-subscriptions', 'bookmarks' ) ) ) {
 		global $wp_the_query;
-		
+
 		$mb->topic_query = $wp_the_query;
 	}
 
@@ -193,7 +193,7 @@ function mb_topic_allows_replies( $topic_id = 0 ) {
 /* ====== Lead Topic ====== */
 
 /**
- * Whether to show the topic when viewing a single topic page.  By default, the topic is shown 
+ * Whether to show the topic when viewing a single topic page.  By default, the topic is shown
  * on page #1, but it's not shown on subsequent pages if the topic is paginated.
  *
  * @since  1.0.0
@@ -1303,7 +1303,7 @@ function mb_topic_editor() {
 	add_action( 'wp_enqueue_editor', 'mb_dequeue_editor_scripts'  );
 	add_filter( 'the_editor',        'mb_topic_the_editor_filter' );
 
-	wp_editor( 
+	wp_editor(
 		format_to_edit( mb_code_trick_reverse( mb_get_topic_content( mb_get_topic_id(), 'raw' ) ) ),
 		'mb_topic_content',
 		array(
@@ -1386,7 +1386,7 @@ function mb_get_topic_subscribe_link( $topic_id = 0 ) {
 		$text    = mb_is_user_subscribed_topic( $user_id, $topic_id ) ? __( 'Unsubscribe', 'message-board' ) : __( 'Subscribe', 'message-board' );
 
 		if ( !empty( $url ) )
-			$link = sprintf( '<a class="mb-subscribe-link" href="%s">%s</a>', $url, $text ); 
+			$link = sprintf( '<a class="mb-subscribe-link" href="%s">%s</a>', $url, $text );
 	}
 
 	return apply_filters( 'mb_get_topic_subscribe_link', $link, $topic_id );
@@ -1464,7 +1464,7 @@ function mb_get_topic_bookmark_link( $topic_id = 0 ) {
 		$text    = mb_is_topic_user_bookmark( $user_id, $topic_id ) ? __( 'Unbookmark', 'message-board' ) : __( 'Bookmark', 'message-board' );
 
 		if ( !empty( $url ) )
-			$link = sprintf( '<a class="mb-bookmark-link" href="%s">%s</a>', $url, $text ); 
+			$link = sprintf( '<a class="mb-bookmark-link" href="%s">%s</a>', $url, $text );
 	}
 
 	return apply_filters( 'mb_get_topic_bookmark_link', $link, $topic_id );
